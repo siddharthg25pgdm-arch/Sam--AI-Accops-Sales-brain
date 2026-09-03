@@ -4,7 +4,7 @@ import { searchAssets, allAssets, slim, facetCounts, coverageGaps, verticalOf, t
 import { ask as askAgent, type AskResult } from "./agent";
 import { logEvent, recentEvents } from "./events";
 
-export type Channel = "web" | "api" | "mcp";
+export type Channel = "web" | "api" | "mcp" | "whatsapp";
 
 export function card(a: Asset, why?: string) {
   return {

@@ -1,6 +1,6 @@
 # SAM: Sales & Marketing Brain for Accops
 
-Design proposal, v0.5. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
+Design proposal, v0.6. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
 Status: Siddharth decided (4 Sep): OpenWA is acceptable for production because SAM is internal; build the codelab-shaped prototype first. Prototype 0 exists in `../prototype/` (see section 11). Remaining decisions in section 10.
 
 Companion artifact: `sam-query-simulation.html` in this folder. Open it in a browser and press Play.
@@ -104,7 +104,7 @@ T5 and T7 are the marketing-strategy payoff. They turn SAM's failures into a con
 |---|---|---|---|---|
 | Web app | Next.js on Vercel | Entra ID SSO | Rich cards, citations, trace panel (Perplexity/Grok style), library browser with card filters | Marketing's home: cards, freshness, gaps, analytics |
 | Teams bot | Bot Framework / Azure Bot | Entra ID (inherent) | Adaptive Cards with buttons for follow-ups | Sales' home |
-| WhatsApp | **OpenWA** (Siddharth's decision, 4 Sep: acceptable for an internal tool) on a dedicated Accops number | Phone verified against Entra user once, via a one-time code sent in Teams | Text, ≤3 links, public URLs first, SharePoint links marked "login" | Residual risk accepted: number can be banned without appeal; keep the handler webhook-shaped so a move to Meta's Cloud API is a config swap |
+| WhatsApp | **Meta WhatsApp Business Cloud API** (Siddharth's decision, 4 Sep evening, revised from OpenWA once hosting became the constraint: no server to run) | Number-to-login map in `SAM_WHATSAPP_USERS`; unregistered numbers get a one-line refusal | Text, ≤3 links, public URLs first, SharePoint links marked internal | Webhook at `/api/channels/whatsapp`, signature-verified, answers after the 200 so Meta never times out; free within the 24-hour service window |
 | API + MCP | REST (`/v1/...`) and an MCP server exposing the same tools | Per-user bearer token issued after Entra login | JSON only, no prose; the caller composes | Dwight extension is the first consumer |
 
 **MCP tools (and REST twins):**
@@ -140,7 +140,7 @@ Cloned to `~/sam-accops/research/`. Verdicts from a read of each:
 - `strategy/coordination/handoff-templates.md`: a From/To/Phase/Context/Deliverable/Acceptance/Evidence handoff schema. Adopt it as the message contract between SAM's router, analyst and composer so each step's output is inspectable.
 - Author SAM's agents in the same format (`<division>-<slug>.md`, persona sections separate from operations sections) so the repo's lint and convert scripts work on them.
 
-**OpenWA (rmyndharis).** MIT, NestJS, well engineered, active. It is an **unofficial** bridge over reverse-engineered WhatsApp Web clients (whatsapp-web.js or Baileys), needs a real phone linked by QR, and its own README says it is "not approved" where finance or regulatory compliance matters. Accops sells to banks. A ban would cut the sales team off with no appeal. Siddharth's decision (4 Sep): use OpenWA in production, since SAM is an internal tool and the ban risk is acceptable. Mitigations: dedicated number, no bulk sends, links only, and a handler written to the generic webhook shape so Meta's Cloud API remains a config swap if the number is ever lost.
+**OpenWA (rmyndharis).** MIT, NestJS, well engineered, active. It is an **unofficial** bridge over reverse-engineered WhatsApp Web clients (whatsapp-web.js or Baileys), needs a real phone linked by QR, and its own README says it is "not approved" where finance or regulatory compliance matters. Accops sells to banks. A ban would cut the sales team off with no appeal. Decision history: OpenWA was chosen on 4 Sep for an internal tool, then reversed the same evening when it turned out there is no VM or office server to host it. Final: Meta's WhatsApp Business Cloud API, built in section 14. OpenWA stays in `research/` as reference only.
 
 ## 9. Delivery plan
 
@@ -217,3 +217,9 @@ Auth for machines: `Authorization: Bearer <token>` with tokens from `SAM_API_TOK
 **Model options.** Default Claude Sonnet 5 (`CLAUDE_MODEL`), Haiku 4.5 supported (effort flag is skipped for it). An optional OpenAI-compatible provider (`LLM_PROVIDER=openai-compatible`) exists for free-tier models such as Groq or Cerebras. Caveat recorded: free tiers often reserve the right to train on prompts, and SAM's prompts carry customer names from case studies, so InfoSec should approve before any free tier is used. Without any key SAM runs retrieval-only, which is free and already answers "find me X".
 
 **WhatsApp hosting.** Siddharth has no VM or office server. Options: Oracle Cloud Always Free ARM instance (genuinely free, enough for OpenWA), Azure free-tier B1s (1 GB, too small for the Chromium engine), or a paid small VM at roughly the cost of a coffee a month. The alternative that needs no server at all is Meta's WhatsApp Business Cloud API, whose webhooks land directly on Vercel. Decision pending.
+
+## 14. WhatsApp channel on Meta's Cloud API (built 4 Sep 2026)
+
+`web/lib/whatsapp.ts` and `web/app/api/channels/whatsapp/route.ts`. Flow per inbound text: verify `X-Hub-Signature-256` with the app secret, extract text messages (statuses, media and reactions ignored), return 200 immediately, then in a post-response task: dedupe on message id, map the sender number to a SAM login, mark the message read with a typing indicator, run the same `apiAsk` as every other channel with a six-hour per-number history for follow-ups, render as verdict plus at most three links with public links first and internal ones labelled, send via the Graph API. Unregistered numbers get one refusal line and are logged as `unregistered`. Without an access token the route runs dry and logs the reply, which is how it was tested locally: handshake, wrong verify token, bad signature, signed message, unregistered sender, and replay of the same message id all behaved as specified, and the WhatsApp question appeared in the dashboard under the mapped login.
+
+What Siddharth must do on the Meta side is in `web/README.md` (about 30 minutes, needs a Meta Business account and a number that is not already on WhatsApp).

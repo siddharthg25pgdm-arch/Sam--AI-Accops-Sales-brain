@@ -48,5 +48,19 @@ claude mcp add --transport http sam https://sam-accops.vercel.app/api/mcp --head
 ```
 Calls made this way show up in the dashboard under the token's label with channel `api` or `mcp`.
 
+## WhatsApp channel (Meta Business Cloud API)
+Webhook: `https://sam-accops.vercel.app/api/channels/whatsapp`. Reps message the SAM number; SAM replies with a verdict and up to three links, public first, internal ones marked. Unregistered numbers get a one-line refusal. Follow-ups work for six hours per number.
+
+Meta setup, once (about 30 minutes, needs a Meta Business account and a number not already on WhatsApp):
+1. developers.facebook.com → Create app → Business → add the **WhatsApp** product.
+2. WhatsApp → API Setup: add the sender phone number, copy **Phone number ID**.
+3. Create a **System user** (Business settings → Users → System users), assign the app, generate a **permanent token** with `whatsapp_business_messaging` and `whatsapp_business_management`.
+4. App settings → Basic: copy the **App secret**.
+5. Set the five `WHATSAPP_*` / `SAM_WHATSAPP_USERS` variables in Vercel and redeploy.
+6. WhatsApp → Configuration → Webhook: callback URL above, verify token = your `WHATSAPP_VERIFY_TOKEN`, subscribe to **messages**.
+7. Send "hi" from a registered number. Replies inside 24 hours of a user message are free service messages.
+
+Without `WHATSAPP_ACCESS_TOKEN` the route runs in dry-run mode and logs what it would have sent.
+
 ## Not in this version
 SharePoint ingestion (cards come from the files on Siddharth's disk), public URLs (all assets show as internal until the bucket map exists), embeddings, Teams, WhatsApp, Slack. Those are channels and feeds onto the same engine; see `../docs/2026-09-04-sam-design.md`.
