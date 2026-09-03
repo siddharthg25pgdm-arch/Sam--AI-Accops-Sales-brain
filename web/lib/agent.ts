@@ -69,15 +69,19 @@ export function heuristicFilters(q: string) {
 
 export async function ask(question: string, history: { role: "user" | "assistant"; content: string }[] = []): Promise<AskResult> {
   const t0 = Date.now();
+  const providerErrors: string[] = [];
   if (openAICompatConfigured()) {
     try { return await askOpenAICompat(question, history, t0); }
-    catch (err) { console.error("openai-compatible path failed, falling back", err); }
+    catch (err) { console.error("openai-compatible path failed, falling back", err); providerErrors.push(`${process.env.OPENAI_COMPAT_MODEL}: ${(err as Error).message}`); }
   }
   if (process.env.ANTHROPIC_API_KEY) {
     try { return await askClaude(question, history, t0); }
-    catch (err) { console.error("claude path failed, falling back", err); }
+    catch (err) { console.error("claude path failed, falling back", err); providerErrors.push(`${process.env.CLAUDE_MODEL ?? "claude"}: ${(err as Error).message}`); }
   }
-  return askLocal(question, t0);
+  const local = askLocal(question, t0);
+  // Surface provider failures in the trace so a silent fallback is visible in the UI, API and dashboard.
+  for (const e of providerErrors) local.trace.unshift({ step: "model provider failed, fell back to retrieval", detail: e.slice(0, 300) });
+  return local;
 }
 
 async function askClaude(question: string, history: { role: "user" | "assistant"; content: string }[], t0: number): Promise<AskResult> {
