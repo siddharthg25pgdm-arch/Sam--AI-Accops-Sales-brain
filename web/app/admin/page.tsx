@@ -15,7 +15,7 @@ export default async function Admin() {
   const opens = events.filter(e => e.kind === "catalogue_open");
   const gaps = events.filter(e => e.kind === "gap");
   const users = new Set(events.map(e => e.user_id));
-  const zero = queries.filter(q => (q.result_count ?? 0) === 0).length;
+  const zero = queries.filter(q => q.intent === "gap" || (q.result_count ?? 0) === 0).length;
   const helpful = feedback.filter(f => f.feedback === "helpful").length;
   const resolved = queries.length ? Math.round(((queries.length - zero) / queries.length) * 100) : null;
 
@@ -47,7 +47,7 @@ export default async function Admin() {
         <div className="stats">
           <div className="stat"><small>People who used SAM</small><b className="tnum">{users.size}</b></div>
           <div className="stat"><small>Questions asked</small><b className="tnum">{queries.length}</b></div>
-          <div className="stat"><small>Answered with at least one asset</small><b className="tnum">{resolved === null ? "–" : `${resolved}%`}</b></div>
+          <div className="stat"><small>Answered with an exact match</small><b className="tnum">{resolved === null ? "–" : `${resolved}%`}</b></div>
           <div className="stat"><small>Rated helpful</small><b className="tnum">{feedback.length ? `${helpful}/${feedback.length}` : "–"}</b></div>
           <div className="stat"><small>Catalogue opens</small><b className="tnum">{opens.length}</b></div>
           <div className="stat"><small>Content gaps logged</small><b className="tnum">{gaps.length}</b></div>
