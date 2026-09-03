@@ -1,8 +1,8 @@
 """SAM agent definition: instruction + tools. Provider-neutral.
 
-runtime.py wraps this with either Google ADK (Gemini, as in the codelab) or the Anthropic tool runner
-(Claude), depending on which API key is present. With no key at all, a local retrieval-only runtime
-runs the tool directly so the interface and data can still be demonstrated.
+runtime.py wraps this with the Anthropic tool runner (Claude) when ANTHROPIC_API_KEY is present.
+With no key, a local retrieval-only runtime runs the tool directly so the interface and data can
+still be demonstrated.
 """
 from sam_tools import search_assets, list_catalog_summary
 

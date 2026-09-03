@@ -1,16 +1,16 @@
-"""Agent runtime: the box labelled "Agent Runtime" in the codelab diagram.
+"""Agent runtime: the "Agent Runtime" box in the architecture. (The Google codelab diagram was the
+shape reference only; SAM is built on Claude, not Gemini.)
 
-Three interchangeable implementations, chosen by environment:
-  GOOGLE_API_KEY or GEMINI_API_KEY  -> ADKRuntime    (Google ADK LlmAgent + InMemoryRunner, Gemini)  [codelab-faithful]
-  ANTHROPIC_API_KEY                 -> ClaudeRuntime (Anthropic SDK tool runner, Claude Opus 5)
-  neither                           -> LocalRuntime  (no model; runs the search tool directly so the UI and data work)
+Two implementations, chosen by environment:
+  ANTHROPIC_API_KEY  -> ClaudeRuntime (Anthropic SDK tool runner, Claude Opus 5)
+  no key             -> LocalRuntime  (no model; runs the search tool directly so the UI and data work)
 
-Set SAM_RUNTIME=adk|claude|local to force one. Every runtime returns the same shape:
+Set SAM_RUNTIME=claude|local to force one. Both return the same shape:
   {"text": str, "trace": [ {"step": str, "detail": str} ... ], "runtime": str}
-so app.py never needs to know which model is behind it.
+so app.py never needs to know which is behind it.
 """
 from __future__ import annotations
-import asyncio, json, os, re, time, uuid
+import json, os, re, time, uuid
 from dotenv import load_dotenv
 import agent as sam_agent
 from sam_tools import search_assets, list_catalog_summary, VERTICAL_SYNONYMS
@@ -19,43 +19,11 @@ load_dotenv()
 
 def _choose() -> str:
     forced = os.getenv("SAM_RUNTIME", "").lower()
-    if forced in {"adk", "claude", "local"}:
+    if forced in {"claude", "local"}:
         return forced
-    if os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY"):
-        return "adk"
     if os.getenv("ANTHROPIC_API_KEY"):
         return "claude"
     return "local"
-
-# ---------------------------------------------------------------- ADK (Gemini), as in the codelab
-class ADKRuntime:
-    name = "adk"
-    def __init__(self) -> None:
-        from google.adk.agents import LlmAgent
-        from google.adk.runners import InMemoryRunner
-        self.model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
-        self.agent = LlmAgent(name=sam_agent.AGENT_NAME, model=self.model,
-                              instruction=sam_agent.INSTRUCTION, tools=sam_agent.TOOLS)
-        self.runner = InMemoryRunner(agent=self.agent)
-
-    def ask(self, prompt: str, session_id: str) -> dict:
-        t0 = time.time()
-        events = asyncio.run(self.runner.run_debug(prompt, session_id=session_id))
-        trace, text = [], []
-        for ev in events:
-            content = getattr(ev, "content", None)
-            for part in (getattr(content, "parts", None) or []):
-                fc = getattr(part, "function_call", None)
-                fr = getattr(part, "function_response", None)
-                if fc:
-                    trace.append({"step": f"tool call: {fc.name}", "detail": json.dumps(dict(fc.args or {}), ensure_ascii=False)})
-                elif fr:
-                    raw = fr.response if isinstance(fr.response, dict) else {"result": str(fr.response)}
-                    trace.append({"step": f"tool result: {fr.name}", "detail": _shorten(json.dumps(raw, ensure_ascii=False))})
-                elif getattr(part, "text", None):
-                    text.append(part.text)
-        trace.append({"step": "model", "detail": f"{self.model} · {time.time()-t0:.1f}s"})
-        return {"text": "\n".join(text).strip() or "(no text returned)", "trace": trace, "runtime": self.name}
 
 # ---------------------------------------------------------------- Claude (Anthropic tool runner)
 class ClaudeRuntime:
@@ -129,8 +97,6 @@ class LocalRuntime:
 def get_runtime():
     kind = _choose()
     try:
-        if kind == "adk":
-            return ADKRuntime()
         if kind == "claude":
             return ClaudeRuntime()
     except Exception as e:  # missing package or bad key: degrade, but say so in the UI

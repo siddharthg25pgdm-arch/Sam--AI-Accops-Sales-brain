@@ -1,8 +1,8 @@
-"""The custom Python RAG tool. Mirrors the codelab's get_menu(), but searches instead of dumping.
+"""The custom Python RAG tool: the "Custom Python Tool" box in the architecture.
 
-Why not return the whole JSON like the codelab does? 8 coffee items fit in a prompt; 71 asset
-cards with text excerpts are ~150 KB and would cost money on every turn and drown the model.
-So the tool takes filters + a query and returns the top matches with a one-line reason each.
+It searches with filters instead of returning the whole JSON. 77 asset cards with text excerpts
+are ~150 KB; sending that on every turn would cost money and drown the model. So the tool takes
+filters + a query and returns the top matches with a one-line reason each.
 """
 from __future__ import annotations
 import json, re

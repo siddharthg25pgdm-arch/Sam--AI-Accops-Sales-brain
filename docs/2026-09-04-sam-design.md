@@ -166,19 +166,20 @@ Everything runs on Vercel and Supabase. Nothing runs on Siddharth's laptop.
 
 Once these are confirmed, the next step is an implementation plan for Phase 0.
 
-## 11. Prototype 0: the codelab shape on real collateral (built 4 Sep 2026)
+## 11. Prototype 0: the four-box shape on real collateral (built 4 Sep 2026)
 
-Siddharth found Google's "Streamlit RAG agent with ADK on Cloud Run" codelab and asked to build that architecture first. Done, in `../prototype/`, box for box:
+Siddharth shared Google's serverless agentic diagram (web interface, agent runtime, custom Python tool, local JSON, model API) as an architecture reference only. SAM does not use Google or Gemini; it is an internal tool on our own stack. Prototype 0 in `../prototype/` keeps the four boxes and swaps the contents:
 
-| Codelab | SAM prototype |
+| Reference box | SAM prototype |
 |---|---|
-| Streamlit web interface | `app.py`: chat with a per-answer "how SAM got there" trace |
-| ADK `LlmAgent` in a Cloud Run container | `agent.py` (instruction + tools) and `runtime.py`, which runs the agent on Google ADK + Gemini when a Google key is present, on Claude via the Anthropic tool runner when an Anthropic key is present, or as a retrieval-only local stand-in with no key |
-| Custom Python tool reading `menu.json` | `sam_tools.py` `search_assets()` over `data/asset_cards.json` |
-| `menu.json` (8 coffees) | 77 asset cards built by `build_cards.py` from the 68-doc inventory plus page counts and first-page text from the 69 PDFs/DOCX on disk. 62 inventory entries matched to files; 9 files were not in the inventory |
+| Web interface | `app.py`: Streamlit chat with a per-answer "how SAM got there" trace |
+| Agent runtime | `agent.py` (instruction + tools) and `runtime.py`: Claude Opus 5 via the Anthropic tool runner when a key is present, otherwise a retrieval-only local stand-in so the flow can be seen with no key |
+| Custom Python tool | `sam_tools.py` `search_assets()` with filters over `data/asset_cards.json` |
+| Local data file | 77 asset cards built by `build_cards.py` from the 68-doc inventory plus page counts and first-page text from the 69 PDFs/DOCX on disk. 62 inventory entries matched to files; 9 files were not in the inventory |
+| Model API | Claude (Anthropic API direct for now; Bedrock remains an option pending InfoSec, see section 10) |
 
-Deliberate differences from the codelab: the tool searches with filters instead of dumping the whole JSON (77 cards with text would cost money on every turn); the deploy must not be `--allow-unauthenticated` because the cards carry client names; and the model is pluggable.
+Deliberate choices: the tool searches with filters instead of returning the whole JSON (77 cards with text is ~150 KB and would cost money on every turn); deployment is internal only because the cards carry client names; the interface is Streamlit for speed and will fold into the Next.js app behind Entra ID.
 
 What it proves: the four-box flow answers "find me X" on real Accops collateral with a visible trace. What it does not do yet: read SharePoint, know public URLs (every card is `private` until the bucket map exists), embeddings, Teams or WhatsApp.
 
-No API key exists on this machine, so the agent path is untested end to end. Adding one key to `prototype/.env` is the next step.
+No Anthropic API key exists on this machine, so only the local stand-in has run. Adding one to `prototype/.env` is the next step.

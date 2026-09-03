@@ -1,7 +1,7 @@
-"""SAM prototype: the "Web Interface" box. Streamlit chat, same shape as the codelab's app.py.
+"""SAM prototype: the "Web Interface" box. Streamlit chat.
 
 Run:   streamlit run app.py
-Deploy: see README.md (Cloud Run buildpacks, no Dockerfile needed).
+Deploy: see README.md.
 """
 from __future__ import annotations
 import json
@@ -16,7 +16,7 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
 html, body, [class*="css"], .stMarkdown, .stChatMessage { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
 .sam-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;margin-right:6px}
-.sam-badge.adk{background:#DBEAFE;color:#1D4ED8}.sam-badge.claude{background:#EDE9FE;color:#6D28D9}.sam-badge.local{background:#FEF3C7;color:#B45309}
+.sam-badge.claude{background:#EDE9FE;color:#6D28D9}.sam-badge.local{background:#FEF3C7;color:#B45309}
 .sam-step{border-left:2px solid #CBD5E1;padding:4px 10px;margin:4px 0;font-size:13px}
 .sam-step b{color:#0B2545}
 .sam-step code{font-size:11.5px;white-space:pre-wrap;word-break:break-word}
@@ -33,7 +33,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 rt = st.session_state.runtime
 
-# ---- sidebar: catalog + architecture note (the codelab shows the menu here; we show the library)
+# ---- sidebar: library summary + runtime + architecture note
 with st.sidebar:
     st.markdown("### Library")
     summary = json.loads(list_catalog_summary())
@@ -45,17 +45,15 @@ with st.sidebar:
     st.divider()
     st.markdown("### Runtime")
     st.markdown(f'<span class="sam-badge {rt.name}">{rt.name.upper()}</span>', unsafe_allow_html=True)
-    if rt.name == "adk":
-        st.caption("Google ADK LlmAgent + InMemoryRunner, Gemini. Codelab-faithful.")
-    elif rt.name == "claude":
+    if rt.name == "claude":
         st.caption("Anthropic tool runner, Claude Opus 5.")
     else:
-        st.caption("No model key found. Retrieval-only stand-in so the flow can be seen. Set GOOGLE_API_KEY or ANTHROPIC_API_KEY in .env to enable the agent.")
+        st.caption("No model key found. Retrieval-only stand-in so the flow can be seen. Set ANTHROPIC_API_KEY in .env to enable the agent.")
     if getattr(rt, "degraded_reason", None):
         st.warning(rt.degraded_reason)
     st.divider()
-    st.caption("Architecture: Web interface → Agent runtime → custom Python tool → local asset_cards.json → model API. "
-               "Same four boxes as the Google codelab, with Accops collateral instead of a coffee menu.")
+    st.caption("Architecture: Web interface → Agent runtime → custom Python tool → local asset_cards.json → Claude API. "
+               "Four boxes, same shape as the reference diagram, on Accops collateral.")
     if st.button("New conversation"):
         st.session_state.messages = []
         st.session_state.session_id = new_session_id()

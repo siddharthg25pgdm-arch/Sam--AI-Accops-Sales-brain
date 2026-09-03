@@ -1,6 +1,6 @@
 """Build data/asset_cards.json: the local RAG source for the SAM prototype.
 
-Mirrors the codelab's menu.json, but built from real Accops collateral:
+The local data file in the architecture, built from real Accops collateral:
   1. Parse the hand-written 68-document inventory (type, industry, products, brief, use-for).
   2. Match each inventory entry to a file on disk under Downloads/Assets.
   3. Pull page count and first-pages text from each PDF with pypdf (free, local, no LLM).

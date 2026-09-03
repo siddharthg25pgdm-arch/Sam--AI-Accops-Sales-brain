@@ -1,35 +1,34 @@
-# SAM prototype (codelab shape)
+# SAM prototype
 
-Mirrors Google's "Streamlit RAG agent with ADK on Cloud Run" codelab, box for box, on real Accops collateral:
+The first working slice of SAM, Accops' sales and marketing brain. It follows the four-box shape of the
+serverless agentic diagram Siddharth shared (web interface → agent runtime → custom tool → local data → model API),
+built on our own stack: Streamlit for the interface, Claude for the model, Accops collateral for the data.
+Nothing here depends on Google.
 
-| Codelab box | SAM prototype |
+| Box | File |
 |---|---|
-| User's browser → Web Interface (Streamlit) | `app.py` |
-| Agent Runtime: ADK `LlmAgent` | `agent.py` (instruction + tools), `runtime.py` (ADK / Claude / local) |
-| Custom Python Tool (RAG) | `sam_tools.py` → `search_assets()`, `list_catalog_summary()` |
-| Local `menu.json` | `data/asset_cards.json`, built by `build_cards.py` from the 68-doc inventory + PDFs on disk |
-| Gemini API | Gemini via ADK **or** Claude via the Anthropic SDK, chosen by which key is in `.env` |
+| Web interface | `app.py` (Streamlit chat with a per-answer trace) |
+| Agent runtime | `agent.py` (instruction + tools), `runtime.py` (Claude tool runner, or a no-model local stand-in) |
+| Custom Python tool | `sam_tools.py` → `search_assets()`, `list_catalog_summary()` |
+| Local data | `data/asset_cards.json`, built by `build_cards.py` from the 68-doc inventory + PDFs on disk |
+| Model API | Claude Opus 5 via the Anthropic SDK |
 
 ## Run locally
 ```
-python -m venv .venv && .venv/Scripts/activate      # Windows
+python -m venv .venv && .venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env                              # add one API key, or leave empty for retrieval-only
-python build_cards.py                               # rebuild data/asset_cards.json (needs Downloads/Assets + inventory .md)
+copy .env.example .env          # add ANTHROPIC_API_KEY, or leave empty for retrieval-only
+python build_cards.py           # rebuild data/asset_cards.json from Downloads/Assets + the inventory .md
 streamlit run app.py
 ```
 
-## Deploy to Cloud Run (as the codelab does, buildpacks, no Dockerfile)
-```
-gcloud run deploy sam-prototype --source . --region asia-south1 \
-  --set-env-vars GOOGLE_API_KEY=... \
-  --command "/cnb/lifecycle/launcher" \
-  --args "sh,-c,python3 -m streamlit run app.py --server.port=\$PORT --server.address=0.0.0.0 --server.headless=true"
-```
-Do **not** use `--allow-unauthenticated` for SAM. The cards contain client names and outcomes. Put it behind IAP or
-Cloud Run IAM with the Accops Google Workspace group, or deploy on Vercel behind Entra ID as per the main design.
+## Deploying (internal only)
+The cards carry client names and deal outcomes, so this never goes on a public URL. In order of preference:
+1. Fold the interface into the Next.js app behind Entra ID, as in `docs/2026-09-04-sam-design.md`.
+2. Run Streamlit on an internal VM or Azure Container Apps with Entra ID in front.
+Never a public PaaS with unauthenticated access.
 
-## What this prototype proves, and what it does not
-Proves: the four-box flow works on real collateral; the tool + card schema is enough to answer "find me X" asks;
-trace visibility per answer. Does not yet: read SharePoint (files come from Downloads/Assets), know public URLs
-(every card is `private` until the bucket map exists), use embeddings (keyword + fuzzy only), or handle Teams/WhatsApp.
+## What this proves, and what it does not
+Proves: the four-box flow answers "find me X" on real collateral, with a visible trace, and the card schema
+is enough for that. Not yet: SharePoint ingestion (files come from Downloads/Assets), public URLs (every card is
+`private` until the bucket map exists), embeddings (keyword + fuzzy only), Teams or WhatsApp channels.
