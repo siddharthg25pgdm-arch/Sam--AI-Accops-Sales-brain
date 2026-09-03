@@ -463,7 +463,7 @@ function applyStep(i){
   if (!sp.skipped){
     if (sp.llm) acc.llm++; acc.tools += sp.tools||0; acc.lat += sp.dur||0; acc.cost += sp.cost||0;
     (sp.src||[]).forEach(id => { const p = $('#src-'+id), v = $('#srcv-'+id); if (p){ p.className = 'pill hit'; v.textContent = 'hit'; v.style.color='var(--green)'; } });
-    if (s.id === 'retrieve' && /→ 0|nothing|none/.test(sp.p||'')) { const g = $('#src-graph'); if (g && (sp.src||[]).includes('graph')) { g.className='pill miss'; $('#srcv-graph').textContent='no match'; $('#srcv-graph').style.color='var(--red)'; } }
+    if (s.id === 'retrieve' && /live Graph → 0/.test(sp.p||'')) { const g = $('#src-graph'); if (g && (sp.src||[]).includes('graph')) { g.className='pill miss'; $('#srcv-graph').textContent='no match'; $('#srcv-graph').style.color='var(--red)'; } }
     (sp.trig||[]).forEach(id => { const t = $('#trig-'+id); if (t){ t.classList.add('fired'); if(!t.querySelector('.badge')) t.appendChild(el('span','badge fresh','fired')); } });
   }
   $('#mLLM').textContent = acc.llm; $('#mTools').textContent = acc.tools; $('#mLat').innerHTML = acc.lat.toFixed(1)+'<small>s</small>'; $('#mCost').textContent = money(acc.cost);
