@@ -9,6 +9,7 @@ Re-run whenever the inventory or the Assets folder changes:  python build_cards.
 """
 from __future__ import annotations
 import json, re, sys, hashlib
+from urllib.parse import quote
 from pathlib import Path
 from rapidfuzz import fuzz, process
 from pypdf import PdfReader
@@ -53,7 +54,7 @@ def parse_inventory(md: str) -> list[dict]:
         cards.append({
             "inventory_id": n,
             "inventory_filename": fname,
-            "title": fields.get("Title") or " ".join(fname.replace("_", " ").replace(".pdf", "").split()),
+            "title": fields.get("Title") or " ".join(re.sub(r"(?<=[a-z])(?=[A-Z])", " ", fname.replace("_", " ").replace(".pdf", "")).split()),
             "asset_type": fields.get("Type", "").split("|")[0].strip(),
             "industry": fields.get("Industry", ""),
             "client": fields.get("Client", ""),
@@ -119,7 +120,7 @@ def main() -> None:
     for c in cards:
         c["visibility"] = "private"
         c["public_url"] = None
-        c["sharepoint_url"] = f"https://accops.sharepoint.com/sites/Sales/Shared%20Documents/{c['file']['path']}" if c.get("file") else None
+        c["sharepoint_url"] = "https://accops.sharepoint.com/sites/Sales/Shared%20Documents/" + quote(c["file"]["path"]) if c.get("file") else None
     # files on disk that the inventory does not know about
     extras = []
     for p in sorted(unmatched_files):
@@ -132,7 +133,7 @@ def main() -> None:
             "file": {"path": str(p.relative_to(ASSETS)).replace("\\", "/"), "ext": p.suffix.lower().lstrip("."),
                      "size_mb": round(p.stat().st_size / 1_048_576, 2), "match_score": None, "sha1": None, **m},
             "visibility": "private", "public_url": None,
-            "sharepoint_url": f"https://accops.sharepoint.com/sites/Sales/Shared%20Documents/{str(p.relative_to(ASSETS)).replace(chr(92), '/')}",
+            "sharepoint_url": "https://accops.sharepoint.com/sites/Sales/Shared%20Documents/" + quote(str(p.relative_to(ASSETS)).replace(chr(92), "/")),
         })
     out = {"generated_from": {"inventory": INVENTORY.name, "assets_dir": str(ASSETS)},
            "counts": {"inventory_entries": len(cards), "matched_to_disk": sum(1 for c in cards if c["file"]),
