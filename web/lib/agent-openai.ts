@@ -12,25 +12,46 @@ import { SYSTEM, toCard, toolPayload, type AskResult } from "./agent";
 type Msg = { role: "system" | "user" | "assistant" | "tool"; content: string | null; tool_calls?: ToolCall[]; tool_call_id?: string; name?: string };
 type ToolCall = { id: string; type: "function"; function: { name: string; arguments: string } };
 
+// Lenient schema on purpose: Groq validates tool arguments strictly against the schema, and open models often send
+// "Banking" for vertical or "5" for limit. We accept free text and normalise server side (see normalise()).
 const toolDef = [{
   type: "function",
   function: {
     name: "search_assets",
-    description: "Search Accops sales and marketing collateral (case studies, whitepapers). Returns ranked asset cards with why they matched.",
+    description: "Search Accops sales and marketing collateral (case studies, whitepapers). Returns ranked asset cards with why they matched. "
+      + `vertical options: ${Object.keys(VERTICALS).join(", ")}. product options: ${PRODUCTS.join(", ")}. asset_type options: Case Study, Whitepaper.`,
     parameters: {
       type: "object",
       properties: {
-        query: { type: "string" },
-        asset_type: { type: "string", enum: ["Case Study", "Whitepaper", ""] },
-        vertical: { type: "string", enum: [...Object.keys(VERTICALS), ""] },
-        product: { type: "string", enum: [...PRODUCTS, ""] },
-        audience: { type: "string", enum: ["internal", "external"] },
-        limit: { type: "integer", minimum: 1, maximum: 8 },
+        query: { type: "string", description: "What the salesperson needs, in plain words" },
+        asset_type: { type: "string", description: "Case Study or Whitepaper; omit for all" },
+        vertical: { type: "string", description: "Industry; omit for all" },
+        product: { type: "string", description: "Product; omit for all" },
+        audience: { type: "string", description: "internal (default) or external" },
+        limit: { type: "string", description: "Max results, 1 to 8" },
       },
       required: ["query"],
     },
   },
 }];
+
+function pick(value: unknown, options: string[]): string | undefined {
+  const v = String(value ?? "").trim().toLowerCase(); if (!v) return undefined;
+  const exact = options.find(o => o.toLowerCase() === v); if (exact) return exact;
+  const partial = options.find(o => o.toLowerCase().includes(v) || v.includes(o.toLowerCase().split(" ")[0])); if (partial) return partial;
+  const hit = Object.entries(VERTICALS).find(([, words]) => words.some(w => v.includes(w)))?.[0];
+  return hit && options.includes(hit) ? hit : undefined;
+}
+function normalise(input: Record<string, unknown>) {
+  return {
+    query: String(input.query ?? ""),
+    asset_type: pick(input.asset_type, ["Case Study", "Whitepaper"]),
+    vertical: pick(input.vertical, Object.keys(VERTICALS)),
+    product: pick(input.product, PRODUCTS),
+    audience: (String(input.audience ?? "").toLowerCase() === "external" ? "external" : "internal") as "internal" | "external",
+    limit: Math.min(Math.max(parseInt(String(input.limit ?? "5"), 10) || 5, 1), 8),
+  };
+}
 
 export function openAICompatConfigured() {
   return process.env.LLM_PROVIDER === "openai-compatible" && Boolean(process.env.OPENAI_COMPAT_API_KEY && process.env.OPENAI_COMPAT_BASE_URL && process.env.OPENAI_COMPAT_MODEL);
@@ -57,13 +78,12 @@ export async function askOpenAICompat(question: string, history: { role: "user" 
     }
     messages.push({ role: "assistant", content: m.content ?? null, tool_calls: m.tool_calls });
     for (const tc of m.tool_calls) {
-      let input: Record<string, string | number> = {};
-      try { input = JSON.parse(tc.function.arguments || "{}"); } catch { /* bad JSON from the model: treat as empty */ }
+      let raw: Record<string, unknown> = {};
+      try { raw = JSON.parse(tc.function.arguments || "{}"); } catch { /* bad JSON from the model: treat as empty */ }
+      const input = normalise(raw); if (!input.query) input.query = question;
       calls++; filters = { ...input };
       trace.push({ step: "tool call: search_assets", detail: JSON.stringify(input) });
-      const { results: hits, considered } = searchAssets({ query: String(input.query ?? question), asset_type: String(input.asset_type ?? "") || undefined,
-        vertical: String(input.vertical ?? "") || undefined, product: String(input.product ?? "") || undefined,
-        audience: (input.audience as "internal" | "external") || "internal", limit: Number(input.limit ?? 5) });
+      const { results: hits, considered } = searchAssets(input);
       if (calls === 1 && hits.length === 0) firstZero = true;
       if (hits.length) lastHits = hits;
       trace.push({ step: "tool result", detail: `${hits.length} of ${considered} assets` });
