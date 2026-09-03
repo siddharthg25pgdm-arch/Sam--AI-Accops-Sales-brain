@@ -1,6 +1,6 @@
 # SAM: Sales & Marketing Brain for Accops
 
-Design proposal, v0.4. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
+Design proposal, v0.5. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
 Status: Siddharth decided (4 Sep): OpenWA is acceptable for production because SAM is internal; build the codelab-shaped prototype first. Prototype 0 exists in `../prototype/` (see section 11). Remaining decisions in section 10.
 
 Companion artifact: `sam-query-simulation.html` in this folder. Open it in a browser and press Play.
@@ -198,3 +198,22 @@ Built in `../web/` (Next.js 16):
 Verified locally: auth guards, ask, gap logging, feedback, admin, non-admin redirect, 401 on unauthenticated API. Screenshots in `../shots/` (gitignored).
 
 Still true: cards come from the files on disk, all assets show as internal until the bucket map exists, no embeddings, no SharePoint ingestion.
+
+## 13. API and MCP surface (built 4 Sep 2026)
+
+One engine, three transports. The REST routes under `/api/v1/` and the MCP server at `/api/mcp` call the same functions as the web chat, so the Dwight extension, an MCP client, and the browser get identical answers and all show up in the same dashboard.
+
+| REST | MCP tool | Purpose |
+|---|---|---|
+| `GET /api/v1/search` | `search_assets` | Ranked cards, why-matched, visibility, links; `audience=external` filters to public |
+| `POST /api/v1/ask` | `ask_sam` | Verdict + up to three assets, gap flag, trace |
+| `GET /api/v1/assets` | `list_catalogue` | Browse with facet counts |
+| `GET /api/v1/public-link` | `public_link` | Public URL or `private_only` + do-not-forward note |
+| `GET /api/v1/gaps` | `content_gaps` | Missing combinations ranked by asks |
+| `POST /api/v1/context` | `context_for_account` | Account brief for outreach (the Dwight call) |
+
+Auth for machines: `Authorization: Bearer <token>` with tokens from `SAM_API_TOKENS` (label:token). The label is the user in analytics. Browser sessions also work on every REST route. All MCP tools are read-only and annotated as such. Claude.ai's own connector UI expects OAuth rather than a static bearer token, so adding SAM there later means adding an OAuth layer; Claude Code, the extension and scripts work today with the header.
+
+**Model options.** Default Claude Sonnet 5 (`CLAUDE_MODEL`), Haiku 4.5 supported (effort flag is skipped for it). An optional OpenAI-compatible provider (`LLM_PROVIDER=openai-compatible`) exists for free-tier models such as Groq or Cerebras. Caveat recorded: free tiers often reserve the right to train on prompts, and SAM's prompts carry customer names from case studies, so InfoSec should approve before any free tier is used. Without any key SAM runs retrieval-only, which is free and already answers "find me X".
+
+**WhatsApp hosting.** Siddharth has no VM or office server. Options: Oracle Cloud Always Free ARM instance (genuinely free, enough for OpenWA), Azure free-tier B1s (1 GB, too small for the Chromium engine), or a paid small VM at roughly the cost of a coffee a month. The alternative that needs no server at all is Meta's WhatsApp Business Cloud API, whose webhooks land directly on Vercel. Decision pending.
