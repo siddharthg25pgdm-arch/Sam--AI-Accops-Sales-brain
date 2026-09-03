@@ -1,7 +1,7 @@
 # SAM: Sales & Marketing Brain for Accops
 
-Design proposal, v0.2. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
-Status: awaiting Siddharth's decisions on the open questions in section 10. Nothing has been built.
+Design proposal, v0.3. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
+Status: Siddharth decided (4 Sep): OpenWA is acceptable for production because SAM is internal; build the codelab-shaped prototype first. Prototype 0 exists in `../prototype/` (see section 11). Remaining decisions in section 10.
 
 Companion artifact: `sam-query-simulation.html` in this folder. Open it in a browser and press Play.
 
@@ -104,7 +104,7 @@ T5 and T7 are the marketing-strategy payoff. They turn SAM's failures into a con
 |---|---|---|---|---|
 | Web app | Next.js on Vercel | Entra ID SSO | Rich cards, citations, trace panel (Perplexity/Grok style), library browser with card filters | Marketing's home: cards, freshness, gaps, analytics |
 | Teams bot | Bot Framework / Azure Bot | Entra ID (inherent) | Adaptive Cards with buttons for follow-ups | Sales' home |
-| WhatsApp | **WhatsApp Business Cloud API (Meta)** | Phone verified against Entra user once, via a one-time code sent in Teams | Text, ≤3 links, public URLs first, SharePoint links marked "login" | See section 8 on why not OpenWA in production |
+| WhatsApp | **OpenWA** (Siddharth's decision, 4 Sep: acceptable for an internal tool) on a dedicated Accops number | Phone verified against Entra user once, via a one-time code sent in Teams | Text, ≤3 links, public URLs first, SharePoint links marked "login" | Residual risk accepted: number can be banned without appeal; keep the handler webhook-shaped so a move to Meta's Cloud API is a config swap |
 | API + MCP | REST (`/v1/...`) and an MCP server exposing the same tools | Per-user bearer token issued after Entra login | JSON only, no prose; the caller composes | Dwight extension is the first consumer |
 
 **MCP tools (and REST twins):**
@@ -140,7 +140,7 @@ Cloned to `~/sam-accops/research/`. Verdicts from a read of each:
 - `strategy/coordination/handoff-templates.md`: a From/To/Phase/Context/Deliverable/Acceptance/Evidence handoff schema. Adopt it as the message contract between SAM's router, analyst and composer so each step's output is inspectable.
 - Author SAM's agents in the same format (`<division>-<slug>.md`, persona sections separate from operations sections) so the repo's lint and convert scripts work on them.
 
-**OpenWA (rmyndharis).** MIT, NestJS, well engineered, active. It is an **unofficial** bridge over reverse-engineered WhatsApp Web clients (whatsapp-web.js or Baileys), needs a real phone linked by QR, and its own README says it is "not approved" where finance or regulatory compliance matters. Accops sells to banks. A ban would cut the sales team off with no appeal. Decision: build the WhatsApp handler against the **WhatsApp Business Cloud API** webhook contract. Keep OpenWA only as a local development harness if useful, because the inbound webhook envelope and outbound send/reply endpoints are shaped almost identically, so production is a config swap.
+**OpenWA (rmyndharis).** MIT, NestJS, well engineered, active. It is an **unofficial** bridge over reverse-engineered WhatsApp Web clients (whatsapp-web.js or Baileys), needs a real phone linked by QR, and its own README says it is "not approved" where finance or regulatory compliance matters. Accops sells to banks. A ban would cut the sales team off with no appeal. Siddharth's decision (4 Sep): use OpenWA in production, since SAM is an internal tool and the ban risk is acceptable. Mitigations: dedicated number, no bulk sends, links only, and a handler written to the generic webhook shape so Meta's Cloud API remains a config swap if the number is ever lost.
 
 ## 9. Delivery plan
 
@@ -159,9 +159,26 @@ Everything runs on Vercel and Supabase. Nothing runs on Siddharth's laptop.
 1. **Internal tool or sellable product first?** Assumed internal, with tenancy addable. Changes auth and data isolation design if wrong.
 2. **Is the public bucket S3-compatible with stable public URLs, and who owns it?** Assumed yes. Needed for T3.
 3. **Uniform read access** to both SharePoint sites for everyone in sales and marketing? Assumed yes, so no per-user trimming in v1.
-4. **WhatsApp via Meta Cloud API** rather than OpenWA in production. Recommended strongly; needs a Meta Business account and a dedicated number.
+4. ~~WhatsApp via Meta Cloud API~~ Decided: OpenWA, internal tool, risk accepted.
 5. **Claude API direct or via Bedrock**, pending InfoSec's view on where case-study text is processed.
 6. **Who approves publish requests (T5)?** Assumed: Siddharth or a named marketing approver.
 7. **Freshness threshold** of 12 months, and whether stale assets are hidden or only badged. Assumed badged.
 
 Once these are confirmed, the next step is an implementation plan for Phase 0.
+
+## 11. Prototype 0: the codelab shape on real collateral (built 4 Sep 2026)
+
+Siddharth found Google's "Streamlit RAG agent with ADK on Cloud Run" codelab and asked to build that architecture first. Done, in `../prototype/`, box for box:
+
+| Codelab | SAM prototype |
+|---|---|
+| Streamlit web interface | `app.py`: chat with a per-answer "how SAM got there" trace |
+| ADK `LlmAgent` in a Cloud Run container | `agent.py` (instruction + tools) and `runtime.py`, which runs the agent on Google ADK + Gemini when a Google key is present, on Claude via the Anthropic tool runner when an Anthropic key is present, or as a retrieval-only local stand-in with no key |
+| Custom Python tool reading `menu.json` | `sam_tools.py` `search_assets()` over `data/asset_cards.json` |
+| `menu.json` (8 coffees) | 77 asset cards built by `build_cards.py` from the 68-doc inventory plus page counts and first-page text from the 69 PDFs/DOCX on disk. 62 inventory entries matched to files; 9 files were not in the inventory |
+
+Deliberate differences from the codelab: the tool searches with filters instead of dumping the whole JSON (77 cards with text would cost money on every turn); the deploy must not be `--allow-unauthenticated` because the cards carry client names; and the model is pluggable.
+
+What it proves: the four-box flow answers "find me X" on real Accops collateral with a visible trace. What it does not do yet: read SharePoint, know public URLs (every card is `private` until the bucket map exists), embeddings, Teams or WhatsApp.
+
+No API key exists on this machine, so the agent path is untested end to end. Adding one key to `prototype/.env` is the next step.
