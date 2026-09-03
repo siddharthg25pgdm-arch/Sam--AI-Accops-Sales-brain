@@ -1,17 +1,18 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { searchAssets, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, type SearchHit, type Asset } from "./cards";
+import { askOpenAICompat, openAICompatConfigured } from "./agent-openai";
 
 export type AskResult = {
   text: string;
   assets: { title: string; asset_type: string; industry: string; why: string; link: string | null; visibility: string; year: string | null; stale: boolean; path: string | null }[];
   trace: { step: string; detail: string }[];
-  runtime: "claude" | "local";
+  runtime: "claude" | "local" | "search";
   intent: string;
   filters: Record<string, unknown>;
   zero: boolean;
 };
 
-const SYSTEM = `You are SAM, the sales and marketing brain for Accops, an Indian cybersecurity and digital workspace company
+export const SYSTEM = `You are SAM, the sales and marketing brain for Accops, an Indian cybersecurity and digital workspace company
 (HySecure ZTNA, HyID MFA/SSO, HyWorks VDI/DaaS, HyLabs, HyDesk, Browser Isolation). You help salespeople find the right
 collateral fast and tell them how to use it.
 
@@ -43,12 +44,12 @@ const tools: Anthropic.Tool[] = [{
   strict: true,
 }];
 
-function toCard(h: SearchHit) {
+export function toCard(h: SearchHit) {
   const a = h.asset;
   return { title: a.title, asset_type: a.asset_type, industry: a.industry, why: h.why, link: a.public_url ?? a.sharepoint_url,
     visibility: a.public_url ? "public" : "internal", year: yearOf(a), stale: isStale(a), path: a.file?.path ?? null };
 }
-function toolPayload(hits: SearchHit[], considered: number) {
+export function toolPayload(hits: SearchHit[], considered: number) {
   return JSON.stringify({ total_considered: considered, results: hits.map(h => ({
     title: h.asset.title, asset_type: h.asset.asset_type, industry: h.asset.industry, client: h.asset.client,
     products: h.asset.products, use_for: h.asset.use_for, brief: (h.asset.brief || h.asset.key_problem || "").slice(0, 300),
@@ -68,6 +69,10 @@ export function heuristicFilters(q: string) {
 
 export async function ask(question: string, history: { role: "user" | "assistant"; content: string }[] = []): Promise<AskResult> {
   const t0 = Date.now();
+  if (openAICompatConfigured()) {
+    try { return await askOpenAICompat(question, history, t0); }
+    catch (err) { console.error("openai-compatible path failed, falling back", err); }
+  }
   if (process.env.ANTHROPIC_API_KEY) {
     try { return await askClaude(question, history, t0); }
     catch (err) { console.error("claude path failed, falling back", err); }
