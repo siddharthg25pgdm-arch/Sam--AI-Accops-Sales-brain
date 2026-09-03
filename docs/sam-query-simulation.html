@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAM · Query Flow Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F8FAFC; --surface:#FFFFFF; --ink:#0F172A; --ink-2:#334155; --ink-3:#64748B; --line:#E2E8F0; --line-2:#CBD5E1;
+  --navy:#0B2545; --blue:#2563EB; --blue-soft:#DBEAFE; --amber:#B45309; --amber-soft:#FEF3C7; --green:#047857; --green-soft:#D1FAE5; --red:#B91C1C; --red-soft:#FEE2E2; --violet:#6D28D9; --violet-soft:#EDE9FE;
+  --ease:cubic-bezier(.23,1,.32,1); --r:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px}
+.sr{position:absolute;left:-9999px}
+
+header{position:sticky;top:0;z-index:20;background:rgba(248,250,252,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.hwrap{max-width:1440px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.01em}
+.brand .mark{width:30px;height:30px;border-radius:8px;background:var(--navy);display:grid;place-items:center}
+.brand small{font-weight:500;color:var(--ink-3);margin-left:6px}
+.scenarios{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.chip{border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);padding:8px 12px;border-radius:999px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;transition:transform 160ms var(--ease),background 160ms var(--ease),border-color 160ms var(--ease)}
+.chip:hover{border-color:var(--blue)}
+.chip:active{transform:scale(.97)}
+.chip[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.chip .ch{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:10px;font-weight:800}
+.controls{display:flex;gap:8px;align-items:center}
+.btn{border:1px solid var(--line-2);background:var(--surface);color:var(--ink);padding:9px 14px;border-radius:8px;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:transform 160ms var(--ease),background 160ms var(--ease)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn.primary:hover{background:#12315a}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.speed{display:flex;align-items:center;gap:6px;color:var(--ink-3);font-size:13px}
+.speed select{font:inherit;padding:7px 8px;border-radius:8px;border:1px solid var(--line-2);background:#fff}
+
+main{max-width:1440px;margin:0 auto;padding:24px 28px 80px}
+.grid{display:grid;grid-template-columns:5fr 4fr 3fr;gap:20px;align-items:start}
+@media (max-width:1100px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.card h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin:0;padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.card h2 span{font-weight:600;text-transform:none;letter-spacing:0;color:var(--ink-2)}
+
+/* channel mock */
+.device{padding:18px}
+.frame{border:1px solid var(--line-2);border-radius:16px;overflow:hidden;background:#fff;min-height:520px;max-height:calc(100vh - 190px);display:flex;flex-direction:column}
+.thread{overflow:auto}
+.frame .bar{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;font-weight:700;font-size:13px}
+.frame .bar .dot{width:10px;height:10px;border-radius:50%}
+.frame.teams .bar{background:#F0F0F8}.frame.teams .bar .dot{background:#5B5FC7}
+.frame.wa .bar{background:#075E54;color:#fff}.frame.wa .bar .dot{background:#25D366}
+.frame.ext .bar{background:#0A66C2;color:#fff}.frame.ext .bar .dot{background:#fff}
+.frame.web .bar{background:var(--navy);color:#fff}.frame.web .bar .dot{background:#60A5FA}
+.thread{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1;background:#FAFBFD}
+.frame.wa .thread{background:#ECE5DD}
+.msg{max-width:88%;padding:10px 13px;border-radius:12px;font-size:14px;opacity:0;transform:translateY(6px);transition:opacity 220ms var(--ease),transform 220ms var(--ease)}
+.msg.in{opacity:1;transform:none}
+.msg.user{align-self:flex-end;background:var(--navy);color:#fff;border-bottom-right-radius:4px}
+.frame.wa .msg.user{background:#DCF8C6;color:var(--ink)}
+.msg.sam{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg.sys{align-self:center;background:transparent;color:var(--ink-3);font-size:12px;padding:2px}
+.typing{display:inline-flex;gap:4px;align-items:center;height:16px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.asset{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:start;background:#fff}
+.asset .ft{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff}
+.ft.pdf{background:#B91C1C}.ft.pptx{background:#C2410C}.ft.docx{background:#1D4ED8}.ft.web{background:#0F766E}.ft.xlsx{background:#15803D}
+.asset b{display:block;font-size:13.5px;line-height:1.3}
+.asset small{color:var(--ink-3);font-size:12px;display:block;margin-top:2px}
+.asset .why{font-size:12.5px;color:var(--ink-2);margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.badge.private{background:var(--amber-soft);color:var(--amber)}
+.badge.public{background:var(--green-soft);color:var(--green)}
+.badge.stale{background:var(--red-soft);color:var(--red)}
+.badge.gap{background:var(--violet-soft);color:var(--violet)}
+.badge.fresh{background:var(--blue-soft);color:#1D4ED8}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.actions span{border:1px solid var(--line-2);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--ink-2);background:#fff}
+.composer{border-top:1px solid var(--line);padding:10px 14px;display:flex;gap:8px;align-items:center;color:var(--ink-3);font-size:13px;background:#fff}
+.composer div{flex:1;border:1px solid var(--line-2);border-radius:999px;padding:8px 12px}
+.jsonout{background:#0B1220;color:#DCE6F5;border-radius:10px;padding:12px;white-space:pre-wrap;word-break:break-word;line-height:1.45}
+.jsonout .k{color:#7DD3FC}.jsonout .s{color:#A7F3D0}.jsonout .n{color:#FDE68A}
+
+/* timeline */
+.timeline{padding:6px 0 10px;max-height:calc(100vh - 150px);overflow:auto;scroll-behavior:smooth}
+.grid > .card:first-child, .grid > aside{position:sticky;top:86px}
+@media (max-width:1100px){.grid > .card:first-child, .grid > aside{position:static}.timeline{max-height:none}}
+.step{display:grid;grid-template-columns:44px 1fr;gap:0;padding:0 18px;position:relative}
+.step .rail{position:relative;display:flex;justify-content:center}
+.step .rail::before{content:"";position:absolute;top:0;bottom:0;width:2px;background:var(--line)}
+.step:first-child .rail::before{top:22px}.step:last-child .rail::before{bottom:calc(100% - 22px)}
+.node{width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid var(--line-2);display:grid;place-items:center;position:relative;z-index:1;margin-top:10px;transition:border-color 200ms var(--ease),background 200ms var(--ease),transform 200ms var(--ease)}
+.node svg{width:13px;height:13px;stroke:var(--ink-3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke 200ms var(--ease)}
+.step.active .node{border-color:var(--blue);background:var(--blue-soft);transform:scale(1.08)}
+.step.active .node svg{stroke:var(--blue)}
+.step.done .node{border-color:var(--navy);background:var(--navy)}
+.step.done .node svg{stroke:#fff}
+.step.skipped .node{border-style:dashed}
+.body{padding:8px 0 14px 8px;border-bottom:1px solid var(--line);opacity:.55;transition:opacity 200ms var(--ease)}
+.step.active .body,.step.done .body{opacity:1}
+.step:last-child .body{border-bottom:0}
+.body .t{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.body .t b{font-size:14px}
+.body .t .meta{color:var(--ink-3);font-size:12px;white-space:nowrap}
+.body .lane{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.lane.agent{color:var(--violet)}.lane.store{color:var(--green)}.lane.edge{color:#1D4ED8}
+.body .d{font-size:13px;color:var(--ink-2);margin-top:3px}
+.payload{margin-top:8px;display:none;background:#F1F5F9;border:1px solid var(--line);border-radius:8px;padding:8px 10px;white-space:pre-wrap;word-break:break-word;color:var(--ink-2)}
+.step.active .payload,.step.done .payload{display:block}
+.step.skipped .payload{display:none}
+.step.skipped .body .d::after{content:" (skipped for this query)";color:var(--ink-3)}
+
+/* meters */
+.meters{padding:14px 18px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.meter{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.meter .l{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.meter .v{font-size:22px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:2px}
+.meter .v small{font-size:12px;font-weight:600;color:var(--ink-3);margin-left:4px}
+.list{padding:6px 18px 14px}
+.list .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.list .row:last-child{border-bottom:0}
+.list .row .name{display:flex;align-items:center;gap:8px;color:var(--ink-2)}
+.pill{width:8px;height:8px;border-radius:50%;background:var(--line-2);transition:background 200ms var(--ease)}
+.pill.hit{background:var(--green)}.pill.miss{background:var(--red)}.pill.na{background:var(--line-2)}
+.trig{opacity:.4;transition:opacity 200ms var(--ease)}
+.trig.fired{opacity:1}
+.trig .badge{margin-left:auto}
+
+/* legend */
+.legend{margin-top:28px}
+.legend h3{font-size:18px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px}
+.legend p{color:var(--ink-2);margin:0 0 16px;max-width:70ch}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.lgrid .card{padding:14px 16px}
+.lgrid .card b{display:block;font-size:14px}
+.lgrid .card .k{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.lgrid .card p{font-size:13px;margin:6px 0 0;color:var(--ink-2)}
+.foot{margin-top:22px;color:var(--ink-3);font-size:12.5px}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0ms!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a1 1 0 0 1 1-1h11l4 4v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M8 13h8M8 17h5M8 9h3"/></svg></span>
+      SAM <small>Query flow simulator · Accops sales & marketing brain</small>
+    </div>
+    <div class="scenarios" id="scenarios" role="group" aria-label="Scenarios"></div>
+    <div class="controls">
+      <div class="speed"><label for="speed">Speed</label><select id="speed"><option value="1">1x</option><option value="2" selected>2x</option><option value="4">4x</option></select></div>
+      <button class="btn" id="stepBtn" title="Advance one touchpoint">Step</button>
+      <button class="btn primary" id="playBtn">Play</button>
+      <button class="btn" id="resetBtn">Reset</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+    <section class="card" aria-labelledby="chT">
+      <h2 id="chT">Channel <span id="chName"></span></h2>
+      <div class="device"><div class="frame" id="frame"><div class="bar"><span class="dot"></span><span id="barTitle"></span></div><div class="thread" id="thread"></div><div class="composer"><div>Ask SAM…</div></div></div></div>
+    </section>
+
+    <section class="card" aria-labelledby="tlT">
+      <h2 id="tlT">Touchpoints <span id="tlCount"></span></h2>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <aside>
+      <section class="card" aria-labelledby="mT">
+        <h2 id="mT">Live meters</h2>
+        <div class="meters">
+          <div class="meter"><div class="l">LLM calls</div><div class="v" id="mLLM">0</div></div>
+          <div class="meter"><div class="l">Data touchpoints</div><div class="v" id="mTools">0</div></div>
+          <div class="meter"><div class="l">Elapsed</div><div class="v" id="mLat">0.0<small>s</small></div></div>
+          <div class="meter"><div class="l">Est. cost</div><div class="v" id="mCost">$0.000</div></div>
+        </div>
+        <h2>Sources touched</h2>
+        <div class="list" id="sources"></div>
+        <h2>Async workflows fired</h2>
+        <div class="list" id="triggers"></div>
+      </section>
+    </aside>
+  </div>
+
+  <section class="legend">
+    <h3>How the engine is wired</h3>
+    <p>One synchronous path answers the question. Eight background workflows keep the brain current, close the loop on "publish this", and turn every unanswered question into a content request. Every channel funnels into the same nine touchpoints.</p>
+    <div class="lgrid" id="legend"></div>
+    <p class="foot">Latency and cost figures are design targets, not measurements. Costs assume Claude Opus 5 at published API rates with a cached system prompt; retrieval and storage costs are negligible per query.</p>
+  </section>
+</main>
+
+<script>
+const ICON = {
+  channel:'<svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>',
+  gate:'<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  ctx:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>',
+  router:'<svg viewBox="0 0 24 24"><path d="M4 12h6m4 0h6M10 12l4-6m-4 6l4 6"/></svg>',
+  search:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/></svg>',
+  eye:'<svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  brain:'<svg viewBox="0 0 24 24"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 3 3 3 0 0 0 2 3v1a3 3 0 0 0 3 3h1V4zM15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 3 3 3 0 0 1-2 3v1a3 3 0 0 1-3 3h-1V4z"/></svg>',
+  compose:'<svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><path d="m12 8 4 4"/></svg>',
+  loop:'<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v5h-5"/></svg>'
+};
+
+// Nine touchpoints. Each scenario supplies per-step payload, duration (s), llm (bool), tools (count), skipped (bool).
+const STEPS = [
+  {id:'channel', lane:'edge', icon:'channel', name:'Channel adapter', desc:'Normalises the inbound message into a Query Event: tenant, user handle, thread id, text, attachments, channel context.'},
+  {id:'gate', lane:'edge', icon:'gate', name:'Gateway & identity', desc:'Maps the sender to an Accops identity (Entra ID, phone-to-user map, or API token) and sets the permission scope: internal or external.'},
+  {id:'ctx', lane:'store', icon:'ctx', name:'Context assembler', desc:'Loads thread history, the asker\'s profile (region, vertical focus) and any channel context such as the LinkedIn page open in the extension.'},
+  {id:'router', lane:'agent', icon:'router', name:'Intent router', desc:'Claude classifies the ask and extracts slots: asset type, product, vertical, competitor, persona, audience, freshness.'},
+  {id:'retrieve', lane:'store', icon:'search', name:'Retrieval fan-out', desc:'In parallel: structured filter on asset cards, hybrid keyword + vector search on chunks, public-registry lookup, live SharePoint search as a safety net.'},
+  {id:'vis', lane:'store', icon:'eye', name:'Visibility resolver', desc:'Stamps each candidate private, public, or both by joining the SharePoint item id to the public-bucket manifest.'},
+  {id:'analysis', lane:'agent', icon:'brain', name:'Contextual analysis', desc:'Claude re-ranks against the deal context and explains why each result fits and how to use it. Detects gaps.'},
+  {id:'compose', lane:'agent', icon:'compose', name:'Response composer', desc:'Renders for the channel: rich cards, Adaptive Card, WhatsApp text with at most three links, or JSON for the API.'},
+  {id:'after', lane:'edge', icon:'loop', name:'Follow-up & learning', desc:'Stores the turn for follow-ups, logs intent and hits, schedules feedback, and files gap or publish requests.'}
+];
+
+const SOURCES = [
+  {id:'idx', name:'Asset-card index (Postgres)'},
+  {id:'vec', name:'Chunk search (pgvector + FTS)'},
+  {id:'pub', name:'Public registry (bucket manifest)'},
+  {id:'graph', name:'Live SharePoint search (Graph)'},
+  {id:'thread', name:'Thread memory'},
+  {id:'crm', name:'Account context (CRM / extension)'}
+];
+
+const TRIGGERS = [
+  {id:'T1', name:'Ingest on file change (Power Automate → webhook)'},
+  {id:'T2', name:'Nightly Graph delta reconciliation'},
+  {id:'T3', name:'Public-bucket manifest sync'},
+  {id:'T4', name:'Weekly blog & web crawl'},
+  {id:'T5', name:'Publish request → marketing approval'},
+  {id:'T6', name:'24-hour "did this help?" nudge'},
+  {id:'T7', name:'Weekly content-gap report'},
+  {id:'T8', name:'Stale-asset owner alert'}
+];
+
+const LEGEND = [
+  {k:'Synchronous path', b:'9 touchpoints, 3 LLM calls', p:'Router (low effort), contextual analysis (high effort), composer (low effort). Target under 8 seconds on web with streaming; WhatsApp gets an immediate acknowledgement.'},
+  {k:'T1 · Ingest', b:'File created or modified', p:'Power Automate posts drive and item ids. Worker fetches via Graph, extracts text with page and slide numbers, chunks, embeds, and asks Claude for the asset card once.'},
+  {k:'T2 · Reconcile', b:'Nightly delta query', p:'Catches renames, moves and deletes that trigger-based flows miss. Deleted files lose their cards and chunks so SAM never cites a ghost.'},
+  {k:'T3 · Public map', b:'Bucket manifest sync', p:'Reads the public bucket listing, matches to SharePoint items by checksum or filename, and stamps visibility. Flags drift when a public file is newer or older than its private twin.'},
+  {k:'T4 · Web', b:'Blogs and web pages', p:'Sitemap and RSS crawl. Public by definition, so these are always shareable answers.'},
+  {k:'T5 · Publish', b:'"Can I send this externally?"', p:'When only a private version exists, SAM files a request. Marketing approves, the file is copied to the bucket, the map updates, and the asker is notified in the same thread.'},
+  {k:'T6 · Feedback', b:'Close the loop', p:'A day later SAM asks whether the asset helped. Thumbs feed the ranking and the gap report.'},
+  {k:'T7 · Gaps', b:'Weekly to marketing', p:'Every query with no strong match becomes a gap record. The report ranks them by frequency and deal value, which is the content roadmap.'},
+  {k:'T8 · Freshness', b:'Older than 12 months', p:'Owner gets a nudge; SAM shows a stale badge until refreshed.'},
+  {k:'API & MCP', b:'Same engine, no UI', p:'The Dwight extension and any internal tool call SAM through an MCP server and REST twin: search_assets, answer, get_asset, public_link, request_publish, context_for_account.'}
+];
+
+const money = n => '$' + n.toFixed(3);
+const pdfLink = (name) => `https://accops.sharepoint.com/sites/Sales/${encodeURIComponent(name)}`;
+
+const SCENARIOS = [
+  {
+    id:'teams', label:'Teams · find a competitor deck', ch:'T', chColor:'#5B5FC7', frame:'teams', bar:'Microsoft Teams · SAM (bot)',
+    user:'Need the competitor analysis vs Citrix for the HDFC Bank deck',
+    steps:{
+      channel:{dur:.1, tools:0, p:'{channel:"teams", user:"aad:priya.n", thread:"19:abc…", text:"Need the competitor analysis vs Citrix for the HDFC Bank deck"}'},
+      gate:{dur:.2, tools:0, p:'identity: priya.n@accops.com · role: Account Executive (West) · scope: INTERNAL (may see private + public)'},
+      ctx:{dur:.3, tools:2, src:['thread','crm'], p:'thread: new · profile: BFSI-heavy territory · CRM hint: "HDFC Bank" = BFSI, stage = Evaluation, incumbent = Citrix'},
+      router:{dur:1.1, llm:true, cost:.004, p:'intent: find_asset\nasset_type: competitor_analysis | battlecard\ncompetitor: Citrix\nvertical: BFSI (from "HDFC Bank")\naudience: internal\nfreshness: prefer ≤ 12 months'},
+      retrieve:{dur:.6, tools:4, src:['idx','vec','pub','graph'], p:'cards filter → 4 candidates · hybrid chunks → 11 hits · public registry → 1 match · live Graph → nothing newer than index'},
+      vis:{dur:.1, tools:0, p:'Accops vs Citrix Battlecard 2026.pptx → PRIVATE\nCitrix Migration Guide for Banks.pdf → PRIVATE\nHDFC-style BFSI case study (Bank X).pdf → PUBLIC + PRIVATE\nCitrix vs Accops blog → PUBLIC'},
+      analysis:{dur:3.4, llm:true, cost:.031, p:'Rank 1 battlecard: covers TCO, RBI data-localisation, HyWorks parity table (slides 4–7).\nRank 2 migration guide: for the technical evaluator, not the deck.\nRank 3 case study: proof point for the same objection.\nNo gap detected.'},
+      compose:{dur:1.2, llm:true, cost:.006, p:'Adaptive Card · 3 assets with why-it-fits · deep links to SharePoint · suggested follow-ups'},
+      after:{dur:.1, tools:1, src:['thread'], trig:['T6'], p:'turn stored · analytics: intent=find_asset, hits=3, competitor=Citrix · T6 nudge scheduled +24h'}
+    },
+    reply:{
+      intro:'Three assets fit the HDFC Bank deck. The battlecard is the one you want for the slides.',
+      assets:[
+        {ft:'pptx', name:'Accops vs Citrix Battlecard 2026.pptx', meta:'Sales › Competitor Analysis · updated 3 weeks ago', badge:['private','fresh'], why:'Slides 4–7 carry the TCO table and the RBI data-localisation argument, which matters for a bank in evaluation.'},
+        {ft:'pdf', name:'Citrix Migration Guide for Banks.pdf', meta:'Sales › Whitepapers › BFSI · updated 5 months ago', badge:['private'], why:'Give this to their infrastructure lead, not the CIO. It answers the "how hard is it to move" objection.'},
+        {ft:'pdf', name:'Bank X: 4,000-seat Citrix replacement.pdf', meta:'Marketing › Case Studies › BFSI · public version exists', badge:['public'], why:'Proof point for the same story. Safe to forward externally.'}
+      ],
+      actions:['Summarise slides 4–7','Public version of the battlecard?','Draft the competitor slide']
+    }
+  },
+  {
+    id:'followup', label:'Teams · follow-up: public link?', ch:'T', chColor:'#5B5FC7', frame:'teams', bar:'Microsoft Teams · SAM (bot) · same thread',
+    prior:[{role:'user', text:'Need the competitor analysis vs Citrix for the HDFC Bank deck'},{role:'sam', text:'Three assets fit the HDFC Bank deck. The battlecard is the one you want…'}],
+    user:'Is there a public version I can send to their CISO?',
+    steps:{
+      channel:{dur:.1, tools:0, p:'{channel:"teams", thread:"19:abc…" (existing), text:"Is there a public version I can send to their CISO?"}'},
+      gate:{dur:.2, tools:0, p:'identity: priya.n@accops.com · scope: INTERNAL · but requested audience: EXTERNAL'},
+      ctx:{dur:.3, tools:1, src:['thread'], p:'thread has 1 prior turn · referents available: battlecard, migration guide, case study · "their CISO" → HDFC Bank, persona CISO'},
+      router:{dur:1.0, llm:true, cost:.004, p:'intent: share_externally (follow-up)\nreferent: "the competitor analysis" → Accops vs Citrix Battlecard 2026.pptx\naudience: external, persona: CISO\nrequires: public_url'},
+      retrieve:{dur:.4, tools:2, src:['idx','pub'], p:'cards by id → 3 referents · public registry → battlecard: none · case study: public URL · blog: public URL'},
+      vis:{dur:.1, tools:0, p:'battlecard → PRIVATE ONLY (never leaves SharePoint)\ncase study → PUBLIC\nblog → PUBLIC'},
+      analysis:{dur:2.6, llm:true, cost:.022, p:'For a CISO the battlecard is internal-only and also too sales-facing. Recommend the public case study plus the ZTNA-for-banks blog. Offer a publish request for a CISO-safe excerpt.'},
+      compose:{dur:1.0, llm:true, cost:.005, p:'Adaptive Card · 2 public links · explicit "internal only" notice · button: Request public excerpt'},
+      after:{dur:.1, tools:1, src:['thread'], trig:['T5','T6'], p:'turn stored · T5 publish request drafted (pending Priya\'s click) · T6 nudge'}
+    },
+    reply:{
+      intro:'The battlecard is internal only, so I won\'t give you a shareable link for it. Two public assets work for a CISO:',
+      assets:[
+        {ft:'pdf', name:'Bank X: 4,000-seat Citrix replacement.pdf', meta:'public.accops.com/case-studies/bank-x.pdf', badge:['public'], why:'Same displacement story, customer-approved for external use.'},
+        {ft:'web', name:'Zero Trust access for banks: what RBI expects', meta:'accops.com/blog/… · public', badge:['public'], why:'CISO-level framing, no pricing or competitor claims.'}
+      ],
+      actions:['Request a CISO-safe public excerpt of the battlecard','Draft the email to the CISO']
+    }
+  },
+  {
+    id:'wa', label:'WhatsApp · quick ask', ch:'W', chColor:'#25D366', frame:'wa', bar:'WhatsApp · SAM · +91 …',
+    user:'bfsi case study pls',
+    steps:{
+      channel:{dur:.2, tools:0, p:'{channel:"whatsapp", from:"+91 98…", text:"bfsi case study pls"} · immediate ack sent: "On it."'},
+      gate:{dur:.2, tools:1, src:['crm'], p:'phone → rahul.m@accops.com (verified device) · scope: INTERNAL · channel policy: links only, never file bodies'},
+      ctx:{dur:.2, tools:1, src:['thread'], p:'no open thread · profile: Regional Sales, South · no account context'},
+      router:{dur:.9, llm:true, cost:.003, p:'intent: find_asset\nasset_type: case_study\nvertical: BFSI\ntone: terse → reply terse'},
+      retrieve:{dur:.5, tools:3, src:['idx','vec','pub'], p:'cards → 6 BFSI case studies · rank by freshness + usage · public registry → 4 have public URLs'},
+      vis:{dur:.1, tools:0, p:'top 3: PUBLIC, PUBLIC, PRIVATE (SharePoint link requires login)'},
+      analysis:{dur:1.8, llm:true, cost:.012, p:'No deal context, so rank by breadth: one large bank, one NBFC, one insurer. Ask one clarifying question only if the user follows up.'},
+      compose:{dur:.7, llm:true, cost:.003, p:'WhatsApp text · ≤ 3 links · public URLs first · SharePoint link marked "login"'},
+      after:{dur:.1, tools:1, src:['thread'], trig:['T6'], p:'turn stored · analytics · T6 nudge'}
+    },
+    replyText:'3 BFSI case studies:\n1. Bank X · 4,000-seat Citrix replacement (public) public.accops.com/cs/bank-x\n2. NBFC Y · secure remote access for 2,100 agents (public) public.accops.com/cs/nbfc-y\n3. Insurer Z · VDI for branch ops (internal, login) accops.sharepoint.com/…/insurer-z\nReply with a bank name or competitor and I\'ll narrow it.'
+  },
+  {
+    id:'ext', label:'Chrome extension · MCP call', ch:'D', chColor:'#0A66C2', frame:'ext', bar:'Dwight extension → SAM MCP · sam.context_for_account',
+    user:'tool: context_for_account { company:"Maybank", person_title:"Group CIO", country:"MY", intent:"first outreach" }',
+    steps:{
+      channel:{dur:.1, tools:0, p:'{channel:"mcp", tool:"context_for_account", caller:"dwight-ext", user_token:"…"}'},
+      gate:{dur:.2, tools:0, p:'token → kaustubh.s@accops.com · scope: INTERNAL · rate limit ok'},
+      ctx:{dur:.3, tools:1, src:['crm'], p:'account: Maybank → BFSI, Malaysia · regulator hook: BNM RMiT · no open opportunity · persona: Group CIO'},
+      router:{dur:1.0, llm:true, cost:.004, p:'intent: answer_question (account brief)\nslots: vertical BFSI, geo MY, persona CIO, stage first-touch\nneeds: public-shareable proof + talking points'},
+      retrieve:{dur:.7, tools:3, src:['idx','vec','pub'], p:'cards: BFSI ∩ (MY ∪ SEA) → 3 · chunks: "BNM RMiT" → 7 hits · public registry → 2 shareable'},
+      vis:{dur:.1, tools:0, p:'SEA banking brochure (MS) → PUBLIC\nBank X case study → PUBLIC\nRMiT mapping sheet → PRIVATE'},
+      analysis:{dur:3.0, llm:true, cost:.028, p:'For first outreach to a Group CIO in MY: lead with RMiT Nov-2025 clause mapping, one regional proof point, no pricing. Return talking points + which asset backs each.'},
+      compose:{dur:.4, llm:false, p:'JSON per MCP schema · no prose · extension\'s own composer writes the message'},
+      after:{dur:.1, tools:1, src:['thread'], trig:[], p:'logged as api call · no nudge for machine callers'}
+    },
+    replyJson:{
+      account:{name:'Maybank', vertical:'BFSI', country:'MY', regulatory_hook:'BNM RMiT (rev. Nov 2025) §10.x access control'},
+      talking_points:[
+        {point:'RMiT expects per-session, identity-bound access to critical systems; most VDI stacks bolt this on.', backed_by:'RMiT mapping sheet (internal)'},
+        {point:'A 4,000-seat bank replaced Citrix in 11 weeks with no branch downtime.', backed_by:'Bank X case study (public)'}
+      ],
+      shareable_assets:[{title:'SEA Banking Digital Workspace Brochure (Bahasa Malaysia)', url:'https://public.accops.com/…/sea-banking-ms.pdf'},{title:'Bank X case study', url:'https://public.accops.com/cs/bank-x'}],
+      internal_only:[{title:'RMiT control mapping.xlsx', sharepoint:'https://accops.sharepoint.com/sites/Sales/…'}],
+      confidence:0.82
+    }
+  },
+  {
+    id:'gap', label:'Web · a question we can\'t answer', ch:'S', chColor:'#0B2545', frame:'web', bar:'SAM web app · sam.accops.com',
+    user:'Do we have a pharma ZTNA case study?',
+    steps:{
+      channel:{dur:.1, tools:0, p:'{channel:"web", user:"aad:vikram.r", thread:new, text:"Do we have a pharma ZTNA case study?"}'},
+      gate:{dur:.2, tools:0, p:'identity: vikram.r@accops.com · Pre-sales · scope: INTERNAL'},
+      ctx:{dur:.2, tools:1, src:['thread'], p:'no thread · profile: Pre-sales, Pharma & Manufacturing accounts'},
+      router:{dur:1.0, llm:true, cost:.004, p:'intent: find_asset (existence check)\nasset_type: case_study\nvertical: pharma\nproduct: ZTNA (HySecure)'},
+      retrieve:{dur:.8, tools:4, src:['idx','vec','pub','graph'], p:'cards: pharma ∩ case_study ∩ ZTNA → 0 · relax product → 2 pharma VDI · relax vertical → 3 ZTNA (BFSI, Gov) · live Graph → 0 · public → n/a'},
+      vis:{dur:.1, tools:0, p:'nearest: Pharma VDI case study → PRIVATE · ZTNA BFSI case study → PUBLIC'},
+      analysis:{dur:2.4, llm:true, cost:.02, p:'Confirmed gap: no pharma + ZTNA case study exists in either site. Nearest substitutes explained. Gap record: {vertical:pharma, product:ZTNA, asset:case_study, asked_by:presales}'},
+      compose:{dur:.9, llm:true, cost:.005, p:'Honest "no" first · two nearest substitutes with the caveat · offer to notify marketing'},
+      after:{dur:.1, tools:1, src:['thread'], trig:['T7','T6'], p:'gap record written → T7 weekly report · T6 nudge'}
+    },
+    reply:{
+      intro:'No. There is no pharma ZTNA case study in the Sales or Marketing sites, and I checked SharePoint live as well. The two closest substitutes:',
+      assets:[
+        {ft:'pdf', name:'PharmaCo: compliant VDI for 1,200 research users.pdf', meta:'Sales › Case Studies › Pharma · 14 months old', badge:['private','stale'], why:'Right vertical, wrong product. Useful for the compliance and data-isolation story.'},
+        {ft:'pdf', name:'Bank X: Zero Trust access for third-party vendors.pdf', meta:'Marketing › Case Studies › BFSI · public', badge:['public'], why:'Right product, wrong vertical. Vendor-access pattern maps well to CRO and CDMO partners.'}
+      ],
+      gap:'Logged as a content gap for marketing. This is the second pharma ZTNA request this month.',
+      actions:['Notify marketing now','Draft a one-paragraph pharma ZTNA proof point from the two']
+    }
+  }
+];
+
+// ---------- state ----------
+let scenario = SCENARIOS[0], cursor = -1, timer = null, playing = false;
+const $ = s => document.querySelector(s);
+const el = (t, cls, html) => { const e = document.createElement(t); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+
+function renderScenarios(){
+  const wrap = $('#scenarios'); wrap.innerHTML = '';
+  SCENARIOS.forEach(s => {
+    const b = el('button','chip'); b.setAttribute('aria-pressed', s === scenario);
+    b.innerHTML = `<span class="ch" style="background:${s.chColor};color:#fff">${s.ch}</span>${s.label}`;
+    b.onclick = () => { scenario = s; reset(); };
+    wrap.appendChild(b);
+  });
+}
+
+function renderLegend(){
+  const g = $('#legend');
+  LEGEND.forEach(l => g.appendChild(el('div','card',`<div class="k">${l.k}</div><b>${l.b}</b><p>${l.p}</p>`)));
+}
+
+function renderTimeline(){
+  const t = $('#timeline'); t.innerHTML = '';
+  STEPS.forEach((s, i) => {
+    const sp = scenario.steps[s.id] || {};
+    const d = el('div','step'); d.dataset.i = i;
+    if (sp.skipped) d.classList.add('skipped');
+    const meta = [];
+    if (sp.llm) meta.push('LLM'); if (sp.tools) meta.push(sp.tools + ' data call' + (sp.tools>1?'s':'')); if (sp.dur != null) meta.push('~' + sp.dur.toFixed(1) + 's');
+    d.innerHTML = `<div class="rail"><div class="node">${ICON[s.icon]}</div></div>
+      <div class="body"><div class="lane ${s.lane}">${s.lane === 'agent' ? 'Claude agent' : s.lane === 'store' ? 'Data' : 'Edge'}</div>
+      <div class="t"><b>${s.name}</b><span class="meta">${meta.join(' · ')}</span></div>
+      <div class="d">${s.desc}</div>
+      <div class="payload mono">${(sp.p || '').replace(/</g,'&lt;')}</div></div>`;
+    t.appendChild(d);
+  });
+  $('#tlCount').textContent = `0 / ${STEPS.length}`;
+}
+
+function renderSide(){
+  const s = $('#sources'); s.innerHTML = '';
+  SOURCES.forEach(x => s.appendChild(el('div','row',`<span class="name"><span class="pill na" id="src-${x.id}"></span>${x.name}</span><span class="mono" id="srcv-${x.id}" style="color:var(--ink-3)">idle</span>`)));
+  const t = $('#triggers'); t.innerHTML = '';
+  TRIGGERS.forEach(x => t.appendChild(el('div','row trig',`<span class="name"><span class="mono" style="color:var(--ink-3)">${x.id}</span>${x.name}</span>`)).id = 'trig-' + x.id);
+  ['mLLM','mTools','mCost'].forEach(id => $('#'+id).textContent = id==='mCost' ? '$0.000' : '0');
+  $('#mLat').innerHTML = '0.0<small>s</small>';
+}
+
+function renderChannel(){
+  const f = $('#frame'); f.className = 'frame ' + scenario.frame;
+  $('#barTitle').textContent = scenario.bar;
+  $('#chName').textContent = scenario.frame === 'teams' ? 'Microsoft Teams' : scenario.frame === 'wa' ? 'WhatsApp' : scenario.frame === 'ext' ? 'Chrome extension (MCP)' : 'Web app';
+  const th = $('#thread'); th.innerHTML = '';
+  (scenario.prior || []).forEach(m => { const d = el('div', 'msg in ' + (m.role==='user'?'user':'sam'), m.text); d.style.opacity = .6; th.appendChild(d); });
+  if (scenario.prior) th.appendChild(el('div','msg sys in','earlier in this thread'));
+}
+
+function pushUser(){
+  const th = $('#thread'); const m = el('div','msg user', scenario.user.replace(/</g,'&lt;')); if (scenario.frame==='ext') m.classList.add('mono');
+  th.appendChild(m); requestAnimationFrame(()=>m.classList.add('in'));
+  if (scenario.frame === 'wa') { const a = el('div','msg sam','On it.'); th.appendChild(a); setTimeout(()=>a.classList.add('in'), 250); }
+}
+function pushTyping(){ const th = $('#thread'); const m = el('div','msg sam','<span class="typing"><i></i><i></i><i></i></span>'); m.id='typing'; th.appendChild(m); requestAnimationFrame(()=>m.classList.add('in')); }
+function pushReply(){
+  const th = $('#thread'); const old = $('#typing'); if (old) old.remove();
+  const m = el('div','msg sam');
+  if (scenario.replyText) m.innerHTML = scenario.replyText.replace(/</g,'&lt;').replace(/\n/g,'<br>');
+  else if (scenario.replyJson) { m.style.maxWidth='100%'; m.innerHTML = `<div class="jsonout mono">${hl(JSON.stringify(scenario.replyJson,null,2))}</div>`; }
+  else {
+    const r = scenario.reply; let h = `<div>${r.intro}</div>`;
+    r.assets.forEach(a => h += `<div class="asset"><div class="ft ${a.ft}">${a.ft.toUpperCase()}</div><div><b>${a.name}</b><small>${a.meta}</small><div class="why">${a.why}</div></div><div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">${a.badge.map(b=>`<span class="badge ${b}">${b==='private'?'Internal only':b==='public'?'Public link':b==='stale'?'14 months old':'Updated recently'}</span>`).join('')}</div></div>`);
+    if (r.gap) h += `<div style="margin-top:10px"><span class="badge gap">Content gap logged</span> <span style="font-size:13px;color:var(--ink-2)">${r.gap}</span></div>`;
+    if (r.actions) h += `<div class="actions">${r.actions.map(a=>`<span>${a}</span>`).join('')}</div>`;
+    m.innerHTML = h; m.style.maxWidth = '96%';
+  }
+  th.appendChild(m); requestAnimationFrame(()=>m.classList.add('in')); th.scrollTop = th.scrollHeight;
+}
+function hl(j){ return j.replace(/</g,'&lt;').replace(/"([^"]+)":/g,'<span class="k">"$1"</span>:').replace(/: "([^"]*)"/g,': <span class="s">"$1"</span>').replace(/: ([0-9.]+)/g,': <span class="n">$1</span>'); }
+
+let acc = {llm:0, tools:0, lat:0, cost:0};
+function applyStep(i){
+  const s = STEPS[i], sp = scenario.steps[s.id] || {};
+  document.querySelectorAll('.step').forEach((d,j)=>{ d.classList.toggle('active', j===i); d.classList.toggle('done', j<i); });
+  if (i === 0) pushUser();
+  if (i === 3) pushTyping();
+  if (!sp.skipped){
+    if (sp.llm) acc.llm++; acc.tools += sp.tools||0; acc.lat += sp.dur||0; acc.cost += sp.cost||0;
+    (sp.src||[]).forEach(id => { const p = $('#src-'+id), v = $('#srcv-'+id); if (p){ p.className = 'pill hit'; v.textContent = 'hit'; v.style.color='var(--green)'; } });
+    if (s.id === 'retrieve' && /→ 0|nothing|none/.test(sp.p||'')) { const g = $('#src-graph'); if (g && (sp.src||[]).includes('graph')) { g.className='pill miss'; $('#srcv-graph').textContent='no match'; $('#srcv-graph').style.color='var(--red)'; } }
+    (sp.trig||[]).forEach(id => { const t = $('#trig-'+id); if (t){ t.classList.add('fired'); if(!t.querySelector('.badge')) t.appendChild(el('span','badge fresh','fired')); } });
+  }
+  $('#mLLM').textContent = acc.llm; $('#mTools').textContent = acc.tools; $('#mLat').innerHTML = acc.lat.toFixed(1)+'<small>s</small>'; $('#mCost').textContent = money(acc.cost);
+  $('#tlCount').textContent = `${i+1} / ${STEPS.length}`;
+  if (i === 7) pushReply();
+  if (i === STEPS.length-1) document.querySelectorAll('.step').forEach(d=>{d.classList.remove('active');d.classList.add('done');});
+  const node = document.querySelectorAll('.step')[i]; if (node) node.scrollIntoView({block:'nearest', behavior:'smooth'});
+}
+
+function step(){ if (cursor >= STEPS.length-1) { stop(); return; } cursor++; applyStep(cursor); if (cursor >= STEPS.length-1) stop(); }
+function play(){ if (playing) { stop(); return; } playing = true; $('#playBtn').textContent = 'Pause'; tick(); }
+function tick(){ if (!playing) return; step(); if (!playing) return; const sp = scenario.steps[STEPS[Math.min(cursor+1, STEPS.length-1)].id] || {}; const speed = +$('#speed').value; timer = setTimeout(tick, Math.max(350, ((sp.dur||.3)*1000 + 400) / speed)); }
+function stop(){ playing = false; clearTimeout(timer); $('#playBtn').textContent = cursor >= STEPS.length-1 ? 'Replay' : 'Play'; if (cursor >= STEPS.length-1) $('#playBtn').onclick = () => { reset(); play(); }; }
+function reset(){ stop(); cursor = -1; acc = {llm:0,tools:0,lat:0,cost:0}; renderScenarios(); renderChannel(); renderTimeline(); renderSide(); $('#playBtn').textContent='Play'; $('#playBtn').onclick = play; }
+
+$('#stepBtn').onclick = () => { if (playing) stop(); step(); };
+$('#resetBtn').onclick = reset;
+renderLegend(); reset();
+</script>
+</body>
+</html>
