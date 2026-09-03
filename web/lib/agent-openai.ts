@@ -3,7 +3,7 @@
  *    LLM_PROVIDER=openai-compatible
  *    OPENAI_COMPAT_BASE_URL=https://api.groq.com/openai/v1
  *    OPENAI_COMPAT_API_KEY=...
- *    OPENAI_COMPAT_MODEL=llama-3.3-70b-versatile
+ *    OPENAI_COMPAT_MODEL=openai/gpt-oss-120b
  *  Read the provider's data-use terms before pointing it at collateral that names customers: free tiers often
  *  reserve the right to train on prompts. Claude remains the default and recommended path. */
 import { searchAssets, VERTICALS, PRODUCTS, type SearchHit } from "./cards";
