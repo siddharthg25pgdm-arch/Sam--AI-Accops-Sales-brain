@@ -77,12 +77,14 @@ export async function ask(question: string, history: { role: "user" | "assistant
 
 async function askClaude(question: string, history: { role: "user" | "assistant"; content: string }[], t0: number): Promise<AskResult> {
   const client = new Anthropic();
-  const model = process.env.CLAUDE_MODEL ?? "claude-opus-5";
+  const model = process.env.CLAUDE_MODEL ?? "claude-sonnet-5";
+  // Effort is supported on Opus/Sonnet 4.6+ and errors on Haiku 4.5, so only send it where it works.
+  const effort = /haiku/.test(model) ? {} : { output_config: { effort: "medium" as const } };
   const messages: Anthropic.MessageParam[] = [...history.slice(-6), { role: "user", content: question }];
   const trace: AskResult["trace"] = [];
   let lastHits: SearchHit[] = [], filters: Record<string, unknown> = {}, calls = 0, firstZero = false;
   for (let i = 0; i < 4; i++) {
-    const res = await client.messages.create({ model, max_tokens: 2000, system: SYSTEM, tools, messages, output_config: { effort: "medium" } });
+    const res = await client.messages.create({ model, max_tokens: 2000, system: SYSTEM, tools, messages, ...effort });
     const toolUses = res.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
     if (res.stop_reason !== "tool_use" || toolUses.length === 0) {
       const text = res.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map(b => b.text).join("\n").trim();
