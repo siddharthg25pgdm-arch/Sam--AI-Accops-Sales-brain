@@ -1,6 +1,6 @@
 # SAM: Sales & Marketing Brain for Accops
 
-Design proposal, v0.3. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
+Design proposal, v0.4. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
 Status: Siddharth decided (4 Sep): OpenWA is acceptable for production because SAM is internal; build the codelab-shaped prototype first. Prototype 0 exists in `../prototype/` (see section 11). Remaining decisions in section 10.
 
 Companion artifact: `sam-query-simulation.html` in this folder. Open it in a browser and press Play.
@@ -183,3 +183,18 @@ Deliberate choices: the tool searches with filters instead of returning the whol
 What it proves: the four-box flow answers "find me X" on real Accops collateral with a visible trace. What it does not do yet: read SharePoint, know public URLs (every card is `private` until the bucket map exists), embeddings, Teams or WhatsApp.
 
 No Anthropic API key exists on this machine, so only the local stand-in has run. Adding one to `prototype/.env` is the next step.
+
+## 12. Web app v1: bot + catalogue + dashboard (built 4 Sep 2026)
+
+Siddharth's direction after the PM/designer review: Teams is organisationally hard, so ship a Vercel web app with login ID + password that he tests himself first; Teams, WhatsApp and Slack become channels later. Two additions to the product: a browsable catalogue next to the bot (the WhatsApp Business + Shopify storefront pattern), and an admin dashboard.
+
+Built in `../web/` (Next.js 16):
+
+- `/login`: users from `SAM_USERS` (id:password[:admin]); signed cookie session.
+- `/`: left pane asks SAM (Claude tool-use loop with `search_assets`, or retrieval-only without a key); right pane is the catalogue with facets (type, industry, product, year), a Latest view, and a "Not available" view listing industry × type × product combinations with zero assets, ranked by how often people have actually asked. Every answer carries three trust signals (year, internal/public, why matched), one-tap feedback, and an expandable trace. On mobile the two panes become tabs.
+- `/admin`: people, questions, answer rate, feedback, catalogue opens, gaps, top questions, most surfaced assets, unanswered questions in the asker's words, recent questions. Events persist to Supabase `sam_events` (schema in `supabase-sam-events.sql`); in-memory until keys are set.
+- Design: Plus Jakarta Sans only, cool paper background, navy primary, status colours carry meaning only, catalogue cards as spined documents grouped on shelves. No page-load motion.
+
+Verified locally: auth guards, ask, gap logging, feedback, admin, non-admin redirect, 401 on unauthenticated API. Screenshots in `../shots/` (gitignored).
+
+Still true: cards come from the files on disk, all assets show as internal until the bucket map exists, no embeddings, no SharePoint ingestion.

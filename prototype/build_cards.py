@@ -107,6 +107,8 @@ def main() -> None:
             p = choices[best[0]]
             c["file"] = {
                 "path": str(p.relative_to(ASSETS)).replace("\\", "/"),
+                "modified": __import__("datetime").datetime.fromtimestamp(p.stat().st_mtime).strftime("%Y-%m-%d"),
+                "year": (re.search(r"20(2[0-9])", p.name) or re.search(r"20(2[0-9])", str(p.parent)) or [None])[0] if re.search(r"20(2[0-9])", str(p)) else None,
                 "ext": p.suffix.lower().lstrip("."),
                 "size_mb": round(p.stat().st_size / 1_048_576, 2),
                 "match_score": best[1],
@@ -131,6 +133,8 @@ def main() -> None:
             "industry": p.parent.name, "client": "", "products": [], "key_problem": "", "key_outcomes": [],
             "brief": "", "use_for": "", "section": "UNINVENTORIED",
             "file": {"path": str(p.relative_to(ASSETS)).replace("\\", "/"), "ext": p.suffix.lower().lstrip("."),
+                     "modified": __import__("datetime").datetime.fromtimestamp(p.stat().st_mtime).strftime("%Y-%m-%d"),
+                     "year": (re.search(r"20(2[0-9])", str(p)) or [None])[0] if re.search(r"20(2[0-9])", str(p)) else None,
                      "size_mb": round(p.stat().st_size / 1_048_576, 2), "match_score": None, "sha1": None, **m},
             "visibility": "private", "public_url": None,
             "sharepoint_url": "https://accops.sharepoint.com/sites/Sales/Shared%20Documents/" + quote(str(p.relative_to(ASSETS)).replace(chr(92), "/")),
