@@ -63,15 +63,29 @@ Microsoft Graph change notifications are **not guaranteed delivery**. Microsoft'
 
 The nightly delta is therefore not redundancy for its own sake. It is the mechanism that makes deletion correct, which matters more than it sounds: **SAM citing a document that no longer exists is worse than SAM missing one.** A salesperson who forwards a dead SharePoint link to a customer looks careless, and that is the failure that destroys trust in the tool.
 
-## 4. What Siddharth needs to provide
+## 4. Scope, confirmed 4 September 2026
+
+Siddharth confirmed the exact sites and folders from the Power Automate trigger picker. **Note the tenant is `propalmsnetwork`, not `accops`** — every SharePoint URL currently in SAM's asset cards is constructed against `accops.sharepoint.com` and is therefore wrong. Fixing those links is part of this task.
+
+| Scope | Site | Library | Folder |
+|---|---|---|---|
+| Sales | `https://propalmsnetwork.sharepoint.com/sites/Company` | Documents | `/Shared Documents/Sales/Sales Collateral` |
+| Marketing | `https://propalmsnetwork.sharepoint.com/sites/MarketingTeam` | Documents | `/Shared Documents/Marketing 2.0` |
+
+Other sites visible in the tenant, **out of scope**: `AccopsSystemsPrivateLimited`, the tenant root, and a personal `contentstorage` workspace.
+
+The Power Automate connection runs as **Siddharth.Gupta@ACCOPS.COM**.
+
+### Still needed
 
 | Item | Why | Who |
 |---|---|---|
-| The two SharePoint site URLs (Sales, Marketing) | To resolve site and drive IDs | Siddharth |
-| Which folders are in scope | Avoid ingesting drafts, archives, personal folders | Siddharth |
-| Entra ID app registration with `Sites.Selected` | Graph access, scoped to only these two sites | Accops IT / Siddharth |
-| Client secret or certificate | Authentication | Whoever creates the registration |
-| Confirmation that everyone in sales and marketing can read both sites | Determines whether per-user permission trimming is needed in v1 | Siddharth |
+| Entra ID app registration with `Sites.Selected` | So SAM can fetch file content back from Graph. Power Automate's trigger does not carry file bytes. | Accops IT / Siddharth |
+| Client ID and secret | Authentication for that registration | Whoever creates it |
+| Admin grant of `Sites.Selected` on the two sites above | `Sites.Selected` is granted per-site, so both need explicit grants | Accops IT |
+| Confirmation that everyone in sales and marketing can read both sites | Decides whether per-user permission trimming is needed in v1 | Siddharth |
+
+**Fallback if IT approval is slow:** build and test the whole pipeline using Power Automate for both the trigger *and* the file content. The "Get file content" action runs under Siddharth's own connection and needs no app registration. It is slower and less suitable for bulk ingest, but it proves the pipeline end to end and can be swapped for Graph later.
 
 **Ask for `Sites.Selected`, not `Sites.Read.All`.** `Sites.Read.All` grants read access to every SharePoint site in the tenant, which is a much harder approval to get and far more than SAM needs. `Sites.Selected` is granted per-site by an administrator and is the correct least-privilege choice. Expect this to be the slowest step; it is an IT approval, not a technical one.
 
@@ -124,15 +138,21 @@ Steps 1 and 2 are the ones that decide whether the rest is worth doing. Do not s
 
 ## 8. Prompt for the next session
 
-Paste this to start:
+The Power Automate MCP is connected in the new session, so the flow can be created directly. Paste this:
 
-> Build SharePoint ingestion for SAM, per `docs/TASK-sharepoint-ingestion.md` in this repo. Read that file first, then `docs/2026-09-04-sam-design.md` sections 2, 3 and 5 for the corpus and card design, and `web/lib/cards.ts` plus `prototype/build_cards.py` and `prototype/generate_cards.py` for the existing card schema and generation code.
+> I'm continuing work on SAM, my sales and marketing collateral assistant. It is live at https://sam-accops.vercel.app and the repo is this one. Today's job is SharePoint ingestion.
 >
-> I have: [paste the two SharePoint site URLs, the in-scope folders, and confirm whether the Entra app registration with Sites.Selected exists yet].
+> Read `docs/TASK-sharepoint-ingestion.md` first — it has the confirmed scope, the recommended mechanism and the traps. Then read `docs/2026-09-04-sam-design.md` sections 2, 3, 5 and 15, and `web/lib/cards.ts` plus `prototype/build_cards.py` and `prototype/generate_cards.py` for the existing asset-card schema and generation code.
 >
-> Start with step 1 only: authenticate, resolve the site and drive IDs, list both libraries recursively, and give me a report of what is actually there — file count by type, total size, folder structure, and anything that looks like an archive or draft folder we should exclude. Do not ingest anything yet. Then recommend the scope before we go further.
+> Scope is confirmed in section 4 of the task doc: the Company site's `/Shared Documents/Sales/Sales Collateral` folder and the MarketingTeam site's `/Shared Documents/Marketing 2.0` folder, both in the `propalmsnetwork` tenant.
 >
-> Note that I originally wanted a SharePoint webhook on every user query; the task document explains why that is the wrong shape and what to do instead. If you disagree with that reasoning after reading it, say so.
+> I have the Power Automate MCP connected, so you can create flows directly. The Entra app registration with `Sites.Selected` does **not** exist yet.
+>
+> Start with discovery only, no ingestion: use Power Automate to list what is actually in those two folders and give me a report — file count by type, total size, folder structure, anything that looks like an archive or draft we should exclude, and how many are scanned PDFs that will not extract. Then recommend the scope and the build order before we change anything.
+>
+> Two things to know. Every SharePoint URL in SAM's current asset cards was constructed against `accops.sharepoint.com` and is wrong, since the real tenant is `propalmsnetwork` — those links need fixing as part of this. And I originally wanted a SharePoint webhook on every user query; section 2 of the task doc explains why that is the wrong shape. If you disagree after reading it, say so.
+>
+> Commit and push after each working step. Vercel deploys from `main`, and commits must be authored as siddharth.g25pgdm@gmail.com or Vercel blocks the deployment.
 
 ## 9. Current state of everything else
 

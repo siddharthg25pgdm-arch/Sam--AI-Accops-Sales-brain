@@ -1,6 +1,6 @@
 # SAM: Sales & Marketing Brain for Accops
 
-Design proposal, v0.7. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
+Design proposal, v0.8. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
 Status: Siddharth decided (4 Sep): OpenWA is acceptable for production because SAM is internal; build the codelab-shaped prototype first. Prototype 0 exists in `../prototype/` (see section 11). Remaining decisions in section 10.
 
 Companion artifact: `sam-query-simulation.html` in this folder. Open it in a browser and press Play.
@@ -237,3 +237,13 @@ Testing the live system against realistic questions then exposed three defects t
 **Asking for something to send externally reported a false gap.** Because no asset has a public link yet, an `audience=external` search always returns nothing, so SAM said "nothing matches" when 18 BFSI case studies exist. Fixed: the model no longer filters externally, recommends the right internal assets, and adds a line about asking marketing to publish first.
 
 The lesson worth keeping: every one of these was invisible until real questions were asked of the deployed system. The dry-run tests were necessary and insufficient.
+
+## 16. Every SharePoint link SAM gives out is currently dead (found 4 September 2026)
+
+Siddharth's Power Automate screenshots revealed the tenant is **`propalmsnetwork`**, not `accops`. Every `sharepoint_url` in SAM's asset cards was constructed by `prototype/build_cards.py` as `https://accops.sharepoint.com/sites/Sales/Shared%20Documents/<path>` — a hostname I invented when there was no real SharePoint access to check against, and never verified. All 66 assets therefore hand out a link that 404s, including in the live WhatsApp test.
+
+The fix is not a string replacement. The real folder structure (`/Shared Documents/Sales/Sales Collateral` on the Company site, `/Shared Documents/Marketing 2.0` on MarketingTeam) does not match the local folder layout the paths were built from, and the correct URL is Graph's `webUrl` field per file, which only exists once ingestion runs. So this is fixed *by* the SharePoint task rather than before it.
+
+Interim honesty measure worth considering: label the links as unverified in the UI until ingestion lands, or suppress them and show the file path only. Better a rep who has to search SharePoint themselves than one who forwards a dead link to a customer.
+
+**The lesson, repeated from section 15:** this was invisible in every test because the tests checked that a link was *present*, never that it *resolved*. Constructed identifiers need verifying against reality, not just format checks.
