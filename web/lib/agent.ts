@@ -23,6 +23,10 @@ Rules:
   After 3 searches you must answer from what you have, even if the answer is "we do not have this".
 - Accops has no battlecards, comparison sheets or decks in this library — only case studies and whitepapers. If asked
   for one, say so plainly and offer the closest case study or whitepaper instead.
+- **No asset has a public link yet**, so nothing can be forwarded outside Accops today. When someone asks for
+  something to send to a customer, search with audience "internal", recommend the right assets, and add one line:
+  these are internal only, so ask marketing to publish before sending. Never search with audience "external" —
+  it always returns nothing and is not a real gap.
 - Reply shape: one sentence of verdict, then up to three assets. For each: exact title, one line on why it fits THIS ask.
   Do not paste links; the interface renders them from your tool results.
 - If nothing fits, say so in the first sentence, offer the two nearest substitutes, and name the gap plainly.
@@ -134,7 +138,10 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
 function askLocal(question: string, t0: number): AskResult {
   const f = heuristicFilters(question);
   const trace: AskResult["trace"] = [{ step: "router (local heuristics)", detail: JSON.stringify(Object.fromEntries(Object.entries(f).filter(([, v]) => v))) }];
-  let args = { query: question, ...f, limit: 3 } as Parameters<typeof searchAssets>[0];
+  // Nothing is published externally yet, so an external filter would always return nothing. Search internally
+  // and tell the user about the restriction instead of reporting a false gap.
+  const askedExternal = f.audience === "external";
+  let args = { query: question, ...f, audience: "internal" as const, limit: 3 } as Parameters<typeof searchAssets>[0];
   trace.push({ step: "tool call: search_assets", detail: JSON.stringify(args) });
   let { results, considered } = searchAssets(args);
   const exactZero = results.length === 0;
@@ -152,7 +159,7 @@ function askLocal(question: string, t0: number): AskResult {
   else if (exactZero) text = `There is no ${want || "exact match"} in the library. Nearest substitutes${label}:`;
   else if (results.length === 1) text = `One asset fits${label}.`;
   else text = `${results.length} assets fit${label}. The first is the closest match.`;
-  if (f.audience === "external" && results.length && !results.some(r => r.asset.public_url)) text += " None has a public version yet, so ask marketing before sending it outside.";
+  if (askedExternal && results.length) text += " All of these are internal only, so ask marketing to publish a version before sending it outside Accops.";
   return { text, assets: results.map(toCard), trace, runtime: "local", intent: exactZero ? "gap" : "find_asset", filters: f, zero: exactZero };
 }
 
