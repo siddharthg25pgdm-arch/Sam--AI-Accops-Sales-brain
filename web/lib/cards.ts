@@ -24,8 +24,44 @@ export const VERTICALS: Record<string, string[]> = {
 };
 export const PRODUCTS = ["HySecure", "HyID", "HyWorks", "HyLabs", "HyDesk", "ZTNA", "MFA", "VDI", "DaaS", "BioAuth", "Browser Isolation", "Nutanix", "Thin Clients"];
 
+/** Same document, two homes. Three files sit in two folders each (a Govt copy of a BFSI bank study, Polycab under
+ *  both manufacturing and nutanix, an e-commerce study twice), and two more share a content hash across inventory
+ *  entries. With only three slots in an answer, a duplicate wastes one, so collapse them here — once, at the source. */
+export function dedupeKey(a: Asset): string {
+  // Filename first: the same document filed under two verticals keeps its name but gets a different hash
+  // (re-saved copies differ byte-wise), so hashing alone misses exactly the cases a salesperson notices.
+  const file = (a.file?.path ?? "").split("/").pop()?.toLowerCase().replace(/\.(pdf|docx)$/, "").replace(/[^a-z0-9]/g, "") ?? "";
+  if (file) return `file:${file}`;
+  const sha = a.file?.sha1;
+  if (sha) return `sha:${sha}`;
+  return `name:${a.title.toLowerCase().replace(/[^a-z0-9]/g, "")}`;
+}
+
+/** Richer card wins: more descriptive text, then an inventory entry, then a shorter path (less likely a stray copy). */
+function richness(a: Asset): number {
+  return (a.brief?.length ?? 0) + (a.use_for?.length ?? 0) + (a.key_problem?.length ?? 0)
+    + a.key_outcomes.join("").length + (a.products?.length ?? 0) * 10
+    + (a.inventory_id !== null ? 50 : 0) - (a.file?.path?.length ?? 0) / 100;
+}
+
+let cachedAssets: Asset[] | null = null;
+
 export function allAssets(): Asset[] {
-  return data.assets.filter(a => a.asset_type !== "Data File" && a.asset_type !== "Content Calendar");
+  if (cachedAssets) return cachedAssets;
+  const usable = data.assets.filter(a => a.asset_type !== "Data File" && a.asset_type !== "Content Calendar");
+  const best = new Map<string, Asset>();
+  for (const a of usable) {
+    const k = dedupeKey(a);
+    const seen = best.get(k);
+    if (!seen || richness(a) > richness(seen)) best.set(k, a);
+  }
+  cachedAssets = [...best.values()];
+  return cachedAssets;
+}
+
+/** Every asset including duplicate copies. Only for diagnostics; answers and the catalogue use allAssets(). */
+export function allAssetsRaw(): Asset[] {
+  return data.assets;
 }
 export function assetKey(a: Asset) { return a.file?.path ?? a.title; }
 export function typeGroup(a: Asset): "Case Study" | "Whitepaper" | "Other" {
