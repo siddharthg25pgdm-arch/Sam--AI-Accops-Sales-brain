@@ -1,6 +1,6 @@
 /** Shared handlers behind both the REST routes (/api/v1/*) and the MCP tools (/api/mcp).
  *  One implementation, two transports, so the Dwight extension and an MCP client see identical behaviour. */
-import { searchAssets, allAssets, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, VERTICALS, type Asset } from "./cards";
+import { searchAssets, allAssets, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, assetLink, assetLocation, VERTICALS, type Asset } from "./cards";
 import { ask as askAgent, type AskResult } from "./agent";
 import { logEvent, recentEvents } from "./events";
 
@@ -11,7 +11,7 @@ export function card(a: Asset, why?: string) {
     title: a.title, asset_type: a.asset_type, type: typeGroup(a), industry: a.industry, vertical: verticalOf(a), client: a.client,
     products: a.products, use_for: a.use_for, brief: (a.brief || a.key_problem || "").slice(0, 400), key_outcomes: a.key_outcomes.slice(0, 5),
     year: yearOf(a), stale: isStale(a), pages: a.file?.pages ?? null, file_path: a.file?.path ?? null,
-    visibility: a.public_url ? "public" : "internal", public_url: a.public_url, sharepoint_url: a.sharepoint_url,
+    visibility: a.public_url ? "public" : "internal", public_url: a.public_url, location: assetLocation(a),
     shareable_externally: Boolean(a.public_url), ...(why ? { why_match: why } : {}),
   };
 }
@@ -59,8 +59,8 @@ export function apiPublicLink(title_or_path: string) {
   if (!a) return { found: false as const };
   return a.public_url
     ? { found: true as const, status: "public" as const, public_url: a.public_url, title: a.title }
-    : { found: true as const, status: "private_only" as const, sharepoint_url: a.sharepoint_url, title: a.title, can_request_publish: true,
-        note: "No public version exists. Do not forward the SharePoint link outside Accops; ask marketing to publish first." };
+    : { found: true as const, status: "private_only" as const, location: assetLocation(a), title: a.title, can_request_publish: true,
+        note: "No public version exists. Find it in SharePoint at the location shown; ask marketing to publish before sending anything outside Accops." };
 }
 
 /** Account brief for the Dwight extension: talking points + shareable assets for a named company/persona. */
@@ -74,14 +74,14 @@ export async function apiContextForAccount(p: { company: string; person_title?: 
     const { results } = searchAssets({ query: [p.industry, p.person_title].filter(Boolean).join(" "), vertical, limit: 3 });
     const fallback = results.length ? results : searchAssets({ query: "", vertical, limit: 3 }).results;
     r = { ...r, assets: fallback.map(h => ({ title: h.asset.title, asset_type: h.asset.asset_type, industry: h.asset.industry, why: h.why,
-      link: h.asset.public_url ?? h.asset.sharepoint_url, visibility: h.asset.public_url ? "public" : "internal", year: yearOf(h.asset), stale: isStale(h.asset), path: h.asset.file?.path ?? null })),
+      link: assetLink(h.asset), location: assetLocation(h.asset), visibility: h.asset.public_url ? "public" : "internal", year: yearOf(h.asset), stale: isStale(h.asset), path: h.asset.file?.path ?? null })),
       answer: fallback.length ? `No exact match for ${p.company}. Strongest ${vertical ?? "cross-industry"} assets to lead with:` : r.answer };
   }
   return {
     account: { company: p.company, person_title: p.person_title ?? null, country: p.country ?? null, industry: p.industry ?? null },
     brief: r.answer,
     shareable_assets: r.assets.filter(a => a.visibility === "public").map(a => ({ title: a.title, url: a.link })),
-    internal_only: r.assets.filter(a => a.visibility !== "public").map(a => ({ title: a.title, sharepoint_url: a.link, why: a.why })),
+    internal_only: r.assets.filter(a => a.visibility !== "public").map(a => ({ title: a.title, location: a.location, why: a.why })),
     gap: r.gap, runtime: r.runtime,
   };
 }

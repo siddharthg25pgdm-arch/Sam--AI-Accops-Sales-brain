@@ -1,10 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, type SearchHit, type Asset } from "./cards";
+import { searchAssets, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, assetLink, assetLocation, type SearchHit, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured } from "./agent-openai";
 
 export type AskResult = {
   text: string;
-  assets: { title: string; asset_type: string; industry: string; why: string; link: string | null; visibility: string; year: string | null; stale: boolean; path: string | null }[];
+  assets: { title: string; asset_type: string; industry: string; why: string; link: string | null; location: string | null; visibility: string; year: string | null; stale: boolean; path: string | null }[];
   trace: { step: string; detail: string }[];
   runtime: "claude" | "local" | "search";
   intent: string;
@@ -54,7 +54,7 @@ const tools: Anthropic.Tool[] = [{
 
 export function toCard(h: SearchHit) {
   const a = h.asset;
-  return { title: a.title, asset_type: a.asset_type, industry: a.industry, why: h.why, link: a.public_url ?? a.sharepoint_url,
+  return { title: a.title, asset_type: a.asset_type, industry: a.industry, why: h.why, link: assetLink(a), location: assetLocation(a),
     visibility: a.public_url ? "public" : "internal", year: yearOf(a), stale: isStale(a), path: a.file?.path ?? null };
 }
 export function toolPayload(hits: SearchHit[], considered: number) {

@@ -154,6 +154,59 @@ The Power Automate MCP is connected in the new session, so the flow can be creat
 >
 > Commit and push after each working step. Vercel deploys from `main`, and commits must be authored as siddharth.g25pgdm@gmail.com or Vercel blocks the deployment.
 
+## 8a. Session note, 4 September 2026 evening: tooling resolved, links fixed, discovery still to do
+
+**The Power Automate MCP was installed but disabled.** Microsoft's official `power-automate` plugin
+(v2.5.0, from the `microsoft/power-platform-skills` marketplace) was present on disk and carried a real
+FlowAgent MCP server, but `~/.claude/settings.json` had `"power-automate@power-platform-skills": false`,
+so the server was never spawned. A disabled plugin produces no "failed to connect" warning and does not
+appear in `claude mcp list` at all, which makes it indistinguishable from not being installed — worth
+remembering the next time a connected-looking tool is missing. The flag is now `true`, but **plugins load
+at session start, so it takes effect only after a restart.** Discovery therefore did not happen this session.
+
+Prerequisites are all confirmed good, so the next session should be able to go straight to discovery:
+
+| Check | Result |
+|---|---|
+| Node.js | v24.13.1 |
+| Azure CLI | 2.89.0 |
+| `az account show` | signed in as `Siddharth.Gupta@ACCOPS.COM` — the account section 4 names |
+| Flow service token | acquired against `https://service.flow.microsoft.com`, so the account is licensed |
+
+FlowAgent exposes `invoke_operation` and `search_operations`, which call SharePoint connector operations
+directly. Discovery may not need a flow built at all — a direct `Get files (properties only)` per library,
+paginated, is likely enough. Try that before building anything.
+
+**Discovery can start before the Entra app registration exists.** Section 4 lists `Sites.Selected` under
+"still needed", and it is — but only for steps 3 to 5, where SAM runs unattended on Vercel with no user
+present. That is an *application* permission. Discovery runs interactively as Siddharth, so it uses
+*delegated* permission through his existing Power Automate connection and needs no registration and no IT
+approval. Do not let the approval queue block step 1.
+
+### The dead links are fixed, ahead of ingestion
+
+Section 16 said the 71 constructed `accops.sharepoint.com` URLs should be fixed *by* ingestion. That is
+still true for producing correct links, but it left SAM actively handing out 404s in the meantime,
+including over WhatsApp. Siddharth chose to suppress them now.
+
+`assetLink()` and `assetLocation()` in `web/lib/cards.ts` are now the only way a URL reaches a user.
+`assetLink()` returns `public_url` or nothing — never the constructed SharePoint URL. `assetLocation()`
+returns "filename, in folder/path" so a rep can find the document themselves. WhatsApp, the web catalogue,
+the chat cards and the REST API all route through them.
+
+A correction worth recording: an earlier reading of this codebase assumed `slim()` was the single chokepoint
+where an asset becomes something a channel renders. It is not. Five separate call sites did
+`public_url ?? sharepoint_url` — `cards.ts`, `agent.ts` and three places in `api.ts` — so fixing `slim()`
+alone would have left chat, WhatsApp and the REST API still emitting dead links. Grep for the pattern, not
+for the function.
+
+**What ingestion must do here:** populate `sharepoint_url` with Graph's real `webUrl` per file, then have
+`assetLink()` prefer it. Store it *only* when Graph actually returned it and leave it null otherwise, so the
+field never again holds a guess in the slot a verified value occupies. That is the actual lesson of section
+16 — not the wrong hostname, but a field that could hold either a fact or a guess with no way to tell.
+
+---
+
 ## 9. Current state of everything else
 
 Working and deployed at https://sam-accops.vercel.app: web app with chat and faceted catalogue, admin dashboard, REST API, MCP server, WhatsApp channel (live, tested 4 September), Supabase analytics, answers from `openai/gpt-oss-120b` on Groq's free tier, deduplication, honest gap handling.

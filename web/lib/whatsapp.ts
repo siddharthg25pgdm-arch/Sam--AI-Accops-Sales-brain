@@ -82,14 +82,16 @@ export async function markRead(messageId: string) {
 }
 
 /** Render SAM's answer for a phone: verdict, then at most three assets, public links first, private links marked. */
-export function renderForWhatsApp(answer: string, assets: { title: string; link: string | null; visibility: string; why: string; year: string | null }[], gap: boolean): string {
+export function renderForWhatsApp(answer: string, assets: { title: string; link: string | null; location: string | null; visibility: string; why: string; year: string | null }[], gap: boolean): string {
   const lines = [answer.trim()];
   const ordered = [...assets].sort((a, b) => Number(b.visibility === "public") - Number(a.visibility === "public")).slice(0, 3);
   ordered.forEach((a, i) => {
-    const vis = a.visibility === "public" ? "public link" : "internal only, login needed";
-    lines.push(`\n${i + 1}. *${a.title}*${a.year ? ` (${a.year})` : ""}\n${a.why}\n${vis}: ${a.link ?? "no link"}`);
+    // A link only when we have a real one. Until SharePoint ingestion supplies Graph's webUrl, private
+    // assets get a findable location instead of a constructed URL that 404s - see assetLink() in lib/cards.ts.
+    const where = a.link ? `public link: ${a.link}` : a.location ? `in SharePoint: ${a.location}` : "internal only, search SharePoint by title";
+    lines.push(`\n${i + 1}. *${a.title}*${a.year ? ` (${a.year})` : ""}\n${a.why}\n${where}`);
   });
-  if (ordered.length && ordered.every(a => a.visibility !== "public")) lines.push("\nNone of these has a public version. Don't forward the links outside Accops; ask marketing to publish first.");
+  if (ordered.length && ordered.every(a => a.visibility !== "public")) lines.push("\nNone of these has a public version yet. Find it in SharePoint and ask marketing to publish before sending anything to a customer.");
   if (gap) lines.push("\nLogged as a content gap for marketing.");
   lines.push("\nReply with an industry, product or competitor to narrow it.");
   return lines.join("\n");

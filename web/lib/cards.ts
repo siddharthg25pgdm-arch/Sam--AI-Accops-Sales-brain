@@ -158,7 +158,33 @@ export function slim(a: Asset): SlimAsset {
   return {
     key: assetKey(a), title: a.title, type: typeGroup(a), asset_type: a.asset_type, industry: a.industry, vertical: verticalOf(a),
     products: productsOf(a), use_for: a.use_for, brief: a.brief || a.key_problem || "", year: yearOf(a), modified: a.file?.modified ?? null,
-    stale: isStale(a), visibility: a.public_url ? "public" : "internal", link: a.public_url ?? a.sharepoint_url, ext: a.file?.ext ?? null,
+    stale: isStale(a), visibility: a.public_url ? "public" : "internal", link: assetLink(a), location: assetLocation(a), ext: a.file?.ext ?? null,
     pages: a.file?.pages ?? null, inventoried: a.inventory_id !== null,
   };
+}
+
+/** Links SAM is willing to hand a human, and the honest fallback when it has none.
+ *
+ *  Every `sharepoint_url` in the current index was *constructed* by prototype/build_cards.py as
+ *  `https://accops.sharepoint.com/sites/Sales/Shared Documents/<local path>` — a hostname, a site and a
+ *  folder layout all invented from a laptop copy and never checked against SharePoint. The real tenant is
+ *  `propalmsnetwork`, the real sites are Company and MarketingTeam, and the real folders are
+ *  `Sales Collateral` and `Marketing 2.0`, so all 71 of those links 404. A rep who forwards one to a
+ *  customer looks careless, which is the failure that destroys trust in SAM.
+ *
+ *  So: only `public_url` is a link. The SharePoint value stays in the data (ingestion will overwrite it with
+ *  Graph's real `webUrl`, which is the only trustworthy source) but never reaches a user until then.
+ *  Callers that want to tell someone *where* a document lives use assetLocation() and print a path, not a URL. */
+export function assetLink(a: Asset): string | null {
+  return a.public_url ?? null;
+}
+
+/** Where to find the document when there is no link: filename, and the folder it sits in.
+ *  "Accops - BFSI (Integrated) - Case Study.pdf, in case studys/case study BFSI" beats a link that 404s. */
+export function assetLocation(a: Asset): string | null {
+  const p = a.file?.path;
+  if (!p) return null;
+  const parts = p.split("/");
+  const name = parts.pop() ?? p;
+  return parts.length ? `${name}, in ${parts.join("/")}` : name;
 }

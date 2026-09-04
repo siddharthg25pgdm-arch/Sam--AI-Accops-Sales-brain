@@ -97,10 +97,16 @@ function Facet({ label, items, value, onChange }: { label: string; items: [strin
   );
 }
 
+/** A real link stays an anchor; an asset with no verified URL renders as a plain card that shows where it lives. */
+function Wrap({ a, opened, children }: { a: SlimAsset; opened: () => void; children: React.ReactNode }) {
+  if (a.link) return <a className="doc" data-type={a.type} href={a.link} target="_blank" rel="noreferrer" onClick={opened}>{children}</a>;
+  return <div className="doc nolink" data-type={a.type} title={a.location ?? undefined}>{children}</div>;
+}
+
 function Doc({ a }: { a: SlimAsset }) {
   function opened() { fetch("/api/open", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: a.key, source: "catalogue" }) }); }
   return (
-    <a className="doc" data-type={a.type} href={a.link ?? "#"} target="_blank" rel="noreferrer" onClick={opened}>
+    <Wrap a={a} opened={opened}>
       <div className="spine" aria-hidden="true"><span>{a.year ?? a.ext?.toUpperCase() ?? ""}</span></div>
       <div className="body">
         <b>{a.title}</b>
@@ -108,10 +114,11 @@ function Doc({ a }: { a: SlimAsset }) {
         {(a.use_for || a.brief) && <p>{a.use_for || a.brief}</p>}
         <div className="tags">
           <span className={`tag ${a.visibility}`}>{a.visibility === "public" ? "Public link" : "Internal only"}</span>
+          {!a.link && a.location && <span className="tag where">{a.location}</span>}
           {a.stale && <span className="tag stale">Older than 2 years</span>}
           {!a.inventoried && <span className="tag gap">Not in inventory</span>}
         </div>
       </div>
-    </a>
+    </Wrap>
   );
 }

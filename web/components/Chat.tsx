@@ -96,7 +96,7 @@ function ResultCard({ a }: { a: ChatAsset }) {
       <div className="side">
         <span className={`tag ${a.visibility === "public" ? "public" : "internal"}`}>{a.visibility === "public" ? "Public link" : "Internal only"}</span>
         {a.stale && <span className="tag stale">Older than 2 years</span>}
-        <a className="open" href={a.link ?? "#"} target="_blank" rel="noreferrer" aria-disabled={!a.link} onClick={opened}>Open</a>
+        {a.link ? <a className="open" href={a.link} target="_blank" rel="noreferrer" onClick={opened}>Open</a> : <span className="where" title={a.location ?? undefined}>{a.location ? `In SharePoint: ${a.location}` : "Search SharePoint by title"}</span>}
       </div>
     </div>
   );
