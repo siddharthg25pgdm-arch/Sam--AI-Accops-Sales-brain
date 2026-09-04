@@ -18,7 +18,11 @@ collateral fast and tell them how to use it.
 
 Rules:
 - Recommend ONLY assets returned by search_assets. Never invent a document, client or number.
-- Call search_assets with sensible filters. If it returns nothing, relax one filter and call it once more.
+- Call search_assets with sensible filters. **You have at most 3 searches.** If a search returns nothing or nothing
+  suitable, do not repeat it with reworded text: drop a filter (asset_type, then product, then vertical) and widen.
+  After 3 searches you must answer from what you have, even if the answer is "we do not have this".
+- Accops has no battlecards, comparison sheets or decks in this library — only case studies and whitepapers. If asked
+  for one, say so plainly and offer the closest case study or whitepaper instead.
 - Reply shape: one sentence of verdict, then up to three assets. For each: exact title, one line on why it fits THIS ask.
   Do not paste links; the interface renders them from your tool results.
 - If nothing fits, say so in the first sentence, offer the two nearest substitutes, and name the gap plainly.
@@ -117,7 +121,14 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
     }
     messages.push({ role: "user", content: results });
   }
-  return { text: "SAM ran out of steps before answering. Try a shorter question.", assets: lastHits.slice(0, 3).map(toCard), trace, runtime: "claude", intent: "other", filters, zero: lastHits.length === 0 };
+  // Search budget exhausted. Answer from whatever the searches did find rather than showing an error,
+  // and treat "nothing found" as a genuine gap so it is logged and reported like any other.
+  trace.push({ step: "search budget reached", detail: `${calls} searches; answering from the best results found` });
+  const cards = lastHits.slice(0, 3).map(toCard);
+  const text = cards.length
+    ? `No exact match. The closest ${cards.length === 1 ? "asset" : "assets"} in the library:`
+    : "Nothing in the library matches that. The library holds case studies and whitepapers only, so battlecards, comparison sheets and decks are not here. Try an industry or product, or browse the catalogue.";
+  return { text, assets: cards, trace, runtime: "claude", intent: cards.length ? "find_asset" : "gap", filters, zero: cards.length === 0 };
 }
 
 function askLocal(question: string, t0: number): AskResult {
