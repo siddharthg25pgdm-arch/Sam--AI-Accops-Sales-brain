@@ -6,13 +6,19 @@ not Claude, not GitHub, not Accops IT.** There is no reset link and no backdoor.
 The good news: **nothing in that file is unrecoverable.** Every value can be re-read from a dashboard you
 already control, or regenerated. Losing the passphrase costs about 20 minutes, not the project.
 
-## Where the passphrase should be
+## Passphrase hint
 
-1. Siddharth's password manager, entry name **"SAM secrets passphrase"**. This is the primary copy.
-2. Nowhere else. Not in this repository, not in chat tools, not in Teams, not in email, not in a note app
-   that syncs in plaintext.
+> **Search in your Teams for "Passphrase" sent to yourself.**
 
-If it is not in the password manager, assume it is gone and follow the rebuild below.
+That is where Siddharth keeps his copy. A second copy belongs in his password manager under
+**"SAM secrets passphrase"**, so that losing access to one does not lose the passphrase.
+
+Note the tradeoff he accepted: a Teams self-message is convenient and always to hand, but it is searchable,
+cloud-synced, retained indefinitely, and visible to Accops IT through eDiscovery. If SAM ever moves beyond
+internal use, or the repository is shared outside Accops, rotate the passphrase and keep the new one in the
+password manager only.
+
+If neither copy can be found, assume it is gone and follow the rebuild below.
 
 ## Rebuild the file from scratch (about 20 minutes)
 

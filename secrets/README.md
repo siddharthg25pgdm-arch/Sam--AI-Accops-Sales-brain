@@ -3,8 +3,11 @@
 `secrets.md.gpg` holds every credential SAM uses: logins, API tokens, database keys, model keys.
 It is symmetrically encrypted with GnuPG (AES-256), so the file in this repository is useless without the passphrase.
 
-**The passphrase is not in this repository and never will be.** It lives in Siddharth's password manager
-under "SAM secrets passphrase". Without it, this file cannot be decrypted by anyone.
+**The passphrase is not in this repository and never will be.** Without it, this file cannot be decrypted by anyone.
+
+> **Passphrase hint: search in your Teams for "Passphrase" sent to yourself.**
+> A second copy belongs in the password manager under "SAM secrets passphrase".
+> Lost both? `secrets/RECOVERY.md` rebuilds every value from the dashboards in about 20 minutes.
 
 ## Read the secrets
 

@@ -28,6 +28,18 @@ A question arrives from the web app, the API, the MCP server, or WhatsApp. All f
 
 Public links are offered before internal ones, and internal links are labelled as login-required. Private files are never attached or forwarded.
 
+## Credentials
+
+All credentials, URLs and account details are in `secrets/secrets.md.gpg`, AES-256 encrypted.
+
+```bash
+bash secrets/decrypt.sh
+```
+
+> **Passphrase hint: search in your Teams for "Passphrase" sent to yourself.**
+
+Lost it? `secrets/RECOVERY.md` rebuilds every value from the Vercel, Supabase, Groq and Meta dashboards.
+
 ## Current state
 
 Working: web app, catalogue with facets, "Not available" gap view, admin dashboard, REST API, MCP server, WhatsApp channel code, Supabase analytics, model answers via Groq's free tier.
