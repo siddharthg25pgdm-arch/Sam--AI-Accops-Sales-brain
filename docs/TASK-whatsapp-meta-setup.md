@@ -1,9 +1,31 @@
 # Task: set up a WhatsApp test number for SAM on Meta
 
-**Status:** open, waiting on Siddharth.
+**Status:** CLOSED, done 4 September 2026. The channel is live end to end.
 **Owner:** Siddharth Gupta.
 **Written:** 4 September 2026.
-**Why this file exists:** so any assistant on any device can guide Siddharth through this without the original conversation. Everything needed is below.
+**Why this file exists:** it was the handoff brief for setting the channel up. It is kept as the record of what was configured, what expires when, and the traps that cost time.
+
+---
+
+## 0. Live configuration, as built
+
+| Thing | Value |
+|---|---|
+| Test number (SAM's sender) | `+1 555 203 1130` |
+| `WHATSAPP_PHONE_NUMBER_ID` | `1323765984143768` |
+| WhatsApp Business Account ID | `1978455382818275` |
+| Meta app ID | `4592550320973349` |
+| Registered recipient | `919013780154` (`SAM_WHATSAPP_USERS` = `919013780154:siddharth`) |
+| Webhook | `https://sam-accops.vercel.app/api/channels/whatsapp`, field `messages` subscribed |
+
+Verified 4 September 2026: `bank case study` from the registered mobile returned three Accops bank case studies with SharePoint links marked internal-only. Vercel logs show the inbound POST and its delivery callbacks, no errors.
+
+### Two expiry dates
+
+- **Access token expires 3 November 2026** (60-day token). Before then, replace it with a permanent System user token: Business settings -> Users -> System users, assign the app, generate with `whatsapp_business_messaging` and `whatsapp_business_management`. Then `vercel env rm WHATSAPP_ACCESS_TOKEN production --yes` and add the new one.
+- **Test number expires early December 2026** (90 days from 4 September). A dedicated production number is still the eventual fix, see section 9.
+
+Both are silent failures: when either lapses, messages simply stop being answered.
 
 ---
 
@@ -57,7 +79,7 @@ A Facebook login that can manage a Meta Business account is required. About 15 m
    - Phone number ID
    - Access token
    - App secret
-   - Mobile number(s) allowed to use SAM, in the form `91XXXXXXXXXX` — country code, digits only, no `+`, no spaces
+   - Mobile number(s) allowed to use SAM, in the form `91XXXXXXXXXX:loginid` — country code, digits only, no `+`, no spaces, then a colon and the person's SAM login ID. The login ID half is required: `userForNumber` in `web/lib/whatsapp.ts` splits on the colon and returns null without it, so a bare number is treated as unregistered.
 
    These go into Vercel as environment variables and the app is redeployed. The access token and app secret are secrets; the token expires in 24 hours regardless.
 
@@ -76,6 +98,18 @@ A Facebook login that can manage a Meta Business account is required. About 15 m
 - The temporary access token dies after 24 hours. When the permanent number is set up, create a **System user** under Business settings → Users → System users, assign the app, and generate a permanent token with the `whatsapp_business_messaging` and `whatsapp_business_management` permissions.
 - Numbers not listed in `SAM_WHATSAPP_USERS` get one line back: "This number isn't registered with SAM yet." That is deliberate.
 - SAM never attaches files over WhatsApp. It sends links only, public links first, and marks internal links as login-required. This is the rule that makes the channel acceptable to InfoSec.
+
+## 6b. Two things that were not in the original plan, and cost the most time
+
+**The app must be published.** While an app is unpublished Meta delivers no production webhooks at all, not even to the app's own admin. The Configuration tab says so in a small orange banner. Verification still succeeds and the webhook still saves, so nothing looks wrong; messages just never arrive. Publish the app before testing.
+
+**Webhook delivery is per WhatsApp Business Account, not per app.** The first test number sat on a WABA that another Meta app (the Vantage Goods Shopify integration) was already subscribed to. Messages to it were answered by that app's auto-responder, and SAM's endpoint received zero POSTs. The callback URL and verify token are app-level and survive a WABA change, so the Configuration tab looked correctly set up the whole time.
+
+The fix was a second WABA with its own test number (`1978455382818275` / `+1 555 203 1130`). After switching WABA, re-verify the webhook and re-subscribe `messages`, and generate the access token against the new WABA: a token minted for the old one fails with OAuth error 190.
+
+Diagnosis that settles it quickly: `vercel logs sam-accops.vercel.app | grep channels/whatsapp`. A GET is Meta's verification handshake. No POST after sending a message means Meta never delivered, so the problem is on Meta's side (unpublished app, or wrong WABA), not in SAM.
+
+---
 
 ## 7. If something fails
 
@@ -99,7 +133,8 @@ Runtime errors appear in Vercel → sam-accops → Logs, filtered to `/api/chann
 
 ## 9. Other open items, for context
 
-- **Real WhatsApp number** — the test number proves the loop; a dedicated number is needed for actual use.
+- **Real WhatsApp number** — the test number proved the loop and expires early December 2026; a dedicated number is needed for actual use. It must not be a number already on the WhatsApp Business app.
+- **Permanent access token** — the current one expires 3 November 2026. See section 0.
 - **SharePoint ingestion** — SAM's 74 assets currently come from files on Siddharth's laptop. Connecting the Sales and Marketing SharePoint sites through Microsoft Graph needs the two site URLs and approval for an app registration. This also brings in battlecards and decks, which are missing today.
 - **Public asset map** — every asset currently shows "Internal only" because the public bucket's listing has not been mapped yet.
 - **Model** — answers are generated by `openai/gpt-oss-120b` on Groq's free tier, because an Anthropic API key was not obtainable. Worth revisiting: Claude via Microsoft Foundry billed through Azure, which would also settle the question of where customer-named text is processed.
