@@ -1,6 +1,6 @@
 # SAM: Sales & Marketing Brain for Accops
 
-Design proposal, v0.6. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
+Design proposal, v0.7. 4 September 2026. Author: Claude, at Siddharth Gupta's request.
 Status: Siddharth decided (4 Sep): OpenWA is acceptable for production because SAM is internal; build the codelab-shaped prototype first. Prototype 0 exists in `../prototype/` (see section 11). Remaining decisions in section 10.
 
 Companion artifact: `sam-query-simulation.html` in this folder. Open it in a browser and press Play.
@@ -223,3 +223,17 @@ Auth for machines: `Authorization: Bearer <token>` with tokens from `SAM_API_TOK
 `web/lib/whatsapp.ts` and `web/app/api/channels/whatsapp/route.ts`. Flow per inbound text: verify `X-Hub-Signature-256` with the app secret, extract text messages (statuses, media and reactions ignored), return 200 immediately, then in a post-response task: dedupe on message id, map the sender number to a SAM login, mark the message read with a typing indicator, run the same `apiAsk` as every other channel with a six-hour per-number history for follow-ups, render as verdict plus at most three links with public links first and internal ones labelled, send via the Graph API. Unregistered numbers get one refusal line and are logged as `unregistered`. Without an access token the route runs dry and logs the reply, which is how it was tested locally: handshake, wrong verify token, bad signature, signed message, unregistered sender, and replay of the same message id all behaved as specified, and the WhatsApp question appeared in the dashboard under the mapped login.
 
 What Siddharth must do on the Meta side is in `web/README.md` (about 30 minutes, needs a Meta Business account and a number that is not already on WhatsApp).
+
+## 15. WhatsApp live, and what the first real test exposed (4 September 2026, evening)
+
+Siddharth completed the Meta setup on a second device and the channel works end to end: "Bank Case Study" from the registered mobile returned three Accops bank case studies. The configuration, and two expiry dates that will fail silently, are recorded in `TASK-whatsapp-meta-setup.md`.
+
+Testing the live system against realistic questions then exposed three defects that the earlier dry-run tests could not, because they only ever exercised the happy path:
+
+**Duplicate assets ate answer slots.** Three documents were filed under two verticals each (a bank case study in both BFSI and Govt folders, Polycab under manufacturing and nutanix, an e-commerce study twice) and four whitepapers existed as both PDF and DOCX. A search for "public sector bank case study" spent one of its three slots on the same document twice. Fixed by deduplicating on filename first, then content hash, keeping the richer card. 74 entries collapse to 66 real documents. Industry classification is unaffected because it comes from card metadata, not the folder.
+
+**A missing asset type produced an error instead of an answer.** Asked for a Citrix battlecard, the model looped on near-identical searches, hit the iteration cap, and returned "SAM ran out of steps before answering". Fixed by telling the model it has a three-search budget and how to widen, telling it the library contains no battlecards or decks, and making budget exhaustion fall back to the best results found or an honest gap. It now answers in one search.
+
+**Asking for something to send externally reported a false gap.** Because no asset has a public link yet, an `audience=external` search always returns nothing, so SAM said "nothing matches" when 18 BFSI case studies exist. Fixed: the model no longer filters externally, recommends the right internal assets, and adds a line about asking marketing to publish first.
+
+The lesson worth keeping: every one of these was invisible until real questions were asked of the deployed system. The dry-run tests were necessary and insufficient.
