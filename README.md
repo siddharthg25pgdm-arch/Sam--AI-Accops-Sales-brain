@@ -46,4 +46,11 @@ Working: web app, catalogue with facets, "Not available" gap view, admin dashboa
 
 Not yet: SharePoint ingestion (assets come from a local folder), public/internal asset mapping (everything shows as internal), a real WhatsApp number, embeddings-based retrieval.
 
-Open tasks are in `docs/TASK-*.md`.
+## Open tasks
+
+| Task | Status |
+|---|---|
+| [`docs/TASK-sharepoint-ingestion.md`](docs/TASK-sharepoint-ingestion.md) | **Next up.** Ingest the real Sales and Marketing libraries. Includes the recommended mechanism, what to ask IT for, and a ready-to-paste prompt. |
+| [`docs/TASK-whatsapp-meta-setup.md`](docs/TASK-whatsapp-meta-setup.md) | Closed, channel live. Kept for the config record and two expiry dates. |
+
+After SharePoint: publication-date extraction and freshness badges, the public/internal asset map, consuming feedback thumbs, publish requests, a weekly gap digest.
