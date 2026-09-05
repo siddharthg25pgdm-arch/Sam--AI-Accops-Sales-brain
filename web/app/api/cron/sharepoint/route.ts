@@ -1,47 +1,41 @@
-import { configured, syncRows, syncDrive, ensureSubscription } from "@/lib/sharepoint";
+import { configured, registry } from "@/lib/sharepoint";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
-/** Nightly reconcile. Vercel cron hits this; it can also be run by hand with the cron secret.
+/** Nightly registry health check. Reports; changes nothing, in SAM or in SharePoint.
  *
- *  This exists because Graph change notifications are explicitly not guaranteed delivery. It does
- *  two jobs the webhook cannot:
- *    - a full delta pass, which is what makes deletions and moves correct. SAM citing a document
- *      that no longer exists is worse than SAM missing one.
- *    - renewing the subscriptions, which Graph expires in at most three days.
+ *  The Power Automate flow is the live path, but flows can be turned off, fail silently, or miss a
+ *  change. This surfaces that: if nothing has been recorded for a while, the flow is probably not
+ *  running, and a stale registry is how SAM ends up citing documents that have moved or gone.
  *
- *  Both run per drive and a failure on one drive must not stop the other, so results are collected
- *  rather than thrown. */
+ *  A full reconcile against Graph would need the app registration this design deliberately avoids,
+ *  so the safety net is instead: run prototype/sp_discover.py + sp_seed_registry.py --write, which
+ *  work on the delegated Azure CLI login and need no IT approval. */
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
-  if (secret) {
-    const auth = req.headers.get("authorization");
-    if (auth !== `Bearer ${secret}`) return new Response("unauthorized", { status: 401 });
+  if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) {
+    return new Response("unauthorized", { status: 401 });
   }
   if (!configured()) {
-    return Response.json({ ok: false, reason: "SharePoint sync not configured (SP_* and SUPABASE_* env vars)" }, { status: 200 });
+    return Response.json({ ok: false, reason: "SUPABASE_URL / SUPABASE_SERVICE_KEY not set" });
   }
 
-  const base = process.env.SAM_PUBLIC_URL ?? `https://${req.headers.get("host")}`;
-  const notificationUrl = `${base}/api/channels/sharepoint`;
-  const results: Record<string, unknown>[] = [];
+  const rows = await registry("sales", 5000);
+  const synced = rows.map(r => r.modified_at).filter(Boolean).sort().reverse();
+  const newest = synced[0] ?? null;
+  const ageDays = newest ? (Date.now() - Date.parse(newest)) / 86_400_000 : null;
 
-  for (const row of await syncRows()) {
-    const entry: Record<string, unknown> = { scope: row.scope, drive_id: row.drive_id };
-    try {
-      const s = await syncDrive(row);
-      entry.sync = { upserts: s.upserts, deletes: s.deletes, scanned: s.scanned };
-    } catch (e) {
-      entry.sync_error = String(e).slice(0, 300);
-    }
-    try {
-      const sub = await ensureSubscription(row, notificationUrl);
-      entry.subscription = { id: sub.id, expires: sub.expires, created: sub.created };
-    } catch (e) {
-      entry.subscription_error = String(e).slice(0, 300);
-    }
-    results.push(entry);
-  }
-
-  return Response.json({ ok: true, ran_at: new Date().toISOString(), notificationUrl, results });
+  return Response.json({
+    ok: true,
+    ran_at: new Date().toISOString(),
+    tracked: rows.length,
+    newest_change: newest,
+    // Sales Collateral is not a busy library, so silence is only suspicious after a while.
+    flow_probably_stalled: ageDays !== null && ageDays > 30,
+    untagged: rows.filter(r => !r.asset_type?.length || r.asset_type[0] === "Other").length,
+    by_type: rows.reduce<Record<string, number>>((acc, r) => {
+      for (const t of r.asset_type ?? []) acc[t] = (acc[t] ?? 0) + 1;
+      return acc;
+    }, {}),
+  });
 }

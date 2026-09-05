@@ -14,6 +14,14 @@ create table if not exists sam_sharepoint_files (
   created_at     timestamptz,
   modified_at    timestamptz,
   modified_by    text,
+  -- Two dates, two questions: created is how old the document really is, modified is whether
+  -- anyone has touched it since. Neither is the publication date - that needs the document text.
+  asset_type     text[] not null default '{}',   -- Case Study | Deck | Brochure | Competitive | ...
+  industry       text[] not null default '{}',   -- BFSI | Government | Pharma / Healthcare | ...
+  product        text[] not null default '{}',   -- HySecure | HyID | ZTNA | MFA | VDI | ...
+  competitor     text[] not null default '{}',   -- Citrix | VMware | Omnissa | ...
+  team           text,                           -- Sales | Marketing
+  status         text not null default 'active', -- active | archived
   etag           text,                         -- changes on any edit, including metadata only
   ctag           text,                         -- changes only when CONTENT changes: re-card gate
   deleted        boolean not null default false,
@@ -27,6 +35,10 @@ create table if not exists sam_sharepoint_files (
 create index if not exists sam_sp_scope_idx    on sam_sharepoint_files (scope, deleted);
 create index if not exists sam_sp_folder_idx   on sam_sharepoint_files (scope, folder);
 create index if not exists sam_sp_modified_idx on sam_sharepoint_files (modified_at desc);
+-- GIN so "BFSI case study" filters on both facets without a scan
+create index if not exists sam_sp_type_idx     on sam_sharepoint_files using gin (asset_type);
+create index if not exists sam_sp_industry_idx on sam_sharepoint_files using gin (industry);
+create index if not exists sam_sp_product_idx  on sam_sharepoint_files using gin (product);
 
 -- Delta cursors and webhook subscriptions, one row per watched drive.
 -- Graph drive subscriptions expire in <= 3 days, so the nightly job renews from here.

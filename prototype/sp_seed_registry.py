@@ -49,7 +49,7 @@ def main() -> None:
     data = mapped_rows()
 
     sync = [{"drive_id": v["drive_id"], "scope": scope, "root_folder": v["root_folder"],
-             "delta_link": v.get("delta_link"), "client_state": env("SP_CLIENT_STATE") or None}
+             "delta_link": v.get("delta_link")}
             for scope, v in inv.items()
             # Only register drives we actually track; marketing stays out until folders are chosen.
             if scope == "sales" or MARKETING_FOLDERS]
@@ -58,7 +58,14 @@ def main() -> None:
         "item_id": r["item_id"], "drive_id": r["drive_id"], "scope": r["scope"], "folder": r["folder"],
         "filename": r["filename"], "ext": r["ext"], "size_bytes": int(r["size_mb"] * 1048576),
         "web_url": r["web_url"], "modified_at": (r["modified"] or None), "modified_by": r["modified_by"] or None,
-        "suggest_ingest": r["suggest_ingest"] == "yes", "skip_reason": r["skip_reason"] or None,
+        "created_at": (r["created"] or None), "suggest_ingest": r["suggest_ingest"] == "yes",
+        "skip_reason": r["skip_reason"] or None,
+        # Tags travel with the row so the catalogue can filter before any document is carded.
+        "asset_type": [x.strip() for x in r["asset_type"].split(";") if x.strip()],
+        "industry": [x.strip() for x in r["industry"].split(";") if x.strip()],
+        "product": [x.strip() for x in r["product"].split(";") if x.strip()],
+        "competitor": [x.strip() for x in r["competitor"].split(";") if x.strip()],
+        "team": "Sales" if r["scope"] == "sales" else "Marketing", "status": r["status"],
     } for r in data]
 
     print(f"sync rows : {[(s['scope'], s['root_folder'], 'delta' if s['delta_link'] else 'no delta') for s in sync]}")

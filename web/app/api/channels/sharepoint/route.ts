@@ -1,57 +1,50 @@
 import { after } from "next/server";
-import { configured, syncRows, syncDrive } from "@/lib/sharepoint";
+import { applyChange, tagsFor, type IncomingFile } from "@/lib/sharepoint";
 
 export const maxDuration = 60;
 
-/** Graph change notifications for the watched SharePoint drives.
+/** SharePoint change tracker. SAM records that a file changed; it never writes to SharePoint.
  *
- *  Two hard requirements from Microsoft, both easy to get wrong:
+ *  This endpoint is READ-ONLY with respect to SharePoint: no create, no move, no rename, no delete,
+ *  no content fetch. Everything it does happens inside SAM's own registry table. Siddharth downloads
+ *  the documents he wants carded and hands them over, so the file bodies never travel.
  *
- *  1. On subscription creation Graph POSTs here with ?validationToken=... and expects that exact
- *     string back as text/plain within 10 seconds. Anything else and the subscription is refused.
- *  2. Every later notification must also be answered inside 10 seconds or Graph retries and
- *     eventually drops the subscription. So acknowledge first and sync in after(), the same shape
- *     the WhatsApp route uses.
+ *  Fed by a Power Automate flow running on Siddharth's own connection - which is why there is no
+ *  Entra app registration here. Power Automate's SharePoint trigger already has permission to watch
+ *  the folder as him, so nothing needs IT approval. The flow POSTs one JSON body per change:
  *
- *  Notifications carry no file data - only "something changed in this drive" - so the work is a
- *  delta query regardless. That is why there is no per-item handling here. */
+ *    { "secret": "...", "event": "created" | "modified" | "deleted",
+ *      "itemId": "...", "driveId": "...", "scope": "sales",
+ *      "name": "Bank Case Study.pdf", "folder": "zCase Studies/BFSI",
+ *      "webUrl": "https://propalmsnetwork.sharepoint.com/...",
+ *      "size": 123456, "created": "2024-01-01T00:00:00Z",
+ *      "modified": "2026-09-05T10:00:00Z", "modifiedBy": "Sandip Mallik", "etag": "...", "cTag": "..." }
+ *
+ *  Acknowledge fast and do the work in after(): Power Automate retries on a slow response, which
+ *  would double-apply a change that is already recorded. */
 export async function POST(req: Request) {
-  const url = new URL(req.url);
-  const validationToken = url.searchParams.get("validationToken");
-  if (validationToken) {
-    return new Response(validationToken, { status: 200, headers: { "Content-Type": "text/plain" } });
-  }
-
-  let body: { value?: { clientState?: string; resource?: string; subscriptionId?: string }[] };
+  let body: IncomingFile & { secret?: string };
   try { body = await req.json(); } catch { return new Response("bad json", { status: 400 }); }
-  const notifications = body.value ?? [];
 
-  // clientState is the shared secret proving this really came from our subscription. Same discipline
-  // as the WhatsApp signature check: anyone can POST this public URL.
-  const expected = process.env.SP_CLIENT_STATE;
-  if (expected && notifications.some(n => n.clientState !== expected)) {
-    return new Response("bad clientState", { status: 401 });
-  }
+  // Shared secret, same discipline as the WhatsApp signature check: this URL is public.
+  const expected = process.env.SP_WEBHOOK_SECRET;
+  if (expected && body.secret !== expected) return new Response("bad secret", { status: 401 });
+  if (!body.itemId) return new Response("itemId required", { status: 400 });
 
-  if (configured() && notifications.length) {
-    const driveIds = new Set(
-      notifications.map(n => /drives\/([^/]+)/.exec(n.resource ?? "")?.[1]).filter(Boolean) as string[]
-    );
-    after(async () => {
-      try {
-        const rows = await syncRows();
-        // Several notifications can land per change; sync each affected drive once, not per message.
-        for (const row of rows.filter(r => driveIds.size === 0 || driveIds.has(r.drive_id))) {
-          const r = await syncDrive(row);
-          console.log(`sharepoint sync ${row.scope}: ${r.upserts} upserts, ${r.deletes} deletes`);
-        }
-      } catch (e) {
-        // Never throw here: Graph has already had its 202 and a throw would only crash the lambda.
-        // The nightly reconcile is what makes a missed notification survivable.
-        console.error("sharepoint sync failed", e);
-      }
-    });
-  }
+  after(async () => {
+    try {
+      const r = await applyChange(body);
+      console.log(`sharepoint ${body.event ?? "modified"} ${body.name ?? body.itemId}: ${r}`);
+    } catch (e) {
+      // Never throw after the ack: the nightly reconcile is what makes a missed change survivable.
+      console.error("sharepoint change failed", e);
+    }
+  });
 
-  return new Response(null, { status: 202 });
+  return Response.json({ ok: true, itemId: body.itemId, tags: tagsFor(body.folder ?? "", body.name ?? "") }, { status: 202 });
+}
+
+/** Lets Siddharth confirm the endpoint is reachable from the Power Automate flow designer. */
+export async function GET() {
+  return Response.json({ ok: true, endpoint: "sharepoint change tracker", writes_to_sharepoint: false });
 }

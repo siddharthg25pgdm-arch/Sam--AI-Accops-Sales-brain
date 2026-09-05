@@ -15,6 +15,8 @@ from __future__ import annotations
 import csv, json, re
 from pathlib import Path
 
+from sp_tags import tags_for, flat
+
 HERE = Path(__file__).parent
 INV = HERE / "data" / "sharepoint_inventory.json"
 OUT = HERE / "data" / "sharepoint_url_map.csv"
@@ -42,19 +44,28 @@ def rows() -> list[dict]:
             if scope == "marketing":
                 if not any(folder == m or folder.startswith(m + "/") for m in MARKETING_FOLDERS):
                     continue
-            dead = bool(DEAD.search("/" + f["path"]))
             doc = f["ext"] in DOC_EXT
+            t = tags_for(folder, f["name"], scope)
             out.append({
                 "scope": scope,
                 "folder": folder,
                 "filename": f["name"],
                 "ext": f["ext"],
                 "size_mb": round(f["size"] / 1048576, 2),
+                # Both dates: created answers "how old is this really", modified answers "has anyone
+                # touched it since". Neither is the publication date - that needs the document text.
+                "created": (f["created"] or "")[:10],
                 "modified": (f["modified"] or "")[:10],
                 "modified_by": f["modified_by"] or "",
+                "tags": flat(t),
+                "asset_type": "; ".join(t["asset_types"]),
+                "industry": "; ".join(t["industries"]),
+                "product": "; ".join(t["products"]),
+                "competitor": "; ".join(t["competitors"]),
+                "status": t["status"],
                 # Suggestion, not a decision - Siddharth picks what to download and card.
-                "suggest_ingest": "no" if (dead or not doc) else "yes",
-                "skip_reason": "archive/draft folder" if dead else ("not a document" if not doc else ""),
+                "suggest_ingest": "no" if (t["status"] == "archived" or not doc) else "yes",
+                "skip_reason": "archive/draft folder" if t["status"] == "archived" else ("not a document" if not doc else ""),
                 "web_url": f["web_url"] or "",
                 "drive_id": inv[scope]["drive_id"],
                 "item_id": f["item_id"],
