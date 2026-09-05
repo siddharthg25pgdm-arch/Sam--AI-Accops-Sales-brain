@@ -1,4 +1,7 @@
--- SAM SharePoint file registry. Run once in the Supabase SQL editor, same project as sam_events.
+-- SAM SharePoint file registry.
+-- Project: accops-marketing-dashboard (ref iwqhayuoxnrhqzozznes) - shared with the marketing
+-- dashboard because the free tier allows only two projects. Every SAM table is prefixed sam_ so
+-- the two apps stay legible side by side; nothing here touches the dashboard's own tables.
 -- Holds WHERE every in-scope document lives, never its contents: SAM hands out links, and the
 -- private-asset-body-never-leaves-SharePoint rule (design section 2) depends on that staying true.
 

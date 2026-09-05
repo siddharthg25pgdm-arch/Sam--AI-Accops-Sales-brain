@@ -6,6 +6,11 @@ The webhook and nightly cron take over afterwards and keep the same rows current
 Scope matches sp_map_urls.py: all of Sales Collateral, plus only the Marketing 2.0 folders
 listed there. Mapping only - no file content is read.
 
+Target project: accops-marketing-dashboard (ref iwqhayuoxnrhqzozznes), shared with the marketing
+dashboard on the free tier. Only sam_-prefixed tables are written, so the dashboard's own tables
+are never touched - but because the database is shared, --write refuses to run unless the target
+tables already exist. Run docs/supabase-sharepoint-files.sql first.
+
   python sp_seed_registry.py            # dry run, prints what it would write
   python sp_seed_registry.py --write    # actually write to Supabase
 """
@@ -18,6 +23,7 @@ from sp_map_urls import rows as mapped_rows, MARKETING_FOLDERS  # single source 
 
 HERE = Path(__file__).parent
 INV = HERE / "data" / "sharepoint_inventory.json"
+EXPECT_REF = "iwqhayuoxnrhqzozznes"   # accops-marketing-dashboard
 
 
 def env(name: str) -> str:
@@ -77,6 +83,17 @@ def main() -> None:
     url, key = env("SUPABASE_URL").rstrip("/"), env("SUPABASE_SERVICE_KEY")
     if not url or not key:
         sys.exit("set SUPABASE_URL and SUPABASE_SERVICE_KEY (or put them in web/.env.local)")
+    if EXPECT_REF not in url:
+        sys.exit(f"refusing to write: SUPABASE_URL is {url!r}, expected project ref {EXPECT_REF}. "
+                 f"Change EXPECT_REF if you really mean a different project.")
+    # A shared database means a typo writes into someone else's app. Prove the tables are ours first.
+    probe = urllib.request.Request(f"{url}/rest/v1/sam_sharepoint_files?select=item_id&limit=1",
+                                   headers={"apikey": key, "Authorization": f"Bearer {key}"})
+    try:
+        urllib.request.urlopen(probe, timeout=30).read()
+    except urllib.error.HTTPError as e:
+        sys.exit(f"sam_sharepoint_files not reachable ({e.code}). Run docs/supabase-sharepoint-files.sql "
+                 f"in the {EXPECT_REF} project first.")
     post(url, key, "sam_sharepoint_sync?on_conflict=drive_id", sync, prefer="resolution=merge-duplicates")
     for i in range(0, len(files), 200):          # PostgREST rejects very large single payloads
         post(url, key, "sam_sharepoint_files?on_conflict=item_id", files[i:i + 200],
