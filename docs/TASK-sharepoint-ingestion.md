@@ -214,3 +214,38 @@ Working and deployed at https://sam-accops.vercel.app: web app with chat and fac
 Not built, in priority order after this task: publication-date extraction and freshness surfacing, the public/internal asset map (0 of 66 assets can be sent to a customer today), consuming the feedback thumbs that are already being collected, publish requests to marketing, a weekly gap digest. Deliberately not building embeddings until the usage log shows keyword search missing things.
 
 Two WhatsApp expiries to handle eventually, both silent failures: access token 3 November 2026, test number early December 2026. See `TASK-whatsapp-meta-setup.md`.
+
+## 8b. Session note, 6 September 2026: the registry is live in Supabase
+
+**Tables created** in `accops-marketing-dashboard` (ref `iwqhayuoxnrhqzozznes`), applied as migration
+`sam_sharepoint_registry` from `docs/supabase-sharepoint-files.sql` unchanged:
+`sam_sharepoint_files` (7 indexes) and `sam_sharepoint_sync` (1). Both have RLS enabled with **zero
+policies**, which is deliberate: RLS-on-no-policy is deny-all for `anon`, and the service role bypasses
+RLS entirely, so the server writes freely while a leaked publishable key reads nothing. The dashboard's
+own 65 tables were not touched.
+
+**`sam_events` already existed and is already persisting.** It was not missing. 26 rows, 21 of them
+`kind='query'`, across 2 users and 2 channels, first write 3 September 23:47 UTC and last 4 September
+14:25 UTC — the WhatsApp test. So the live app's analytics are healthy and `docs/supabase-sam-events.sql`
+needs no run. The reason this looked uncertain is worth recording: `web/lib/events.ts` falls back to an
+**in-memory buffer** when `SUPABASE_URL`/`SUPABASE_SERVICE_KEY` are absent, so a local run shows analytics
+apparently working while nothing persists. Absence of errors proves nothing here; the row count in
+Supabase is the only real evidence.
+
+**The sync cursor is loaded.** One row in `sam_sharepoint_sync` for the sales drive, carrying the real
+Graph `deltaLink` captured during discovery. Marketing 2.0 is correctly absent — `MARKETING_FOLDERS` in
+`sp_map_urls.py` is still `[]`, so the seed emits no marketing sync row and no marketing files. That 960 GB
+library stays out until specific folders are named.
+
+### The one thing that blocked the file load
+
+`prototype/sp_seed_registry.py --write` needs `SUPABASE_SERVICE_KEY`. It is **not** recoverable from this
+machine: `web/.env.local` never had it, `web/.env.deploy.local` does not carry it, and `vercel env pull`
+returns sensitive values **as empty strings** rather than plaintext. It exists only encrypted in Vercel and
+in the Supabase dashboard. Copy it from
+`https://supabase.com/dashboard/project/iwqhayuoxnrhqzozznes/settings/api-keys` into `web/.env.local`
+(gitignored via `web/.gitignore:34`) and the seed runs in one command.
+
+Loading 874 rows through the Supabase MCP instead was tried and rejected: the generated SQL is ~500 KB, and
+relaying each batch through the model's context costs far more than it is worth for a load the seed script
+already does correctly and idempotently.
