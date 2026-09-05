@@ -2,3 +2,5 @@
 .env
 __pycache__/
 *.pyc
+data/sharepoint_inventory.json
+data/_clean_paths.json

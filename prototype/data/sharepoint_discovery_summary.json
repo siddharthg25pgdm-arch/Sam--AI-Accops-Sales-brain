@@ -1,0 +1,146 @@
+{
+  "sales": {
+    "site_url": "https://propalmsnetwork.sharepoint.com/sites/Company",
+    "site_id": "propalmsnetwork.sharepoint.com,3eb66d31-1ee9-4e6e-9a5a-5ae36e45822b,e424dc6e-6cb4-4ecf-854a-b4404efe7682",
+    "drive_id": "b!MW22Pukebk6aWlrjbkWCK27cJOS0bM9OhUq0QE7-doKh1nVGqaB-SKHlnIF7W6dj",
+    "root_folder": "Sales/Sales Collateral",
+    "has_delta_link": true,
+    "totals": {
+      "files": 874,
+      "folders": 692,
+      "bytes": 13988144890
+    },
+    "documents": {
+      "count": 518,
+      "bytes": 7531212960
+    },
+    "clean_documents": {
+      "count": 402,
+      "bytes": 7184830135,
+      "by_ext": {
+        "pptx": 241,
+        "pdf": 138,
+        "docx": 21,
+        "txt": 2
+      },
+      "by_folder": {
+        "Sales/Sales Collateral/Presentations": 302,
+        "Sales/Sales Collateral/Gartner Reading material": 27,
+        "Sales/Sales Collateral/Competition": 21,
+        "Sales/Sales Collateral/Whitepapers": 16,
+        "Sales/Sales Collateral/Brochures & Datasheets": 11,
+        "Sales/Sales Collateral/Paid Media_Case Studies": 6,
+        "Sales/Sales Collateral/Roadshows": 5,
+        "Sales/Sales Collateral/Tech Solution Documents": 4,
+        "Sales/Sales Collateral/eBooks": 3,
+        "Sales/Sales Collateral/Company Certifications": 2,
+        "Sales/Sales Collateral/Product Editions": 2,
+        "Sales/Sales Collateral/3rd Party Reports References": 1,
+        "Sales/Sales Collateral/Accops Brand Files": 1,
+        "Sales/Sales Collateral/Accops Featured in Reports": 1
+      }
+    },
+    "all_by_ext": {
+      "pptx": 263,
+      "pdf": 227,
+      "png": 149,
+      "mp4": 75,
+      "html": 36,
+      "js": 28,
+      "docx": 26,
+      "xlsx": 22,
+      "jpg": 21,
+      "zip": 4,
+      "map": 4,
+      "csv": 3,
+      "svg": 3,
+      "css": 3,
+      "tmp": 2,
+      "txt": 2,
+      "xlsm": 1,
+      "gz": 1,
+      "xml": 1,
+      "json": 1
+    },
+    "excluded_archive_draft": 116,
+    "sample_web_url": "https://propalmsnetwork.sharepoint.com/sites/Company/Shared%20Documents/Sales/Sales%20Collateral/eBooks/Accops%20-%20eBook%20-%20DaaS%20for%20BFSI.pdf"
+  },
+  "marketing": {
+    "site_url": "https://propalmsnetwork.sharepoint.com/sites/MarketingTeam",
+    "site_id": "propalmsnetwork.sharepoint.com,fbd76a26-26a1-43d1-a01f-3d79685f5de6,0ece2bfb-de4e-4cf5-aa9d-c723953d16f1",
+    "drive_id": "b!JmrX-6Em0UOgHz15aF9d5vsrzg5O3vVMqp3HI5U9FvG6HeB9ChENR676X2rqXmer",
+    "root_folder": "Marketing 2.0",
+    "has_delta_link": true,
+    "totals": {
+      "files": 44863,
+      "folders": 14596,
+      "bytes": 1030859100515
+    },
+    "documents": {
+      "count": 8886,
+      "bytes": 50589908131
+    },
+    "clean_documents": {
+      "count": 2854,
+      "bytes": 14019369311,
+      "by_ext": {
+        "docx": 1493,
+        "pdf": 844,
+        "pptx": 507,
+        "txt": 8,
+        "doc": 2
+      },
+      "by_folder": {
+        "Marketing 2.0/Workspaces/Musadiq": 682,
+        "Marketing 2.0/Resources/Miscellaneous": 437,
+        "Marketing 2.0/Workspaces/Sandip": 161,
+        "Marketing 2.0/Resources/Blogs": 143,
+        "Marketing 2.0/Resources/Brochures & Datasheets": 126,
+        "Marketing 2.0/Resources/EDM": 124,
+        "Marketing 2.0/Resources/Public Relation": 123,
+        "Marketing 2.0/Resources/Case Studies": 118,
+        "Marketing 2.0/FY25/Lead Gen": 96,
+        "Marketing 2.0/Resources/External Content Agency": 74,
+        "Marketing 2.0/Workspaces/Samhita": 70,
+        "Marketing 2.0/Resources/Website Revamp": 60,
+        "Marketing 2.0/FY23-24/Plans and Activities": 50,
+        "Marketing 2.0/Resources/WhitePapers": 50,
+        "Marketing 2.0/Resources/Technical Product Marketing - Samhita": 47,
+        "Marketing 2.0/Resources/Videos": 46,
+        "Marketing 2.0/Resources/ISR": 41,
+        "Marketing 2.0/Events/2026-2027 FY": 38,
+        "Marketing 2.0/Brand/Logos": 33,
+        "Marketing 2.0/FY25/Collaterals": 32,
+        "Marketing 2.0/Resources/Partner Resources": 30,
+        "Marketing 2.0/FY25/Plan-FY24-25": 28,
+        "Marketing 2.0/Resources/SKO": 24,
+        "Marketing 2.0/Resources/Presentations": 23,
+        "Marketing 2.0/Zakir_ISR/Inside Sales - 2025": 21
+      }
+    },
+    "all_by_ext": {
+      "jpg": 20659,
+      "png": 4507,
+      "docx": 3410,
+      "pdf": 3336,
+      "xlsx": 2033,
+      "pptx": 1989,
+      "mp4": 1638,
+      "jpeg": 1142,
+      "php": 612,
+      "html": 561,
+      "arw": 428,
+      "mts": 390,
+      "zip": 351,
+      "heic": 273,
+      "svg": 272,
+      "mov": 254,
+      "download": 233,
+      "wfp": 192,
+      "scss": 178,
+      "csv": 158
+    },
+    "excluded_archive_draft": 6032,
+    "sample_web_url": "https://propalmsnetwork.sharepoint.com/sites/MarketingTeam/Shared%20Documents/Marketing%202.0/Brand/Logos/New%20Branding%2002_18/HyWorks/HyWORKS%20New%20Branding_2018.pdf"
+  }
+}
