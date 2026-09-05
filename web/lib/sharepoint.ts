@@ -80,6 +80,30 @@ export type Tags = {
   team: string; status: "active" | "archived";
 };
 
+/** Scope roots, as Power Automate reports them. The trigger's {Path} is LIBRARY-relative
+ *  ("Shared Documents/Sales/Sales Collateral/Competition/..."), while the registry stores folders
+ *  relative to the scope root ("Competition/..."), because sp_seed_registry.py builds them from
+ *  Graph's item hierarchy. Two sources, two meanings, one column - so normalise on the way in or
+ *  the same folder arrives under two names and the catalogue facets split in half. */
+const SCOPE_ROOTS: Record<string, string[]> = {
+  sales: ["Shared Documents/Sales/Sales Collateral", "Sales/Sales Collateral"],
+  marketing: ["Shared Documents/Marketing 2.0", "Marketing 2.0"],
+};
+
+/** Strip the scope root and any surrounding slashes, so a Power Automate {Path} and a Graph-derived
+ *  path both land on the same value. Case-insensitive: SharePoint paths are not case-stable. */
+export function scopeRelative(path: string, scope = "sales"): string {
+  let p = (path ?? "").replace(/^\/+|\/+$/g, "");
+  for (const root of SCOPE_ROOTS[scope] ?? []) {
+    if (p.toLowerCase() === root.toLowerCase()) return "";
+    if (p.toLowerCase().startsWith(root.toLowerCase() + "/")) {
+      p = p.slice(root.length + 1);
+      break;
+    }
+  }
+  return p.replace(/^\/+|\/+$/g, "");
+}
+
 export function tagsFor(folder: string, filename: string, scope = "sales"): Tags {
   const hay = `${folder} ${filename}`;
   const top = (folder.split("/")[0] ?? "").toLowerCase();
@@ -128,7 +152,7 @@ export async function applyChange(f: IncomingFile): Promise<string> {
     return "marked deleted";
   }
 
-  const folder = (f.folder ?? "").replace(/^\/+|\/+$/g, "");
+  const folder = scopeRelative(f.folder ?? "", f.scope ?? "sales");
   const name = f.name ?? "";
   const ext = (name.split(".").pop() ?? "").toLowerCase();
   const t = tagsFor(folder, name, f.scope ?? "sales");

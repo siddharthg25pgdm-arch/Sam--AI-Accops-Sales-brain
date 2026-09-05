@@ -296,3 +296,89 @@ battlecards, decks or competitor analyses at all. The registry has **552 decks**
 **37 competitive assets** (33 ingestable), including named Omnissa, VMware, Citrix and Forcepoint
 comparisons. "Which deck has the Citrix comparison?" is answerable from the registry today, by filename
 and folder, before a single document has been carded.
+
+## 8c. Turning the Power Automate flow on
+
+Everything on SAM's side is built and deployed. Verified live on 6 September 2026:
+`GET /api/channels/sharepoint` answers `{"ok":true,...,"writes_to_sharepoint":false}`, and
+`GET /api/cron/sharepoint` reports `tracked: 874, untagged: 0` - production is reading the registry
+that was loaded today.
+
+**Nothing below needs the IT team.** The flow runs on Siddharth's own SharePoint connection, which
+already has permission to watch the folder. No Entra app registration, no `Sites.Selected`, no admin
+grant. That was the point of choosing Power Automate over Graph for this path.
+
+### Two things to set before building the flow
+
+1. **`SP_WEBHOOK_SECRET` is not set in Vercel.** It is currently absent, and the route treats an unset
+   secret as "skip the check" - so the endpoint is open right now. Pick a long random string, add it in
+   Vercel (Production), redeploy, then use the same value in the flow's `secret` field.
+2. **No cron schedule exists.** `/api/cron/sharepoint` is written but nothing calls it; there is no
+   `vercel.json`. Add one with a `crons` entry, or leave the health check to be hit manually. It reports
+   only - it changes nothing - so this is not urgent, but an unscheduled health check catches nothing.
+
+### The flow, in the Power Automate UI
+
+**Trigger:** *SharePoint - When a file is created or modified (properties only)*.
+Site Address `https://propalmsnetwork.sharepoint.com/sites/Company`, Library Name `Documents`,
+Folder `/Shared Documents/Sales/Sales Collateral`. Include Nested Folders **Yes** - the registry spans
+183 folders, and the default misses every one of them.
+
+**Action:** *HTTP - POST* to `https://sam-accops.vercel.app/api/channels/sharepoint`,
+header `Content-Type: application/json`, body:
+
+```json
+{
+  "secret":     "<the SP_WEBHOOK_SECRET value>",
+  "event":      "modified",
+  "itemId":     "@{triggerOutputs()?['body/{Identifier}']}",
+  "driveId":    "b!MW22Pukebk6aWlrjbkWCK27cJOS0bM9OhUq0QE7-doKh1nVGqaB-SKHlnIF7W6dj",
+  "scope":      "sales",
+  "name":       "@{triggerOutputs()?['body/{FilenameWithExtension}']}",
+  "folder":     "@{triggerOutputs()?['body/{Path}']}",
+  "webUrl":     "@{triggerOutputs()?['body/{Link}']}",
+  "size":       @{triggerOutputs()?['body/{Size}']},
+  "modified":   "@{triggerOutputs()?['body/Modified']}",
+  "modifiedBy": "@{triggerOutputs()?['body/Editor/DisplayName']}",
+  "etag":       "@{triggerOutputs()?['body/{Identifier}']}"
+}
+```
+
+`driveId` is hardcoded because the whole flow watches one library, and the trigger does not surface a
+drive id in a usable form. It is the same value now sitting in `sam_sharepoint_sync`.
+
+Expect **202** with the tags SAM inferred echoed back - that response is the fastest way to confirm the
+tagging agrees with `prototype/sp_tags.py` before trusting it.
+
+### Three traps specific to this flow
+
+- **`{Path}` is library-relative, not scope-relative - now handled.** It arrives as
+  `Shared Documents/Sales/Sales Collateral/Competition/...`, while the registry stores
+  `Competition/...`, because `sp_seed_registry.py` builds folders from Graph's item hierarchy. Two
+  sources, two meanings, one column. Left alone, every notification would have created a second copy
+  of an existing folder and split the catalogue facets in half.
+  `scopeRelative()` in `web/lib/sharepoint.ts` now strips the scope root before the upsert. It is
+  case-insensitive, because SharePoint paths are not case-stable, and idempotent, so an
+  already-relative path passes through untouched - which matters because the seed script and the flow
+  write the same column. 8 of 8 cases pass, and the normalised outputs match folders that really exist
+  in the registry. This was a live defect that would have fired on the very first notification; it is
+  the same shape as section 8a's `sharepoint_url` problem - a field where two writers disagree about
+  what the value means.
+- **Deletions do not fire this trigger.** "When a file is created or modified" never sees a delete, so
+  `event: "deleted"` will never arrive from it. Deletion is the case section 3 argues matters most -
+  a dead link is worse than a missing document - so it needs either a second flow on
+  *When a file is deleted* or the periodic re-seed. Until one of those exists, deleted files stay in the
+  registry and SAM can still cite them.
+- **Modify storms.** Editing a file in Office Online fires the trigger repeatedly. `applyChange()` is an
+  upsert on `item_id`, so this is harmless to correctness, but it burns flow runs on a free tier. Add a
+  trigger condition on `{IsFolder}` being false at minimum.
+
+### Order to do it in
+
+1. Set `SP_WEBHOOK_SECRET` in Vercel, redeploy.
+2. Build the flow above, save, **do not turn it on**.
+3. Test by editing one throwaway file in Sales Collateral. Check the run history for a 202, then confirm
+   the row's `last_synced` moved in Supabase.
+4. Check `folder` on that row matches the registry's convention. Fix the prefix strip if not.
+5. Turn the flow on.
+6. Decide on deletions - second flow, or a periodic `sp_discover.py` + `sp_seed_registry.py --write`.
