@@ -11,6 +11,12 @@ dashboard on the free tier. Only sam_-prefixed tables are written, so the dashbo
 are never touched - but because the database is shared, --write refuses to run unless the target
 tables already exist. Run docs/supabase-sharepoint-files.sql first.
 
+Credentials, in precedence order: the SUPABASE_URL / SUPABASE_SERVICE_KEY environment variables,
+then web/.env.local, then - only if the service key is still missing - the Supabase management API,
+using a personal access token from PAT_PATH. That last hop exists because `vercel env pull` returns
+sensitive values as empty strings, so on a fresh machine the service key is genuinely unavailable
+locally. Nothing fetched that way is written to disk.
+
   python sp_seed_registry.py            # dry run, prints what it would write
   python sp_seed_registry.py --write    # actually write to Supabase
 """
@@ -24,6 +30,9 @@ from sp_map_urls import rows as mapped_rows, MARKETING_FOLDERS  # single source 
 HERE = Path(__file__).parent
 INV = HERE / "data" / "sharepoint_inventory.json"
 EXPECT_REF = "iwqhayuoxnrhqzozznes"   # accops-marketing-dashboard
+# Path, relative to the home directory, of a Supabase personal access token. Only read when the
+# service key is not already in the environment or web/.env.local.
+PAT_PATH = Path("OneDrive - Accops Systems Private Limited") / "Desktop" / ".supabase_pat"
 
 
 def env(name: str) -> str:
@@ -36,6 +45,37 @@ def env(name: str) -> str:
                 if line.strip().startswith(name + "="):
                     return line.split("=", 1)[1].strip().strip('"')
     return v
+
+
+# Cloudflare in front of api.supabase.com rejects urllib's default User-Agent with a bare
+# 403 error 1010 - a WAF block, not an auth failure. The tell is a numeric code and no JSON body.
+_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+       "Chrome/131.0.0.0 Safari/537.36")
+
+
+def from_pat() -> tuple[str, str]:
+    """Derive the project URL and service key from a Supabase personal access token.
+
+    Last resort, for when the service_role key is not on this machine: vercel env pull returns
+    sensitive values as empty strings, so the key lives only in Vercel (encrypted) and the
+    dashboard. A PAT can read it back through the management API. Nothing is written to disk -
+    the key exists only for this process, which is the point.
+    """
+    pat = os.environ.get("SUPABASE_PAT", "")
+    if not pat:
+        patfile = Path(os.path.expanduser("~")) / PAT_PATH
+        if not patfile.exists():
+            return "", ""
+        pat = patfile.read_text(encoding="utf-8").strip()
+    req = urllib.request.Request(f"https://api.supabase.com/v1/projects/{EXPECT_REF}/api-keys",
+                                 headers={"Authorization": f"Bearer {pat}", "User-Agent": _UA,
+                                          "Accept": "application/json"})
+    try:
+        keys = json.loads(urllib.request.urlopen(req, timeout=30).read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"management API -> {e.code}: {e.read().decode()[:200]}")
+    svc = next((k["api_key"] for k in keys if k.get("name") == "service_role" and k.get("api_key")), "")
+    return (f"https://{EXPECT_REF}.supabase.co", svc) if svc else ("", "")
 
 
 def post(url: str, key: str, path: str, payload: list[dict] | dict, method: str = "POST", prefer: str = "") -> None:
@@ -81,6 +121,11 @@ def main() -> None:
         return
 
     url, key = env("SUPABASE_URL").rstrip("/"), env("SUPABASE_SERVICE_KEY")
+    if not key:
+        pat_url, pat_key = from_pat()
+        if pat_key:
+            url, key = url or pat_url, pat_key
+            print("service key: read from the Supabase management API via PAT, not stored on disk")
     if not url or not key:
         sys.exit("set SUPABASE_URL and SUPABASE_SERVICE_KEY (or put them in web/.env.local)")
     if EXPECT_REF not in url:

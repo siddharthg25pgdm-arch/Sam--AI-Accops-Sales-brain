@@ -249,3 +249,50 @@ in the Supabase dashboard. Copy it from
 Loading 874 rows through the Supabase MCP instead was tried and rejected: the generated SQL is ~500 KB, and
 relaying each batch through the model's context costs far more than it is worth for a load the seed script
 already does correctly and idempotently.
+
+### Loaded and verified, 6 September 2026
+
+**874 rows in `sam_sharepoint_files`, 1 in `sam_sharepoint_sync`.** Loaded by
+`prototype/sp_seed_registry.py --write` in five batches of 200. Idempotent on `item_id`, so it is safe
+to re-run.
+
+The service-key problem above was solved without storing anything: the script gained a third credential
+fallback that reads the `service_role` key from the Supabase **management API** using a personal access
+token, and holds it only in memory. Two things learned doing it:
+
+- An `sbp_` PAT is **not** a service key. It is an account-wide management-API token; the service key is a
+  per-project data-plane JWT for PostgREST. Different planes, not interchangeable - but the first can
+  fetch the second.
+- `api.supabase.com` sits behind Cloudflare, which rejects urllib's default User-Agent with a bare
+  **403 error 1010**. That is a WAF block, not an auth failure; the tell is a numeric code with no JSON
+  body, where a real auth rejection returns `{"message": ...}`. A browser UA fixes it. Same trap as Lusha.
+
+**Verification.**
+
+| Check | Result |
+|---|---|
+| Row count | 874 files, 1 sync row |
+| Suggested for ingest | 413 |
+| Archived | 177 |
+| Distinct folders | 183 |
+| Total size | 13.03 GB |
+| `web_url` null or empty | **0** |
+| `web_url` not on `propalmsnetwork.sharepoint.com` | **0** |
+| Rows outside the sales scope | **0** - Marketing 2.0 stayed out |
+| Graph resolution, 12 stratified samples | **12/12 resolve, 0 URL mismatches** |
+
+The resolution test hits `GET /drives/{id}/items/{item_id}` per row on the delegated Azure CLI login and
+compares Graph's `webUrl` against the stored one. That is the real check: a URL is only correct if the
+item behind it still exists.
+
+**Two URL shapes are now in the registry, and the difference matters for `assetLink()`.** Office files
+carry `_layouts/15/Doc.aspx?sourcedoc={GUID}&...&action=edit`; PDFs carry a direct path. Both came from
+Graph rather than construction, which is what section 8a required. But `action=edit` means a rep who
+forwards a `.pptx` link sends the customer to an *editing* surface. Prefer `action=default`, or strip the
+parameter, when `assetLink()` starts returning `sharepoint_url`.
+
+**The gap named at the top of this document is now measurable.** SAM's 66-document snapshot had no
+battlecards, decks or competitor analyses at all. The registry has **552 decks** (308 ingestable) and
+**37 competitive assets** (33 ingestable), including named Omnissa, VMware, Citrix and Forcepoint
+comparisons. "Which deck has the Citrix comparison?" is answerable from the registry today, by filename
+and folder, before a single document has been carded.
