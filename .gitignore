@@ -2,3 +2,5 @@ research/
 *.png
 *.log
 shots/
+
+.vercel

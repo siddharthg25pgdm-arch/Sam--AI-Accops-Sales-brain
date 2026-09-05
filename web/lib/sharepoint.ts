@@ -18,6 +18,9 @@ export type IncomingFile = {
   event?: "created" | "modified" | "deleted";
   itemId: string; driveId?: string; scope?: string;
   name?: string; folder?: string; webUrl?: string; size?: number;
+  /** SharePoint list item id, the integer the create/modify trigger exposes as {Id}. Recorded so
+   *  deletions - which carry only this, never the Graph id - can match a row exactly. */
+  listItemId?: number | string;
   created?: string; modified?: string; modifiedBy?: string; etag?: string; cTag?: string;
 };
 
@@ -139,18 +142,62 @@ async function rest(path: string, init: RequestInit = {}) {
   return r.status === 204 ? null : r.json();
 }
 
+/** Tombstone a deleted file. Soft delete only: the row survives so the catalogue can explain a
+ *  disappearance, and because SAM citing a document that no longer exists is worse than SAM
+ *  missing one.
+ *
+ *  Deletion is the hardest case, because SharePoint's "When a file is deleted" trigger returns only
+ *  `id, name, filenameWithExtension, deletedBy, timeDeleted, isFolder` - no webUrl, and crucially no
+ *  Graph {Identifier}. The file is gone, so there is no live link to hand back. Its `id` is the
+ *  SharePoint LIST ITEM id, an integer, which is a different identifier space from `item_id`
+ *  (the Graph driveItem id). Matching item_id against it would match nothing, every time.
+ *
+ *  So three keys, most reliable first:
+ *    1. list_item_id - exact, but only present on rows the modify flow has already touched, because
+ *       Graph's delta does not return it and the seeded 874 therefore lack it.
+ *    2. (folder, filename) - verified unique across all 874 seeded rows.
+ *    3. filename alone - deliberately NOT used. 58 rows share a filename with another row and one
+ *       name repeats 35 times, so this could tombstone 35 live documents in a single call.
+ *
+ *  Every path is guarded by a count check before the write. PostgREST updates every row a filter
+ *  matches, so an over-broad filter is a mass deletion; refusing anything but an exact single match
+ *  turns that into a logged no-op. An unmatched delete is usually a move - it arrives as
+ *  delete-in-old plus create-in-new, and the create re-adds the file correctly. */
+async function applyDelete(f: IncomingFile): Promise<string> {
+  const stamp = { deleted: true, deleted_at: new Date().toISOString() };
+  const mark = async (filter: string, how: string) => {
+    const rows = (await rest(`sam_sharepoint_files?${filter}&select=item_id,deleted`)) as
+      { item_id: string; deleted: boolean }[] | null;
+    if (!rows || rows.length !== 1) return null;              // 0 = unknown, >1 = ambiguous; never guess
+    if (rows[0].deleted) return `already deleted (${how})`;
+    await rest(`sam_sharepoint_files?item_id=eq.${encodeURIComponent(rows[0].item_id)}`, {
+      method: "PATCH", body: JSON.stringify(stamp),
+    });
+    return `marked deleted by ${how}`;
+  };
+
+  if (f.listItemId != null && f.listItemId !== "") {
+    const hit = await mark(`list_item_id=eq.${encodeURIComponent(String(f.listItemId))}`, "list_item_id");
+    if (hit) return hit;
+  }
+  const name = f.name ?? "";
+  if (name) {
+    const folder = scopeRelative(f.folder ?? "", f.scope ?? "sales");
+    const hit = await mark(
+      `folder=eq.${encodeURIComponent(folder)}&filename=eq.${encodeURIComponent(name)}`,
+      "folder+filename");
+    if (hit) return hit;
+  }
+  // Deliberately no filename-only fallback. Say so loudly instead: the nightly re-seed is the
+  // backstop, and a wrongly-kept row is recoverable where a wrongly-tombstoned one is not.
+  return `no match, left alone (name=${name || "?"}, listItemId=${f.listItemId ?? "?"})`;
+}
+
 /** Record one change in SAM's registry. Touches nothing in SharePoint. */
 export async function applyChange(f: IncomingFile): Promise<string> {
   if (!configured()) return "skipped: supabase not configured";
 
-  if (f.event === "deleted") {
-    // Soft delete. A tombstone lets the catalogue explain a disappearance, and SAM citing a
-    // document that no longer exists is worse than SAM missing one.
-    await rest(`sam_sharepoint_files?item_id=eq.${encodeURIComponent(f.itemId)}`, {
-      method: "PATCH", body: JSON.stringify({ deleted: true, deleted_at: new Date().toISOString() }),
-    });
-    return "marked deleted";
-  }
+  if (f.event === "deleted") return await applyDelete(f);
 
   const folder = scopeRelative(f.folder ?? "", f.scope ?? "sales");
   const name = f.name ?? "";
@@ -160,6 +207,8 @@ export async function applyChange(f: IncomingFile): Promise<string> {
     method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
     body: JSON.stringify([{
       item_id: f.itemId, drive_id: f.driveId ?? "", scope: f.scope ?? "sales", folder, filename: name,
+      // Fills in as the modify flow sees each file; this is what makes deletion an exact match later.
+      list_item_id: f.listItemId != null && f.listItemId !== "" ? Number(f.listItemId) : null,
       ext, size_bytes: f.size ?? 0, web_url: f.webUrl ?? "",
       created_at: f.created ?? null, modified_at: f.modified ?? null, modified_by: f.modifiedBy ?? null,
       etag: f.etag ?? null, ctag: f.cTag ?? null, deleted: false, deleted_at: null,
