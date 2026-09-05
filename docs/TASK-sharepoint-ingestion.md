@@ -297,88 +297,90 @@ battlecards, decks or competitor analyses at all. The registry has **552 decks**
 comparisons. "Which deck has the Citrix comparison?" is answerable from the registry today, by filename
 and folder, before a single document has been carded.
 
-## 8c. Turning the Power Automate flow on
+## 8c. The flows are built. 6 September 2026.
 
-Everything on SAM's side is built and deployed. Verified live on 6 September 2026:
-`GET /api/channels/sharepoint` answers `{"ok":true,...,"writes_to_sharepoint":false}`, and
-`GET /api/cron/sharepoint` reports `tracked: 874, untagged: 0` - production is reading the registry
-that was loaded today.
+Both flows exist in the **Accops Systems Private Limited** environment, created through the Flow API
+on Siddharth's own connection. No Entra app registration, no `Sites.Selected`, no IT ticket - as
+designed.
 
-**Nothing below needs the IT team.** The flow runs on Siddharth's own SharePoint connection, which
-already has permission to watch the folder. No Entra app registration, no `Sites.Selected`, no admin
-grant. That was the point of choosing Power Automate over Graph for this path.
+| Flow | ID | State |
+|---|---|---|
+| SAM - Sales Collateral changed | `75e43d49-a5ba-4acd-878c-f710617dfdae` | **Started** |
+| SAM - Sales Collateral deleted | `a93e1937-1ac9-46c7-9145-a706fc79e840` | Stopped, pending first test |
 
-### Two things to set before building the flow
+`SP_WEBHOOK_SECRET` is set in Vercel and **enforced**: the endpoint returns 401 unsigned, 202 signed.
+Both flow definitions carry the value; it was never written to the repo.
 
-1. **`SP_WEBHOOK_SECRET` is not set in Vercel.** It is currently absent, and the route treats an unset
-   secret as "skip the check" - so the endpoint is open right now. Pick a long random string, add it in
-   Vercel (Production), redeploy, then use the same value in the flow's `secret` field.
-2. **No cron schedule exists.** `/api/cron/sharepoint` is written but nothing calls it; there is no
-   `vercel.json`. Add one with a `crons` entry, or leave the health check to be hit manually. It reports
-   only - it changes nothing - so this is not urgent, but an unscheduled health check catches nothing.
+An existing flow, **"Sharepoint Update"** (`88e32663`, drafts Siddharth an email on any change), turned
+out to be the best documentation available - it settled three things that were otherwise guesswork:
+the library GUID `4675d6a1-a0a9-487e-a1e5-9c817b5ba763` (which matches the GUID inside the stored
+`deltaLink`, confirming the same library from two directions), a working SharePoint connection to
+reuse, and the fact that these triggers use `splitOn` to fan an array into one run per file - so the
+HTTP body must read `triggerOutputs()?['body/...']` post-split, not index an array.
 
-### The flow, in the Power Automate UI
+### Deletion: why it needed a new column
 
-**Trigger:** *SharePoint - When a file is created or modified (properties only)*.
-Site Address `https://propalmsnetwork.sharepoint.com/sites/Company`, Library Name `Documents`,
-Folder `/Shared Documents/Sales/Sales Collateral`. Include Nested Folders **Yes** - the registry spans
-183 folders, and the default misses every one of them.
+The delete trigger (`GetOnDeletedFileItems`) returns **only**
+`id, name, filenameWithExtension, deletedBy, timeDeleted, isFolder`. There is no `webUrl`, no `{Link}`,
+and no Graph `{Identifier}` - the file is gone, so SharePoint has no live link to give. Its `id` is the
+SharePoint **list item id**, an integer, which is a different identifier space from `item_id`
+(the Graph driveItem id, `01X5UIHT...`). Matching one against the other would have failed silently on
+every deletion.
 
-**Action:** *HTTP - POST* to `https://sam-accops.vercel.app/api/channels/sharepoint`,
-header `Content-Type: application/json`, body:
+So `sam_sharepoint_files` gained `list_item_id bigint`. The create/modify trigger exposes that same
+integer as `{Id}`, so the changed-flow records it, and deletion becomes an exact match for every file
+the flow has seen. Measured before choosing:
 
-```json
-{
-  "secret":     "<the SP_WEBHOOK_SECRET value>",
-  "event":      "modified",
-  "itemId":     "@{triggerOutputs()?['body/{Identifier}']}",
-  "driveId":    "b!MW22Pukebk6aWlrjbkWCK27cJOS0bM9OhUq0QE7-doKh1nVGqaB-SKHlnIF7W6dj",
-  "scope":      "sales",
-  "name":       "@{triggerOutputs()?['body/{FilenameWithExtension}']}",
-  "folder":     "@{triggerOutputs()?['body/{Path}']}",
-  "webUrl":     "@{triggerOutputs()?['body/{Link}']}",
-  "size":       @{triggerOutputs()?['body/{Size}']},
-  "modified":   "@{triggerOutputs()?['body/Modified']}",
-  "modifiedBy": "@{triggerOutputs()?['body/Editor/DisplayName']}",
-  "etag":       "@{triggerOutputs()?['body/{Identifier}']}"
-}
-```
+| Match key | Safety |
+|---|---|
+| `list_item_id` | Exact. Absent on the 874 seeded rows - Graph's delta does not return it - so it fills in over time. |
+| `(folder, filename)` | **0 collisions across all 874 rows.** The fallback. |
+| `filename` alone | **Rejected.** 58 rows share a name with another row, and one name repeats **35 times**. |
 
-`driveId` is hardcoded because the whole flow watches one library, and the trigger does not surface a
-drive id in a usable form. It is the same value now sitting in `sam_sharepoint_sync`.
+Every path counts matching rows before writing. PostgREST updates every row a filter matches, so an
+over-broad filter is a mass tombstoning; requiring exactly one match turns that into a logged no-op.
+An unmatched delete is usually a *move*, which arrives as delete-in-old plus create-in-new - and the
+create re-adds the file correctly.
 
-Expect **202** with the tags SAM inferred echoed back - that response is the fastest way to confirm the
-tagging agrees with `prototype/sp_tags.py` before trusting it.
+### What is proven, and what is not
 
-### Three traps specific to this flow
+Verified against production:
 
-- **`{Path}` is library-relative, not scope-relative - now handled.** It arrives as
-  `Shared Documents/Sales/Sales Collateral/Competition/...`, while the registry stores
-  `Competition/...`, because `sp_seed_registry.py` builds folders from Graph's item hierarchy. Two
-  sources, two meanings, one column. Left alone, every notification would have created a second copy
-  of an existing folder and split the catalogue facets in half.
-  `scopeRelative()` in `web/lib/sharepoint.ts` now strips the scope root before the upsert. It is
-  case-insensitive, because SharePoint paths are not case-stable, and idempotent, so an
-  already-relative path passes through untouched - which matters because the seed script and the flow
-  write the same column. 8 of 8 cases pass, and the normalised outputs match folders that really exist
-  in the registry. This was a live defect that would have fired on the very first notification; it is
-  the same shape as section 8a's `sharepoint_url` problem - a field where two writers disagree about
-  what the value means.
-- **Deletions do not fire this trigger.** "When a file is created or modified" never sees a delete, so
-  `event: "deleted"` will never arrive from it. Deletion is the case section 3 argues matters most -
-  a dead link is worse than a missing document - so it needs either a second flow on
-  *When a file is deleted* or the periodic re-seed. Until one of those exists, deleted files stay in the
-  registry and SAM can still cite them.
-- **Modify storms.** Editing a file in Office Online fires the trigger repeatedly. `applyChange()` is an
-  upsert on `item_id`, so this is harmless to correctness, but it burns flow runs on a free tier. Add a
-  trigger condition on `{IsFolder}` being false at minimum.
+- `scopeRelative()` works end to end. A signed request carrying the library-relative path
+  `Shared Documents/Sales/Sales Collateral/Competition` stored folder `Competition`, joining the 3
+  rows already there rather than creating a duplicate. That defect would have fired on the first real
+  notification. Probe row removed; back to exactly 874.
+- The secret is enforced, both flows validate against Power Automate's rules, and both registered.
 
-### Order to do it in
+**Not yet proven: the trigger field names.** `{Identifier}`, `{Path}`, `{Link}`, `{FilenameWithExtension}`,
+`{IsFolder}`, `ID`, `Editor/DisplayName` are taken from the working "Sharepoint Update" flow and
+Microsoft's connector reference, but no run has executed - a polling trigger only fires on a real
+change, and **SAM never writes to SharePoint**, so this cannot be self-tested without breaking the
+invariant the whole design rests on.
 
-1. Set `SP_WEBHOOK_SECRET` in Vercel, redeploy.
-2. Build the flow above, save, **do not turn it on**.
-3. Test by editing one throwaway file in Sales Collateral. Check the run history for a 202, then confirm
-   the row's `last_synced` moved in Supabase.
-4. Check `folder` on that row matches the registry's convention. Fix the prefix strip if not.
-5. Turn the flow on.
-6. Decide on deletions - second flow, or a periodic `sp_discover.py` + `sp_seed_registry.py --write`.
+Baseline for that test, captured now: **874 rows, 0 with `list_item_id`, 0 tombstoned.** Any movement
+is attributable to the flow.
+
+### To finish it
+
+1. **Edit or re-upload one throwaway file** in Sales Collateral. Within a minute the changed flow runs.
+2. Check that row: `list_item_id` should be non-null and `folder` should have no
+   `Shared Documents/...` prefix. If `folder` is wrong, the trigger's `{Path}` differs from what the
+   reference flow suggested and `scopeRelative()` needs another root added.
+3. **Then delete that same file.** Start the deleted flow first. The row should flip to
+   `deleted = true`, matched by `list_item_id`.
+4. If the deletion run fires but nothing is marked, read the run's HTTP body. The likely cause is
+   Microsoft's documented caveat: retrieving a *deleted* file's properties can require a
+   site-collection-admin connection. The trigger still fires for a normal user - only some fields may
+   come back empty. `(folder, filename)` covers that case, which is exactly why it is the fallback.
+5. Once both pass, the changed flow is already on; just start the deleted flow.
+
+### Still open
+
+- **No cron schedule.** `/api/cron/sharepoint` is written and returns real data - `tracked: 874,
+  untagged: 0` - but nothing calls it, and there is no `vercel.json`. It only reports, so it changes
+  nothing, but an unscheduled health check catches nothing either.
+- **Modify storms.** Editing in Office Online fires the trigger repeatedly. `applyChange()` is an
+  upsert, so correctness is unaffected, but it burns flow runs. The `{IsFolder}` condition is in place;
+  a tighter trigger condition may be wanted if run volume becomes a problem.
+- **Marketing 2.0 remains excluded** until specific folders are named.
