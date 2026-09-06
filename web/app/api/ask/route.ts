@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth";
 import { ask } from "@/lib/agent";
 import { logEvent } from "@/lib/events";
+import { ready } from "@/lib/registry-cache";
 
 export const maxDuration = 60;
 
@@ -12,6 +13,9 @@ export async function POST(req: Request) {
   const question = String(body.question ?? "").trim();
   if (!question) return NextResponse.json({ error: "Ask something." }, { status: 400 });
   const history = Array.isArray(body.history) ? body.history.slice(-6) : [];
+  // Block only on a cold start. After that the cache is warm and this returns immediately, so the
+  // first question of a session still searches the full registry rather than the 77 cards alone.
+  await ready();
   const t0 = Date.now();
   const result = await ask(question, history);
   const eventId = await logEvent({

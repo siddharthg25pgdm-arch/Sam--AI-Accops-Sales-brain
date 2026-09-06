@@ -296,13 +296,13 @@ Cloud API (the doc's decision 4 still reads "OpenWA" - superseded on 4 Sep eveni
 Revised 6 September: **platform first on a small sample, demo, then decide about the corpus.** Teams is
 dropped for now by Siddharth's call - revisit after the MVP.
 
-1. **P4.1** - two clicks, closes out the Power Automate work.
-2. **P6.1 the trace panel** - backend already returns `trace`; the UI ignores it. Highest demo value
-   per hour of work in the whole list.
+1. **P4.1** - two clicks, closes out the Power Automate work. Both flows are now Started.
+2. ~~**P6.1 the trace panel**~~ - **already built and styled.** See the correction in P6. Open it
+   during the demo; it is the Perplexity-style "how SAM got there".
 3. **P0.1 + P0.2** - the registry starts answering, and links become real. This is what makes
-   "which deck has the Citrix comparison?" answerable.
-4. **P6a.2 session ids** - tiny, but it must land *before* demo traffic or the session metrics have
-   no history to report.
+   "which deck has the Citrix comparison?" answerable. **Now the top of the build list.**
+4. **P6a.2 WhatsApp session ids** - small, and it must land *before* demo traffic or the session
+   metrics have no history.
 5. **P7.1 to P7.3** - card 20-50 documents in Claude Enterprise, load to Supabase.
 6. **P6.4 the eval set** - 30 real questions, so "it works" is a number and not an opinion.
 7. **P6a.1 + P6a.3 to P6a.5** - the rollup and the dashboard panels, once there is data worth showing.

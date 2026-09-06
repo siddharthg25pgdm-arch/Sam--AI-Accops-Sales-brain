@@ -1,4 +1,5 @@
 import raw from "@/data/asset_cards.json";
+import { registryAssets } from "./registry-cache";
 
 export type AssetFile = {
   path: string; ext: string; size_mb: number; pages: number | null; modified?: string; year?: string | null;
@@ -44,19 +45,46 @@ function richness(a: Asset): number {
     + (a.inventory_id !== null ? 50 : 0) - (a.file?.path?.length ?? 0) / 100;
 }
 
-let cachedAssets: Asset[] | null = null;
-
+/** Cards plus the live SharePoint registry, deduplicated.
+ *
+ *  Two corpora meet here. The 77 hand-written cards are rich - brief, key_problem, key_outcomes -
+ *  but frozen, undated, and every one of their 71 SharePoint URLs was constructed against the wrong
+ *  tenant and 404s. The registry is the opposite: no document text, but real files with dates and a
+ *  webUrl verified against Graph.
+ *
+ *  richness() already prefers the card, which is right - a carded asset answers better. But the
+ *  card's dead sharepoint_url would then win too, and a rep forwarding a 404 is the failure this
+ *  project has already been bitten by twice. So when a card and a registry row are the same
+ *  document, keep the card and graft the registry's verified link and dates onto it.
+ *
+ *  Not memoised in a module variable any more: the registry cache refreshes on a TTL, so a frozen
+ *  result would go stale and never notice. The merge is a few hundred rows of map work per call. */
 export function allAssets(): Asset[] {
-  if (cachedAssets) return cachedAssets;
   const usable = data.assets.filter(a => a.asset_type !== "Data File" && a.asset_type !== "Content Calendar");
   const best = new Map<string, Asset>();
-  for (const a of usable) {
+  for (const a of [...usable, ...registryAssets()]) {
     const k = dedupeKey(a);
     const seen = best.get(k);
-    if (!seen || richness(a) > richness(seen)) best.set(k, a);
+    if (!seen) { best.set(k, a); continue; }
+    const winner = richness(a) > richness(seen) ? a : seen;
+    const other = winner === a ? seen : a;
+    // Whichever wins, a verified SharePoint link and a real date beat their absence. verified()
+    // is true only for registry-sourced URLs, so a constructed one can never overwrite a real one.
+    best.set(k, {
+      ...winner,
+      sharepoint_url: verified(winner) ? winner.sharepoint_url : (verified(other) ? other.sharepoint_url : winner.sharepoint_url),
+      file: winner.file && other.file
+        ? { ...winner.file, year: winner.file.year ?? other.file.year, modified: winner.file.modified ?? other.file.modified }
+        : (winner.file ?? other.file),
+    });
   }
-  cachedAssets = [...best.values()];
-  return cachedAssets;
+  return [...best.values()];
+}
+
+/** A SharePoint URL is trustworthy only if it came from Graph. The registry writes the real tenant;
+ *  the 71 constructed ones in asset_cards.json point at accops.sharepoint.com, which does not exist. */
+function verified(a: Asset): boolean {
+  return Boolean(a.sharepoint_url?.includes("propalmsnetwork.sharepoint.com"));
 }
 
 /** Every asset including duplicate copies. Only for diagnostics; answers and the catalogue use allAssets(). */
@@ -172,11 +200,17 @@ export function slim(a: Asset): SlimAsset {
  *  `Sales Collateral` and `Marketing 2.0`, so all 71 of those links 404. A rep who forwards one to a
  *  customer looks careless, which is the failure that destroys trust in SAM.
  *
- *  So: only `public_url` is a link. The SharePoint value stays in the data (ingestion will overwrite it with
- *  Graph's real `webUrl`, which is the only trustworthy source) but never reaches a user until then.
- *  Callers that want to tell someone *where* a document lives use assetLocation() and print a path, not a URL. */
+ *  Updated 6 September 2026, which is what section 8a of the SharePoint task asked for. A SharePoint
+ *  URL is now handed out **only when it came from Graph** - the registry writes the real tenant, so
+ *  `propalmsnetwork.sharepoint.com` is the proof of provenance. Constructed URLs stay suppressed
+ *  exactly as before. The field can hold a fact or a guess, and this is how the two are told apart.
+ *
+ *  Order: public link first, because it is the only thing a rep can send a customer. Then the
+ *  verified internal link, which needs a login and is marked internal in every channel. Then nothing,
+ *  and the caller prints assetLocation() instead. */
 export function assetLink(a: Asset): string | null {
-  return a.public_url ?? null;
+  if (a.public_url) return a.public_url;
+  return verified(a) ? a.sharepoint_url : null;
 }
 
 /** Where to find the document when there is no link: filename, and the folder it sits in.
