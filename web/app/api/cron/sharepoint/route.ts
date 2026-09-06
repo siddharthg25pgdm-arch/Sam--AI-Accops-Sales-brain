@@ -1,4 +1,6 @@
 import { configured, registry } from "@/lib/sharepoint";
+import { ready, cacheState } from "@/lib/registry-cache";
+import { allAssets, assetLink } from "@/lib/cards";
 
 export const maxDuration = 60;
 
@@ -25,10 +27,20 @@ export async function GET(req: Request) {
   const newest = synced[0] ?? null;
   const ageDays = newest ? (Date.now() - Date.parse(newest)) / 86_400_000 : null;
 
+  // What the agent actually answers from, after cards and registry are merged and deduplicated.
+  // Reported here because "874 rows are tracked" and "SAM can answer about 696 things" are different
+  // numbers, and only the second one is what a user experiences.
+  await ready();
+  const answerable = allAssets();
+  const withLink = answerable.filter(a => assetLink(a)).length;
+
   return Response.json({
     ok: true,
     ran_at: new Date().toISOString(),
     tracked: rows.length,
+    answerable: answerable.length,
+    answerable_with_link: withLink,
+    registry_cache: cacheState(),
     newest_change: newest,
     // Sales Collateral is not a busy library, so silence is only suspicious after a while.
     flow_probably_stalled: ageDays !== null && ageDays > 30,
