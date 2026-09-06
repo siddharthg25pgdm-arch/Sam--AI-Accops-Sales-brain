@@ -1,6 +1,10 @@
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { recentEvents, persistent } from "@/lib/events";
+import { daily, rollup, totals, byDay } from "@/lib/metrics";
+import { registry } from "@/lib/sharepoint";
+import { ready } from "@/lib/registry-cache";
+import { allAssets, assetLink } from "@/lib/cards";
 import { TopBar } from "@/components/TopBar";
 
 export const dynamic = "force-dynamic";
@@ -9,15 +13,21 @@ export default async function Admin() {
   const user = await currentUser();
   if (!user) redirect("/login");
   if (!user.admin) redirect("/");
-  const events = await recentEvents(2000);
+  // Rollup first, so the panels below are never stale. Cheap: it only recomputes the recent window.
+  await rollup(3);
+  const [rows, events, regRows] = await Promise.all([daily(30), recentEvents(500), registry("sales", 5000)]);
+  await ready();
+  const m = totals(rows);
+  const chart = byDay(rows, 14);
+  const answerable = allAssets();
+  const linked = answerable.filter(a => assetLink(a)).length;
+  const carded = answerable.filter(a => a.inventory_id !== null).length;
+  const chanRows = Object.entries(m.byChannel).sort((a, b) => b[1].queries - a[1].queries);
+  const ms = (v: number | null) => v == null ? "–" : v >= 1000 ? `${(v / 1000).toFixed(1)}s` : `${v}ms`;
   const queries = events.filter(e => e.kind === "query");
   const feedback = events.filter(e => e.kind === "feedback");
   const opens = events.filter(e => e.kind === "catalogue_open");
   const gaps = events.filter(e => e.kind === "gap");
-  const users = new Set(events.map(e => e.user_id));
-  const zero = queries.filter(q => q.intent === "gap" || (q.result_count ?? 0) === 0).length;
-  const helpful = feedback.filter(f => f.feedback === "helpful").length;
-  const resolved = queries.length ? Math.round(((queries.length - zero) / queries.length) * 100) : null;
 
   // top queries, grouped loosely by lowercase text
   const top = new Map<string, number>();
@@ -45,12 +55,40 @@ export default async function Admin() {
         {!persistent() && <div className="notice">Events are held in memory only. Add SUPABASE_URL and SUPABASE_SERVICE_KEY, run docs/supabase-sam-events.sql, and this becomes permanent.</div>}
 
         <div className="stats">
-          <div className="stat"><small>People who used SAM</small><b className="tnum">{users.size}</b></div>
-          <div className="stat"><small>Questions asked</small><b className="tnum">{queries.length}</b></div>
-          <div className="stat"><small>Answered with an exact match</small><b className="tnum">{resolved === null ? "–" : `${resolved}%`}</b></div>
-          <div className="stat"><small>Rated helpful</small><b className="tnum">{feedback.length ? `${helpful}/${feedback.length}` : "–"}</b></div>
-          <div className="stat"><small>Catalogue opens</small><b className="tnum">{opens.length}</b></div>
-          <div className="stat"><small>Content gaps logged</small><b className="tnum">{gaps.length}</b></div>
+          <div className="stat"><small>Questions asked</small><b className="tnum">{m.queries}</b></div>
+          <div className="stat"><small>Answered</small><b className="tnum">{m.answerRate === null ? "–" : `${m.answerRate}%`}</b></div>
+          {/* p95, not the mean: an average hides the one question in twenty that took eight seconds,
+              and that is the one a rep remembers. Worst channel, because that is who complains. */}
+          <div className="stat"><small>Response time (p95)</small><b className="tnum">{ms(m.latencyP95)}</b></div>
+          <div className="stat"><small>People, busiest day</small><b className="tnum">{m.users}</b></div>
+          <div className="stat"><small>Rated helpful</small><b className="tnum">{m.feedbackTotal ? `${m.feedbackHelpful}/${m.feedbackTotal}` : "–"}</b></div>
+          <div className="stat"><small>Content gaps logged</small><b className="tnum">{m.gaps}</b></div>
+        </div>
+
+        <div className="two">
+          <div className="panel">
+            <h2>By channel</h2>
+            <p className="sub" style={{ marginTop: -6 }}>Where the questions come from, and how fast each one answers.</p>
+            {chanRows.length === 0 ? <p style={{ color: "var(--ink-3)" }}>No traffic yet.</p> : (
+              <table><thead><tr><th>Channel</th><th className="tnum">Questions</th><th className="tnum">p50</th><th className="tnum">p95</th></tr></thead>
+                <tbody>{chanRows.map(([c, v]) => (
+                  <tr key={c}><td>{c}</td><td className="tnum">{v.queries}</td><td className="tnum">{ms(v.p50)}</td><td className="tnum">{ms(v.p95)}</td></tr>
+                ))}</tbody></table>
+            )}
+          </div>
+          <div className="panel">
+            <h2>Corpus</h2>
+            <p className="sub" style={{ marginTop: -6 }}>What SAM can actually talk about, not just what is tracked.</p>
+            <table><tbody>
+              <tr><td>Tracked in SharePoint</td><td className="tnum">{regRows.length}</td></tr>
+              <tr><td>Answerable, after dedupe</td><td className="tnum">{answerable.length}</td></tr>
+              <tr><td>With a working link</td><td className="tnum">{linked}</td></tr>
+              {/* The real coverage number: everything else is findable by name but cannot be
+                  reasoned about, because no document text has been read. */}
+              <tr><td>Carded (has document detail)</td><td className="tnum">{carded}</td></tr>
+              <tr><td>Archived or skipped</td><td className="tnum">{regRows.filter(r => r.status === "archived").length}</td></tr>
+            </tbody></table>
+          </div>
         </div>
 
         <div className="panel">
