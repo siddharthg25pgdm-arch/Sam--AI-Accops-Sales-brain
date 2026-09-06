@@ -237,19 +237,24 @@ read that stays constant-time. Far cheaper to do now, at 26 rows, than after rea
 to `sam_events` today. Live data confirms it: 25 API events and 1 WhatsApp, **average 1402 ms, max
 2867 ms**. So several metrics below need only a query and a tile, no instrumentation.
 
-- [ ] **P6a.1 Rollup table + nightly job.** `sam_metrics_daily` keyed by (day, channel): queries,
+- [x] **P6a.1 Rollup table - DONE 6 Sep.** `sam_metrics_daily` + `sam_rollup_metrics()`, schema in
+      `docs/supabase-sam-metrics.sql`. Backfilled and reconciled exactly against raw events (21
+      queries, 5 gaps). Recomputes rather than increments, so a late event cannot corrupt it. Still
+      to do: call it from a cron rather than on page render. Original scope: `sam_metrics_daily` keyed by (day, channel): queries,
       users, sessions, gaps, zero-result rate, p50/p95 latency, feedback split. Backfill from
       `sam_events`. Everything after this reads the rollup, not raw events.
 - [ ] **P6a.2 Populate `session_id`.** The column exists and is **always null** - 0 distinct sessions
       across all 26 events. Without it there is no "messages per session", no conversation depth, no
       returning-user metric. Small change in the web and WhatsApp entry points; do it before the demo
       so the numbers have history.
-- [ ] **P6a.3 Response-time panel.** p50 / p95 / max, split by channel and by `runtime`
+- [x] **P6a.3 Response-time panel - DONE 6 Sep.** p50/p95/max per channel, p95 as the headline tile.
+      Original scope: p50 / p95 / max, split by channel and by `runtime`
       (claude vs local vs search). The data is already there. This is "time to message" - it is also
       the number that tells you when a model change made SAM slower.
-- [ ] **P6a.4 Channel breakdown.** Queries, users and latency per channel - web, whatsapp, api, mcp.
+- [x] **P6a.4 Channel breakdown - DONE 6 Sep.** Original scope: Queries, users and latency per channel - web, whatsapp, api, mcp.
       Currently invisible even though every event carries `channel`.
-- [ ] **P6a.5 Corpus panel.** Files tracked, by type and industry, ingestable vs skipped, archived,
+- [x] **P6a.5 Corpus panel - DONE 6 Sep.** Tracked / answerable / linked / carded, which are four
+      different numbers with only the last being real coverage. Original scope: Files tracked, by type and industry, ingestable vs skipped, archived,
       tombstoned, total size, newest change, and **how many are carded vs registry-only**. That last
       one is the real coverage number and nothing reports it today. Reads
       `sam_sharepoint_files`, which already holds all of it.
