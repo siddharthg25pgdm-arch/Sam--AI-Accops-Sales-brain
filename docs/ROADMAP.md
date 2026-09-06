@@ -86,10 +86,13 @@ Without this the 874 rows are inert and the three findings above stay true.
       content. Needs the date read out of the document text. *This is the trust feature: one stale
       asset sent to a customer costs more than ten missing ones.*
 - [ ] **P1.2 Freshness badges** in answers and catalogue, once P1.1 exists. 12-month threshold,
-      badge rather than hide (design decision 7).
+      badge rather than hide - settled, see section 4.
 - [ ] **P1.3 The public/internal map.** **0 of 66 assets can be sent to a customer today.** Every
-      `public_url` is empty, which is why `audience=external` produced a false gap on 4 Sep. Needs
-      the public bucket confirmed (design decision 2) and URLs recorded.
+      `public_url` is empty, which is why `audience=external` produced a false gap on 4 Sep.
+      **Unblocked 6 Sep:** match SAM's assets to accops.com pages by title from
+      `case-studies-sitemap.xml` (37), `ebooks-sitemap.xml` (4), `solution-documents-sitemap.xml` (9)
+      and `webinars-sitemap.xml` (18), and fill `public_url`. Page first, bucket PDF if one is ever
+      confirmed. Approver is Siddharth.
 - [ ] **P1.4 Consume the feedback thumbs.** They are collected and stored; nothing reads them. 0 rows
       so far, so this waits until there is traffic.
 
@@ -100,8 +103,10 @@ This is where the 413 ingestable files become answerable, not just findable.
 - [ ] **P2.1 Card a pilot of 10 documents** from the registry and compare against the hand-written
       inventory where they overlap, exactly as `prototype/generate_cards.py` already does. **Do not
       skip the comparison** - build order step 2 exists because it is the gate on everything after.
-- [ ] **P2.2 Bulk-card the 413.** Report cost and timing first. Remember SAM never downloads file
-      content itself: Siddharth downloads and hands them over.
+- [ ] **P2.2 Bulk-card the 413.** Report cost and timing first. SAM never downloads file content:
+      Siddharth downloads, Claude Enterprise cards, only the card reaches Supabase. See "the carding
+      boundary" in section 4 - including the two refinements (split the card by audience; write
+      `client_actual` separately) that should be applied **while** carding, not retrofitted.
 - [ ] **P2.3 Flag scanned PDFs** that extract nothing rather than indexing an empty document.
 
 ### P3 - Channels
@@ -142,12 +147,40 @@ This is where the 413 ingestable files become answerable, not just findable.
 
 From design section 10, still unanswered and now attached to the work they hold up:
 
-| # | Decision | Blocks |
+| # | Decision | Status |
 |---|---|---|
-| 2 | Is the public bucket S3-compatible with stable URLs, and who owns it? | **P1.3** |
-| 5 | Claude API direct or via Bedrock (InfoSec's view on where case-study text is processed)? | **P2.2** |
-| 6 | Who approves publish requests? | **P1.3** |
-| 7 | Freshness threshold 12 months; badge or hide? | **P1.2** (assumed: badge) |
+| 2 | Public link source | **Settled 6 Sep: page first, PDF if available.** accops.com already publishes 37 case studies, 4 ebooks, 9 solution documents and 18 webinars as live pages; SAM matches on title and fills `public_url` from the sitemaps. A bucket PDF, if one is ever confirmed, takes precedence over the page. No bucket hunt needed to unblock P1.3. |
+| 5 | Where document text is processed | **Settled 6 Sep: it is not.** See "the carding boundary" below. |
+| 6 | Who approves publish requests | **Settled 6 Sep: Siddharth.** |
+| 7 | Freshness threshold | **Settled: 12 months, badge not hide.** Hiding creates the worse failure - a rep cannot find something they know exists. |
+
+### The carding boundary (decided 6 September 2026)
+
+Siddharth's design, and it is a better answer than "which model API do we trust":
+
+> Claude Enterprise reads the documents and writes the cards. The cards go to Supabase. Groq reads only
+> the cards. No original file is ever ingested by SAM or sent to a free-tier model.
+
+This extends the rule that already makes WhatsApp acceptable to InfoSec - *a private asset's file body
+never leaves SharePoint* - one layer outward: **the card is the boundary object.** Its real value is
+that the boundary becomes inspectable. You can read all 874 cards and know exactly what a third-party
+model can see, which is impossible once raw document text is flowing.
+
+**The gap it does not close, stated plainly.** A card is not neutral. Of the 77 cards today, **40 name a
+client**, and `key_problem` carries things like RBI mandates and exact user counts. That is
+competitively sensitive whether or not the bank is named. Groq still sees customer-identifying content
+at answer time - a paragraph instead of a PDF. Materially better, not zero.
+
+**Two refinements that close most of the remainder:**
+
+1. **Split the card by audience.** The model needs title, type, industry, products and folder to rank a
+   match and explain it. It does not need `key_problem` verbatim. Keep the sensitive detail in Supabase,
+   render it to the browser behind Entra login, and pass the model a leaner projection. Same UX, smaller
+   exposure. Make this a real column split so "what does Groq see?" is a query, not a guess.
+2. **Anonymise at carding time, inside Claude Enterprise.** Siddharth already does this by instinct -
+   one existing card reads "India's largest private bank" rather than the name. Make it the rule: write
+   both `client` (descriptive, model-visible) and `client_actual` (real name, Supabase only, never in a
+   prompt). Cheap while carding anyway; painful to retrofit across 413 documents.
 
 Decisions 1, 3 and 4 are settled: internal tool first, uniform read access assumed, WhatsApp on Meta's
 Cloud API (the doc's decision 4 still reads "OpenWA" - superseded on 4 Sep evening, section 14).
