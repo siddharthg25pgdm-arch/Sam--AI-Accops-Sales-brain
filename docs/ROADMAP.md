@@ -65,11 +65,37 @@ Probed live on 6 September 2026.
 
 Ordered by what unblocks the most. Effort is rough and assumes one working session unless stated.
 
-### P0 - Join the registry to the agent
+### P0 - Join the registry to the agent - DONE 6 September 2026
 
-Without this the 874 rows are inert and the three findings above stay true.
+**Live in production.** `/api/cron/sharepoint` now reports it:
 
-- [ ] **P0.1 Make the agent read `sam_sharepoint_files`.** Merge registry rows into the card set at
+```
+tracked            : 874     rows in the registry
+answerable         : 696     what SAM can actually talk about
+answerable_with_link: 630     was 0
+decks              : 552     was 0
+competitive        :  37     was 0
+```
+
+"Accops vs Citrix" returns three competitive assets, all with working links - the question this
+project's task document opens with, and one the 77-card corpus could not answer at all.
+
+How it was done, and the trade-off taken. `allAssets()`, `searchAssets()`, `facetCounts()` and
+`coverageGaps()` are synchronous and 25 call sites across four channels depend on that; Supabase is
+async. `web/lib/registry-cache.ts` holds the projected rows and refreshes on a 5-minute TTL, so the
+read path stays synchronous and no caller changed. The cost is that a cold start sees cards only for
+one request - invisible for a search tool, and `/api/ask` awaits `ready()` so the first real question
+never hits it. A failed refresh keeps the previous contents rather than emptying the catalogue.
+
+Merging beat picking a winner. `richness()` already prefers the hand-card, which is correct, but the
+card's `sharepoint_url` is one of the 71 constructed links that 404. So when a card and a registry row
+are the same document the card wins **and the registry's verified link and dates are grafted onto it**.
+`verified()` tests for the real tenant, so a constructed URL can never overwrite a real one.
+
+Because every channel converges on `cards.ts`, web chat, WhatsApp, REST and MCP all gained this at
+once. No channel code was touched.
+
+- [x] **P0.1 Make the agent read `sam_sharepoint_files`.** Merge registry rows into the card set at
       query time, keyed by filename. A registry row with no card still answers "this exists, here is
       the link, here is the folder" - which is most of what a rep needs.
 
@@ -80,12 +106,15 @@ Without this the 874 rows are inert and the three findings above stay true.
       (load once on first request, refresh on a TTL) or those functions go async and **25 call sites
       across 5 files** follow: `page.tsx`, `agent.ts`, `agent-openai.ts`, `api.ts`, `cards.ts`.
       Warm cache is the smaller change and fits Vercel's model. *One session.*
-- [ ] **P0.2 Prefer the verified `web_url` in `assetLink()`.** Section 8a of the SharePoint task
-      requires this: store Graph's `webUrl` only when Graph returned it, never a guess. **Strip or
-      rewrite `action=edit`** on Office links first - as loaded, a forwarded `.pptx` link opens an
-      *editing* surface for the customer. *Small, but do not skip the edit-link part.*
-- [ ] **P0.3 Retire the 71 dead constructed URLs** from `asset_cards.json` once P0.2 lands. They are
-      suppressed today, not removed.
+- [x] **P0.2 Prefer the verified `web_url` in `assetLink()`.** Done - and `safeLink()` rewrites
+      `action=edit` to `action=default`, so a forwarded `.pptx` no longer opens an editing surface for
+      the customer. 0 edit-links remain.
+      This is what section 8a asked for: a SharePoint URL is handed out only when Graph produced it,
+      never when it was constructed. Provenance is the test - the registry writes the real tenant, so
+      `propalmsnetwork.sharepoint.com` proves the link is a fact rather than a guess.
+- [ ] **P0.3 Retire the 71 dead constructed URLs** from `asset_cards.json`. Now cosmetic rather than
+      urgent: `verified()` means they can never be handed out, and where a registry row exists for the
+      same document the real link already wins. Worth doing so the field stops holding a lie.
 
 ### P1 - Make answers trustworthy
 
