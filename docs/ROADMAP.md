@@ -170,6 +170,56 @@ inherit it at once.
       the web chat passes `history` through `apiAsk` but nothing persists it across a reload. Cheap,
       and follow-ups are most of how a demo actually gets used.
 
+### P6a - The operator dashboard, SaaS-grade
+
+Added 6 September 2026 at Siddharth's request: "think of this like a SaaS product". Treated as a first
+class surface, not an admin afterthought - this is how SAM's value gets shown to a manager, and later
+how a customer would be shown their own usage.
+
+**What exists.** `web/app/admin/page.tsx`, 108 lines: people, questions, exact-match rate, helpful
+ratings, catalogue opens, gaps logged, top queries, top assets, and a 14-day bar chart.
+
+**The structural problem, worth fixing before there is traffic.** The page calls
+`recentEvents(2000)`, pulls the rows into Node, and computes every metric with `.filter()` in
+JavaScript. That is fine at 26 events and degrades every day it is used - eventually a Vercel function
+timeout. The fix is not a nicer chart library, it is **moving aggregation into Postgres**: a daily
+rollup table or materialised view turns "last 14 days" from fetch-2000-and-filter into one indexed
+read that stays constant-time. Far cheaper to do now, at 26 rows, than after real traffic.
+
+**Already captured but never shown.** `latency_ms`, `channel`, `runtime` and `intent` are all written
+to `sam_events` today. Live data confirms it: 25 API events and 1 WhatsApp, **average 1402 ms, max
+2867 ms**. So several metrics below need only a query and a tile, no instrumentation.
+
+- [ ] **P6a.1 Rollup table + nightly job.** `sam_metrics_daily` keyed by (day, channel): queries,
+      users, sessions, gaps, zero-result rate, p50/p95 latency, feedback split. Backfill from
+      `sam_events`. Everything after this reads the rollup, not raw events.
+- [ ] **P6a.2 Populate `session_id`.** The column exists and is **always null** - 0 distinct sessions
+      across all 26 events. Without it there is no "messages per session", no conversation depth, no
+      returning-user metric. Small change in the web and WhatsApp entry points; do it before the demo
+      so the numbers have history.
+- [ ] **P6a.3 Response-time panel.** p50 / p95 / max, split by channel and by `runtime`
+      (claude vs local vs search). The data is already there. This is "time to message" - it is also
+      the number that tells you when a model change made SAM slower.
+- [ ] **P6a.4 Channel breakdown.** Queries, users and latency per channel - web, whatsapp, api, mcp.
+      Currently invisible even though every event carries `channel`.
+- [ ] **P6a.5 Corpus panel.** Files tracked, by type and industry, ingestable vs skipped, archived,
+      tombstoned, total size, newest change, and **how many are carded vs registry-only**. That last
+      one is the real coverage number and nothing reports it today. Reads
+      `sam_sharepoint_files`, which already holds all of it.
+- [ ] **P6a.6 Freshness panel.** Assets over 12 months old, by owner, so a stale asset has a name
+      attached. Needs P1.1 publication dates.
+- [ ] **P6a.7 Gap report.** Ranked missing combinations with example questions and first/last seen.
+      `coverageGaps()` and the `gap` events exist; nothing presents them as a worklist.
+- [ ] **P6a.8 Per-user activity.** Who is actually using SAM, how often, and their top questions.
+      Matters for adoption reporting to a manager, and it is the metric that shows whether sales
+      picked it up or only marketing did.
+- [ ] **P6a.9 Export.** CSV or a shareable snapshot, because the first thing anyone does with a
+      number a manager likes is put it in a deck.
+
+**Deliberately not in v1:** per-tenant isolation and billing. Design decision 1 says internal tool
+first; the rollup schema should key on (day, channel) in a way that a `tenant_id` could be added
+later without a rewrite, and no further.
+
 ### P7 - The MVP demo path
 
 Siddharth's plan, 6 September: prove the platform on 10-50 files before ingesting anything.
@@ -251,13 +301,44 @@ dropped for now by Siddharth's call - revisit after the MVP.
    per hour of work in the whole list.
 3. **P0.1 + P0.2** - the registry starts answering, and links become real. This is what makes
    "which deck has the Citrix comparison?" answerable.
-4. **P7.1 to P7.3** - card 20-50 documents in Claude Enterprise, load to Supabase.
-5. **P6.4 the eval set** - 30 real questions, so "it works" is a number and not an opinion.
-6. **P6.2 request_publish** + **P1.3 public links** - both now unblocked; approver is Siddharth.
-7. **P7.4 demo**, then decide on the remaining 413 with evidence.
+4. **P6a.2 session ids** - tiny, but it must land *before* demo traffic or the session metrics have
+   no history to report.
+5. **P7.1 to P7.3** - card 20-50 documents in Claude Enterprise, load to Supabase.
+6. **P6.4 the eval set** - 30 real questions, so "it works" is a number and not an opinion.
+7. **P6a.1 + P6a.3 to P6a.5** - the rollup and the dashboard panels, once there is data worth showing.
+8. **P6.2 request_publish** + **P1.3 public links** - both now unblocked; approver is Siddharth.
+9. **P7.4 demo**, then decide on the remaining 413 with evidence.
 
 P4.2 (the cron) is ten minutes and fits anywhere. P1.1 publication dates ride along free during P7.2,
 since Claude is already reading the documents.
 
 **Deferred until after the MVP:** the full 874-document carding (P2.2), Teams (P3.1), embeddings, and
 Marketing 2.0.
+
+---
+
+## 6. Who does what
+
+Written 6 September 2026, because the honest answer to "can you build it yourself?" is *almost*.
+
+### Claude builds, unattended
+
+Everything that is code, schema, or a query against systems already connected: **P6.1** trace panel,
+**P0.1/P0.2** registry join and link preference, **P6.2** request_publish end to end, **P6a.1 to
+P6a.9** the whole dashboard, **P4.2** the cron, **P1.2** freshness badges, **P6.3/P6.5** feedback and
+web memory. No input needed beyond a review of the result.
+
+### Siddharth does, because Claude cannot
+
+| Task | Why it cannot be automated | Effort |
+|---|---|---|
+| **P4.1** upload then delete a test file in Sales Collateral | SAM is read-only against SharePoint by design, and the flow's polling trigger only fires on a real change. Faking it would break the invariant the architecture rests on. | 2 minutes |
+| **P7.1** choose the 20-50 demo documents | Judgement about what a manager should see. Claude can *suggest* a shortlist from the registry facets. | 20 minutes |
+| **P7.2** download those files and card them | The rule that never bends: SAM never downloads file content. Claude Enterprise reads what Siddharth hands over. | An hour or two |
+| **P6.4** supply the 30 eval questions | These must be *real* questions sales actually asks. Invented ones would grade SAM against a fiction. Scoring is mechanical once the list exists. | 30 minutes |
+| **P1.3** confirm which accops.com page matches which asset | Title matching gets most of the way; the ambiguous ones need someone who knows the customers. | 30 minutes, after the automated pass |
+
+### Needs a decision, not work
+
+Nothing right now. All four open decisions were settled on 6 September - see section 4.
+
