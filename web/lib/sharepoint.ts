@@ -227,6 +227,10 @@ export type RegistryRow = {
   created_at: string | null; modified_at: string | null; modified_by: string | null;
   asset_type: string[]; industry: string[]; product: string[]; competitor: string[];
   status: string; deleted: boolean;
+  /** Only ever written by the Power Automate flow - the seed cannot produce it, because Graph's
+   *  delta does not return the SharePoint list item id. So a non-null value here is proof that a
+   *  real notification arrived and the trigger's field mapping is correct. */
+  list_item_id: number | null;
 };
 
 /** Registry read for the catalogue and the reconcile report. */

@@ -44,6 +44,12 @@ export async function GET(req: Request) {
     newest_change: newest,
     // Sales Collateral is not a busy library, so silence is only suspicious after a while.
     flow_probably_stalled: ageDays !== null && ageDays > 30,
+    // Has the Power Automate flow ever actually written here? Until the first notification lands,
+    // every row is seed data and the trigger's field mapping is still unproven. list_item_id only
+    // ever arrives from the flow - the seed cannot produce it, because Graph's delta does not return
+    // the SharePoint list item id. So this is the unambiguous "the flow works" signal.
+    flow_proven: rows.some(r => r.list_item_id != null),
+    flow_touched: rows.filter(r => r.list_item_id != null).length,
     untagged: rows.filter(r => !r.asset_type?.length || r.asset_type[0] === "Other").length,
     by_type: rows.reduce<Record<string, number>>((acc, r) => {
       for (const t of r.asset_type ?? []) acc[t] = (acc[t] ?? 0) + 1;

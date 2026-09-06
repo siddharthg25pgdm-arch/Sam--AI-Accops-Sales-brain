@@ -158,9 +158,27 @@ This is where the 413 ingestable files become answerable, not just findable.
 
 ### P4 - Operational safety
 
-- [ ] **P4.1 Finish the deletion flow test.** Two clicks: edit a throwaway file, confirm
-      `list_item_id` fills and `folder` has no prefix; then delete it and confirm the row flips to
-      `deleted = true`. Baseline recorded: **874 rows, 0 with `list_item_id`, 0 tombstoned.**
+- [ ] **P4.1 Confirm the flows fire.** *Blocked 6 September: Siddharth has **view-only** access to
+      Sales Collateral and cannot create, edit or delete a file there.*
+
+      **This does not break the flows.** They run on his connection and only need **read** to watch
+      the library - which is exactly what a tracker should need, and it is a point in favour of the
+      design rather than against it. What it blocks is only his ability to *trigger* a test himself.
+
+      **The flows will most likely validate themselves.** The trigger fires on anyone's change, and
+      the registry shows the library is actively edited by others - SANDIP MALLIK and Samhita TV
+      account for most recent modifications. So a real change should arrive on its own within days.
+      That makes a **monitoring check more useful than a manual test**, and it is built: see P4.1a.
+
+      Baseline for whenever it fires: **874 rows, 0 with `list_item_id`, 0 tombstoned.** The first
+      real notification moves `list_item_id` off zero, which is the unambiguous signal.
+
+      Two ways to unblock a deliberate test, in order of preference: ask whoever owns the library for
+      edit rights on **one** throwaway subfolder, or have a colleague who already has edit rights
+      re-save any file while Siddharth watches the run history.
+- [ ] **P4.1a Flow-health check.** Report whether the flows have ever fired, and how recently, so a
+      silent failure is visible without anyone remembering to look. Folded into
+      `/api/cron/sharepoint`.
 - [ ] **P4.2 Add `vercel.json` with a cron.** `/api/cron/sharepoint` works and returns real data
       (`tracked: 874, untagged: 0`) but **nothing calls it**. An unscheduled health check catches
       nothing.
