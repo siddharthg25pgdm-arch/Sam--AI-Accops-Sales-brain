@@ -209,6 +209,9 @@ field never again holds a guess in the slot a verified value occupies. That is t
 
 ## 9. Current state of everything else
 
+> Superseded by [ROADMAP.md](ROADMAP.md), which is verified against the
+> deployed app and the database. The list below is the 4 September snapshot.
+
 Working and deployed at https://sam-accops.vercel.app: web app with chat and faceted catalogue, admin dashboard, REST API, MCP server, WhatsApp channel (live, tested 4 September), Supabase analytics, answers from `openai/gpt-oss-120b` on Groq's free tier, deduplication, honest gap handling.
 
 Not built, in priority order after this task: publication-date extraction and freshness surfacing, the public/internal asset map (0 of 66 assets can be sent to a customer today), consuming the feedback thumbs that are already being collected, publish requests to marketing, a weekly gap digest. Deliberately not building embeddings until the usage log shows keyword search missing things.

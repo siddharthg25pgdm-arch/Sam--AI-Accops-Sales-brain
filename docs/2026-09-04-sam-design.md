@@ -7,6 +7,10 @@ Companion artifact: `sam-query-simulation.html` in this folder. Open it in a bro
 
 ---
 
+> **Current state of the build:** see [ROADMAP.md](ROADMAP.md) - what is done, what is
+> left, and which open decisions block which item. Verified against the deployed app,
+> rather than restating this document's plan.
+
 ## 1. What SAM is
 
 SAM is an internal assistant that answers two kinds of question for Accops sales and marketing:
@@ -159,7 +163,7 @@ Everything runs on Vercel and Supabase. Nothing runs on Siddharth's laptop.
 1. **Internal tool or sellable product first?** Assumed internal, with tenancy addable. Changes auth and data isolation design if wrong.
 2. **Is the public bucket S3-compatible with stable public URLs, and who owns it?** Assumed yes. Needed for T3.
 3. **Uniform read access** to both SharePoint sites for everyone in sales and marketing? Assumed yes, so no per-user trimming in v1.
-4. ~~WhatsApp via Meta Cloud API~~ Decided: OpenWA, internal tool, risk accepted.
+4. ~~WhatsApp via Meta Cloud API~~ ~~Decided: OpenWA, internal tool, risk accepted.~~ **Superseded the same evening: Meta's WhatsApp Business Cloud API.** OpenWA needs a server and there is none; it is also an unofficial bridge, which is the wrong risk when Accops sells to banks. Built and live - see section 14.
 5. **Claude API direct or via Bedrock**, pending InfoSec's view on where case-study text is processed.
 6. **Who approves publish requests (T5)?** Assumed: Siddharth or a named marketing approver.
 7. **Freshness threshold** of 12 months, and whether stale assets are hidden or only badged. Assumed badged.
