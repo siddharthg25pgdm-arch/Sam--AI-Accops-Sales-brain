@@ -71,7 +71,15 @@ Without this the 874 rows are inert and the three findings above stay true.
 
 - [ ] **P0.1 Make the agent read `sam_sharepoint_files`.** Merge registry rows into the card set at
       query time, keyed by filename. A registry row with no card still answers "this exists, here is
-      the link, here is the folder" - which is most of what a rep needs. *Half a session.*
+      the link, here is the folder" - which is most of what a rep needs.
+
+      **Scope, measured rather than guessed.** `cards.ts` line 1 is
+      `import raw from "@/data/asset_cards.json"` and `allAssets()` is **synchronous** with a
+      module-level cache; `searchAssets()`, `facetCounts()` and `coverageGaps()` are sync too.
+      Supabase reads are async, so this is not a one-line swap - it needs a warm-cache pattern
+      (load once on first request, refresh on a TTL) or those functions go async and **25 call sites
+      across 5 files** follow: `page.tsx`, `agent.ts`, `agent-openai.ts`, `api.ts`, `cards.ts`.
+      Warm cache is the smaller change and fits Vercel's model. *One session.*
 - [ ] **P0.2 Prefer the verified `web_url` in `assetLink()`.** Section 8a of the SharePoint task
       requires this: store Graph's `webUrl` only when Graph returned it, never a guess. **Strip or
       rewrite `action=edit`** on Office links first - as loaded, a forwarded `.pptx` link opens an
@@ -132,6 +140,52 @@ This is where the 413 ingestable files become answerable, not just findable.
 - [ ] **P4.4 Two WhatsApp expiries, both silent failures.** Access token **3 November 2026**, test
       number **early December 2026**. See `TASK-whatsapp-meta-setup.md`.
 
+### P6 - Platform completeness, independent of corpus size
+
+Added 6 September 2026 after Siddharth reframed the priority: **build the platform fully on a small
+sample, demo it, then ingest.** Everything here is worth doing with 20 files and is not made easier by
+having 874. Corpus work (P2) is explicitly deferred behind this.
+
+The architecture makes this cheap. `web/lib/api.ts` is 87 lines and every channel converges there -
+web chat, WhatsApp, REST and MCP all call `apiSearch` / `apiAsk`. Fix something below and all four
+inherit it at once.
+
+- [ ] **P6.1 The trace panel.** Design section 6 promises "rich cards, citations, trace panel
+      (Perplexity/Grok style)". `apiAsk` already **returns** `trace`, and `web/app/page.tsx` never
+      renders it - zero references. This is the single most demo-visible gap: a manager watching SAM
+      answer cannot see *why* it picked those three assets. Backend already done; this is UI only.
+      *Half a session, high demo value.*
+- [ ] **P6.2 Finish `request_publish`.** `apiPublicLink` returns `can_request_publish: true`, but no
+      tool or route exists to file one. A rep is told they may ask and then given no way to ask - a
+      dead end in the API surface. Needs a `sam_publish_requests` table, a REST route, an MCP tool and
+      a queue on the admin page. Approver is Siddharth (settled). *One session.*
+- [ ] **P6.3 Feedback loop closure.** Thumbs are collected and stored, and the admin page counts them,
+      but nothing acts on them. Minimum useful version: surface "queries rated wrong_asset" as a list
+      so the ranking can be corrected. 0 rows today, so this needs demo traffic first.
+- [ ] **P6.4 An eval set.** Design phase 1 sets an exit criterion of **hit@3 >= 85%** on 30 real sales
+      questions. No eval set exists. Without it "is SAM good?" is a matter of opinion, and every
+      ranking change is unmeasurable. This is the honest way to show a manager it works. *Write the 30
+      questions with Siddharth; scoring is mechanical after that.*
+- [ ] **P6.5 Conversation memory on the web channel.** WhatsApp keeps six hours of per-number history;
+      the web chat passes `history` through `apiAsk` but nothing persists it across a reload. Cheap,
+      and follow-ups are most of how a demo actually gets used.
+
+### P7 - The MVP demo path
+
+Siddharth's plan, 6 September: prove the platform on 10-50 files before ingesting anything.
+
+- [ ] **P7.1 Pick 20 to 50 demo documents** spanning the facets that make SAM look real: a couple of
+      BFSI and Government case studies, a Citrix or Omnissa competitive deck, a whitepaper, a brochure.
+      **The competitive deck matters most** - "which deck has the Citrix comparison?" is the question
+      the current 66-document corpus cannot answer at all, and the registry shows 37 such assets exist.
+- [ ] **P7.2 Card them in Claude Enterprise**, applying the two refinements from section 4 while
+      carding, not after: split the card by audience, and write `client_actual` separately.
+- [ ] **P7.3 Load into Supabase** as the first real rows of the card table, so the demo runs on the
+      same path production will use - not on a JSON file that gets thrown away.
+- [ ] **P7.4 Demo.** Then decide whether the remaining 413 are worth carding, with evidence.
+
+**What P7 does not need:** embeddings, the full 874, Teams, or Marketing 2.0.
+
 ### P5 - Deliberately not doing yet
 
 - **Embeddings / pgvector.** Held until the usage log shows keyword search missing things. 21 queries
@@ -189,11 +243,21 @@ Cloud API (the doc's decision 4 still reads "OpenWA" - superseded on 4 Sep eveni
 
 ## 5. Suggested order
 
-1. **P4.1** - two clicks, and it closes out today's work.
-2. **P0.1 + P0.2** - the registry starts answering questions. Biggest single jump in usefulness.
-3. **P2.1** - pilot cards, with the inventory comparison.
-4. **P3.1** - Teams, if sales is the priority audience.
-5. **P1.1 + P1.2** - dates and freshness.
-6. **P1.3** - public links, once decisions 2 and 6 land.
+Revised 6 September: **platform first on a small sample, demo, then decide about the corpus.** Teams is
+dropped for now by Siddharth's call - revisit after the MVP.
 
-P4.2 can be slotted in anywhere; it is ten minutes.
+1. **P4.1** - two clicks, closes out the Power Automate work.
+2. **P6.1 the trace panel** - backend already returns `trace`; the UI ignores it. Highest demo value
+   per hour of work in the whole list.
+3. **P0.1 + P0.2** - the registry starts answering, and links become real. This is what makes
+   "which deck has the Citrix comparison?" answerable.
+4. **P7.1 to P7.3** - card 20-50 documents in Claude Enterprise, load to Supabase.
+5. **P6.4 the eval set** - 30 real questions, so "it works" is a number and not an opinion.
+6. **P6.2 request_publish** + **P1.3 public links** - both now unblocked; approver is Siddharth.
+7. **P7.4 demo**, then decide on the remaining 413 with evidence.
+
+P4.2 (the cron) is ten minutes and fits anywhere. P1.1 publication dates ride along free during P7.2,
+since Claude is already reading the documents.
+
+**Deferred until after the MVP:** the full 874-document carding (P2.2), Teams (P3.1), embeddings, and
+Marketing 2.0.
