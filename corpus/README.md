@@ -31,3 +31,34 @@ So the InfoSec argument is unchanged - a rep on WhatsApp still cannot receive a 
 What changed is who does the downloading during carding, and it is a laptop-local step either way.
 
 **If this folder is ever read by anything under `web/`, the rule is broken.** Keep it a build input.
+
+## Blocked: Graph and SharePoint REST, 7 September 2026
+
+`sp_fetch.py` resolves all 27 demo documents against the registry and is ready to run, but both
+document APIs now return 401 with
+`InvalidAuthenticationToken ... Continuous access evaluation ... InteractionRequired`.
+
+**A fresh interactive `az login` does not clear it.** That rules out a stale token, which was the
+first guess. What remains is a Conditional Access policy the Azure CLI cannot satisfy - typically a
+compliant-device requirement, an MFA claim the CLI does not carry, or an approved-client-app
+restriction.
+
+Scoped, not total:
+
+| API | State |
+|---|---|
+| Microsoft Graph | 401, CAE challenge |
+| SharePoint REST (`_api/web`) | 401 `invalid_request` |
+| Power Automate Flow API | **works** - 2 flows listed |
+
+Flow still working is what shows this is a policy scoped to document access rather than a broken
+login. It also means the change trigger keeps running: the pipeline is unaffected, only bulk
+download is.
+
+The timing lines up with the Sales Collateral permission change earlier the same day, so something
+on the tenant tightened.
+
+**This is not worth engineering around.** The options are to ask IT which policy applies to Graph
+for CLI clients, or for Siddharth to download the 27 documents through the browser - where the
+session already satisfies whatever the policy wants, since he can open the folder. The second needs
+no ticket. `docs/demo-corpus.md` lists exactly which files.
