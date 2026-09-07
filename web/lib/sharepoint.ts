@@ -268,6 +268,9 @@ export type RegistryRow = {
    *  delta does not return the SharePoint list item id. So a non-null value here is proof that a
    *  real notification arrived and the trigger's field mapping is correct. */
   list_item_id: number | null;
+  /** Set to now() only by applyChange, so a value newer than the backfill proves a real
+   *  notification arrived. The seed and the backfill both leave it at their own run time. */
+  last_synced: string | null;
 };
 
 /** Registry read for the catalogue and the reconcile report. */
