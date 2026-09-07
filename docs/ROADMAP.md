@@ -234,7 +234,12 @@ inherit it at once.
 - [ ] **P6.3 Feedback loop closure.** Thumbs are collected and stored, and the admin page counts them,
       but nothing acts on them. Minimum useful version: surface "queries rated wrong_asset" as a list
       so the ranking can be corrected. 0 rows today, so this needs demo traffic first.
-- [ ] **P6.4 An eval set.** Design phase 1 sets an exit criterion of **hit@3 >= 85%** on 30 real sales
+- [~] **P6.4 Eval set - DRAFTED 7 Sep, needs Siddharth.** `docs/eval-set.md` has 30 questions and
+      `prototype/eval.mjs` scores them against the live API, exiting non-zero below 85% so it can
+      gate a deploy later. **10 are real, pulled from `sam_events`; 20 are marked `[invented]` and
+      must be replaced with what sales genuinely asks** - otherwise the 85% grades SAM against a
+      fiction. Questions 11-15 are the ones to watch: they cover the competitive assets that did not
+      exist in SAM's answers before the registry join. Original scope: Design phase 1 sets an exit criterion of **hit@3 >= 85%** on 30 real sales
       questions. No eval set exists. Without it "is SAM good?" is a matter of opinion, and every
       ranking change is unmeasurable. This is the honest way to show a manager it works. *Write the 30
       questions with Siddharth; scoring is mechanical after that.*
@@ -302,7 +307,10 @@ to `sam_events` today. Live data confirms it: 25 API events and 1 WhatsApp, **av
 - [x] **P6a.8 Per-user activity - DONE 7 Sep.** Original scope: Who is actually using SAM, how often, and their top questions.
       Matters for adoption reporting to a manager, and it is the metric that shows whether sales
       picked it up or only marketing did.
-- [ ] **P6a.9 Export.** CSV or a shareable snapshot, because the first thing anyone does with a
+- [x] **P6a.9 Export - DONE 7 Sep.** `/api/v1/export?set=metrics|assets|gaps`, linked from the
+      dashboard header. UTF-8 BOM so Excel does not mangle the curly apostrophes already in
+      accops.com titles, and every cell quoted - a half-escaped CSV shifts columns silently rather
+      than erroring, which reads as "the data is wrong". Original scope: CSV or a shareable snapshot, because the first thing anyone does with a
       number a manager likes is put it in a deck.
 
 **Deliberately not in v1:** per-tenant isolation and billing. Design decision 1 says internal tool
