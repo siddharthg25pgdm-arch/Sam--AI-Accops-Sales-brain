@@ -106,3 +106,38 @@ https://propalmsnetwork.sharepoint.com/sites/Company/Shared%20Documents/Sales/Sa
 
 Once these are in `corpus/sharepoint/`, run `python prototype/extract_text.py` and the text is
 ready for carding.
+
+---
+
+## If you download the whole Sales Collateral folder instead
+
+Measured 7 September 2026, so this is arithmetic rather than a guess.
+
+| Slice | Files | Size |
+|---|---|---|
+| Everything in the library | 874 | 12.6 GB |
+| Ingestable only (drops logos, wallpapers, videos, .lnk) | 413 | 6.2 GB |
+| **Ingestable under 50 MB** | **377** | **3.0 GB** |
+| The 36 files over 50 MB | 36 | 3.3 GB |
+| All PDFs | 138 | **0.4 GB** |
+
+**Half the ingestable volume is 36 files.** Skipping those turns a 6.2 GB download into 3.0 GB and
+loses almost nothing: they are event decks stuffed with images, and the text a card needs is a
+fraction of the bytes.
+
+**The real cost is not the download.** Extraction and card review scale with file *count*, not size.
+413 documents is roughly twenty times the demo corpus, and every card should be sanity-checked
+before a rep sees it - that check is the gate build order step 2 exists to enforce. Downloading
+everything is a few minutes; carding everything is not, and a corpus of unreviewed cards is how SAM
+starts confidently citing things nobody verified.
+
+**Recommended order, if the whole library is coming down anyway:**
+
+1. **The 27 in this document.** Enough for the demo and the eval set, all reviewable in one sitting.
+2. **The 138 PDFs (0.4 GB).** PDFs extract cleanly and are the types reps actually send - brochures,
+   datasheets, case studies. Highest value per megabyte in the library by a wide margin.
+3. **The remaining Office files under 50 MB**, once the first two have proven the card quality holds.
+4. **The 36 large decks, or never.** Decide with evidence about whether decks are being asked for.
+
+Downloading more than that in one go is not harmful - it is just inventory that has to be carded
+before it does anything, and it delays the demo rather than improving it.
