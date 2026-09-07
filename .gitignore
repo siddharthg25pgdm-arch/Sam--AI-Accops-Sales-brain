@@ -4,3 +4,9 @@ research/
 shots/
 
 .vercel
+
+# Downloaded source documents, public and private. Never committed - see corpus/README.md.
+# Ignore the CONTENTS, not the directory: git cannot re-include a file inside an excluded
+# directory, so `corpus/` plus a negation would hide the README too.
+corpus/*
+!corpus/README.md
