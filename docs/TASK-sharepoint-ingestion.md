@@ -387,3 +387,55 @@ is attributable to the flow.
   upsert, so correctness is unaffected, but it burns flow runs. The `{IsFolder}` condition is in place;
   a tighter trigger condition may be wanted if run volume becomes a problem.
 - **Marketing 2.0 remains excluded** until specific folders are named.
+
+## 8d. The first real notification, 7 September 2026: two bugs, both invisible
+
+The flow fired on its own - Hitanshu Aggarwal renamed a bootcamp deck from `Confidential-` to
+`Public-Shareable-` at 05:29. Power Automate showed **10 runs, every one Succeeded**, and
+`Notify_SAM` returned **202 Accepted**. Nothing whatsoever reached the registry: still 874 rows,
+0 `list_item_id`, last write still the seed.
+
+**Both failures were invisible by construction.** The route returns 202 before doing the work, because
+Graph and Power Automate both require a fast acknowledgement, so anything that fails inside `after()`
+leaves a green run in the flow dashboard. A green run is not evidence. The registry is.
+
+Reading the run's actual HTTP inputs is what found them:
+
+**1. `size` arrives as `""`.** The trigger sends an empty string when it has no size for a file, and
+`""` into a `bigint` is Postgres `22P02`, which fails the whole row - not just that column. Reproduced
+directly against PostgREST rather than inferred. Fixed with a `num()` coercion; `applyDelete` used the
+same unguarded pattern for `listItemId` and was hardened too.
+
+**2. `{Identifier}` is not the Graph driveItem id.** It is a URL-encoded **path**:
+`Shared%2bDocuments%252fSales%252fSales%2bCollateral%252f...`. Keying the upsert on it would have
+created a second row for a document already in the registry. `applyChange()` now resolves the existing
+row first - `list_item_id`, then `(folder, filename)` - and only falls back to the trigger's identifier
+for a genuinely new file.
+
+Everything else in the payload was correct: real filename, real `{Id}` of 33644, correct `webUrl`,
+`modifiedBy`, and both dates. Only those two fields were wrong, and either one alone was fatal.
+
+### The rename problem, and why the backfill exists
+
+This first notification was a **rename**, which is the one case `(folder, filename)` cannot match by
+definition - the filename is precisely what changed. `list_item_id` survives renames and moves, but the
+874 seeded rows did not have one, because Graph's `delta` does not return it.
+
+Graph does expose it as `sharepointIds.listItemId` on the driveItem, so it can be backfilled rather
+than waited for. `prototype/sp_backfill_listitem.py` resolved **874 of 874, 0 unresolved** - which is
+also a free integrity check on the seed, since every row still points at a live SharePoint item.
+
+Verified against this exact file: registry `item_id` `01X5UIHT3L6SKVAXEBTVA3DJ3FTW7HHROE` is list item
+**33644**, the number the notification carried, and Graph confirms it was renamed at 05:29:16. Once the
+backfill lands, that row matches on `list_item_id` and a rename updates in place.
+
+**No duplicate was created in the end** - only because the `size` bug killed the write first. Two bugs
+cancelling out is luck, not correctness.
+
+### The lesson, and it is the third time this project has learned it
+
+Section 15 recorded that dry-run tests only exercised the happy path. Section 16 recorded that tests
+checked a link was *present*, never that it *resolved*. This one is the same shape again: the flow
+reported success, the HTTP call reported success, and the only honest signal was whether the data
+actually changed. **`flow_proven` in `/api/cron/sharepoint` now checks exactly that** - `list_item_id`
+can only ever arrive from a real notification, so it cannot be faked by a seed or a green run.
