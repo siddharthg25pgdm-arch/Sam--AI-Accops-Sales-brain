@@ -10,3 +10,7 @@ shots/
 # directory, so `corpus/` plus a negation would hide the README too.
 corpus/*
 !corpus/README.md
+# Cards are the exception, and deliberately so. A card holds no file body - it is the
+# boundary object the design rests on (Claude Enterprise writes it, Groq only ever reads it),
+# so it must be reviewable in a diff. Ignoring it lost 7 cards to one untracked directory.
+!corpus/cards/

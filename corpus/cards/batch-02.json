@@ -1,0 +1,106 @@
+{
+  "generated_by": "Claude Enterprise, in-session, 7 September 2026",
+  "note": "Product documents from corpus/text/. No client is named in any of these - they are product literature, not customer stories - so client is empty and client_named is false throughout. Feature lists are summarised rather than reproduced: a card is for deciding what to send, not a substitute for the datasheet.",
+  "cards": [
+    {
+      "source": "public/Accops DaaS Brochure V4 2026.pdf",
+      "title": "Accops DaaS: Managed Cloud Desktops with ZTNA and MFA Built In",
+      "asset_type": "Brochure",
+      "industry": "",
+      "client": "",
+      "client_named": false,
+      "products": ["DaaS", "VDI", "ZTNA", "MFA"],
+      "competitors": [],
+      "personas": ["CIO", "IT head", "Head of Infrastructure", "procurement"],
+      "regulations": [],
+      "key_problem": "Organisations running remote access on separate VDI, ZTNA and MFA products carry the integration cost, the CapEx of refreshing VDI infrastructure, and the operational load of managing it all in-house.",
+      "key_outcomes": [
+        "VDI, ZTNA, MFA, data protection and UX monitoring on one platform",
+        "Named in the Gartner Magic Quadrant",
+        "Zero-CapEx, pay-as-you-go consumption pricing",
+        "Multi-tenant or dedicated control plane, customer's choice",
+        "Scale up and down on demand without infrastructure refreshes"
+      ],
+      "brief": "A managed, subscription DaaS platform that unifies ZTNA, MFA, VDI brokering, data protection and UX monitoring rather than integrating them from separate products. Two deployment models: a multi-tenant control plane with standardised, Accops-managed VDI catalogues, or a dedicated control plane the customer fully controls and customises. Compute is chosen per user persona; identity integrates with AD or Entra ID; Windows and Linux are both supported.",
+      "use_for": "Prospects weighing cloud desktops against building VDI in-house, anyone resisting CapEx, and BYOD or contractor scenarios where corporate laptops are the alternative.",
+      "publish_year": "2026",
+      "confidence": 0.95,
+      "public_url": "https://downloads.accops.com/Accops%20DaaS%20Brochure%20V4%202026.pdf"
+    },
+    {
+      "source": "public/Accops Hysecure Datasheet V5 2026.pdf",
+      "title": "Accops HySecure Gateway: Zero Trust Remote Access Datasheet",
+      "asset_type": "Datasheet",
+      "industry": "",
+      "client": "",
+      "client_named": false,
+      "products": ["HySecure", "ZTNA", "MFA", "VDI", "HyWorks"],
+      "competitors": [],
+      "personas": ["CISO", "IT head", "Network architect", "procurement"],
+      "regulations": [],
+      "key_problem": "Giving on-premises, remote and third-party users access to internal applications without putting them on the network, across application types too varied for a single VPN to cover well.",
+      "key_outcomes": [
+        "Zero-trust access with continuous identity and device-posture verification",
+        "Web, TCP, UDP, file shares, RDP, VoIP and SaaS applications on one gateway",
+        "TLS 1.3 with quantum-safe encryption algorithms available",
+        "Contextual access by user, device, location and time",
+        "On-premises, virtualised or cloud deployment"
+      ],
+      "brief": "The HySecure Gateway datasheet. A platform-agnostic remote access and security gateway covering web, TCP, UDP, client-server, file share, RDP, VoIP and SaaS applications including Microsoft 365, Google Workspace and Salesforce. Security includes TLS 1.3, quantum-safe algorithms, endpoint trust levels, DDoS protection, web application protection and adaptive risk-based policies. Access is contextual on user, device, location and time; deployment is on-premises, virtual or cloud.",
+      "use_for": "The technical answer when a prospect asks what HySecure actually supports - protocols, encryption, deployment models - and for security questionnaires.",
+      "publish_year": "2026",
+      "confidence": 0.95,
+      "public_url": "https://downloads.accops.com/Accops%20Hysecure%20Datasheet%20V5%202026.pdf"
+    },
+    {
+      "source": "public/Accops HyDesk Brochure. V6 2026.pdf",
+      "title": "Accops HyDesk: Thin and Zero Client Endpoints",
+      "asset_type": "Brochure",
+      "industry": "",
+      "client": "",
+      "client_named": false,
+      "products": ["HyDesk", "VDI", "Thin Clients"],
+      "competitors": [],
+      "personas": ["IT head", "Head of Infrastructure", "procurement", "CFO"],
+      "regulations": [],
+      "key_problem": "Replacing PCs in a corporate estate means managing patching, software distribution and a hardware refresh cycle on every desk, at high power and support cost.",
+      "key_outcomes": [
+        "Up to 80% lower power consumption than a full PC",
+        "Certified for 7 years of service, extending the refresh cycle",
+        "Three tiers: zero client, standard thin PC, power-user thin PC",
+        "Kiosk, desktop and Windows Embedded modes on the same family",
+        "Centralised deploy, patch, audit and remote troubleshooting"
+      ],
+      "brief": "A family of hybrid endpoint devices replacing PCs with centralised server-side or web-based computing. Three tiers run from an ultra-thin zero client for pure VDI to a power-user thin PC with Windows Embedded, SSD and rich graphics. Devices boot into kiosk mode for VDI only, desktop mode with a local productivity suite, or Windows Embedded. Sessions survive controller outages and can continue offline, and idle detection powers devices down without admin intervention.",
+      "use_for": "Endpoint refresh conversations, sustainability or e-waste requirements, and any deal where the PC fleet cost is the objection rather than the software.",
+      "publish_year": "2026",
+      "confidence": 0.93,
+      "public_url": "https://downloads.accops.com/Accops%20HyDesk%20Brochure.%20V6%202026.pdf"
+    },
+    {
+      "source": "public/Accops Nano Brochure. V5 2026.pdf",
+      "title": "Accops Nano: Compliant BYOD Access from a USB Stick",
+      "asset_type": "Brochure",
+      "industry": "",
+      "client": "",
+      "client_named": false,
+      "products": ["Nano", "HySecure", "VDI", "MFA"],
+      "competitors": [],
+      "personas": ["CISO", "IT head", "Head of Compliance"],
+      "regulations": [],
+      "key_problem": "Letting people work from personal devices means trusting an endpoint that may already carry a keylogger or malware, and that will retain session data after the work is done.",
+      "key_outcomes": [
+        "Hardened read-only Linux Live OS booted from a USB drive",
+        "Session data wiped at reboot, no trace left on the personal device",
+        "Isolates the session from any keylogger or malware on the host",
+        "Clipboard, USB, printing and screen capture all lockable",
+        "Removes the need to ship, manage and retrieve corporate laptops"
+      ],
+      "brief": "A hardened, encrypted Ubuntu Live OS delivered on a USB drive. Booting from it turns any personal machine into a read-only secure container, isolated from whatever is already on the host, with access to private applications through HySecure and to virtual desktops through the Digital Workspace. Integrity is checked at every boot; host storage and external devices are blocked; all session data is wiped on reboot. Clipboard, USB, printing and screen capture are individually controllable, with full audit trails.",
+      "use_for": "BYOD and contractor access in regulated industries, and any conversation where shipping laptops is the current answer and the cost or delay is the objection.",
+      "publish_year": "2026",
+      "confidence": 0.94,
+      "public_url": "https://downloads.accops.com/Accops%20Nano%20Brochure.%20V5%202026.pdf"
+    }
+  ]
+}
