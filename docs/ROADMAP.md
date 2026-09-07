@@ -205,7 +205,14 @@ inherit it at once.
       renders it - zero references. This is the single most demo-visible gap: a manager watching SAM
       answer cannot see *why* it picked those three assets. Backend already done; this is UI only.
       *Half a session, high demo value.*
-- [ ] **P6.2 Finish `request_publish`.** `apiPublicLink` returns `can_request_publish: true`, but no
+- [x] **P6.2 `request_publish` - DONE 7 Sep.** `sam_publish_requests` table, `POST
+      /api/v1/request-publish` (405 on GET, since a write route triggerable by a link preview is
+      not a route), an MCP tool, and an approver panel that shows first on the admin page when
+      non-empty. The MCP tool is the only one with `readOnlyHint: false` - clients use that to
+      decide what needs confirming, and a write marked read-only would let an agent file requests
+      on someone's behalf. A unique partial index on `lower(asset_title) where status='open'`
+      merges repeat asks onto one row; the 409 is reported to the rep as success, because the
+      request does exist. Original scope: `apiPublicLink` returns `can_request_publish: true`, but no
       tool or route exists to file one. A rep is told they may ask and then given no way to ask - a
       dead end in the API surface. Needs a `sam_publish_requests` table, a REST route, an MCP tool and
       a queue on the admin page. Approver is Siddharth (settled). *One session.*
@@ -373,7 +380,7 @@ dropped for now by Siddharth's call - revisit after the MVP.
 5. **P7.1 to P7.3** - card 20-50 documents in Claude Enterprise, load to Supabase.
 6. **P6.4 the eval set** - 30 real questions, so "it works" is a number and not an opinion.
 7. **P6a.1 + P6a.3 to P6a.5** - the rollup and the dashboard panels, once there is data worth showing.
-8. **P6.2 request_publish** + **P1.3 public links** - both now unblocked; approver is Siddharth.
+8. ~~**P6.2 request_publish**~~ done 7 Sep. **P1.3 public links** - unblocked; approver is Siddharth.
 9. **P7.4 demo**, then decide on the remaining 413 with evidence.
 
 P4.2 (the cron) is ten minutes and fits anywhere. P1.1 publication dates ride along free during P7.2,
