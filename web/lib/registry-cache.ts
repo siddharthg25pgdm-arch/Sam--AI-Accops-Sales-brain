@@ -65,7 +65,10 @@ export function rowToAsset(r: RegistryRow): Asset {
 
 /** Cached registry assets. Returns [] until the first load completes, and kicks that load off. */
 export function registryAssets(): Asset[] {
-  const fresh = g.__samRegAt != null && Date.now() - g.__samRegAt < TTL_MS;
+  // An EMPTY cache is never fresh, however recently it was stamped. Otherwise a single failed
+  // refresh pins the registry shut for the whole TTL and SAM quietly answers from the cards alone.
+  const loaded = g.__samReg?.length ? g.__samReg.length > 0 : false;
+  const fresh = loaded && g.__samRegAt != null && Date.now() - g.__samRegAt < TTL_MS;
   if (!fresh) void refresh();
   return g.__samReg ?? [];
 }
@@ -94,9 +97,16 @@ export async function refresh(): Promise<number> {
 }
 
 /** Warm the cache and wait for it. For entry points that can afford one await - the chat route -
- *  so the first real question does not see an empty registry. */
+ *  so the first real question does not see an empty registry.
+ *
+ *  Retries while the cache is EMPTY, not just while the timestamp is unset. A refresh that fails -
+ *  a cold Supabase connection, a transient 5xx - used to still stamp `__samRegAt`, which made
+ *  `registryAssets()` consider the cache fresh and skip refreshing for the full TTL. The result was
+ *  a five-minute window where SAM silently answered from the 74 cards instead of 696 assets, with
+ *  nothing in the logs, because the failure path deliberately swallows errors. Found by running the
+ *  eval set locally and seeing `answerable: 66`. */
 export async function ready(): Promise<void> {
-  if (g.__samRegAt == null) await refresh();
+  if (!g.__samReg?.length) await refresh();
 }
 
 export function cacheState() {
