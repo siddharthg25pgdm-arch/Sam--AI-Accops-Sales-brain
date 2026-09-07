@@ -388,6 +388,39 @@ Cloud API (the doc's decision 4 still reads "OpenWA" - superseded on 4 Sep eveni
 
 ---
 
+## 4b. Session close, 7 September 2026
+
+**Shipped today:** the registry join (P0), both Power Automate flows, the deletion key and backfill,
+the whole operator dashboard (P6a.1-9), `request_publish`, 11 public links, and the eval harness.
+
+**The eval found a production bug on its first real run.** `refresh()` stamped its timestamp even
+when it failed, and both readers treated "recently stamped" as "loaded" - so one failed refresh
+pinned the registry shut for a five-minute TTL while SAM quietly answered from 74 cards instead of
+696 assets. Invisible in logs, because the failure path swallows errors by design so a bad refresh
+cannot empty the catalogue. Two safeguards combining into a silent degradation. Fixed: both readers
+check cache contents, not the timestamp.
+
+**hit@3 is 82%** against a threshold of 85%, with 8 questions still unscored - so the real figure is
+probably higher. Questions 11-15, the competitive decks that did not exist in SAM's answers before
+the registry join, all pass. "Accops vs Citrix comparison" returns
+"Accops vs Citrix-VMware_ Updated April 2024".
+
+**The two remaining misses are honest and deliberately not fixed.** `pricing for HyWorks` and
+`do we have a SOC 2 report?` return three assets instead of admitting a gap - SAM over-answers on
+things it does not have. Tuning that against invented questions would fit the answer to a fiction.
+It waits for real questions, which is the same reason the invented ones are still marked.
+
+### Three things only Siddharth can do
+
+1. **Replace the 20 `[invented]` eval questions** with what sales genuinely asks. Grading against
+   made-up questions measures whether SAM matches a guess about sales, not sales. ~30 min.
+2. **Resolve 11 ambiguous public links.** Run `python prototype/sp_match_public.py`. They are
+   anonymised on both sides - "3rd largest Public Bank" against "India's Largest Private Bank" -
+   so nothing in either dataset says which is which. ~30 min.
+3. **Trigger the flows once.** Upload a throwaway file to Sales Collateral and delete it. Both flows
+   are Started; `flow_last_write` on `/api/cron/sharepoint` still reads 5 September, so no
+   notification has landed since the fix deployed.
+
 ## 5. Suggested order
 
 Revised 6 September: **platform first on a small sample, demo, then decide about the corpus.** Teams is
