@@ -1,6 +1,6 @@
 {
   "generated_by": "Claude Enterprise, in-session, 7 September 2026",
-  "note": "Cards written from corpus/text/*.txt, which was extracted from the documents in corpus/. Every number and client descriptor here appears in the source; nothing is inferred. client_named is false on all three because each document anonymises its own customer - which is what makes these safe for the model-visible projection described in ROADMAP.md section 4.",
+  "note": "Cards written from corpus/text/*.txt, which was extracted from the documents in corpus/. Every number and client descriptor here appears in the source; nothing is inferred. client_named is false on all three because each document anonymises its own customer - which is what makes these safe for the model-visible projection described in ROADMAP.md section 4. Revised 8 September 2026 after comparing against the hand-written cards in prototype/data/asset_cards.json, which is the build-order step 2 quality gate. The comparison found this batch had DROPPED four outcomes the documents support: automated vendor onboarding/offboarding and RBI mandate compliance on the BFSI card, and the 40,000 work-from-home total and Accops L2/L3 managed service on the private bank card. All four were re-verified in corpus/text/ before being added - the 40,000 figure sits in an unformatted summary tile that a naive grep misses. The hand cards were right and these cards were thin.",
   "cards": [
     {
       "source": "public/Accops - BFSI (Integrated) - Case Study V2.pdf",
@@ -9,16 +9,32 @@
       "industry": "Banking (Private Sector)",
       "client": "India's largest private sector bank and India's third-largest private sector bank, as a combined study",
       "client_named": false,
-      "products": ["HySecure", "BioAuth", "ZTNA", "VDI", "MFA", "Browser Isolation"],
+      "products": [
+        "HySecure",
+        "BioAuth",
+        "ZTNA",
+        "VDI",
+        "MFA",
+        "Browser Isolation"
+      ],
       "competitors": [],
-      "personas": ["CISO", "CIO", "IT head", "Head of Infrastructure"],
-      "regulations": ["RBI"],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
+      "regulations": [
+        "RBI"
+      ],
       "key_problem": "Both banks needed MFA for vendor access to decade-old applications with no SAML or OAuth support, and had to scale remote access far beyond what VPN and existing VDI could carry, without buying Azure AD P1 licences for every vendor.",
       "key_outcomes": [
         "Scaled secure remote access from 500 to 30,000+ users",
         "Biometric authentication rolled out to 90,000 users",
         "Eliminated Azure AD P1 licensing dependency for vendors",
         "MFA added to legacy apps without modifying them",
+        "Automated vendor onboarding and offboarding, cutting manual effort",
+        "RBI mandate compliance for vendor access achieved",
         "SWIFT and other high-risk applications isolated in VDI"
       ],
       "brief": "A combined study of two top Indian private banks. The first needed RBI-mandated MFA for vendors using personal devices against legacy applications, without the cost of Azure AD P1 licences. The second scaled from 500 to 30,000 remote users through COVID and needed biometrics for 90,000 people without proprietary scanner lock-in. Accops delivered ZTNA, VDI, an application proxy gateway for MFA on legacy apps, passwordless OTP for vendors, and BioAuth integrated with Active Directory.",
@@ -35,9 +51,18 @@
       "industry": "Media & Entertainment",
       "client": "A dominant Indian DTH and OTT content distribution company, operating since 2001 with 630+ channels",
       "client_named": false,
-      "products": ["HySecure", "HyWorks", "HyID", "HyLite"],
+      "products": [
+        "HySecure",
+        "HyWorks",
+        "HyID",
+        "HyLite"
+      ],
       "competitors": [],
-      "personas": ["CIO", "IT head", "Head of Infrastructure"],
+      "personas": [
+        "CIO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
       "regulations": [],
       "key_problem": "Onboarding and securing remote access for more than 300 vendors and suppliers was slow and risky, with no granular per-application access control and rising costs from a traditional IT estate.",
       "key_outcomes": [
@@ -61,17 +86,30 @@
       "industry": "Banking (Private Sector)",
       "client": "One of the top 5 private sector banks in India, with 4,758 branches, 10,990 ATMs and 5,972 cash recyclers as of March 2022",
       "client_named": false,
-      "products": ["HyWorks", "HySecure", "HyID", "VDI", "DaaS"],
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "VDI",
+        "DaaS"
+      ],
       "competitors": [],
-      "personas": ["CIO", "CISO", "IT head", "Head of Business Continuity"],
+      "personas": [
+        "CIO",
+        "CISO",
+        "IT head",
+        "Head of Business Continuity"
+      ],
       "regulations": [],
       "key_problem": "A bank running Accops on-premises for 3,000 management users had to reach roughly 25,000 work-from-home users almost overnight when lockdown began, while keeping core banking service levels unchanged.",
       "key_outcomes": [
         "Scaled from 3,000 to around 25,000 remote users",
         "Roughly 10,000 concurrent users on existing on-premises infrastructure",
         "A further 15,000 users enabled from an Azure deployment",
-        "Users distributed across setups to avoid a single point of failure",
-        "Back office, HR, finance, developers and third-party vendors all covered"
+        "40,000 work-from-home users in total",
+        "Infrastructure live within days of the pandemic hitting",
+        "VDI and remote access managed end-to-end by an Accops L2/L3 team",
+        "Users distributed across setups to avoid a single point of failure"
       ],
       "brief": "The bank had used Accops on-premises since 2017 for 3,000 management and IT users. The pandemic required roughly 25,000 users working from home with no drop in core banking service levels. The existing setup was scaled to about 10,000 concurrent users, then extended to Azure for a further 15,000 - deliberately spread across deployments for disaster recovery rather than concentrated in one.",
       "use_for": "Banking prospects who need proof of scale, a hybrid on-premises-plus-cloud VDI design, or business continuity for a workforce that cannot come to an office.",
