@@ -136,3 +136,29 @@ aws s3 ls s3://downloads.accops.com/ --recursive | awk '{$1="";$2="";$3="";print
 
 `prototype/sp_match_public.py` then matches them the same way it matched the website pages, and
 `public_url` starts carrying direct PDFs.
+
+
+---
+
+## Who downloads what, and why it is not the same answer
+
+Settled 7 September 2026.
+
+**Public documents: Claude fetches them.** The S3 bucket and accops.com pages are already published
+to the internet - anyone with the URL has them, so reading one adds no exposure that publishing did
+not already create. 13 of the 14 visible bucket objects are downloaded and extract cleanly:
+**143,348 characters, zero scanned, zero failures.** One object,
+`Accops MEA PPT Updated- for attendee.pdf`, returns 403 on every filename variant tried, so it has
+different ACLs rather than a naming problem.
+
+**Private SharePoint documents: Siddharth downloads them.** Technically reachable through Graph on
+the delegated login, and deliberately not fetched. Design section 2: *a private asset's file body
+never leaves SharePoint.* That rule is what makes the WhatsApp channel acceptable to InfoSec, and it
+is the same rule the carding boundary rests on - Claude Enterprise reads the documents, Groq only
+ever sees the derived card. Pulling private PDFs through a session would dissolve both at once for
+the sake of saving a few minutes of downloading.
+
+So the 32-document list above stays a handover. The public PDFs are already here.
+
+Downloads land in `prototype/data/public_pdfs/`, which is gitignored - they are re-fetchable, and it
+keeps the repo honest about never holding a private file body.
