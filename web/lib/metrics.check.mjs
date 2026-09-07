@@ -40,4 +40,38 @@ assert.ok(w[0].vertical.startsWith("Pharma"), "rank by distinct askers before as
 assert.equal(w.find(g => g.vertical === "BFSI").external, 2, "external asks must be counted separately");
 assert.equal(w.find(g => g.vertical === "BFSI").examples.length, 1, "identical queries dedupe in examples");
 
-console.log("metrics.check: 4 assertions passed");
+// --- freshness(): mirrors metrics.ts, same drift caveat as gapWorklist above.
+function freshness(rows, months = 12) {
+  const cutoff = new Date(Date.now() - months * 30.44 * 86_400_000).toISOString();
+  const acc = new Map();
+  for (const r of rows) {
+    if (r.deleted || r.status !== "active" || r.suggest_ingest === false) continue;
+    const owner = r.modified_by || "unknown";
+    const f = acc.get(owner) ?? { owner, total: 0, stale: 0, oldest: null };
+    f.total++;
+    if (r.modified_at && r.modified_at < cutoff) {
+      f.stale++;
+      if (!f.oldest || r.modified_at < f.oldest) f.oldest = r.modified_at;
+    }
+    acc.set(owner, f);
+  }
+  return [...acc.values()].filter(f => f.stale > 0).sort((a, b) => b.stale - a.stale);
+}
+
+const assets = [
+  { modified_by: "A", modified_at: "2021-01-01T00:00:00Z", status: "active", deleted: false, suggest_ingest: true },
+  { modified_by: "A", modified_at: "2026-09-01T00:00:00Z", status: "active", deleted: false, suggest_ingest: true },
+  { modified_by: "B", modified_at: "2022-06-01T00:00:00Z", status: "active", deleted: false, suggest_ingest: true },
+  { modified_by: "B", modified_at: "2020-01-01T00:00:00Z", status: "active", deleted: false, suggest_ingest: true },
+  // Archived copies and logos going stale is not news - a nudge about them wastes the owner's time.
+  { modified_by: "C", modified_at: "2019-01-01T00:00:00Z", status: "archived", deleted: false, suggest_ingest: true },
+  { modified_by: "D", modified_at: "2019-01-01T00:00:00Z", status: "active", deleted: false, suggest_ingest: false },
+];
+const fr = freshness(assets);
+assert.equal(fr[0].owner, "B", "most stale owner ranks first");
+assert.equal(fr.find(f => f.owner === "A").stale, 1, "a recent file is not stale");
+assert.ok(!fr.find(f => f.owner === "C"), "archived assets excluded");
+assert.ok(!fr.find(f => f.owner === "D"), "non-documents excluded");
+assert.equal(fr.find(f => f.owner === "B").oldest, "2020-01-01T00:00:00Z", "oldest tracked");
+
+console.log("metrics.check: 9 assertions passed");

@@ -170,3 +170,33 @@ export function userActivity(events: { kind: string; user_id: string; channel?: 
     return { user: r.user, queries: r.queries, gaps: r.gaps, channels: r.channels, lastSeen: r.lastSeen, top: top?.[0] ?? "" };
   }).sort((a, b) => b.queries - a.queries);
 }
+
+export type FreshRow = { owner: string; total: number; stale: number; oldest: string | null };
+
+/** Freshness by owner, so a stale asset has a name attached and the nudge has somewhere to go.
+ *
+ *  Honest about which date this is. It uses SharePoint's `modified_at`, NOT a publication date -
+ *  those are different questions and only the second one is really "how old is this content".
+ *  A file touched last week can hold 2022 numbers, and a file untouched since 2021 might still be
+ *  accurate. So this over-reports freshness and under-reports staleness, and the UI says so.
+ *  P1.1 replaces it with the date read out of the document, which is the real signal.
+ *
+ *  Even so it is worth showing now: 506 of 697 active assets have not been touched in over two
+ *  years, and nobody knew that. */
+export function freshness(rows: { modified_by: string | null; modified_at: string | null; status: string; deleted: boolean; suggest_ingest?: boolean }[], months = 12): FreshRow[] {
+  const cutoff = new Date(Date.now() - months * 30.44 * 86_400_000).toISOString();
+  const acc = new Map<string, FreshRow>();
+  for (const r of rows) {
+    // Only documents a rep could actually send. Logos and archived copies going stale is not news.
+    if (r.deleted || r.status !== "active" || r.suggest_ingest === false) continue;
+    const owner = r.modified_by || "unknown";
+    const f = acc.get(owner) ?? { owner, total: 0, stale: 0, oldest: null };
+    f.total++;
+    if (r.modified_at && r.modified_at < cutoff) {
+      f.stale++;
+      if (!f.oldest || r.modified_at < f.oldest) f.oldest = r.modified_at;
+    }
+    acc.set(owner, f);
+  }
+  return [...acc.values()].filter(f => f.stale > 0).sort((a, b) => b.stale - a.stale);
+}

@@ -271,6 +271,8 @@ export type RegistryRow = {
   /** Set to now() only by applyChange, so a value newer than the backfill proves a real
    *  notification arrived. The seed and the backfill both leave it at their own run time. */
   last_synced: string | null;
+  /** False for logos, shortcuts and anything in an archive folder - things a rep would never send. */
+  suggest_ingest: boolean;
 };
 
 /** Registry read for the catalogue and the reconcile report. */

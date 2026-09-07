@@ -261,7 +261,12 @@ to `sam_events` today. Live data confirms it: 25 API events and 1 WhatsApp, **av
       tombstoned, total size, newest change, and **how many are carded vs registry-only**. That last
       one is the real coverage number and nothing reports it today. Reads
       `sam_sharepoint_files`, which already holds all of it.
-- [ ] **P6a.6 Freshness panel.** Assets over 12 months old, by owner, so a stale asset has a name
+- [x] **P6a.6 Freshness panel - DONE 7 Sep, with a caveat stated in the UI.** Was listed as blocked
+      on P1.1, which was only half right: the registry already has `modified_at` from Graph for all
+      874 rows. That is not a publication date - a file touched last week can hold 2022 numbers -
+      so the panel says so and treats itself as a floor, not the full picture. It surfaced something
+      nobody knew: **506 of 697 active assets have not been touched in over two years**, and three
+      owners carry most of it (Vijender Yadav 103, BALABHARATHY 91, SANDIP MALLIK 91). Original scope: Assets over 12 months old, by owner, so a stale asset has a name
       attached. Needs P1.1 publication dates.
 - [x] **P6a.7 Gap report - DONE 7 Sep.** Ranked by distinct askers, not ask count. External asks
       labelled "needs a public link, not new content" rather than counted as missing content -

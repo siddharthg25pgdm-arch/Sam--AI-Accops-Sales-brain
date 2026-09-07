@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { recentEvents, persistent } from "@/lib/events";
-import { daily, rollup, totals, byDay, gapWorklist, userActivity } from "@/lib/metrics";
+import { daily, rollup, totals, byDay, gapWorklist, userActivity, freshness } from "@/lib/metrics";
 import { registry } from "@/lib/sharepoint";
 import { ready } from "@/lib/registry-cache";
 import { allAssets, assetLink } from "@/lib/cards";
@@ -22,6 +22,8 @@ export default async function Admin() {
   const answerable = allAssets();
   const linked = answerable.filter(a => assetLink(a)).length;
   const carded = answerable.filter(a => a.inventory_id !== null).length;
+  const stale = freshness(regRows);
+  const staleTotal = stale.reduce((n, f) => n + f.stale, 0);
   const worklist = gapWorklist(events);
   const people = userActivity(events);
   const chanRows = Object.entries(m.byChannel).sort((a, b) => b[1].queries - a[1].queries);
@@ -138,6 +140,26 @@ export default async function Admin() {
                         what produced the false gap on 4 September. */}
                     {g.external > 0 && <span className="tag" style={{ marginLeft: 6 }}>needs a public link, not new content</span>}
                   </td>
+                </tr>
+              ))}</tbody></table>
+          )}
+        </div>
+
+        <div className="panel">
+          <h2>Stale assets, by owner</h2>
+          <p className="sub" style={{ marginTop: -6 }}>
+            <b>{staleTotal}</b> documents untouched for over a year. This uses SharePoint&apos;s
+            last-modified date, not a publication date &ndash; a file touched last week can still hold
+            2022 numbers, so treat this as a floor, not the full picture.
+          </p>
+          {stale.length === 0 ? <p style={{ color: "var(--ink-3)" }}>Nothing older than a year.</p> : (
+            <table><thead><tr>
+              <th>Owner</th><th className="tnum">Stale</th><th className="tnum">Of</th><th>Oldest</th>
+            </tr></thead>
+              <tbody>{stale.slice(0, 10).map(f => (
+                <tr key={f.owner}>
+                  <td>{f.owner}</td><td className="tnum">{f.stale}</td><td className="tnum">{f.total}</td>
+                  <td>{f.oldest ? new Date(f.oldest).toLocaleDateString("en-IN", { month: "short", year: "numeric" }) : "–"}</td>
                 </tr>
               ))}</tbody></table>
           )}
