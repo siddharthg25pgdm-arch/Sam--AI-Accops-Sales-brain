@@ -1,4 +1,4 @@
-import { configured, registry } from "@/lib/sharepoint";
+import { configured, registry, syncStatus } from "@/lib/sharepoint";
 import { ready, cacheState } from "@/lib/registry-cache";
 import { allAssets, assetLink } from "@/lib/cards";
 
@@ -22,7 +22,7 @@ export async function GET(req: Request) {
     return Response.json({ ok: false, reason: "SUPABASE_URL / SUPABASE_SERVICE_KEY not set" });
   }
 
-  const rows = await registry("sales", 5000);
+  const [rows, sync] = await Promise.all([registry("sales", 5000), syncStatus()]);
   const synced = rows.map(r => r.modified_at).filter(Boolean).sort().reverse();
   const newest = synced[0] ?? null;
   const ageDays = newest ? (Date.now() - Date.parse(newest)) / 86_400_000 : null;
@@ -50,6 +50,11 @@ export async function GET(req: Request) {
     // sets it to now(), so a value newer than the backfill means a real notification landed.
     // ponytail: a dedicated last_notification column would be cleaner, add it if this gets fiddly.
     flow_last_write: rows.map(r => r.last_synced).filter(Boolean).sort().reverse()[0] ?? null,
+    // Deletions are NOT covered by the flow - see syncStatus(). This is the one number that says
+    // whether SAM might still be citing files that no longer exist.
+    deletes_last_checked: sync?.last_run ?? null,
+    deletes_last_result: sync?.last_result ?? null,
+    deletes_stale: sync?.last_run ? (Date.now() - Date.parse(sync.last_run)) > 36 * 3_600_000 : true,
     untagged: rows.filter(r => !r.asset_type?.length || r.asset_type[0] === "Other").length,
     by_type: rows.reduce<Record<string, number>>((acc, r) => {
       for (const t of r.asset_type ?? []) acc[t] = (acc[t] ?? 0) + 1;

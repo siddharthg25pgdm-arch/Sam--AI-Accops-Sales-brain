@@ -127,6 +127,14 @@ def main() -> None:
     for r in back:
         # A file restored from the recycle bin should come back, not stay a tombstone.
         patch(r["item_id"], {"deleted": False, "deleted_at": None})
+    # Stamp the sync row so the dashboard can say how long ago deletions were last checked.
+    # Deletions are the one thing the Power Automate flow cannot see, so "when did this last run"
+    # is the difference between a bounded gap and an unbounded one.
+    urllib.request.urlopen(urllib.request.Request(
+        f"{url}/rest/v1/sam_sharepoint_sync?scope=eq.sales",
+        data=json.dumps({"last_run": now,
+                         "last_result": f"reconcile: {len(gone)} tombstoned, {len(back)} restored"}).encode(),
+        method="PATCH", headers={**H, "Content-Type": "application/json"}), timeout=30).read()
     print(f"tombstoned {len(gone)}, restored {len(back)}")
 
 

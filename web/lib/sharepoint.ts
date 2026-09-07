@@ -280,3 +280,19 @@ export async function registry(scope = "sales", limit = 2000): Promise<RegistryR
   if (!configured()) return [];
   return (await rest(`sam_sharepoint_files?scope=eq.${scope}&deleted=is.false&select=*&limit=${limit}&order=modified_at.desc`)) as RegistryRow[];
 }
+
+export type SyncRow = { scope: string; last_run: string | null; last_result: string | null };
+
+/** When deletions were last reconciled.
+ *
+ *  The Power Automate delete trigger does not fire on a non-admin connection (verified 7 September
+ *  2026: zero runs against the modify flow's five, identical config). So deletions are caught by
+ *  `prototype/sp_reconcile.py`, which runs on the delegated Azure CLI login and cannot run on
+ *  Vercel - no Python, no az session. That makes "how long since it last ran" a real number a human
+ *  has to watch, rather than a detail. A stale reconcile means SAM may still be citing files that
+ *  have been deleted, which section 3 of the task doc calls the worst failure available. */
+export async function syncStatus(scope = "sales"): Promise<SyncRow | null> {
+  if (!configured()) return null;
+  const rows = (await rest(`sam_sharepoint_sync?scope=eq.${scope}&select=scope,last_run,last_result`)) as SyncRow[] | null;
+  return rows?.[0] ?? null;
+}

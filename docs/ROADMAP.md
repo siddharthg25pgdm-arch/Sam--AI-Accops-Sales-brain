@@ -410,7 +410,40 @@ the registry join, all pass. "Accops vs Citrix comparison" returns
 things it does not have. Tuning that against invented questions would fit the answer to a fiction.
 It waits for real questions, which is the same reason the invented ones are still marked.
 
+### Deletions: what is and is not possible without an admin
+
+Settled by test on 7 September, and worth stating precisely because it is easy to misread.
+
+**SAM cannot prevent, reject or approve a deletion.** It never writes to SharePoint at all - that is
+the design rule that makes the WhatsApp channel acceptable to InfoSec. Nobody's ability to delete a
+file is affected by anything here.
+
+**What SAM cannot do is be *told* about a deletion in real time.** Power Automate's
+"When a file is deleted" trigger needs a site-collection-admin connection to read a deleted file's
+properties, so on a normal connection it never fires - zero runs against the modify flow's five,
+with identical config, while the file was genuinely gone.
+
+**Deletions are still caught, just on a schedule:**
+
+| Change | Detected | Needs admin |
+|---|---|---|
+| File added or modified | ~1 minute, Power Automate | No - proven working |
+| File deleted | next reconcile run | No - proven working |
+
+`prototype/sp_reconcile.py` walks the folder through Graph, which reports what exists for any user,
+and tombstones what has gone. It found the test deletion correctly.
+
+**Why it is not on a Vercel cron.** The reconcile runs on the delegated Azure CLI login; Vercel has
+no Python and no `az` session. Scheduling the health endpoint instead would produce a green cron that
+is not doing the job - the exact false comfort this project has already been caught by three times.
+So the reconcile stamps `sam_sharepoint_sync.last_run`, and **the dashboard shows a banner when it
+is more than 36 hours old**, saying plainly that SAM may be citing files that have gone.
+
+Making it truly automatic needs a Graph app credential - the Entra registration this design has
+otherwise avoided entirely. That is a real trade to make later, not a bug to fix now.
+
 ### Three things only Siddharth can do
+
 
 1. **Replace the 20 `[invented]` eval questions** with what sales genuinely asks. Grading against
    made-up questions measures whether SAM matches a guess about sales, not sales. ~30 min.

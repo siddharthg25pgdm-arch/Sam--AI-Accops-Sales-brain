@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { recentEvents, persistent } from "@/lib/events";
 import { daily, rollup, totals, byDay, gapWorklist, userActivity, freshness } from "@/lib/metrics";
-import { registry } from "@/lib/sharepoint";
+import { registry, syncStatus } from "@/lib/sharepoint";
 import { ready } from "@/lib/registry-cache";
 import { allAssets, assetLink } from "@/lib/cards";
 import { apiPublishQueue } from "@/lib/api";
@@ -16,7 +16,11 @@ export default async function Admin() {
   if (!user.admin) redirect("/");
   // Rollup first, so the panels below are never stale. Cheap: it only recomputes the recent window.
   await rollup(3);
-  const [rows, events, regRows, pubQueue] = await Promise.all([daily(30), recentEvents(500), registry("sales", 5000), apiPublishQueue()]);
+  const [rows, events, regRows, pubQueue, sync] = await Promise.all([daily(30), recentEvents(500), registry("sales", 5000), apiPublishQueue(), syncStatus()]);
+  // Deletions are the one change the Power Automate flow cannot see, so a stale reconcile means SAM
+  // may be citing files that no longer exist - the worst failure this project has named.
+  const delAgeH = sync?.last_run ? (Date.now() - Date.parse(sync.last_run)) / 3_600_000 : null;
+  const delStale = delAgeH === null || delAgeH > 36;
   await ready();
   const m = totals(rows);
   const chart = byDay(rows, 14);
@@ -65,6 +69,16 @@ export default async function Admin() {
           <a href="/api/v1/export?set=gaps">registry</a>
         </p>
         {!persistent() && <div className="notice">Events are held in memory only. Add SUPABASE_URL and SUPABASE_SERVICE_KEY, run docs/supabase-sam-events.sql, and this becomes permanent.</div>}
+
+        {delStale && (
+          <div className="notice">
+            Deleted files were last checked{" "}
+            {delAgeH === null ? "never" : `${Math.round(delAgeH)} hours ago`}. The SharePoint delete
+            trigger needs a site-collection-admin connection, so deletions are caught by a reconcile
+            instead: run <code>python prototype/sp_reconcile.py --write</code>. Until then SAM may
+            still be pointing people at files that have gone.
+          </div>
+        )}
 
         <div className="stats">
           <div className="stat"><small>Questions asked</small><b className="tnum">{m.queries}</b></div>
