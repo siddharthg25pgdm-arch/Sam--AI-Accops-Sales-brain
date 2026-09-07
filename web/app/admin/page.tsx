@@ -56,7 +56,14 @@ export default async function Admin() {
       <TopBar user={user} current="admin" />
       <main className="admin">
         <h1>Dashboard</h1>
-        <p className="sub">Who is asking, what they ask, and whether SAM answered.</p>
+        <p className="sub">
+          Who is asking, what they ask, and whether SAM answered.{" "}
+          {/* Retyping a number out of a dashboard is how it gets transcribed wrong into a deck. */}
+          Export:{" "}
+          <a href="/api/v1/export?set=metrics">metrics</a>{" · "}
+          <a href="/api/v1/export?set=assets">assets</a>{" · "}
+          <a href="/api/v1/export?set=gaps">registry</a>
+        </p>
         {!persistent() && <div className="notice">Events are held in memory only. Add SUPABASE_URL and SUPABASE_SERVICE_KEY, run docs/supabase-sam-events.sql, and this becomes permanent.</div>}
 
         <div className="stats">
