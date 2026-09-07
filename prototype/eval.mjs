@@ -26,13 +26,15 @@ if (!token) {
 function questions() {
   const md = readFileSync(join(HERE, "..", "docs", "eval-set.md"), "utf8");
   const out = [];
-  for (const line of md.split("\n")) {
+  // Split on \r?\n: git's autocrlf writes CRLF on Windows, and a trailing \r breaks the row regex
+  // silently - it reports "0 questions" rather than failing, which reads like an empty file.
+  for (const line of md.split(/\r?\n/)) {
     const m = line.match(/^\|\s*(\d+)\s*\|(.+)$/);
     if (!m) continue;
     const cells = m[2].split("|").map(c => c.trim());
     const [q, type, expect, source] = cells;
     if (!q || !type) continue;
-    out.push({ n: Number(m[1]), q, type, expect, invented: /invented/i.test(source ?? "") });
+    out.push({ n: Number(m[1]), q, type, expect, modelled: /modelled/i.test(source ?? "") });
   }
   return out;
 }
@@ -68,14 +70,14 @@ function judge(qn, res) {
 
 const qs = questions();
 console.log(`${qs.length} questions against ${base}\n`);
-let hits = 0, scored = 0, unscored = 0, invented = 0;
+let hits = 0, scored = 0, unscored = 0, modelled = 0;
 
 for (const qn of qs) {
   let res;
   try { res = await ask(qn.q); }
   catch (e) { console.log(`  ERR  ${qn.n.toString().padStart(2)}  ${qn.q.slice(0, 52)}  ${e.message}`); continue; }
   const { hit, why } = judge(qn, res);
-  if (qn.invented) invented++;
+  if (qn.modelled) modelled++;
   if (hit === null) { unscored++; console.log(`  ----  ${qn.n.toString().padStart(2)}  ${qn.q.slice(0, 52).padEnd(54)} ${why}`); continue; }
   scored++; if (hit) hits++;
   console.log(`  ${hit ? "HIT " : "MISS"}  ${qn.n.toString().padStart(2)}  ${qn.q.slice(0, 52).padEnd(54)} ${why}`);
@@ -84,5 +86,5 @@ for (const qn of qs) {
 const rate = scored ? Math.round((hits / scored) * 100) : 0;
 console.log(`\nhit@3: ${hits}/${scored} = ${rate}%   (threshold ${THRESHOLD}%)`);
 if (unscored) console.log(`${unscored} unscored - fill in the expect column`);
-if (invented) console.log(`${invented} questions are still [invented] - replace them with real asks before trusting this number`);
+if (modelled) console.log(`${modelled} of ${qs.length} are modelled, not real asks. Replace them from sam_events once reps have used SAM for a few weeks.`);
 process.exit(rate >= THRESHOLD ? 0 : 1);
