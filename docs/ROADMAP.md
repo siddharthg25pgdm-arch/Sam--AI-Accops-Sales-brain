@@ -1,5 +1,8 @@
 # SAM: what is built, and what is left
 
+> **Starting a new session?** Read [HANDOVER.md](HANDOVER.md) first - it has the current state,
+> what is blocked, and a prompt to paste.
+
 **Written:** 6 September 2026, after the SharePoint registry landed.
 **Live:** https://sam-accops.vercel.app
 **Purpose:** one place that answers "what is actually done?" without reading six documents. Verified
