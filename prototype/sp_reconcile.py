@@ -46,6 +46,7 @@ def live_items(tok: str) -> tuple[set[str], set[tuple[str, str]]]:
     registry, which is what makes the second key safe."""
     ids: set[str] = set()
     pairs: set[tuple[str, str]] = set()
+    failed: list[str] = []
     stack = [urllib.parse.quote(ROOT)]
     while stack:
         path = stack.pop()
@@ -57,6 +58,7 @@ def live_items(tok: str) -> tuple[set[str], set[tuple[str, str]]]:
                     url, headers={"Authorization": f"Bearer {tok}"}), timeout=60).read())
             except urllib.error.HTTPError as e:
                 print(f"  warn: {path[:60]} -> {e.code}")
+                failed.append(f"{path[:60]} -> {e.code}")
                 break
             rel = urllib.parse.unquote(path)
             rel = rel[len(ROOT) + 1:] if rel.startswith(ROOT + "/") else ("" if rel == ROOT else rel)
@@ -66,7 +68,7 @@ def live_items(tok: str) -> tuple[set[str], set[tuple[str, str]]]:
                 if "folder" in it:
                     stack.append(path + "/" + urllib.parse.quote(it["name"]))
             url = d.get("@odata.nextLink")
-    return ids, pairs
+    return ids, pairs, failed
 
 
 def main() -> None:
@@ -86,8 +88,22 @@ def main() -> None:
         headers=H), timeout=60).read())
     print(f"registry rows: {len(rows)}")
 
-    live, livePairs = live_items(graph_token())
+    live, livePairs, failed = live_items(graph_token())
     print(f"live in SharePoint: {len(live)}")
+
+    # A walk that could not read the library returns an empty set, and every registry row then looks
+    # deleted. On 8 September that was 874 rows - the whole catalogue - because Graph 401s under the
+    # Conditional Access policy while the az token itself is perfectly valid. "I could not see it" is
+    # not "it is not there", and the difference is the entire catalogue. Refuse rather than tombstone.
+    if failed:
+        print(f"\n{len(failed)} folder listing(s) failed: {failed[0]}")
+        sys.exit("refusing to write: the SharePoint walk was incomplete, so absence proves nothing.\n"
+                 "  A 401 here is the Conditional Access block - see corpus/README.md. The registry\n"
+                 "  is left untouched, which is correct: a stale link is a smaller problem than an\n"
+                 "  empty SAM.")
+    if not live:
+        sys.exit("refusing to write: the walk found 0 live files, which means it could not read\n"
+                 "  the library rather than that the library is empty.")
 
     # Rows whose Graph id is no longer present. Only ids that LOOK like Graph ids are checked: a row
     # created by the modify flow carries the trigger's URL-encoded path instead, and comparing that
