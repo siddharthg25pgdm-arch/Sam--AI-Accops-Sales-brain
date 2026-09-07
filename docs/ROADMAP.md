@@ -155,10 +155,41 @@ once. No channel code was touched.
 
 This is where the 413 ingestable files become answerable, not just findable.
 
-- [ ] **P2.1 Card a pilot of 10 documents** from the registry and compare against the hand-written
-      inventory where they overlap, exactly as `prototype/generate_cards.py` already does. **Do not
-      skip the comparison** - build order step 2 exists because it is the gate on everything after.
-- [ ] **P2.2 Bulk-card the 413.** Report cost and timing first. SAM never downloads file content:
+- [x] **P2.1 Card a pilot - DONE 8 September 2026, and it was 27 documents rather than 10.**
+      All of `docs/demo-corpus.md` is carded: 34 cards across `corpus/cards/batch-01..05.json`, up
+      from 7. Both section 4 refinements were applied while carding rather than retrofitted -
+      `client_actual` is a separate field from the descriptive `client`, and `model_visible` names
+      the lean projection Groq sees.
+
+      **The comparison ran and caught the generated cards, not the hand ones.** Four outcomes the
+      documents plainly support had been dropped: automated vendor onboarding/offboarding and RBI
+      mandate compliance from the BFSI card, the 40,000 work-from-home total and the Accops L2/L3
+      managed service from the private bank card. Fixed, and the gate is now re-runnable as
+      `prototype/compare_cards.py`. It checks `asset_type` as well as similarity, because
+      overlap-over-`min()` scores a brochure 1.00 against a case study for the same product - the
+      identical trap `sp_match_public.py` fell into with 31 confident wrong matches.
+
+      **Three findings from reading the documents, each of which changes an answer:**
+      - The **ISO 27001 certificate expired on 20 September 2024**, and it is exactly the file a rep
+        sends when procurement asks. Card marked `expired`. Siddharth needs to supply the current one.
+      - The **2025 Gartner MQ** places Accops as a **Niche Player** and names a Caution that Accops
+        holds ISO 27001 and no other compliance certificates. That is the sourced answer to eval Q28,
+        "do we have a SOC 2 report?" - the answer is no, and it is now citable.
+      - `2026-06-11-Accops vs other VDI providers.pptx` is **dated 29 NOV 2022 on its own title
+        slide**. The filename date is a SharePoint touch, not a content date. This is P1.1's argument
+        in one file, and `docs/demo-corpus.md` had picked it as "most recent" on the filename alone.
+
+      Five of the nine brochures are superseded by newer public editions, so each card carries
+      `superseded_by`. Every such claim is checked against `corpus/public/` rather than asserted; the
+      check caught one that was wrong.
+- [ ] **P2.1a Load the cards into SAM.** *This is the gap that matters now.* The 34 cards are not in
+      the read path: `web/lib/cards.ts` line 1 is `import raw from "@/data/asset_cards.json"` plus
+      `registryAssets()`, and **nothing under `web/` reads `corpus/`** - verified, not assumed. So the
+      eval on 8 September returned **86%, exactly as before**, because it measured a corpus that never
+      saw the day's work. That is the honest reading of an unchanged number, and it is a wiring task,
+      not a carding one. Load the cards to Supabase and merge them in `cards.ts` the way the registry
+      already is, keeping `client_actual` and the non-`model_visible` fields off the model prompt.
+- [ ] **P2.2 Bulk-card the remaining ~386.** Report cost and timing first. SAM never downloads file content:
       Siddharth downloads, Claude Enterprise cards, only the card reaches Supabase. See "the carding
       boundary" in section 4 - including the two refinements (split the card by audience; write
       `client_actual` separately) that should be applied **while** carding, not retrofitted.
