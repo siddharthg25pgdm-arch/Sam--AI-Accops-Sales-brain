@@ -24,12 +24,12 @@ export async function apiSearch(p: { query?: string; asset_type?: string; vertic
   return { results: results.map(r => card(r.asset, r.why)), total_considered: considered, filters: p };
 }
 
-export async function apiAsk(question: string, who: string, channel: Channel, history: { role: "user" | "assistant"; content: string }[] = []) {
+export async function apiAsk(question: string, who: string, channel: Channel, history: { role: "user" | "assistant"; content: string }[] = [], sessionId?: string | null) {
   const t0 = Date.now();
   const r: AskResult = await askAgent(question, history);
-  const eventId = await logEvent({ user_id: who, channel, kind: "query", query: question, intent: r.intent, filters: r.filters,
+  const eventId = await logEvent({ user_id: who, channel, session_id: sessionId ?? null, kind: "query", query: question, intent: r.intent, filters: r.filters,
     result_count: r.assets.length, result_ids: r.assets.map(a => a.path ?? a.title), runtime: r.runtime, latency_ms: Date.now() - t0 });
-  if (r.zero) await logEvent({ user_id: who, channel, kind: "gap", query: question, filters: r.filters, ref_event_id: eventId });
+  if (r.zero) await logEvent({ user_id: who, channel, session_id: sessionId ?? null, kind: "gap", query: question, filters: r.filters, ref_event_id: eventId });
   return { answer: r.text, assets: r.assets, gap: r.zero, runtime: r.runtime, trace: r.trace, event_id: eventId };
 }
 

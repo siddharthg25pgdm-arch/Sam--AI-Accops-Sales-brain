@@ -55,6 +55,14 @@ const g = globalThis as unknown as { __waHist?: Map<string, Turn[]>; __waSeen?: 
 const hist: Map<string, Turn[]> = (g.__waHist ??= new Map<string, Turn[]>()); const seen: Set<string> = (g.__waSeen ??= new Set<string>());
 const TTL = 6 * 60 * 60 * 1000;
 
+/** Session id per number, restarted whenever the history window lapses. Keyed off the same TTL as
+ *  the conversation, so "messages per session" means "messages in one back-and-forth". */
+export function sessionFor(from: string, isNew: boolean): string {
+  const sess: Map<string, string> = ((g as { __waSess?: Map<string, string> }).__waSess ??= new Map());
+  if (isNew || !sess.has(from)) sess.set(from, `wa-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`);
+  return sess.get(from)!;
+}
+
 export function alreadySeen(id: string): boolean {
   if (seen.has(id)) return true;
   seen.add(id); if (seen.size > 5000) seen.clear();
@@ -109,7 +117,10 @@ export async function handleInbound(m: InboundText): Promise<void> {
   }
   const h = (hist.get(m.from) ?? []).filter(x => Date.now() - x.at < TTL);
   const history = h.map(({ role, content }) => ({ role, content }));
-  const r = await apiAsk(m.text, user, "whatsapp", history);
+  // A session is the 6-hour window this history already defines: empty means a new conversation,
+  // non-empty means the same one continuing. Derived rather than stored, so there is no second
+  // piece of state to keep in step with the window - and it resets exactly when context does.
+  const r = await apiAsk(m.text, user, "whatsapp", history, sessionFor(m.from, h.length === 0));
   const body = renderForWhatsApp(r.answer, r.assets, r.gap);
   h.push({ role: "user", content: m.text, at: Date.now() }, { role: "assistant", content: r.answer, at: Date.now() });
   hist.set(m.from, h.slice(-8));
