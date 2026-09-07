@@ -1,6 +1,6 @@
 {
   "generated_by": "Claude Enterprise, in-session, 7 September 2026",
-  "note": "Product documents from corpus/text/. No client is named in any of these - they are product literature, not customer stories - so client is empty and client_named is false throughout. Feature lists are summarised rather than reproduced: a card is for deciding what to send, not a substitute for the datasheet.",
+  "note": "Product documents from corpus/text/. No client is named in any of these - they are product literature, not customer stories - so client is empty and client_named is false throughout. Feature lists are summarised rather than reproduced: a card is for deciding what to send, not a substitute for the datasheet. Visibility added 8 September 2026: all four are downloadable from the public S3 bucket, so visibility is 'both' - it was omitted when the batch was written, and an absent field is not the same as a known-safe one.",
   "cards": [
     {
       "source": "public/Accops DaaS Brochure V4 2026.pdf",
@@ -9,9 +9,19 @@
       "industry": "",
       "client": "",
       "client_named": false,
-      "products": ["DaaS", "VDI", "ZTNA", "MFA"],
+      "products": [
+        "DaaS",
+        "VDI",
+        "ZTNA",
+        "MFA"
+      ],
       "competitors": [],
-      "personas": ["CIO", "IT head", "Head of Infrastructure", "procurement"],
+      "personas": [
+        "CIO",
+        "IT head",
+        "Head of Infrastructure",
+        "procurement"
+      ],
       "regulations": [],
       "key_problem": "Organisations running remote access on separate VDI, ZTNA and MFA products carry the integration cost, the CapEx of refreshing VDI infrastructure, and the operational load of managing it all in-house.",
       "key_outcomes": [
@@ -25,7 +35,8 @@
       "use_for": "Prospects weighing cloud desktops against building VDI in-house, anyone resisting CapEx, and BYOD or contractor scenarios where corporate laptops are the alternative.",
       "publish_year": "2026",
       "confidence": 0.95,
-      "public_url": "https://downloads.accops.com/Accops%20DaaS%20Brochure%20V4%202026.pdf"
+      "public_url": "https://downloads.accops.com/Accops%20DaaS%20Brochure%20V4%202026.pdf",
+      "visibility": "both"
     },
     {
       "source": "public/Accops Hysecure Datasheet V5 2026.pdf",
@@ -34,9 +45,20 @@
       "industry": "",
       "client": "",
       "client_named": false,
-      "products": ["HySecure", "ZTNA", "MFA", "VDI", "HyWorks"],
+      "products": [
+        "HySecure",
+        "ZTNA",
+        "MFA",
+        "VDI",
+        "HyWorks"
+      ],
       "competitors": [],
-      "personas": ["CISO", "IT head", "Network architect", "procurement"],
+      "personas": [
+        "CISO",
+        "IT head",
+        "Network architect",
+        "procurement"
+      ],
       "regulations": [],
       "key_problem": "Giving on-premises, remote and third-party users access to internal applications without putting them on the network, across application types too varied for a single VPN to cover well.",
       "key_outcomes": [
@@ -50,7 +72,8 @@
       "use_for": "The technical answer when a prospect asks what HySecure actually supports - protocols, encryption, deployment models - and for security questionnaires.",
       "publish_year": "2026",
       "confidence": 0.95,
-      "public_url": "https://downloads.accops.com/Accops%20Hysecure%20Datasheet%20V5%202026.pdf"
+      "public_url": "https://downloads.accops.com/Accops%20Hysecure%20Datasheet%20V5%202026.pdf",
+      "visibility": "both"
     },
     {
       "source": "public/Accops HyDesk Brochure. V6 2026.pdf",
@@ -59,9 +82,18 @@
       "industry": "",
       "client": "",
       "client_named": false,
-      "products": ["HyDesk", "VDI", "Thin Clients"],
+      "products": [
+        "HyDesk",
+        "VDI",
+        "Thin Clients"
+      ],
       "competitors": [],
-      "personas": ["IT head", "Head of Infrastructure", "procurement", "CFO"],
+      "personas": [
+        "IT head",
+        "Head of Infrastructure",
+        "procurement",
+        "CFO"
+      ],
       "regulations": [],
       "key_problem": "Replacing PCs in a corporate estate means managing patching, software distribution and a hardware refresh cycle on every desk, at high power and support cost.",
       "key_outcomes": [
@@ -75,7 +107,8 @@
       "use_for": "Endpoint refresh conversations, sustainability or e-waste requirements, and any deal where the PC fleet cost is the objection rather than the software.",
       "publish_year": "2026",
       "confidence": 0.93,
-      "public_url": "https://downloads.accops.com/Accops%20HyDesk%20Brochure.%20V6%202026.pdf"
+      "public_url": "https://downloads.accops.com/Accops%20HyDesk%20Brochure.%20V6%202026.pdf",
+      "visibility": "both"
     },
     {
       "source": "public/Accops Nano Brochure. V5 2026.pdf",
@@ -84,9 +117,18 @@
       "industry": "",
       "client": "",
       "client_named": false,
-      "products": ["Nano", "HySecure", "VDI", "MFA"],
+      "products": [
+        "Nano",
+        "HySecure",
+        "VDI",
+        "MFA"
+      ],
       "competitors": [],
-      "personas": ["CISO", "IT head", "Head of Compliance"],
+      "personas": [
+        "CISO",
+        "IT head",
+        "Head of Compliance"
+      ],
       "regulations": [],
       "key_problem": "Letting people work from personal devices means trusting an endpoint that may already carry a keylogger or malware, and that will retain session data after the work is done.",
       "key_outcomes": [
@@ -100,7 +142,8 @@
       "use_for": "BYOD and contractor access in regulated industries, and any conversation where shipping laptops is the current answer and the cost or delay is the objection.",
       "publish_year": "2026",
       "confidence": 0.94,
-      "public_url": "https://downloads.accops.com/Accops%20Nano%20Brochure.%20V5%202026.pdf"
+      "public_url": "https://downloads.accops.com/Accops%20Nano%20Brochure.%20V5%202026.pdf",
+      "visibility": "both"
     }
   ]
 }
