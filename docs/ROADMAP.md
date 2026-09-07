@@ -246,7 +246,11 @@ to `sam_events` today. Live data confirms it: 25 API events and 1 WhatsApp, **av
       to do: call it from a cron rather than on page render. Original scope: `sam_metrics_daily` keyed by (day, channel): queries,
       users, sessions, gaps, zero-result rate, p50/p95 latency, feedback split. Backfill from
       `sam_events`. Everything after this reads the rollup, not raw events.
-- [ ] **P6a.2 Populate `session_id`.** The column exists and is **always null** - 0 distinct sessions
+- [x] **P6a.2 Session ids - DONE 7 Sep.** Derived from the 6-hour history window WhatsApp already
+      keeps: an empty window means a new conversation, a non-empty one means the same one
+      continuing. No second piece of state to keep in step with the TTL, and the session resets
+      exactly when context does, so "messages per session" means "messages in one back-and-forth".
+      `apiAsk` now takes an optional session id; the web route already had its own. Original note: The column exists and is **always null** - 0 distinct sessions
       across all 26 events. Without it there is no "messages per session", no conversation depth, no
       returning-user metric. Small change in the web and WhatsApp entry points; do it before the demo
       so the numbers have history.
@@ -364,7 +368,7 @@ dropped for now by Siddharth's call - revisit after the MVP.
    during the demo; it is the Perplexity-style "how SAM got there".
 3. **P0.1 + P0.2** - the registry starts answering, and links become real. This is what makes
    "which deck has the Citrix comparison?" answerable. **Now the top of the build list.**
-4. **P6a.2 WhatsApp session ids** - small, and it must land *before* demo traffic or the session
+4. ~~**P6a.2 WhatsApp session ids**~~ - done 7 Sep. Original note: small, and it must land *before* demo traffic or the session
    metrics have no history.
 5. **P7.1 to P7.3** - card 20-50 documents in Claude Enterprise, load to Supabase.
 6. **P6.4 the eval set** - 30 real questions, so "it works" is a number and not an opinion.
