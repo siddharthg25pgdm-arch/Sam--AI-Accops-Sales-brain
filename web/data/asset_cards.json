@@ -46,8 +46,8 @@
     "text_excerpt": "ACCOPS.COM BANKING CASE STUDY 1 © Copyright Accops Systems 2025. All rights reserved. B Challenges Faced Bank 1: India’s Largest Private Sector Bank • Required Multi-Factor Authentication (MFA) for vendor access due to RBI’s mandate. • Vendors used personal devices to access business-critical lending applications, increasing security risks. • Legacy applications, over a decade old, lacked modern authentication protocols like SAML or OAuth. • The bank’s existing Secure Access Service Edge (SASE) solution required vendors to have Azure AD P1 licenses, which would have significantly increased costs. • The business team wanted a seamless onboarding and offboarding experience for vendors without manual intervention. Bank 2: India’s Third-Largest Private Sector Bank • Initially supported only 500 remote users via traditional VPN and VDI. • COVID-19 drove the need for a scalable remote work solution, increasing the user base to 30,000. • Vendors, IT admins, developers, and business users needed secure remote access to internal portals, test environments, and critical applications. • The bank required biometric authentication for 90,000 users but faced high costs and complex integrations with proprietary biometric systems. • Compliance with security regulations necessitated application isolation for sensitive systems like SWIFT. Transforming Secure Access in India's Leading Banks with Accops CASE STUDY About the Clients Two of India’s top private sector banks—one being the largest pr",
     "pdf_title": ""
    },
-   "visibility": "private",
-   "public_url": null,
+   "visibility": "both",
+   "public_url": "https://downloads.accops.com/Accops%20-%20BFSI%20%28Integrated%29%20-%20Case%20Study%20V2.pdf",
    "sharepoint_url": "https://accops.sharepoint.com/sites/Sales/Shared%20Documents/case%20studys/case%20study%20BFSI/Accops%20-%20BFSI%20%28Integrated%29%20-%20Case%20Study.pdf"
   },
   {
@@ -125,8 +125,8 @@
     "text_excerpt": " a ACCOPS CASE STUDY 1 How Accops aided a large pvt. sector bank to set up a secure hybrid workspace Enabling the bank to deliver a seamless experience to employees and end-users while accessing banking applications and resources from anywhere. BANKING CASE STUDY Banking Digital Workspace HyWorks, HySecure, HyID ACCOPS.COM ACCOPS CASE STUDY 2 Business Context for Work from Home As was the case with all enterprises, the Bank too was faced with the risk of business disruption caused by the outbreak of pandemic and the lockdown that followed. The Bank had to deliver its core banking services to its customers by overcoming unprecedented challenges, requiring continuity of all back office and corporate operation with same service levels as before Covid19. Though banking was classified as an essential service, the working from office was no longer a possibility considering safety of the workforce. Even a small scale infection in back office and corporate IT team can have significant impact on ensuring smooth IT infra operations and cause disruptions in customer service. The need of the hour, while ensuring the safety of its employees, was to deploy a solution that provided seamless and anywhere access to critical Banking IT infrastructure, applications and resources without compromising security. This would mean that the Bank now had to take some radical approaches with regards to its IT service delivery which required putting across a design that would help provision and control w",
     "pdf_title": ""
    },
-   "visibility": "private",
-   "public_url": null,
+   "visibility": "both",
+   "public_url": "https://downloads.accops.com/Accops%20-%20Leading%20Pvt.%20Sector%20Bank%20-%20Case%20Study%202026.pdf",
    "sharepoint_url": "https://accops.sharepoint.com/sites/Sales/Shared%20Documents/case%20studys/case%20study%20BFSI/Accops%20-%20Leading%20Pvt.%20Sector%20Bank%20-%20Case%20Study.pdf"
   },
   {
@@ -1215,8 +1215,8 @@
     "text_excerpt": "ACCOPS.COM DTH – CASE STUDY 1 © Copyright Accops Systems 2024. All rights reserved. B Challenges Faced This prominent Indian content distribution company experienced growing challenges across its IT infrastructure. These included escalating cybersecurity threats, difficulties ensuring secure remote access for multiple partners, scalability limitations, access control complexities, and higher IT costs. Cybersecurity Threats: Business productivity and security were compromised due to the constantly evolving cyber threat landscape. Remote Access Concerns: Delays in onboarding and potential data breaches as managing secure remote access for numerous vendors and suppliers was complex. Scalability: The inability to quickly adjust IT resources to meet fluctuating business needs resulted in missed opportunities and inefficiencies. Compliance issue: The lack of granular application access controls led to increased security risks and potential compliance violations. IT Costs: High operational costs were a direct result of the complexities of managing a traditional IT infrastructure Problem Statement This DTH and OTT platform confronted various obstacles within its IT management. With advancing technologies, the heightened threat of sophisticated cyberattacks remained a crucial concern. The necessity to enable secure remote access for a network of 300+ vendors and suppliers further heightened security risks around sensitive company information. Major Indian DTH and OTT Platform Transfor",
     "pdf_title": ""
    },
-   "visibility": "private",
-   "public_url": null,
+   "visibility": "both",
+   "public_url": "https://downloads.accops.com/Accops%20-%20DTH%20-%20Case%20Study.pdf",
    "sharepoint_url": "https://accops.sharepoint.com/sites/Sales/Shared%20Documents/case%20studys/case%20study%20media/Accops%20-%20DTH%20-%20Case%20Study.pdf"
   },
   {
