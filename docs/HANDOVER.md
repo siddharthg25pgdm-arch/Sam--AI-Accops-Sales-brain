@@ -51,6 +51,16 @@ Deletions are caught by `prototype/sp_reconcile.py` instead, which needs no admi
 any demo** - it takes a minute and stops SAM showing a link to a deleted file. The dashboard shows a
 banner when it has not run in 36 hours.
 
+> **Corrected 8 September: the reconcile is also blocked by Conditional Access, and it used to fail
+> dangerously.** It walks the folder through Graph, and Graph 401s on that folder for the same reason
+> `sp_fetch.py` does - the `az` token is valid, the listing is refused. The walk swallowed the 401 and
+> returned an empty set, so every registry row looked deleted: it reported **"to tombstone: 874"**,
+> the entire catalogue. `--write` would have taken SAM offline and looked like a clean run doing it.
+> Now guarded - it refuses to write on any failed listing or a zero-file result, verified against the
+> live 401. **So deletions are currently not being caught at all.** Report-only still runs; it just
+> cannot see anything. Closing this needs the same Graph access the whole Conditional Access block
+> covers, which is a Siddharth/IT item, not a code one.
+
 ## What needs Siddharth, not Claude
 
 1. **Replace the 20 `[modelled]` eval questions** in `docs/eval-set.md` with real asks. The honest way
