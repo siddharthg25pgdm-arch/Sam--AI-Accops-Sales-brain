@@ -439,3 +439,47 @@ checked a link was *present*, never that it *resolved*. This one is the same sha
 reported success, the HTTP call reported success, and the only honest signal was whether the data
 actually changed. **`flow_proven` in `/api/cron/sharepoint` now checks exactly that** - `list_item_id`
 can only ever arrive from a real notification, so it cannot be faked by a seed or a green run.
+
+## 8e. Full lifecycle tested, 7 September 2026: create works, delete does not fire
+
+Siddharth got edit access and ran the real test: uploaded
+`Accops Wipro Day Presentation V2.0 - Public.pptx` to
+`Presentations/Event Presentations/Webinars`, then deleted it.
+
+**Create: works, end to end.** The modify flow fired at 09:17:14 and the row landed at 09:17:16 with
+`folder` correctly stripped to `Presentations/Event Presentations/Webinars`, `list_item_id` 33655
+written by the flow rather than the backfill, `asset_type: Deck`, a real Graph `webUrl`, and
+`modified_by: Siddharth Gupta`. Row count went 874 -> 875, which is right for a genuinely new file.
+Both 7 September fixes held: `size` arrived as `""` again and degraded to 0 instead of killing the
+write, and `scopeRelative()` stripped the library prefix.
+
+**Delete: the trigger never fires.** Zero runs on the deleted flow while the changed flow ran five
+times, with **identical** site, list GUID, folder path and one-minute recurrence, Started and
+unsuspended. The file really was gone from Graph. This matches Microsoft's documented requirement
+that "When a file is deleted" needs a **site-collection-admin** connection to read a deleted file's
+properties.
+
+Worth correcting an earlier guess in section 8c: this is a **total no-fire, not a
+fields-come-back-empty degradation**. The `(folder, filename)` fallback in `applyDelete()` was built
+for the degraded case and never gets called, because no notification arrives at all.
+
+### The fix, which needs no admin
+
+`prototype/sp_reconcile.py`. Walks the scope root through Graph - which reports what exists without
+any special permission - diffs it against the registry, and tombstones what has gone. Also
+un-tombstones anything restored from the recycle bin, since a soft delete should be reversible.
+
+It matches on **two keys**, and that turned out to be necessary rather than defensive. Seeded rows
+carry a Graph driveItem id; rows the flow created carry Power Automate's `{Identifier}`, which is a
+URL-encoded path. The first version checked only Graph ids and reported **0 to tombstone** - missing
+the one row that actually needed it, because that row was flow-created. Adding a
+`(folder, filename)` fallback found exactly 1, which is the correct answer.
+
+Verified: 875 rows in, 1 tombstoned, 874 live - back to baseline with an audit trail rather than a
+hard delete.
+
+**So deletion is handled, on a schedule rather than in real time.** A file deleted at noon is
+tombstoned by the next reconcile, not within a minute. Given section 3's argument that a dead
+citation is the worst failure, a nightly gap is acceptable where an unbounded one was not. Getting
+real-time deletes back needs a site-collection-admin connection - the only thing in this whole
+pipeline that does.
