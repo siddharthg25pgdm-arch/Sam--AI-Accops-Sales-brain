@@ -176,7 +176,10 @@ This is where the 413 ingestable files become answerable, not just findable.
       Two ways to unblock a deliberate test, in order of preference: ask whoever owns the library for
       edit rights on **one** throwaway subfolder, or have a colleague who already has edit rights
       re-save any file while Siddharth watches the run history.
-- [ ] **P4.1a Flow-health check.** Report whether the flows have ever fired, and how recently, so a
+- [x] **P4.1a Flow-health check - DONE, then corrected.** `flow_proven` on `list_item_id` broke the
+      moment the backfill populated all 874 - it reported the backfill, not a notification. Replaced
+      with `flow_last_write`, which reads `last_synced`; only `applyChange` sets that to now(). A
+      signal that turns true for the wrong reason is worse than no signal. Original scope: Report whether the flows have ever fired, and how recently, so a
       silent failure is visible without anyone remembering to look. Folded into
       `/api/cron/sharepoint`.
 - [ ] **P4.2 Add `vercel.json` with a cron.** `/api/cron/sharepoint` works and returns real data
@@ -260,9 +263,12 @@ to `sam_events` today. Live data confirms it: 25 API events and 1 WhatsApp, **av
       `sam_sharepoint_files`, which already holds all of it.
 - [ ] **P6a.6 Freshness panel.** Assets over 12 months old, by owner, so a stale asset has a name
       attached. Needs P1.1 publication dates.
-- [ ] **P6a.7 Gap report.** Ranked missing combinations with example questions and first/last seen.
+- [x] **P6a.7 Gap report - DONE 7 Sep.** Ranked by distinct askers, not ask count. External asks
+      labelled "needs a public link, not new content" rather than counted as missing content -
+      conflating those two is what produced the false gap on 4 Sep. Deliberately not `coverageGaps()`,
+      which enumerates ~72 permutations nobody asked for. Original scope: Ranked missing combinations with example questions and first/last seen.
       `coverageGaps()` and the `gap` events exist; nothing presents them as a worklist.
-- [ ] **P6a.8 Per-user activity.** Who is actually using SAM, how often, and their top questions.
+- [x] **P6a.8 Per-user activity - DONE 7 Sep.** Original scope: Who is actually using SAM, how often, and their top questions.
       Matters for adoption reporting to a manager, and it is the metric that shows whether sales
       picked it up or only marketing did.
 - [ ] **P6a.9 Export.** CSV or a shareable snapshot, because the first thing anyone does with a
