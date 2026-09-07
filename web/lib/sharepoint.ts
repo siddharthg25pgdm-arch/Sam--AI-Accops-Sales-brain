@@ -176,8 +176,9 @@ async function applyDelete(f: IncomingFile): Promise<string> {
     return `marked deleted by ${how}`;
   };
 
-  if (f.listItemId != null && f.listItemId !== "") {
-    const hit = await mark(`list_item_id=eq.${encodeURIComponent(String(f.listItemId))}`, "list_item_id");
+  const listItemId = num(f.listItemId);
+  if (listItemId != null) {
+    const hit = await mark(`list_item_id=eq.${listItemId}`, "list_item_id");
     if (hit) return hit;
   }
   const name = f.name ?? "";
@@ -193,6 +194,30 @@ async function applyDelete(f: IncomingFile): Promise<string> {
   return `no match, left alone (name=${name || "?"}, listItemId=${f.listItemId ?? "?"})`;
 }
 
+/** Power Automate sends "" for an absent number, and "" into a bigint is a 22P02 that fails the
+ *  whole row. Anything not a real number becomes null. */
+function num(v: unknown): number | null {
+  if (v == null || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+/** The item_id of the row this notification is about, or null if the file is new to SAM.
+ *  Same key order as applyDelete: list_item_id is exact, (folder, filename) is unique across all
+ *  874 seeded rows, and there is deliberately no filename-only fallback. */
+async function findRow(listItemId: number | null, folder: string, filename: string): Promise<string | null> {
+  const one = async (filter: string) => {
+    const rows = (await rest(`sam_sharepoint_files?${filter}&select=item_id&limit=2`)) as { item_id: string }[] | null;
+    return rows && rows.length === 1 ? rows[0].item_id : null;
+  };
+  if (listItemId != null) {
+    const hit = await one(`list_item_id=eq.${listItemId}`);
+    if (hit) return hit;
+  }
+  if (!filename) return null;
+  return await one(`folder=eq.${encodeURIComponent(folder)}&filename=eq.${encodeURIComponent(filename)}`);
+}
+
 /** Record one change in SAM's registry. Touches nothing in SharePoint. */
 export async function applyChange(f: IncomingFile): Promise<string> {
   if (!configured()) return "skipped: supabase not configured";
@@ -203,13 +228,25 @@ export async function applyChange(f: IncomingFile): Promise<string> {
   const name = f.name ?? "";
   const ext = (name.split(".").pop() ?? "").toLowerCase();
   const t = tagsFor(folder, name, f.scope ?? "sales");
+  const listItemId = num(f.listItemId);
+
+  // Power Automate's {Identifier} is NOT the Graph driveItem id. The first real notification, on
+  // 7 September 2026, sent "Shared%2bDocuments%252fSales%252f..." - a URL-encoded PATH. Keying on it
+  // would insert a second row for a file already in the registry, so match the seeded row first by
+  // list_item_id, then by (folder, filename), exactly as deletion does. Only fall back to whatever
+  // the trigger called an identifier when the file is genuinely new.
+  const existing = await findRow(listItemId, folder, name);
+  const itemId = existing ?? f.itemId;
+
   await rest("sam_sharepoint_files?on_conflict=item_id", {
     method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
     body: JSON.stringify([{
-      item_id: f.itemId, drive_id: f.driveId ?? "", scope: f.scope ?? "sales", folder, filename: name,
+      item_id: itemId, drive_id: f.driveId ?? "", scope: f.scope ?? "sales", folder, filename: name,
       // Fills in as the modify flow sees each file; this is what makes deletion an exact match later.
-      list_item_id: f.listItemId != null && f.listItemId !== "" ? Number(f.listItemId) : null,
-      ext, size_bytes: f.size ?? 0, web_url: f.webUrl ?? "",
+      list_item_id: listItemId,
+      // The trigger sends "" for a file with no size, and "" into a bigint is 22P02, which killed the
+      // whole upsert after the 202 had already been returned - a silent failure by construction.
+      ext, size_bytes: num(f.size) ?? 0, web_url: f.webUrl ?? "",
       created_at: f.created ?? null, modified_at: f.modified ?? null, modified_by: f.modifiedBy ?? null,
       etag: f.etag ?? null, ctag: f.cTag ?? null, deleted: false, deleted_at: null,
       asset_type: t.asset_type, industry: t.industry, product: t.product, competitor: t.competitor,
