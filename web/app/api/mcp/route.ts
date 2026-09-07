@@ -5,7 +5,7 @@
 import { createMcpHandler, withMcpAuth } from "mcp-handler";
 import { z } from "zod";
 import { callerFromToken } from "@/lib/apiauth";
-import { apiSearch, apiAsk, apiAssets, apiGaps, apiPublicLink, apiContextForAccount } from "@/lib/api";
+import { apiSearch, apiAsk, apiAssets, apiGaps, apiPublicLink, apiContextForAccount, apiRequestPublish } from "@/lib/api";
 import { VERTICALS, PRODUCTS } from "@/lib/cards";
 
 export const maxDuration = 60;
@@ -49,6 +49,20 @@ const handler = createMcpHandler((server) => {
     inputSchema: z.object({ asset: z.string().describe("Asset title or file path from a previous result") }),
     annotations: { readOnlyHint: true, openWorldHint: false },
   }, async ({ asset }) => text(apiPublicLink(asset)));
+
+  // The only tool here that writes. readOnlyHint stays FALSE deliberately: MCP clients use it to
+  // decide what needs confirming, and marking a write read-only would let an agent file publish
+  // requests on someone's behalf without asking. Idempotent because a repeat ask for the same asset
+  // merges onto the existing open row rather than creating a second one.
+  server.registerTool("request_publish", {
+    title: "Request an asset be published",
+    description: "Ask for an internal-only asset to be published so it can be sent to customers. Use when public_link returns private_only and the user needs something shareable. Say who it is for and why in the reason - that is what the approver reads.",
+    inputSchema: z.object({
+      asset: z.string().describe("Asset title from a previous result"),
+      reason: z.string().optional().describe("Who needs it and why, in one line"),
+    }),
+    annotations: { readOnlyHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ asset, reason }, extra) => text(await apiRequestPublish({ asset, reason }, who(extra), "mcp")));
 
   server.registerTool("content_gaps", {
     title: "Content gaps",

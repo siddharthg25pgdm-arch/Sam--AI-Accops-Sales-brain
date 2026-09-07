@@ -63,6 +63,65 @@ export function apiPublicLink(title_or_path: string) {
         note: "No public version exists. Find it in SharePoint at the location shown; ask marketing to publish before sending anything outside Accops." };
 }
 
+export type PublishRequest = {
+  id: number; created_at: string; asset_title: string; asset_path: string | null;
+  requested_by: string; channel: string; reason: string | null; status: string;
+  decided_by: string | null; decided_at: string | null; public_url: string | null;
+};
+
+function sbCfg() {
+  const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SERVICE_KEY;
+  return url && key ? { url: url.replace(/\/$/, ""), key } : null;
+}
+
+/** File a request to publish an internal-only asset externally.
+ *
+ *  This is the other half of apiPublicLink()'s can_request_publish:true, which promised a rep they
+ *  could ask and then gave them nowhere to ask. Approver is Siddharth.
+ *
+ *  Repeat asks for the same asset merge onto the existing open row rather than creating a second
+ *  one - a unique index on lower(asset_title) where status='open' enforces it. That keeps an agent
+ *  that retries, and three reps hitting the same wall, from burying the approver in duplicates. */
+export async function apiRequestPublish(p: { asset: string; reason?: string }, who: string, channel: Channel) {
+  const c = sbCfg();
+  const a = allAssets().find(x => x.title.toLowerCase() === p.asset.toLowerCase())
+    ?? allAssets().find(x => x.title.toLowerCase().includes(p.asset.toLowerCase()));
+  if (!a) return { ok: false as const, error: `No asset matches "${p.asset}".` };
+  if (a.public_url) return { ok: false as const, error: "Already public.", public_url: a.public_url, title: a.title };
+  if (!c) return { ok: false as const, error: "Publish requests need SUPABASE_URL and SUPABASE_SERVICE_KEY." };
+
+  const body = {
+    asset_title: a.title, asset_path: a.file?.path ?? null,
+    requested_by: who, channel, reason: p.reason ?? null,
+  };
+  const r = await fetch(`${c.url}/rest/v1/sam_publish_requests`, {
+    method: "POST", cache: "no-store",
+    headers: { apikey: c.key, Authorization: `Bearer ${c.key}`, "Content-Type": "application/json", Prefer: "return=representation" },
+    body: JSON.stringify(body),
+  });
+  if (r.status === 409) {
+    // The unique index fired: someone already asked and it is still open. That is a success from the
+    // rep's point of view - the request exists - so say so rather than reporting an error.
+    return { ok: true as const, status: "already_requested" as const, title: a.title,
+             note: "Someone has already asked for this one. It is in the queue." };
+  }
+  if (!r.ok) return { ok: false as const, error: `Could not file the request (${r.status}).` };
+  const [row] = (await r.json()) as PublishRequest[];
+  await logEvent({ user_id: who, channel, kind: "query", query: `publish request: ${a.title}`, intent: "request_publish", result_count: 1 });
+  return { ok: true as const, status: "requested" as const, id: row?.id, title: a.title,
+           note: "Filed. Siddharth approves publish requests; you will get the public link when it goes live." };
+}
+
+/** The approver's queue. Open requests, newest first. */
+export async function apiPublishQueue(status = "open"): Promise<PublishRequest[]> {
+  const c = sbCfg();
+  if (!c) return [];
+  const r = await fetch(`${c.url}/rest/v1/sam_publish_requests?status=eq.${status}&order=created_at.desc&limit=100`, {
+    headers: { apikey: c.key, Authorization: `Bearer ${c.key}` }, cache: "no-store",
+  });
+  return r.ok ? ((await r.json()) as PublishRequest[]) : [];
+}
+
 /** Account brief for the Dwight extension: talking points + shareable assets for a named company/persona. */
 export async function apiContextForAccount(p: { company: string; person_title?: string; country?: string; industry?: string; intent?: string }, who: string, channel: Channel) {
   const q = [p.intent ?? "first outreach", "to", p.person_title ?? "a decision maker", "at", p.company, p.industry ? `(${p.industry})` : "", p.country ? `in ${p.country}` : "",

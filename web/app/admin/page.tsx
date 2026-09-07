@@ -5,6 +5,7 @@ import { daily, rollup, totals, byDay, gapWorklist, userActivity, freshness } fr
 import { registry } from "@/lib/sharepoint";
 import { ready } from "@/lib/registry-cache";
 import { allAssets, assetLink } from "@/lib/cards";
+import { apiPublishQueue } from "@/lib/api";
 import { TopBar } from "@/components/TopBar";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +16,7 @@ export default async function Admin() {
   if (!user.admin) redirect("/");
   // Rollup first, so the panels below are never stale. Cheap: it only recomputes the recent window.
   await rollup(3);
-  const [rows, events, regRows] = await Promise.all([daily(30), recentEvents(500), registry("sales", 5000)]);
+  const [rows, events, regRows, pubQueue] = await Promise.all([daily(30), recentEvents(500), registry("sales", 5000), apiPublishQueue()]);
   await ready();
   const m = totals(rows);
   const chart = byDay(rows, 14);
@@ -144,6 +145,24 @@ export default async function Admin() {
               ))}</tbody></table>
           )}
         </div>
+
+        {/* Siddharth approves these (settled 6 Sep). Shown first when non-empty: a rep is blocked on
+            each one, waiting to send something to a customer. */}
+        {pubQueue.length > 0 && (
+          <div className="panel">
+            <h2>Publish requests waiting on you</h2>
+            <p className="sub" style={{ marginTop: -6 }}>
+              Someone wants to send an internal-only asset to a customer. Each one is a rep waiting.
+            </p>
+            <table><thead><tr><th>Asset</th><th>Who</th><th>Why</th><th>Asked</th></tr></thead>
+              <tbody>{pubQueue.map(q => (
+                <tr key={q.id}>
+                  <td>{q.asset_title}</td><td>{q.requested_by}</td>
+                  <td>{q.reason ?? "–"}</td><td>{fmt(q.created_at)}</td>
+                </tr>
+              ))}</tbody></table>
+          </div>
+        )}
 
         <div className="panel">
           <h2>Stale assets, by owner</h2>
