@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { recentEvents, persistent } from "@/lib/events";
-import { daily, rollup, totals, byDay } from "@/lib/metrics";
+import { daily, rollup, totals, byDay, gapWorklist, userActivity } from "@/lib/metrics";
 import { registry } from "@/lib/sharepoint";
 import { ready } from "@/lib/registry-cache";
 import { allAssets, assetLink } from "@/lib/cards";
@@ -22,6 +22,8 @@ export default async function Admin() {
   const answerable = allAssets();
   const linked = answerable.filter(a => assetLink(a)).length;
   const carded = answerable.filter(a => a.inventory_id !== null).length;
+  const worklist = gapWorklist(events);
+  const people = userActivity(events);
   const chanRows = Object.entries(m.byChannel).sort((a, b) => b[1].queries - a[1].queries);
   const ms = (v: number | null) => v == null ? "–" : v >= 1000 ? `${(v / 1000).toFixed(1)}s` : `${v}ms`;
   const queries = events.filter(e => e.kind === "query");
@@ -111,6 +113,51 @@ export default async function Admin() {
                 <tbody>{topAssetList.map(([k, n]) => <tr key={k}><td>{k.split("/").pop()}</td><td className="tnum">{n}</td></tr>)}</tbody></table>
             )}
           </div>
+        </div>
+
+        <div className="panel">
+          <h2>Content gaps, ranked by demand</h2>
+          <p className="sub" style={{ marginTop: -6 }}>
+            What people asked for and did not get, most-wanted first. Ranked by how many different
+            people asked, not how many times &ndash; one person rephrasing is not demand.
+          </p>
+          {worklist.length === 0 ? <p style={{ color: "var(--ink-3)" }}>Nothing has gone unanswered.</p> : (
+            <table><thead><tr>
+              <th>Industry</th><th>Type</th><th>Product</th>
+              <th className="tnum">People</th><th className="tnum">Asks</th><th>What they typed</th>
+            </tr></thead>
+              <tbody>{worklist.slice(0, 12).map(g => (
+                <tr key={g.key}>
+                  <td>{g.vertical}</td><td>{g.type}</td><td>{g.product || "–"}</td>
+                  <td className="tnum">{g.users.length}</td>
+                  <td className="tnum">{g.asks}</td>
+                  <td>
+                    {g.examples[0]}
+                    {/* An external ask is not missing content: the asset exists and has no public
+                        URL. That is a publish decision, not a writing job - conflating the two is
+                        what produced the false gap on 4 September. */}
+                    {g.external > 0 && <span className="tag" style={{ marginLeft: 6 }}>needs a public link, not new content</span>}
+                  </td>
+                </tr>
+              ))}</tbody></table>
+          )}
+        </div>
+
+        <div className="panel">
+          <h2>Who is using SAM</h2>
+          <p className="sub" style={{ marginTop: -6 }}>Adoption: whether sales picked it up, or only marketing did.</p>
+          {people.length === 0 ? <p style={{ color: "var(--ink-3)" }}>No activity yet.</p> : (
+            <table><thead><tr>
+              <th>Person</th><th className="tnum">Questions</th><th className="tnum">Unanswered</th>
+              <th>Channels</th><th>Last seen</th><th>Asks most</th>
+            </tr></thead>
+              <tbody>{people.map(u => (
+                <tr key={u.user}>
+                  <td>{u.user}</td><td className="tnum">{u.queries}</td><td className="tnum">{u.gaps}</td>
+                  <td>{u.channels.join(", ")}</td><td>{fmt(u.lastSeen)}</td><td>{u.top}</td>
+                </tr>
+              ))}</tbody></table>
+          )}
         </div>
 
         <div className="two">

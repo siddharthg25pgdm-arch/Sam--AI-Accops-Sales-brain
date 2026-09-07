@@ -105,3 +105,68 @@ export function byDay(rows: DailyMetric[], days = 14) {
   }
   return out;
 }
+
+export type GapRow = {
+  key: string; vertical: string; type: string; product: string;
+  asks: number; external: number; examples: string[]; users: string[];
+  firstSeen: string; lastSeen: string;
+};
+
+/** Content gaps as a worklist: what people actually asked for and did not get.
+ *
+ *  Deliberately NOT coverageGaps(), which enumerates every vertical x type x product permutation -
+ *  around 72 of them, most of which nobody will ever ask for. "No Telecom whitepaper about MFA" is
+ *  true and commercially meaningless. Demand is the only ranking that earns someone's time.
+ *
+ *  `external` counts the asks that failed only because the asset has no public URL. Those are not
+ *  missing content at all - the asset exists and cannot be sent - so they belong in a publish queue,
+ *  not a writing queue. Conflating the two is what produced the false gap on 4 September. */
+export function gapWorklist(events: { kind: string; query?: string | null; filters?: Record<string, unknown> | null; user_id: string; created_at?: string }[]): GapRow[] {
+  const acc = new Map<string, GapRow>();
+  for (const e of events) {
+    if (e.kind !== "gap") continue;
+    const f = (e.filters ?? {}) as Record<string, string>;
+    const vertical = f.vertical || "any", type = f.asset_type || "any", product = f.product || "";
+    const key = `${vertical}|${type}|${product}`;
+    const at = e.created_at ?? "";
+    const row = acc.get(key) ?? {
+      key, vertical, type, product, asks: 0, external: 0, examples: [], users: [],
+      firstSeen: at, lastSeen: at,
+    };
+    row.asks++;
+    if (f.audience === "external") row.external++;
+    if (e.query && !row.examples.includes(e.query) && row.examples.length < 3) row.examples.push(e.query);
+    if (!row.users.includes(e.user_id)) row.users.push(e.user_id);
+    if (at && at < row.firstSeen) row.firstSeen = at;
+    if (at && at > row.lastSeen) row.lastSeen = at;
+    acc.set(key, row);
+  }
+  // Askers before asks: three people wanting the same thing is a stronger signal than one person
+  // asking three times, which is usually someone rephrasing.
+  return [...acc.values()].sort((a, b) => b.users.length - a.users.length || b.asks - a.asks);
+}
+
+export type UserRow = { user: string; queries: number; gaps: number; channels: string[]; lastSeen: string; top: string };
+
+/** Per-user activity. The adoption number: whether sales picked SAM up or only marketing did. */
+export function userActivity(events: { kind: string; user_id: string; channel?: string; query?: string | null; created_at?: string }[]): UserRow[] {
+  const acc = new Map<string, UserRow & { counts: Map<string, number> }>();
+  for (const e of events) {
+    if (e.kind !== "query" && e.kind !== "gap") continue;
+    const r = acc.get(e.user_id) ?? {
+      user: e.user_id, queries: 0, gaps: 0, channels: [] as string[], lastSeen: "", top: "",
+      counts: new Map<string, number>(),
+    };
+    if (e.kind === "query") r.queries++; else r.gaps++;
+    const ch = e.channel ?? "web";
+    if (!r.channels.includes(ch)) r.channels.push(ch);
+    const at = e.created_at ?? "";
+    if (at > r.lastSeen) r.lastSeen = at;
+    if (e.query) r.counts.set(e.query, (r.counts.get(e.query) ?? 0) + 1);
+    acc.set(e.user_id, r);
+  }
+  return [...acc.values()].map(r => {
+    const top = [...r.counts.entries()].sort((a, b) => b[1] - a[1])[0];
+    return { user: r.user, queries: r.queries, gaps: r.gaps, channels: r.channels, lastSeen: r.lastSeen, top: top?.[0] ?? "" };
+  }).sort((a, b) => b.queries - a.queries);
+}
