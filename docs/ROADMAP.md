@@ -124,7 +124,22 @@ once. No channel code was touched.
       asset sent to a customer costs more than ten missing ones.*
 - [ ] **P1.2 Freshness badges** in answers and catalogue, once P1.1 exists. 12-month threshold,
       badge rather than hide - settled, see section 4.
-- [ ] **P1.3 The public/internal map.** **0 of 66 assets can be sent to a customer today.** Every
+- [x] **P1.3 Public links - 11 done 7 Sep, 11 need a human.** Was 0 of 66 sendable; now 11 assets
+      carry a live accops.com URL and `visibility: both`. "BFSI case study I can send to a
+      customer" - the exact query that logged a false gap on 4 Sep - returns three real answers.
+      `prototype/sp_match_public.py` does the matching and is re-runnable as more pages publish.
+
+      **The near-miss worth remembering.** The first run reported 31 confident matches and most
+      were wrong: seven different whitepapers all matched a page whose slug is just `ztna`, each
+      scoring a perfect 1.00. Overlap-over-`min()` gives full marks whenever a one-token slug
+      shares its only word, so category landing pages outscored every real document. Fixed by
+      excluding one-and-two-word generic slugs and requiring two shared tokens. **A confidence
+      score is not evidence** - the wrong matches were the most confident ones.
+
+      **Still needs Siddharth:** 11 ambiguous matches, all anonymised bank case studies against
+      anonymised page titles ("3rd largest Public Bank" vs "India's Largest Private Bank").
+      Run `python prototype/sp_match_public.py` to see them. Deliberately not guessed - a wrong
+      public link sends a customer to another company's case study. Original scope: **0 of 66 assets can be sent to a customer today.** Every
       `public_url` is empty, which is why `audience=external` produced a false gap on 4 Sep.
       **Unblocked 6 Sep:** match SAM's assets to accops.com pages by title from
       `case-studies-sitemap.xml` (37), `ebooks-sitemap.xml` (4), `solution-documents-sitemap.xml` (9)
