@@ -240,7 +240,20 @@ export function searchAssets(args: SearchArgs): { results: SearchHit[]; consider
     const hits = tokens.filter(t => b.includes(t));
     const titleHits = tokens.filter(t => a.title.toLowerCase().includes(t)).length;
     const fresh = isStale(a) ? 0 : 0.4;
-    const score = hits.length * 2 + titleHits * 1.5 + fresh;
+    // Matching EVERY token is a different kind of answer from matching one of them, and the old
+    // flat score could not say so. "hysecure datasheet" over 702 assets returned a government
+    // reference architecture and a defence brochure alongside the two actual HySecure datasheets,
+    // because anything mentioning HySecure anywhere in its blob scored within a point of them - and
+    // the model, handed three near-equal results, concluded there was no datasheet at all.
+    const complete = tokens.length > 1 && hits.length === tokens.length ? 6 : 0;
+    // A token naming an asset type ("datasheet", "battlecard", "brochure") is a filter the rep
+    // typed in words rather than selected, so honour it as one - but ONLY once the asset has
+    // matched something else too. Rewarding the type token alone made "forcepoint competitive"
+    // rank every Competitive-typed asset over the actual Forcepoint deck, because they all earned
+    // the bonus on "competitive" while matching nothing about Forcepoint.
+    const typeToken = tokens.some(t => typeGroup(a).toLowerCase().includes(t) || a.asset_type.toLowerCase().includes(t));
+    const typeHit = typeToken && hits.length > 1 ? 3 : 0;
+    const score = hits.length * 2 + titleHits * 1.5 + complete + typeHit + fresh;
     if (tokens.length && hits.length === 0) continue;
     out.push({ asset: a, score, why: hits.length ? `matched ${hits.slice(0, 5).join(", ")}` : "matched your filters" });
   }

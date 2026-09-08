@@ -59,7 +59,17 @@ button { cursor: pointer; }
 .result .body b { display: block; font-size: 14px; line-height: 1.3; }
 .result .body small { color: var(--ink-3); font-size: 12.5px; display: block; }
 .result .body .why { font-size: 13px; color: var(--ink-2); margin-top: 4px; }
-.result .side { padding: 10px 10px 10px 0; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+/* max-width plus min-width:0 because .where holds an untruncated SharePoint path. Without a cap
+   this column grows to fit "Global Data Company__Accops-Nutanix.V3.pdf, in case studys/case study
+   nutanix" and squeezes .body to one word per line - the title renders as a vertical column with
+   the path overlapping it. Only shows on assets with no public link, which is why carded assets
+   looked fine and registry-only ones did not. */
+.result .side { padding: 10px 10px 10px 0; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; min-width: 0; max-width: 42%; flex-shrink: 0; }
+/* The location line had no rule at all. Clamp it to two lines and let the full path live in the
+   title attribute, which the markup already sets. */
+.result .side .where { font-size: 11.5px; color: var(--ink-3); text-align: right; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2;
+  overflow-wrap: anywhere; }
 .open { padding: 6px 10px; border-radius: 7px; background: var(--navy); color: #fff; font-size: 12.5px; font-weight: 600; white-space: nowrap; transition: transform 140ms var(--ease); }
 .open:active { transform: scale(.97); }
 .open[aria-disabled="true"] { background: var(--slate-soft); color: var(--ink-3); pointer-events: none; }
