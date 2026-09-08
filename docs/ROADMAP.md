@@ -121,12 +121,25 @@ once. No channel code was touched.
 
 ### P1 - Make answers trustworthy
 
-- [ ] **P1.1 Publication dates.** 0 of 77 cards have one, so SAM cannot warn that a case study is
+- [~] **P1.1 Publication dates - done for the 34 carded assets, 8 September 2026.** Every card
+      carries `publish_year` read from the DOCUMENT BODY, which is the distinction this item was
+      always about and which the corpus immediately vindicated: `2026-06-11-Accops vs other VDI
+      providers.pptx` is dated 29 NOV 2022 on its own title slide. Still open for the ~840 uncarded
+      files, which have only `created_at` / `modified_at`. Original scope: **P1.1 Publication dates.** 0 of 77 cards have one, so SAM cannot warn that a case study is
       three years old. `modified_at` is not the same thing - a file touched last week can hold 2022
       content. Needs the date read out of the document text. *This is the trust feature: one stale
       asset sent to a customer costs more than ten missing ones.*
-- [ ] **P1.2 Freshness badges** in answers and catalogue, once P1.1 exists. 12-month threshold,
-      badge rather than hide - settled, see section 4.
+- [x] **P1.2 Freshness - DONE 8 September 2026, and it became a trust note rather than a badge.**
+      `trustNote()` in `cards.ts` returns the single most important reason to hesitate, because age
+      turned out to be the *least* useful of the three things carding found:
+      1. **Expired** beats everything - the ISO 27001 certificate expired 20 September 2024 and is
+         exactly what a rep sends when procurement asks. Commercial risk, not cosmetics.
+      2. **A newer edition exists** - five of the nine brochures are superseded by public 2026
+         versions, so "the latest HySecure datasheet" has a right answer and a wrong one.
+      3. Otherwise the age note, and only where a year was read from the document.
+
+      It reaches every channel *and the model*: `stale: true` could not distinguish an old but usable
+      whitepaper from an expired certificate, and only one of those must never reach procurement.
 - [x] **P1.3 Public links - 11 done 7 Sep, 11 need a human.** Was 0 of 66 sendable; now 11 assets
       carry a live accops.com URL and `visibility: both`. "BFSI case study I can send to a
       customer" - the exact query that logged a false gap on 4 Sep - returns three real answers.
@@ -182,13 +195,31 @@ This is where the 413 ingestable files become answerable, not just findable.
       Five of the nine brochures are superseded by newer public editions, so each card carries
       `superseded_by`. Every such claim is checked against `corpus/public/` rather than asserted; the
       check caught one that was wrong.
-- [ ] **P2.1a Load the cards into SAM.** *This is the gap that matters now.* The 34 cards are not in
-      the read path: `web/lib/cards.ts` line 1 is `import raw from "@/data/asset_cards.json"` plus
-      `registryAssets()`, and **nothing under `web/` reads `corpus/`** - verified, not assumed. So the
-      eval on 8 September returned **86%, exactly as before**, because it measured a corpus that never
-      saw the day's work. That is the honest reading of an unchanged number, and it is a wiring task,
-      not a carding one. Load the cards to Supabase and merge them in `cards.ts` the way the registry
-      already is, keeping `client_actual` and the non-`model_visible` fields off the model prompt.
+- [x] **P2.1a Load the cards into SAM - DONE 8 September 2026. Eval 86% -> 89%.**
+      `sam_asset_cards` (schema in `docs/supabase-sam-asset-cards.sql`), loaded by
+      `prototype/load_cards.py`, read through `web/lib/cards-cache.ts` and merged in `allAssets()`.
+      Live in production with all 34 cards; `/api/cron/sharepoint` reports `cards_cache` so an empty
+      one is visible rather than silently degrading every answer.
+
+      **Two provenance bugs the merge exposed**, both the same shape as the constructed-URL problem
+      `verified()` already solved:
+      - `winner.year ?? other.year` let a **guess beat a fact**. A registry year is inferred from the
+        filename and is *always* set, so it won whenever the registry row won on richness - reporting
+        2026 for a deck dated 29 NOV 2022 on its own title slide. The carded year now wins outright.
+      - The provenance test itself sniffed the path prefix, but the merge deliberately **rewrites**
+        `file.path` to the registry's real folder (so a rep is told "Competition/VDI and DaaS" rather
+        than "in sharepoint"). A test reading that string stops being true the moment it is rewritten.
+        Explicit `carded` flag instead, set once at projection.
+
+      **The column split was dropped**, superseding section 4's refinement 1: Siddharth's call, on the
+      grounds that SAM is an internal tool and `key_problem` / `key_outcomes` / `client` are not
+      confidential in that context. `client_actual` is still never selected into `CardRow` at all -
+      not selecting a column is a stronger guarantee than remembering to strip it.
+- [ ] **P2.1b Verify the production model honours `trust`.** The retrieval side is verified end to end
+      locally ("EXPIRED on 2024-09-20 - do not send" reaches the answer payload), but the local
+      runtime has no model key and falls back to retrieval-only, so **the system-prompt changes have
+      not been exercised against a real model**. Needs a production `SAM_API_TOKENS` value to test.
+      Ask SAM for the ISO certificate and check the answer says it has expired instead of offering it.
 - [ ] **P2.2 Bulk-card the remaining ~386.** Report cost and timing first. SAM never downloads file content:
       Siddharth downloads, Claude Enterprise cards, only the card reaches Supabase. See "the carding
       boundary" in section 4 - including the two refinements (split the card by audience; write
