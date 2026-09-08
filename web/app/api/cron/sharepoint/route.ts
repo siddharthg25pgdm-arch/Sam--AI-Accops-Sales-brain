@@ -13,8 +13,27 @@ export const maxDuration = 60;
  *
  *  A full reconcile against Graph would need the app registration this design deliberately avoids,
  *  so the safety net is instead: run prototype/sp_discover.py + sp_seed_registry.py --write, which
- *  work on the delegated Azure CLI login and need no IT approval. */
+ *  work on the delegated Azure CLI login and need no IT approval.
+ *
+ *  SCHEDULED NIGHTLY at 02:30 UTC by web/vercel.json, and it is important to be exact about what
+ *  that does and does not buy. This endpoint REPORTS. It notices a flow that has stopped writing and
+ *  a reconcile that has not run, which is worth having. It does NOT catch deletions - that needs
+ *  sp_reconcile.py, which walks Graph, and Graph 401s under the Conditional Access policy (verified
+ *  8 September 2026: it reported all 874 rows as deleted, and would have tombstoned the entire
+ *  catalogue had the guard not stopped it).
+ *
+ *  So a green cron here does not mean deletions are handled. It means the reporting ran. Reading it
+ *  as more than that is precisely the false comfort this project has already been caught by four
+ *  times, which is why deletes_stale is in the payload and the dashboard shows a banner on it. */
 export async function GET(req: Request) {
+  // Vercel sends CRON_SECRET as `Authorization: Bearer <value>` automatically once the env var is
+  // set on the project - nothing in vercel.json configures that.
+  //
+  // The check is skipped when the secret is UNSET, which is deliberate but worth being honest
+  // about: it keeps local development and a quick curl working, and it is exactly why this endpoint
+  // was publicly readable in production until 8 September. The payload is aggregate counts only -
+  // no filenames, links or customer data - so the exposure was small, but "the guard is optional"
+  // is the kind of thing that stays true longer than anyone intends.
   const secret = process.env.CRON_SECRET;
   if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) {
     return new Response("unauthorized", { status: 401 });

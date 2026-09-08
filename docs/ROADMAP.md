@@ -262,7 +262,20 @@ This is where the 413 ingestable files become answerable, not just findable.
       signal that turns true for the wrong reason is worse than no signal. Original scope: Report whether the flows have ever fired, and how recently, so a
       silent failure is visible without anyone remembering to look. Folded into
       `/api/cron/sharepoint`.
-- [ ] **P4.2 Add `vercel.json` with a cron.** `/api/cron/sharepoint` works and returns real data
+- [x] **P4.2 Cron added 8 September 2026 - `web/vercel.json`, 02:30 UTC daily.**
+      Placed in `web/` because that is Vercel's root directory here (there is no root
+      `package.json`). Daily, so it is within the Hobby one-per-day limit.
+
+      **Be exact about what it buys.** This endpoint REPORTS. It surfaces a flow that has stopped
+      writing and a reconcile that has not run. It does **not** catch deletions - that needs
+      `sp_reconcile.py`, which is blocked by Conditional Access. A green cron here does not mean
+      deletions are handled, and reading it that way is the false comfort this project has been
+      caught by four times. Said so at the route, since `vercel.json` takes no comments.
+
+      **Needs Siddharth:** add `CRON_SECRET` to the Vercel project (value in the session notes).
+      Vercel then sends it as `Authorization: Bearer <value>` automatically. Until it is set the
+      endpoint stays publicly readable - aggregate counts only, no filenames or customer data, but
+      still open. Original scope: **P4.2 Add `vercel.json` with a cron.** `/api/cron/sharepoint` works and returns real data
       (`tracked: 874, untagged: 0`) but **nothing calls it**. An unscheduled health check catches
       nothing.
 - [ ] **P4.3 Periodic re-seed** as the reconcile backstop: `sp_discover.py` +
