@@ -37,7 +37,11 @@ export const PRODUCTS = ["HySecure", "HyID", "HyWorks", "HyLabs", "HyDesk", "ZTN
 export function dedupeKey(a: Asset): string {
   // Filename first: the same document filed under two verticals keeps its name but gets a different hash
   // (re-saved copies differ byte-wise), so hashing alone misses exactly the cases a salesperson notices.
-  const file = (a.file?.path ?? "").split("/").pop()?.toLowerCase().replace(/\.(pdf|docx)$/, "").replace(/[^a-z0-9]/g, "") ?? "";
+  // Strip EVERY document extension, not just pdf and docx. 35 documents in the active registry
+  // exist as both a .pdf and a .pptx of the same name, and leaving .pptx on meant they never
+  // collapsed - so a rep asking about ZTNA for Government spent two of three answer slots on one
+  // document in two file formats.
+  const file = (a.file?.path ?? "").split("/").pop()?.toLowerCase().replace(/\.(pdf|docx|pptx|doc|ppt|xlsx)$/, "").replace(/[^a-z0-9]/g, "") ?? "";
   if (file) return `file:${file}`;
   const sha = a.file?.sha1;
   if (sha) return `sha:${sha}`;
