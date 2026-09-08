@@ -110,7 +110,7 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
   const effort = /haiku/.test(model) ? {} : { output_config: { effort: "medium" as const } };
   const messages: Anthropic.MessageParam[] = [...history.slice(-6), { role: "user", content: question }];
   const trace: AskResult["trace"] = [];
-  let lastHits: SearchHit[] = [], filters: Record<string, unknown> = {}, calls = 0, firstZero = false;
+  let lastHits: SearchHit[] = [], filters: Record<string, unknown> = {}, calls = 0;
   for (let i = 0; i < 4; i++) {
     const res = await client.messages.create({ model, max_tokens: 2000, system: SYSTEM, tools, messages, ...effort });
     const toolUses = res.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
@@ -118,7 +118,12 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
       const text = res.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map(b => b.text).join("\n").trim();
       trace.push({ step: "model", detail: `${model} · ${((Date.now() - t0) / 1000).toFixed(1)}s · ${res.usage.input_tokens} in / ${res.usage.output_tokens} out` });
       return { text: text || "No answer was produced.", assets: lastHits.slice(0, 3).map(toCard), trace, runtime: "claude",
-        intent: calls ? (firstZero ? "gap" : "find_asset") : "other", filters, zero: firstZero };
+        // A gap is "we ended up with nothing", not "the first search missed". The model's opening
+        // search is often over-filtered on purpose - it narrows, then widens - so keying the gap to
+        // it reported a content gap on questions that were answered two searches later. That is how
+        // "hysecure datasheet" showed three assets under a red "Logged as a content gap" banner:
+        // two independent signals disagreeing about the same answer.
+        intent: calls ? (lastHits.length ? "find_asset" : "gap") : "other", filters, zero: lastHits.length === 0 };
     }
     messages.push({ role: "assistant", content: res.content });
     const results: Anthropic.ToolResultBlockParam[] = [];
@@ -129,7 +134,6 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
       const { results: hits, considered } = searchAssets({ query: String(input.query ?? ""), asset_type: String(input.asset_type ?? "") || undefined,
         vertical: String(input.vertical ?? "") || undefined, product: String(input.product ?? "") || undefined,
         audience: (input.audience as "internal" | "external") || "internal", limit: Number(input.limit ?? 5) });
-      if (calls === 1 && hits.length === 0) firstZero = true;
       if (hits.length) lastHits = hits;
       trace.push({ step: "tool result", detail: `${hits.length} of ${considered} assets` });
       results.push({ type: "tool_result", tool_use_id: tu.id, content: toolPayload(hits, considered) });
@@ -142,19 +146,30 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
   const cards = lastHits.slice(0, 3).map(toCard);
   const text = cards.length
     ? `No exact match. The closest ${cards.length === 1 ? "asset" : "assets"} in the library:`
-    : "Nothing in the library matches that. The library holds case studies and whitepapers only, so battlecards, comparison sheets and decks are not here. Try an industry or product, or browse the catalogue.";
+    : "Nothing in the library matches that. Try an industry, product or competitor, or browse the catalogue.";
   return { text, assets: cards, trace, runtime: "claude", intent: cards.length ? "find_asset" : "gap", filters, zero: cards.length === 0 };
 }
 
 function askLocal(question: string, t0: number): AskResult {
   const f = heuristicFilters(question);
   const trace: AskResult["trace"] = [{ step: "router (local heuristics)", detail: JSON.stringify(Object.fromEntries(Object.entries(f).filter(([, v]) => v))) }];
-  // Nothing is published externally yet, so an external filter would always return nothing. Search internally
-  // and tell the user about the restriction instead of reporting a false gap.
+  // Some assets ARE published now, so an external ask is answerable rather than automatically a
+  // false gap. Try external first when that is what was asked, and fall back to internal only if it
+  // finds nothing - the old code searched internally always and told every rep that nothing could
+  // be sent, which stopped being true once the public links landed.
   const askedExternal = f.audience === "external";
-  let args = { query: question, ...f, audience: "internal" as const, limit: 3 } as Parameters<typeof searchAssets>[0];
+  let args = { query: question, ...f, audience: askedExternal ? "external" as const : "internal" as const, limit: 3 } as Parameters<typeof searchAssets>[0];
   trace.push({ step: "tool call: search_assets", detail: JSON.stringify(args) });
   let { results, considered } = searchAssets(args);
+  // Asked for something sendable and nothing is published: widen to internal and say so, rather
+  // than reporting a gap for an asset the library actually holds.
+  let externalEmpty = false;
+  if (!results.length && askedExternal) {
+    externalEmpty = true;
+    args = { ...args, audience: "internal" as const };
+    trace.push({ step: "tool call: search_assets (internal fallback)", detail: JSON.stringify(args) });
+    ({ results, considered } = searchAssets(args));
+  }
   const exactZero = results.length === 0;
   if (!results.length && (f.asset_type || f.product)) {
     args = { ...args, asset_type: undefined, product: undefined };
@@ -170,7 +185,9 @@ function askLocal(question: string, t0: number): AskResult {
   else if (exactZero) text = `There is no ${want || "exact match"} in the library. Nearest substitutes${label}:`;
   else if (results.length === 1) text = `One asset fits${label}.`;
   else text = `${results.length} assets fit${label}. The first is the closest match.`;
-  if (askedExternal && results.length) text += " All of these are internal only, so ask marketing to publish a version before sending it outside Accops.";
+  // Only say "internal only" when it is true of what was actually returned. Saying it unconditionally
+  // told reps a public case study could not be sent, which is the false-gap defect in reverse.
+  if (externalEmpty && results.length) text += " None of these is published yet, so ask marketing before sending anything outside Accops.";
   return { text, assets: results.map(toCard), trace, runtime: "local", intent: exactZero ? "gap" : "find_asset", filters: f, zero: exactZero };
 }
 
