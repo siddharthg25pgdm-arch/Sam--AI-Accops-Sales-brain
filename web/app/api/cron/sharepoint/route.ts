@@ -1,5 +1,6 @@
 import { configured, registry, syncStatus } from "@/lib/sharepoint";
 import { ready, cacheState } from "@/lib/registry-cache";
+import { cardCacheState } from "@/lib/cards-cache";
 import { allAssets, assetLink } from "@/lib/cards";
 
 export const maxDuration = 60;
@@ -41,6 +42,11 @@ export async function GET(req: Request) {
     answerable: answerable.length,
     answerable_with_link: withLink,
     registry_cache: cacheState(),
+    // The carded corpus, reported for the same reason the registry cache is: a cache that is warm
+    // but EMPTY is the failure mode this project has already been caught by, and it is invisible
+    // unless the count is on the health endpoint. 0 here means SAM is answering without any of the
+    // publication years, expiries or visibility flags that carding produced.
+    cards_cache: cardCacheState(),
     newest_change: newest,
     // Sales Collateral is not a busy library, so silence is only suspicious after a while.
     flow_probably_stalled: ageDays !== null && ageDays > 30,
