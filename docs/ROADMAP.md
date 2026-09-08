@@ -132,8 +132,9 @@ once. No channel code was touched.
 - [x] **P1.2 Freshness - DONE 8 September 2026, and it became a trust note rather than a badge.**
       `trustNote()` in `cards.ts` returns the single most important reason to hesitate, because age
       turned out to be the *least* useful of the three things carding found:
-      1. **Expired** beats everything - the ISO 27001 certificate expired 20 September 2024 and is
-         exactly what a rep sends when procurement asks. Commercial risk, not cosmetics.
+      1. **Expired** beats everything, where a card sets it. The ISO 27001 certificate was the
+         original case; the warning on that one specific card was removed on 8 September at
+         Siddharth's instruction, but the mechanism stands for anything else that expires.
       2. **A newer edition exists** - five of the nine brochures are superseded by public 2026
          versions, so "the latest HySecure datasheet" has a right answer and a wrong one.
       3. Otherwise the age note, and only where a year was read from the document.
@@ -183,8 +184,12 @@ This is where the 413 ingestable files become answerable, not just findable.
       identical trap `sp_match_public.py` fell into with 31 confident wrong matches.
 
       **Three findings from reading the documents, each of which changes an answer:**
-      - The **ISO 27001 certificate expired on 20 September 2024**, and it is exactly the file a rep
-        sends when procurement asks. Card marked `expired`. Siddharth needs to supply the current one.
+      - The **ISO 27001 certificate on file states validity to 20 September 2024.** Warned on
+        initially; warning **removed 8 September on Siddharth's instruction** - not sales-critical in
+        his view. The dates stay in the card's outcomes and brief. Fixing this also exposed that
+        the age rule was being applied to a certificate ("check it still reflects the product",
+        which is meaningless for a dated record) - certifications, awards and analyst reports are
+        now exempt from it, and those three cards had been mis-typed as "Other".
       - The **2025 Gartner MQ** places Accops as a **Niche Player** and names a Caution that Accops
         holds ISO 27001 and no other compliance certificates. That is the sourced answer to eval Q28,
         "do we have a SOC 2 report?" - the answer is no, and it is now citable.
@@ -216,7 +221,7 @@ This is where the 413 ingestable files become answerable, not just findable.
       confidential in that context. `client_actual` is still never selected into `CardRow` at all -
       not selecting a column is a stronger guarantee than remembering to strip it.
 - [ ] **P2.1b Verify the production model honours `trust`.** The retrieval side is verified end to end
-      locally ("EXPIRED on 2024-09-20 - do not send" reaches the answer payload), but the local
+      locally (a supersession warning reaches the answer payload), but the local
       runtime has no model key and falls back to retrieval-only, so **the system-prompt changes have
       not been exercised against a real model**. Needs a production `SAM_API_TOKENS` value to test.
       Ask SAM for the ISO certificate and check the answer says it has expired instead of offering it.
