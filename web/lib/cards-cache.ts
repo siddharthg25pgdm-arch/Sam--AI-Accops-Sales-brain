@@ -80,8 +80,13 @@ export function cardAssets(): Asset[] {
   return g.__samCards ?? [];
 }
 
-/** Lookup by source path, for the fields Asset does not carry (stale_risk, superseded_by,
- *  needs_human, expired). Used by the trust badge rather than by ranking. */
+/** Card metadata for the fields an Asset does not carry - expired, stale_risk, superseded_by,
+ *  needs_human. Read by trustNote(), not by ranking.
+ *
+ *  Keyed by FILENAME, lowercased, not by the corpus source path. allAssets() rewrites file.path to
+ *  the registry's real folder, so a source-keyed map stops resolving the moment a card is merged
+ *  with its registry row - which is every card that has one. The filename is what dedupeKey already
+ *  matches the two corpora on, so it is the key that survives. */
 export function cardMeta(): Map<string, CardRow> {
   return g.__samCardMeta ?? new Map();
 }
@@ -93,7 +98,7 @@ export async function refreshCards(): Promise<number> {
   try {
     const rows = await cardRows(2000);
     g.__samCards = rows.map(cardToAsset);
-    g.__samCardMeta = new Map(rows.map(r => [r.source, r]));
+    g.__samCardMeta = new Map(rows.map(r => [r.filename.toLowerCase(), r]));
     g.__samCardsAt = Date.now();
     return g.__samCards.length;
   } catch (e) {

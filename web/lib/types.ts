@@ -1,6 +1,6 @@
 /** Client-safe shapes. No JSON import here, so client components never bundle the full card file. */
 export type SlimAsset = {
-  key: string; title: string; type: "Case Study" | "Whitepaper" | "Other"; asset_type: string; industry: string; vertical: string;
+  key: string; title: string; type: "Case Study" | "Whitepaper" | "Battlecard" | "Deck" | "Brochure" | "Other"; asset_type: string; industry: string; vertical: string;
   products: string[]; use_for: string; brief: string; year: string | null; modified: string | null; stale: boolean;
   visibility: "internal" | "public"; link: string | null; location: string | null; ext: string | null; pages: number | null; inventoried: boolean;
 };

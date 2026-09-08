@@ -1,6 +1,6 @@
 /** Shared handlers behind both the REST routes (/api/v1/*) and the MCP tools (/api/mcp).
  *  One implementation, two transports, so the Dwight extension and an MCP client see identical behaviour. */
-import { searchAssets, allAssets, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, assetLink, assetLocation, VERTICALS, type Asset } from "./cards";
+import { searchAssets, allAssets, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, trustNote, assetLink, assetLocation, VERTICALS, type Asset } from "./cards";
 import { ask as askAgent, type AskResult } from "./agent";
 import { logEvent, recentEvents } from "./events";
 
@@ -10,7 +10,7 @@ export function card(a: Asset, why?: string) {
   return {
     title: a.title, asset_type: a.asset_type, type: typeGroup(a), industry: a.industry, vertical: verticalOf(a), client: a.client,
     products: a.products, use_for: a.use_for, brief: (a.brief || a.key_problem || "").slice(0, 400), key_outcomes: a.key_outcomes.slice(0, 5),
-    year: yearOf(a), stale: isStale(a), pages: a.file?.pages ?? null, file_path: a.file?.path ?? null,
+    year: yearOf(a), stale: isStale(a), trust: trustNote(a), pages: a.file?.pages ?? null, file_path: a.file?.path ?? null,
     visibility: a.public_url ? "public" : "internal", public_url: a.public_url, location: assetLocation(a),
     shareable_externally: Boolean(a.public_url), ...(why ? { why_match: why } : {}),
   };
@@ -133,7 +133,7 @@ export async function apiContextForAccount(p: { company: string; person_title?: 
     const { results } = searchAssets({ query: [p.industry, p.person_title].filter(Boolean).join(" "), vertical, limit: 3 });
     const fallback = results.length ? results : searchAssets({ query: "", vertical, limit: 3 }).results;
     r = { ...r, assets: fallback.map(h => ({ title: h.asset.title, asset_type: h.asset.asset_type, industry: h.asset.industry, why: h.why,
-      link: assetLink(h.asset), location: assetLocation(h.asset), visibility: h.asset.public_url ? "public" : "internal", year: yearOf(h.asset), stale: isStale(h.asset), path: h.asset.file?.path ?? null })),
+      link: assetLink(h.asset), location: assetLocation(h.asset), visibility: h.asset.public_url ? "public" : "internal", year: yearOf(h.asset), stale: isStale(h.asset), trust: trustNote(h.asset), path: h.asset.file?.path ?? null })),
       answer: fallback.length ? `No exact match for ${p.company}. Strongest ${vertical ?? "cross-industry"} assets to lead with:` : r.answer };
   }
   return {

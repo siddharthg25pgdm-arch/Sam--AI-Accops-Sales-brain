@@ -1,6 +1,6 @@
 import raw from "@/data/asset_cards.json";
 import { registryAssets } from "./registry-cache";
-import { cardAssets } from "./cards-cache";
+import { cardAssets, cardMeta } from "./cards-cache";
 
 export type AssetFile = {
   path: string; ext: string; size_mb: number; pages: number | null; modified?: string; year?: string | null;
@@ -147,10 +147,16 @@ export function allAssetsRaw(): Asset[] {
   return data.assets;
 }
 export function assetKey(a: Asset) { return a.file?.path ?? a.title; }
-export function typeGroup(a: Asset): "Case Study" | "Whitepaper" | "Other" {
+export function typeGroup(a: Asset): "Case Study" | "Whitepaper" | "Battlecard" | "Deck" | "Brochure" | "Other" {
   const t = a.asset_type.toLowerCase();
   if (t.includes("case")) return "Case Study";
+  // Battlecard before deck: a competitive comparison IS a deck, and the rep asking for one wants
+  // that specific thing. Checked before "white" too, since a competitive analysis can be written up
+  // as a whitepaper - the Omnissa VVF teardown is exactly that.
+  if (t.includes("battlecard") || t.includes("competit")) return "Battlecard";
   if (t.includes("white") || t.includes("thought") || t.includes("brief") || t.includes("pov")) return "Whitepaper";
+  if (t.includes("brochure") || t.includes("datasheet")) return "Brochure";
+  if (t.includes("deck") || t.includes("presentation") || t.includes("webinar") || t.includes("event")) return "Deck";
   return "Other";
 }
 export function verticalOf(a: Asset): string {
@@ -170,6 +176,37 @@ export function isStale(a: Asset): boolean {
   const y = yearOf(a); if (!y) return false;
   return new Date().getFullYear() - Number(y) >= 2;
 }
+
+/** The one-line reason a rep should hesitate before sending this, or null when there is none.
+ *
+ *  P1.2 asked for a freshness badge. Age turned out to be the least useful of the three things
+ *  carding actually found, so this returns whichever matters most rather than just a year:
+ *
+ *    1. EXPIRED beats everything. The ISO 27001 certificate expired on 20 September 2024 and is
+ *       precisely what a rep reaches for when procurement asks for it. Sending it is a live
+ *       commercial problem, not an aesthetic one.
+ *    2. A newer edition exists. Five of the nine brochures are superseded by public 2026 versions,
+ *       so "the latest HySecure datasheet" has a right answer and a wrong one.
+ *    3. Otherwise the age warning, and only where a publication year was actually read from the
+ *       document - never from a filename, which is how a 2022 deck came to look like a 2026 one.
+ *
+ *  Deliberately one string rather than a flags object: it goes into an answer, a WhatsApp message
+ *  and a model prompt, and all three want a sentence a human can read. */
+export function trustNote(a: Asset): string | null {
+  const m = cardMeta().get((a.file?.path ?? "").split("/").pop()?.toLowerCase() ?? "");
+  if (m?.expired) {
+    return `EXPIRED${m.expiry_date ? ` on ${m.expiry_date}` : ""} - do not send. ${m.needs_human || ""}`.trim();
+  }
+  if (m?.superseded_by) {
+    const newer = m.superseded_by.split(" - ")[0].split("/").pop();
+    return `A newer edition exists${newer ? `: ${newer}` : ""} - prefer that one.`;
+  }
+  if (m?.stale_risk) return m.stale_risk;
+  const y = yearOf(a);
+  if (y && isStale(a)) return `Published ${y}; over two years old, so check it still reflects the product.`;
+  return null;
+}
+
 export function blob(a: Asset): string {
   return [a.title, a.asset_type, a.industry, a.client, a.products.join(" "), a.key_problem, a.key_outcomes.join(" "),
     a.brief, a.use_for, a.section, a.file?.path ?? "", a.file?.text_excerpt ?? ""].join(" ").toLowerCase();

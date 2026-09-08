@@ -1,10 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, assetLink, assetLocation, type SearchHit, type Asset } from "./cards";
+import { searchAssets, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, type SearchHit, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured } from "./agent-openai";
 
 export type AskResult = {
   text: string;
-  assets: { title: string; asset_type: string; industry: string; why: string; link: string | null; location: string | null; visibility: string; year: string | null; stale: boolean; path: string | null }[];
+  assets: { title: string; asset_type: string; industry: string; why: string; link: string | null; location: string | null; visibility: string; year: string | null; stale: boolean; trust: string | null; path: string | null }[];
   trace: { step: string; detail: string }[];
   runtime: "claude" | "local" | "search";
   intent: string;
@@ -21,12 +21,16 @@ Rules:
 - Call search_assets with sensible filters. **You have at most 3 searches.** If a search returns nothing or nothing
   suitable, do not repeat it with reworded text: drop a filter (asset_type, then product, then vertical) and widen.
   After 3 searches you must answer from what you have, even if the answer is "we do not have this".
-- Accops has no battlecards, comparison sheets or decks in this library — only case studies and whitepapers. If asked
-  for one, say so plainly and offer the closest case study or whitepaper instead.
-- **No asset has a public link yet**, so nothing can be forwarded outside Accops today. When someone asks for
-  something to send to a customer, search with audience "internal", recommend the right assets, and add one line:
-  these are internal only, so ask marketing to publish before sending. Never search with audience "external" —
-  it always returns nothing and is not a real gap.
+- The library DOES contain decks, battlecards and competitive comparisons — 552 decks and 8 competitive assets,
+  including Accops vs Citrix, vs VMware Horizon, vs Omnissa, vs Zscaler and vs Cisco AnyConnect. Recommend them
+  when asked. (Both of these were once false and the prompt said so; do not tell a rep a deck does not exist.)
+- SOME assets have a public link and can be forwarded; most cannot. Use the tool result, not an assumption:
+  visibility "public" means sendable, "internal" means it must not leave Accops. When someone asks for something
+  to send to a customer, search with audience "external" first — that filter now returns real results. If it comes
+  back empty, fall back to an internal search and say plainly that nothing is published yet.
+- **trust** on a result is a warning to pass on, in your own words. If it says EXPIRED, say the document must not be
+  sent and why. If it says a newer edition exists, recommend the newer one instead. If it is a note about age, mention
+  it in the one line about that asset. Never recommend an expired document as if it were current.
 - Reply shape: one sentence of verdict, then up to three assets. For each: exact title, one line on why it fits THIS ask.
   Do not paste links; the interface renders them from your tool results.
 - If nothing fits, say so in the first sentence, offer the two nearest substitutes, and name the gap plainly.
@@ -40,7 +44,7 @@ const tools: Anthropic.Tool[] = [{
     type: "object",
     properties: {
       query: { type: "string", description: "What the salesperson needs, in plain words: use case, competitor, regulator, persona." },
-      asset_type: { type: "string", enum: ["Case Study", "Whitepaper", ""], description: "Optional filter." },
+      asset_type: { type: "string", enum: ["Case Study", "Whitepaper", "Battlecard", "Deck", "Brochure", ""], description: "Optional filter. Battlecard covers competitive comparisons (Citrix, VMware, Omnissa, Zscaler, VPNs)." },
       vertical: { type: "string", enum: [...Object.keys(VERTICALS), ""], description: "Optional industry filter." },
       product: { type: "string", enum: [...PRODUCTS, ""], description: "Optional product filter." },
       audience: { type: "string", enum: ["internal", "external"], description: "external = only assets with a public URL." },
@@ -55,13 +59,20 @@ const tools: Anthropic.Tool[] = [{
 export function toCard(h: SearchHit) {
   const a = h.asset;
   return { title: a.title, asset_type: a.asset_type, industry: a.industry, why: h.why, link: assetLink(a), location: assetLocation(a),
-    visibility: a.public_url ? "public" : "internal", year: yearOf(a), stale: isStale(a), path: a.file?.path ?? null };
+    visibility: a.public_url ? "public" : "internal", year: yearOf(a), stale: isStale(a),
+    // Why a rep should hesitate, in words. Null for most assets; an expiry or a newer edition for
+    // the ones where sending the wrong copy actually costs something.
+    trust: trustNote(a), path: a.file?.path ?? null };
 }
 export function toolPayload(hits: SearchHit[], considered: number) {
   return JSON.stringify({ total_considered: considered, results: hits.map(h => ({
     title: h.asset.title, asset_type: h.asset.asset_type, industry: h.asset.industry, client: h.asset.client,
     products: h.asset.products, use_for: h.asset.use_for, brief: (h.asset.brief || h.asset.key_problem || "").slice(0, 300),
     key_outcomes: h.asset.key_outcomes.slice(0, 4), year: yearOf(h.asset), stale: isStale(h.asset),
+    // The model needs the REASON, not just a boolean. "stale: true" cannot distinguish an old but
+    // perfectly usable whitepaper from an ISO certificate that expired two years ago, and only one
+    // of those must never be sent to procurement.
+    trust: trustNote(h.asset),
     visibility: h.asset.public_url ? "public" : "internal", why_match: h.why })) });
 }
 
