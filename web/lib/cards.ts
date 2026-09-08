@@ -160,6 +160,9 @@ export function typeGroup(a: Asset): "Case Study" | "Whitepaper" | "Battlecard" 
   if (t.includes("battlecard") || t.includes("competit")) return "Battlecard";
   if (t.includes("white") || t.includes("thought") || t.includes("brief") || t.includes("pov")) return "Whitepaper";
   if (t.includes("brochure") || t.includes("datasheet")) return "Brochure";
+  // eBooks group with whitepapers: both are buyer-education documents a rep sends to make an
+  // argument, and a rep asking for "a whitepaper on browser isolation" should find the eBook too.
+  if (t.includes("ebook") || t.includes("e-book")) return "Whitepaper";
   if (t.includes("deck") || t.includes("presentation") || t.includes("webinar") || t.includes("event")) return "Deck";
   return "Other";
 }
