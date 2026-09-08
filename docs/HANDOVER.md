@@ -14,10 +14,10 @@ Teams is the only unbuilt one and Siddharth has deferred it.
 | | |
 |---|---|
 | Registry | 874 SharePoint rows, live |
-| Answerable | 702 assets after merge and dedupe |
-| With a working link | 650 |
-| Cards from real documents | **34**, in Supabase and read by every channel |
-| Assets with a publication date | 34, read from the document body not the filename |
+| Answerable | 678 assets after merge and dedupe (was 702 before the PDF/PPTX twins collapsed) |
+| With a working link | 626 |
+| Cards from real documents | **46**, in Supabase and read by every channel |
+| Assets with a publication date | 46, read from the document body not the filename |
 | Eval | **89% hit@3** against an 85% threshold, up from 86% |
 | Power Automate | create/modify flow proven writing; delete trigger never fires |
 | Nightly cron | `web/vercel.json`, 02:30 UTC - **reports only, does not reconcile** |
@@ -85,6 +85,29 @@ Three things worth knowing because they change what SAM says:
 The system prompt had also gone stale in a way that was actively suppressing correct answers: it
 told the model Accops has **no decks or battlecards** (there are 552 decks and 8 competitive assets)
 and that **nothing has a public link** (7 carded assets are sendable). Both fixed.
+
+## What live UI testing found that API testing did not
+
+Siddharth signed in on 8 September and ran six real queries. Four bugs, none of which curl showed:
+
+1. **"We don't have a HySecure datasheet."** SAM holds two, both carded. An asset survived search
+   on ANY single token, so everything mentioning HySecure ranked alongside the real datasheets and
+   the model - handed three near-equal results - concluded there was no datasheet. Complete matches
+   now score far higher. *This is the failure mode to watch for: SAM denying an asset it holds.*
+2. **Titles rendered as a vertical column of single words** with the SharePoint path overlapping
+   them. `.side` had no width cap and `.where` had no CSS rule at all.
+3. **"Logged as a content gap" above three good assets.** The gap keyed off whether the model's
+   FIRST search returned zero and was never revised, so a question answered on the second search
+   still reported a gap - two signals contradicting each other on one screen.
+4. **35 documents listed twice.** `dedupeKey` stripped `.pdf` and `.docx` but not `.pptx`, so a
+   document saved in both formats never collapsed.
+
+Two stale claims were also still live in code after the prompt fix: the exhausted-budget fallback
+told reps the library holds "case studies and whitepapers only", and the local path appended "All of
+these are internal only" even to assets with public links.
+
+**The lesson, and it is the same one as always: test in the real UI.** Every one of these was
+invisible from the API.
 
 ## What needs Siddharth, not Claude
 
