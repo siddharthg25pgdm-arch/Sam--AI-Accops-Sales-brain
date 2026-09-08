@@ -281,6 +281,32 @@ export async function registry(scope = "sales", limit = 2000): Promise<RegistryR
   return (await rest(`sam_sharepoint_files?scope=eq.${scope}&deleted=is.false&select=*&limit=${limit}&order=modified_at.desc`)) as RegistryRow[];
 }
 
+/** One asset card: what a document SAYS, written by Claude Enterprise from the real text.
+ *
+ *  client_actual is in the table and deliberately NOT in this type. It holds real customer names,
+ *  and everything that reads a CardRow ends up in an Asset, a JSON response or a model prompt.
+ *  Nothing in the answer path needs it, so it is not selected - which is a stronger guarantee than
+ *  remembering to strip it later. Query the table directly if a human needs it. */
+export type CardRow = {
+  source: string; filename: string; title: string; asset_type: string; industry: string;
+  client: string; products: string[]; competitors: string[]; personas: string[]; regulations: string[];
+  key_problem: string; key_outcomes: string[]; brief: string; use_for: string;
+  publish_year: string | null; expired: boolean; expiry_date: string | null;
+  stale_risk: string; superseded_by: string; visibility: string; internal_reason: string;
+  public_url: string; confidence: number; needs_human: string; batch: string;
+};
+
+const CARD_COLS = "source,filename,title,asset_type,industry,client,products,competitors,personas," +
+  "regulations,key_problem,key_outcomes,brief,use_for,publish_year,expired,expiry_date,stale_risk," +
+  "superseded_by,visibility,internal_reason,public_url,confidence,needs_human,batch";
+
+/** Every asset card. Explicit column list rather than select=*, so client_actual cannot arrive by
+ *  accident when someone adds a column later. */
+export async function cardRows(limit = 2000): Promise<CardRow[]> {
+  if (!configured()) return [];
+  return (await rest(`sam_asset_cards?select=${CARD_COLS}&limit=${limit}&order=source`)) as CardRow[];
+}
+
 export type SyncRow = { scope: string; last_run: string | null; last_result: string | null };
 
 /** When deletions were last reconciled.

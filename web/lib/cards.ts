@@ -1,5 +1,6 @@
 import raw from "@/data/asset_cards.json";
 import { registryAssets } from "./registry-cache";
+import { cardAssets } from "./cards-cache";
 
 export type AssetFile = {
   path: string; ext: string; size_mb: number; pages: number | null; modified?: string; year?: string | null;
@@ -9,6 +10,11 @@ export type Asset = {
   inventory_id: number | null; title: string; asset_type: string; industry: string; client: string;
   products: string[]; key_problem: string; key_outcomes: string[]; brief: string; use_for: string; section: string;
   file: AssetFile | null; visibility: "private" | "public" | "both"; public_url: string | null; sharepoint_url: string | null;
+  /** True when this came from the carded corpus - a human-equivalent read of the real document, so
+   *  its year is a fact rather than a filename guess. Set once at projection time and carried
+   *  through the merge, because the merge rewrites `file.path` to the registry's real folder and
+   *  provenance must not depend on a string we deliberately overwrite. */
+  carded?: boolean;
 };
 
 const data = raw as unknown as { counts: Record<string, number>; assets: Asset[] };
@@ -38,31 +44,45 @@ export function dedupeKey(a: Asset): string {
   return `name:${a.title.toLowerCase().replace(/[^a-z0-9]/g, "")}`;
 }
 
-/** Richer card wins: more descriptive text, then an inventory entry, then a shorter path (less likely a stray copy). */
+/** Richer card wins: more descriptive text, then a card read from the real document, then an
+ *  inventory entry, then a shorter path (less likely a stray copy).
+ *
+ *  The +200 for a carded asset is not a tie-break, it is a statement about provenance. A hand-written
+ *  card was written from a filename and a memory of the document; a corpus card was written from the
+ *  extracted text, and carries the publication year, the expiry and the visibility that go with
+ *  having actually read the thing. Where both describe the same document, the one that read it wins
+ *  even if the older card happens to have a longer brief. */
 function richness(a: Asset): number {
   return (a.brief?.length ?? 0) + (a.use_for?.length ?? 0) + (a.key_problem?.length ?? 0)
     + a.key_outcomes.join("").length + (a.products?.length ?? 0) * 10
+    + (carded(a) ? 200 : 0)
     + (a.inventory_id !== null ? 50 : 0) - (a.file?.path?.length ?? 0) / 100;
 }
 
-/** Cards plus the live SharePoint registry, deduplicated.
+/** Every corpus SAM has, deduplicated.
  *
- *  Two corpora meet here. The 77 hand-written cards are rich - brief, key_problem, key_outcomes -
- *  but frozen, undated, and every one of their 71 SharePoint URLs was constructed against the wrong
- *  tenant and 404s. The registry is the opposite: no document text, but real files with dates and a
- *  webUrl verified against Graph.
+ *  THREE now, not two, and they are good at different things.
  *
- *  richness() already prefers the card, which is right - a carded asset answers better. But the
- *  card's dead sharepoint_url would then win too, and a rep forwarding a 404 is the failure this
- *  project has already been bitten by twice. So when a card and a registry row are the same
- *  document, keep the card and graft the registry's verified link and dates onto it.
+ *  The 77 hand-written cards are rich - brief, key_problem, key_outcomes - but frozen, undated, and
+ *  every one of their 71 SharePoint URLs was constructed against the wrong tenant and 404s.
  *
- *  Not memoised in a module variable any more: the registry cache refreshes on a TTL, so a frozen
- *  result would go stale and never notice. The merge is a few hundred rows of map work per call. */
+ *  The registry is the opposite: 874 real files with verified Graph webUrls and dates, but no
+ *  document text, so it can say a file exists and not what is in it.
+ *
+ *  The carded corpus (cards-cache) is new. Claude Enterprise read the actual documents, so these
+ *  carry what the other two cannot: a publication year read from the document BODY, an expiry where
+ *  one has passed, and a visibility that says whether a rep may forward the thing at all.
+ *
+ *  richness() decides which wins, and a carded asset should - it answers better. What it must NOT
+ *  take with it is a dead link, so whichever card wins, a verified SharePoint URL and a real date
+ *  are grafted on from the loser. verified() is true only for registry-sourced URLs, so a
+ *  constructed one can never overwrite a real one.
+ *
+ *  Not memoised: both caches refresh on a TTL, so a frozen result would go stale and never notice. */
 export function allAssets(): Asset[] {
   const usable = data.assets.filter(a => a.asset_type !== "Data File" && a.asset_type !== "Content Calendar");
   const best = new Map<string, Asset>();
-  for (const a of [...usable, ...registryAssets()]) {
+  for (const a of [...usable, ...registryAssets(), ...cardAssets()]) {
     const k = dedupeKey(a);
     const seen = best.get(k);
     if (!seen) { best.set(k, a); continue; }
@@ -70,11 +90,35 @@ export function allAssets(): Asset[] {
     const other = winner === a ? seen : a;
     // Whichever wins, a verified SharePoint link and a real date beat their absence. verified()
     // is true only for registry-sourced URLs, so a constructed one can never overwrite a real one.
+    //
+    // The year is the same kind of question - provenance, not precedence. A carded year was read
+    // out of the document body; a registry year is inferred from the filename or created date, and
+    // is ALWAYS set, so `winner.year ?? other.year` would let a guess beat a fact whenever the
+    // registry row won on richness. "2026-06-11-Accops vs other VDI providers.pptx" is dated
+    // 29 NOV 2022 on its own title slide: the filename is a SharePoint touch, four years out.
+    const dated = carded(winner) ? winner : (carded(other) ? other : null);
+    // A card's `section` is its corpus prefix - "sharepoint" or "public" - which is where the FILE
+    // sits on disk, not where the document lives in SharePoint. The registry knows the real folder
+    // ("Competition/VDI and DaaS"), and that is what a rep needs to be told, so keep the real one.
+    const filed = !carded(winner) && winner.section ? winner.section
+                : !carded(other) && other.section ? other.section
+                : winner.section;
     best.set(k, {
       ...winner,
+      carded: winner.carded || other.carded,
+      section: filed,
       sharepoint_url: verified(winner) ? winner.sharepoint_url : (verified(other) ? other.sharepoint_url : winner.sharepoint_url),
+      // A public URL is a fact wherever it came from, and it is what makes an asset sendable.
+      public_url: winner.public_url ?? other.public_url,
       file: winner.file && other.file
-        ? { ...winner.file, year: winner.file.year ?? other.file.year, modified: winner.file.modified ?? other.file.modified }
+        ? {
+            ...winner.file,
+            // Keep the registry's real folder path too - it is what assetLocation() prints and what
+            // searchAssets() matches on, so "Competition" stays a findable word.
+            path: carded(winner) && other.file.path ? other.file.path : winner.file.path,
+            year: dated?.file?.year ?? winner.file.year ?? other.file.year,
+            modified: winner.file.modified ?? other.file.modified,
+          }
         : (winner.file ?? other.file),
     });
   }
@@ -85,6 +129,17 @@ export function allAssets(): Asset[] {
  *  the 71 constructed ones in asset_cards.json point at accops.sharepoint.com, which does not exist. */
 function verified(a: Asset): boolean {
   return Boolean(a.sharepoint_url?.includes("propalmsnetwork.sharepoint.com"));
+}
+
+/** True for an asset that came from the carded corpus, where a year means "the document says so"
+ *  rather than "the filename suggests so".
+ *
+ *  Reads an explicit flag rather than sniffing the path prefix. The merge deliberately rewrites
+ *  `file.path` to the registry's real folder so a rep is told where the document actually lives,
+ *  and a provenance test that depended on that string would quietly stop being true the moment it
+ *  was rewritten - costing the card its richness bonus on the next comparison. */
+function carded(a: Asset): boolean {
+  return a.carded === true;
 }
 
 /** Every asset including duplicate copies. Only for diagnostics; answers and the catalogue use allAssets(). */

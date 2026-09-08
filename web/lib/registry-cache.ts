@@ -16,6 +16,7 @@
  *  needs, but it cannot answer "what outcome did that bank get". Carding fills that in later. */
 import type { Asset } from "./cards";
 import { registry, type RegistryRow } from "./sharepoint";
+import { cardsReady } from "./cards-cache";
 
 const TTL_MS = 5 * 60_000;
 
@@ -106,7 +107,14 @@ export async function refresh(): Promise<number> {
  *  nothing in the logs, because the failure path deliberately swallows errors. Found by running the
  *  eval set locally and seeing `answerable: 66`. */
 export async function ready(): Promise<void> {
-  if (!g.__samReg?.length) await refresh();
+  // Warms BOTH corpora, not just the registry. Four call sites await this - /api/ask, /admin,
+  // the cron and the export - and every one of them wants "SAM is loaded", not "the registry is
+  // loaded". Warming them here rather than adding a second await at each call site means the next
+  // entry point added cannot forget one of them. They load in parallel; neither blocks the other.
+  await Promise.all([
+    g.__samReg?.length ? Promise.resolve() : refresh(),
+    cardsReady(),
+  ]);
 }
 
 export function cacheState() {
