@@ -192,6 +192,10 @@ export function isStale(a: Asset): boolean {
  *
  *  Deliberately one string rather than a flags object: it goes into an answer, a WhatsApp message
  *  and a model prompt, and all three want a sentence a human can read. */
+/** Asset types that record a moment rather than describe the product, so the generic age note is
+ *  meaningless for them. An explicit expiry or a stale_risk on the card still applies. */
+const DATED_RECORD = new Set(["Certification", "Certificate", "Award", "Analyst Report"]);
+
 export function trustNote(a: Asset): string | null {
   const m = cardMeta().get((a.file?.path ?? "").split("/").pop()?.toLowerCase() ?? "");
   if (m?.expired) {
@@ -202,6 +206,12 @@ export function trustNote(a: Asset): string | null {
     return `A newer edition exists${newer ? `: ${newer}` : ""} - prefer that one.`;
   }
   if (m?.stale_risk) return m.stale_risk;
+  // The generic age note is about product literature going out of date - a 2022 brochure may
+  // describe a release the customer will not get. It does not apply to a certificate, an award or
+  // an analyst report, which are dated records of a point in time and are not "stale" for being old.
+  // Without this, SAM tells a rep to check whether a 2021 ISO certificate "still reflects the
+  // product", which is not a sentence that means anything.
+  if (DATED_RECORD.has(a.asset_type)) return null;
   const y = yearOf(a);
   if (y && isStale(a)) return `Published ${y}; over two years old, so check it still reflects the product.`;
   return null;

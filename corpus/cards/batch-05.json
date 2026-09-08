@@ -1,11 +1,23 @@
 {
   "generated_by": "Claude Enterprise, in-session, 8 September 2026",
-  "note": "Sections C, D, E and F of docs/demo-corpus.md - vertical, proof and credibility, technical briefs, and the newest whitepaper. Written from corpus/text/*.txt. Two cards here carry findings that change what SAM should say rather than just what it knows: the ISO 27001 certificate EXPIRED on 20 September 2024 and is the document a rep reaches for when procurement asks, and the 2025 Gartner Magic Quadrant is a licensed Gartner document that places Accops as a Niche Player with named Cautions. Both are recorded on the card rather than smoothed over, because a card that hides a problem is worse than no card.",
+  "note": "Sections C, D, E and F of docs/demo-corpus.md - vertical, proof and credibility, technical briefs, and the newest whitepaper. Written from corpus/text/*.txt. Two cards here carry findings that change what SAM should say rather than just what it knows: the ISO 27001 certificate EXPIRED on 20 September 2024 and is the document a rep reaches for when procurement asks, and the 2025 Gartner Magic Quadrant is a licensed Gartner document that places Accops as a Niche Player with named Cautions. Both are recorded on the card rather than smoothed over, because a card that hides a problem is worse than no card. Revised 8 September 2026 on Siddharth's instruction: the ISO certificate card no longer carries an expiry warning. The dates remain in key_outcomes and brief because they are printed on the document, but expired is false and nothing warns a rep before sending it. Recorded here so the change is a decision on the record rather than an omission someone later reads as an oversight.",
   "schema_notes": {
     "expired": "Set where the document has a stated expiry date that has passed. SAM must warn before a rep sends it.",
     "third_party_copyright": "The document is not Accops' to distribute. Licensing sits with the named owner."
   },
-  "model_visible": ["title", "asset_type", "industry", "client", "products", "competitors", "personas", "use_for", "publish_year", "visibility", "expired"],
+  "model_visible": [
+    "title",
+    "asset_type",
+    "industry",
+    "client",
+    "products",
+    "competitors",
+    "personas",
+    "use_for",
+    "publish_year",
+    "visibility",
+    "expired"
+  ],
   "cards": [
     {
       "source": "sharepoint/Accops Solutions for Govt. V1 '26.pdf",
@@ -15,9 +27,27 @@
       "client": "",
       "client_actual": "",
       "client_named": false,
-      "products": ["HySecure", "HyID", "HyWorks", "HyDesk", "Huddle", "AirBridge", "Browser Isolation", "ZTNA", "MFA", "VDI", "Thin Clients"],
+      "products": [
+        "HySecure",
+        "HyID",
+        "HyWorks",
+        "HyDesk",
+        "Huddle",
+        "AirBridge",
+        "Browser Isolation",
+        "ZTNA",
+        "MFA",
+        "VDI",
+        "Thin Clients"
+      ],
       "competitors": [],
-      "personas": ["CISO", "CIO", "IT head", "Head of Infrastructure", "procurement"],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Head of Infrastructure",
+        "procurement"
+      ],
       "regulations": [],
       "key_problem": "A government department modernising its IT security needs one reference architecture covering private application access, identity, desktops, internet isolation, file transfer, remote support and endpoints - not seven separate product pitches it has to assemble itself.",
       "key_outcomes": [
@@ -45,9 +75,27 @@
       "client": "",
       "client_actual": "",
       "client_named": false,
-      "products": ["HyWorks", "HySecure", "HyID", "HyDesk", "Huddle", "AirBridge", "Browser Isolation", "VDI", "ZTNA", "MFA", "BioAuth", "Thin Clients"],
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "HyDesk",
+        "Huddle",
+        "AirBridge",
+        "Browser Isolation",
+        "VDI",
+        "ZTNA",
+        "MFA",
+        "BioAuth",
+        "Thin Clients"
+      ],
       "competitors": [],
-      "personas": ["CISO", "CIO", "IT head", "Head of Infrastructure"],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
       "regulations": [],
       "key_problem": "Armed forces operate across border areas and sensitive zones on air-gapped networks, with high insider-threat risk and a need for data sovereignty, while still having to give contractors, temporary staff and OEM personnel controlled access.",
       "key_outcomes": [
@@ -70,14 +118,24 @@
     {
       "source": "sharepoint/Accops recognized by Gartner_ Oct 2024.pdf",
       "title": "Accops Gartner Recognition Summary: Market Guide and Peer Insights (Oct 2024)",
-      "asset_type": "Other",
+      "asset_type": "Analyst Report",
       "industry": "",
       "client": "",
       "client_actual": "",
       "client_named": false,
-      "products": ["DaaS", "VDI", "HySecure", "HyWorks"],
+      "products": [
+        "DaaS",
+        "VDI",
+        "HySecure",
+        "HyWorks"
+      ],
       "competitors": [],
-      "personas": ["CIO", "IT head", "procurement", "CISO"],
+      "personas": [
+        "CIO",
+        "IT head",
+        "procurement",
+        "CISO"
+      ],
       "regulations": [],
       "key_problem": "A prospect who has not heard of Accops asks what independent validation exists, and needs analyst recognition rather than the vendor's own claims.",
       "key_outcomes": [
@@ -101,15 +159,40 @@
     {
       "source": "sharepoint/MQ for DaaS 2025.pdf",
       "title": "Gartner Magic Quadrant for Desktop as a Service, 11 August 2025",
-      "asset_type": "Other",
+      "asset_type": "Analyst Report",
       "industry": "",
       "client": "",
       "client_actual": "",
       "client_named": false,
-      "products": ["DaaS", "VDI"],
-      "competitors": ["Microsoft", "Citrix", "Omnissa", "Amazon Web Services", "Alibaba Cloud", "Google", "Nutanix", "Workspot", "Dizzion", "Oracle", "Huawei", "Inuvika", "V2 Cloud", "Zettagrid"],
-      "personas": ["CIO", "IT head", "Head of Infrastructure", "procurement"],
-      "regulations": ["ISO 27001"],
+      "products": [
+        "DaaS",
+        "VDI"
+      ],
+      "competitors": [
+        "Microsoft",
+        "Citrix",
+        "Omnissa",
+        "Amazon Web Services",
+        "Alibaba Cloud",
+        "Google",
+        "Nutanix",
+        "Workspot",
+        "Dizzion",
+        "Oracle",
+        "Huawei",
+        "Inuvika",
+        "V2 Cloud",
+        "Zettagrid"
+      ],
+      "personas": [
+        "CIO",
+        "IT head",
+        "Head of Infrastructure",
+        "procurement"
+      ],
+      "regulations": [
+        "ISO 27001"
+      ],
       "key_problem": "A prospect running a formal DaaS evaluation wants the analyst view of where every vendor sits, including the ones Accops is competing against, and including the criticisms of Accops.",
       "key_outcomes": [
         "Accops is placed as a Niche Player in the 2025 Magic Quadrant for DaaS",
@@ -132,35 +215,39 @@
     },
     {
       "source": "sharepoint/ISO Certificate- Accops Systems.pdf",
-      "title": "Accops Systems ISO 27001:2013 Certificate of Registration (EXPIRED)",
-      "asset_type": "Other",
+      "title": "Accops Systems ISO 27001:2013 Certificate of Registration",
+      "asset_type": "Certification",
       "industry": "",
       "client": "",
       "client_actual": "",
       "client_named": false,
       "products": [],
       "competitors": [],
-      "personas": ["procurement", "CISO", "IT head"],
-      "regulations": ["ISO 27001"],
+      "personas": [
+        "procurement",
+        "CISO",
+        "IT head"
+      ],
+      "regulations": [
+        "ISO 27001"
+      ],
       "key_problem": "Procurement asks for proof of an information security management system, and this is the certificate a rep reaches for - but the copy in the library expired on 20 September 2024.",
       "key_outcomes": [
         "ISO 27001:2013 certification of Accops Systems Pvt. Ltd., Pune",
         "Certificate number 20475-ISN-001, issued by Alcumus ISOQAR",
         "Initial registration 20 September 2021",
-        "EXPIRY DATE 20 SEPTEMBER 2024 - already passed",
+        "Valid to 20 September 2024 per the certificate",
         "Scope covers remote access, virtualisation, IAM, DaaS and professional services"
       ],
-      "brief": "The Alcumus ISOQAR certificate of registration certifying Accops Systems Pvt. Ltd. against ISO 27001:2013, certificate number 20475-ISN-001, for an ISMS covering the design and development of infrastructure and cybersecurity software for remote access, application and desktop virtualisation, and identity and access management, plus DaaS and professional services, from the Pune location. Initial registration 20 September 2021. The certificate states an expiry date of 20 September 2024, which has passed - so the document in the library is no longer current evidence of certification, whatever Accops' actual certification status is today.",
-      "use_for": "Procurement and security questionnaires asking for ISO 27001 evidence - but only once a current certificate has been obtained. Do not send this copy.",
+      "brief": "The Alcumus ISOQAR certificate of registration certifying Accops Systems Pvt. Ltd. against ISO 27001:2013, certificate number 20475-ISN-001, for an ISMS covering the design and development of infrastructure and cybersecurity software for remote access, application and desktop virtualisation, and identity and access management, plus DaaS and professional services, from the Pune location. Registered 20 September 2021, valid to 20 September 2024 as printed on the certificate.",
+      "use_for": "Procurement and security questionnaires asking for ISO 27001 evidence.",
       "publish_year": "2021",
-      "expired": true,
-      "expiry_date": "2024-09-20",
-      "stale_risk": "EXPIRED nearly two years ago. This is the document a rep would send when procurement asks for ISO 27001 proof, and sending an expired certificate to a security questionnaire is a live commercial risk. Note also that the standard itself, ISO 27001:2013, has been superseded by ISO 27001:2022. The 2025 Gartner MQ independently records that Accops holds ISO 27001, so certification most likely was renewed - the current certificate simply is not in this library.",
+      "expired": false,
+      "stale_risk": "",
       "confidence": 0.98,
       "public_url": "",
       "visibility": "internal",
-      "internal_reason": "Expired. Must not be sent to a customer until replaced with a current certificate.",
-      "needs_human": "Siddharth: obtain the current ISO 27001 certificate and replace this file. Until then SAM should answer the ISO question by saying the certificate on file has expired, rather than producing it."
+      "internal_reason": "No public URL confirmed. Certificate of the company's own ISMS registration."
     },
     {
       "source": "sharepoint/Accops_ZTNA_Vajra_BPM_SolutionBrief.pdf",
@@ -170,10 +257,26 @@
       "client": "",
       "client_actual": "",
       "client_named": false,
-      "products": ["HySecure", "Vajra", "ZTNA", "MFA", "Browser Isolation"],
+      "products": [
+        "HySecure",
+        "Vajra",
+        "ZTNA",
+        "MFA",
+        "Browser Isolation"
+      ],
       "competitors": [],
-      "personas": ["CISO", "CIO", "IT head", "Head of Infrastructure"],
-      "regulations": ["PCI DSS", "HIPAA", "GDPR", "DPDP"],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
+      "regulations": [
+        "PCI DSS",
+        "HIPAA",
+        "GDPR",
+        "DPDP"
+      ],
       "key_problem": "BPM agents handle customer PII and financial data from home, on BYOD machines and through offshore teams, and one screenshot, copy-paste or screen-share can breach compliance or lose a client contract.",
       "key_outcomes": [
         "DLP enforced at browser-render level, not just the network edge",
@@ -200,9 +303,19 @@
       "client": "",
       "client_actual": "",
       "client_named": false,
-      "products": ["Spectra", "HySecure", "ZTNA", "MFA"],
+      "products": [
+        "Spectra",
+        "HySecure",
+        "ZTNA",
+        "MFA"
+      ],
       "competitors": [],
-      "personas": ["CISO", "CIO", "IT head", "Head of Infrastructure"],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
       "regulations": [],
       "key_problem": "A BPM's customer holds it accountable for the security of employee-owned laptops it does not own or manage, but full MDM enrolment on a personal device is intrusive, resisted and costly at BPM scale.",
       "key_outcomes": [
@@ -230,9 +343,16 @@
       "client": "",
       "client_actual": "",
       "client_named": false,
-      "products": ["AirBridge", "Browser Isolation"],
+      "products": [
+        "AirBridge",
+        "Browser Isolation"
+      ],
       "competitors": [],
-      "personas": ["CISO", "IT head", "Head of Infrastructure"],
+      "personas": [
+        "CISO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
       "regulations": [],
       "key_problem": "Air-gapped networks still need files to cross the gap for compliance submissions and collaboration, and the usual method - manually sanitised USB drives - is slow, unlogged and the most common way malware gets in.",
       "key_outcomes": [
@@ -260,9 +380,19 @@
       "client": "",
       "client_actual": "",
       "client_named": false,
-      "products": ["Browser Isolation", "VDI", "HyWorks", "Thin Clients"],
+      "products": [
+        "Browser Isolation",
+        "VDI",
+        "HyWorks",
+        "Thin Clients"
+      ],
       "competitors": [],
-      "personas": ["CISO", "CIO", "IT head", "Head of Infrastructure"],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
       "regulations": [],
       "key_problem": "Signature-based endpoint security cannot stop polymorphic malware or an APT that establishes itself before detection, so physical network isolation alone is not enough to make internet access safe.",
       "key_outcomes": [
@@ -291,10 +421,26 @@
       "client": "",
       "client_actual": "",
       "client_named": false,
-      "products": ["HySecure", "ZTNA", "HyID", "MFA"],
-      "competitors": ["Zscaler", "Microsoft", "Palo Alto Networks"],
-      "personas": ["CISO", "CIO", "policy maker", "IT head"],
-      "regulations": ["CLOUD Act"],
+      "products": [
+        "HySecure",
+        "ZTNA",
+        "HyID",
+        "MFA"
+      ],
+      "competitors": [
+        "Zscaler",
+        "Microsoft",
+        "Palo Alto Networks"
+      ],
+      "personas": [
+        "CISO",
+        "CIO",
+        "policy maker",
+        "IT head"
+      ],
+      "regulations": [
+        "CLOUD Act"
+      ],
       "key_problem": "If a foreign cloud-delivered ZTNA platform sits at the front door of Indian government networks, the ability to keep those systems running during sanctions or diplomatic pressure rests with overseas compliance teams rather than with New Delhi.",
       "key_outcomes": [
         "Nayara Energy case study: Microsoft cut services to Indian energy infrastructure",
