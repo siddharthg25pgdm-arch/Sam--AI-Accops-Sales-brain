@@ -9,15 +9,18 @@
 SAM is live at https://sam-accops.vercel.app. Every channel works: web chat, WhatsApp, REST, MCP.
 Teams is the only unbuilt one and Siddharth has deferred it.
 
+**Updated 8 September 2026.**
+
 | | |
 |---|---|
 | Registry | 874 SharePoint rows, live |
-| Answerable | 700 assets after merge and dedupe |
-| With a working link | 648 |
-| Cards from real documents | 7 (3 case studies, 4 product brochures) |
-| Assets with a publication date | 7, up from 0 |
-| Eval | **86% hit@3** against an 85% threshold |
+| Answerable | 702 assets after merge and dedupe |
+| With a working link | 650 |
+| Cards from real documents | **34**, in Supabase and read by every channel |
+| Assets with a publication date | 34, read from the document body not the filename |
+| Eval | **89% hit@3** against an 85% threshold, up from 86% |
 | Power Automate | create/modify flow proven writing; delete trigger never fires |
+| Nightly cron | `web/vercel.json`, 02:30 UTC - **reports only, does not reconcile** |
 
 Read `docs/ROADMAP.md` first - it is verified against the deployed app rather than restating a plan.
 
@@ -61,6 +64,25 @@ banner when it has not run in 36 hours.
 > cannot see anything. Closing this needs the same Graph access the whole Conditional Access block
 > covers, which is a Siddharth/IT item, not a code one.
 
+## What changed on 8 September
+
+Carding, then wiring it in. All 27 documents in `docs/demo-corpus.md` are carded (34 cards with the
+7 from the public bucket), loaded into `sam_asset_cards`, and merged into every channel's answers.
+
+Three things worth knowing because they change what SAM says:
+
+- **The ISO 27001 certificate expired on 20 September 2024** and is exactly what a rep sends when
+  procurement asks. Asking SAM for it now returns "EXPIRED on 2024-09-20 - do not send".
+- **The 2025 Gartner MQ places Accops as a Niche Player** and records that Accops holds ISO 27001 and
+  no other compliance certificates. That is the sourced answer to "do we have a SOC 2 report?" - no.
+- **`2026-06-11-Accops vs other VDI providers.pptx` is dated 29 NOV 2022** on its own title slide.
+  The filename is a SharePoint touch date. SAM now reports 2022 and marks it stale, which is why
+  publication year had to be read from the document body rather than inferred.
+
+The system prompt had also gone stale in a way that was actively suppressing correct answers: it
+told the model Accops has **no decks or battlecards** (there are 552 decks and 8 competitive assets)
+and that **nothing has a public link** (7 carded assets are sendable). Both fixed.
+
 ## What needs Siddharth, not Claude
 
 1. **Replace the 20 `[modelled]` eval questions** in `docs/eval-set.md` with real asks. The honest way
@@ -71,6 +93,17 @@ banner when it has not run in 36 hours.
 3. **The other 29 S3 filenames.** `downloads.accops.com` is publicly readable per object but listing
    is 403. Only 14 of 43 names are known. `aws s3 ls s3://downloads.accops.com/ --recursive` gets the
    rest, and every match becomes a direct-PDF public link.
+4. **A current ISO 27001 certificate.** The one in the library expired 20 September 2024, and it is
+   what procurement asks for. Gartner independently records that Accops holds ISO 27001, so it was
+   almost certainly renewed - the current certificate is simply not in Sales Collateral. Drop the new
+   file in and re-run `python prototype/extract_text.py` then the carding step.
+5. **Add `CRON_SECRET` to the Vercel project.** Any random 16+ character string. Vercel then sends it
+   as `Authorization: Bearer <value>` on every cron run, and `/api/cron/sharepoint` stops being
+   publicly readable. It exposes aggregate counts only, so this is tidiness rather than urgency.
+6. **A production API token, if the model side needs verifying.** The system-prompt changes have not
+   been exercised against a real model - the local runtime has no model key and falls back to
+   retrieval-only. Ask SAM in production for the ISO certificate: the answer should say it has
+   expired rather than offer it.
 
 ## The carding boundary, which must not drift
 
