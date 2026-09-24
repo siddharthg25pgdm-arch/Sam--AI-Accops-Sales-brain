@@ -1,5 +1,5 @@
 import raw from "@/data/asset_cards.json";
-import { registryAssets } from "./registry-cache";
+import { registryAssets, safeLink } from "./registry-cache";
 import { cardAssets, cardMeta } from "./cards-cache";
 
 export type AssetFile = {
@@ -388,7 +388,7 @@ export function slim(a: Asset): SlimAsset {
   return {
     key: assetKey(a), title: a.title, type: typeGroup(a), asset_type: a.asset_type, industry: a.industry, vertical: verticalOf(a),
     products: productsOf(a), use_for: a.use_for, brief: a.brief || a.key_problem || "", year: yearOf(a), modified: a.file?.modified ?? null,
-    stale: isStale(a), visibility: a.public_url ? "public" : "internal", link: assetLink(a), location: assetLocation(a), ext: a.file?.ext ?? null,
+    stale: isStale(a), visibility: a.public_url ? "public" : "internal", link: assetLink(a), trust: trustNote(a), location: assetLocation(a), ext: a.file?.ext ?? null,
     pages: a.file?.pages ?? null, inventoried: a.inventory_id !== null,
   };
 }
@@ -412,7 +412,13 @@ export function slim(a: Asset): SlimAsset {
  *  and the caller prints assetLocation() instead. */
 export function assetLink(a: Asset): string | null {
   if (a.public_url) return a.public_url;
-  return verified(a) ? a.sharepoint_url : null;
+  return internalLink(a);
+}
+
+/** The verified SharePoint link on its own, whether or not a public one exists. Needs an Accops login;
+ *  never to be forwarded outside Accops. Null when the only URL on file was constructed. */
+export function internalLink(a: Asset): string | null {
+  return verified(a) && a.sharepoint_url ? safeLink(a.sharepoint_url) : null;
 }
 
 /** Where to find the document when there is no link: filename, and the folder it sits in.

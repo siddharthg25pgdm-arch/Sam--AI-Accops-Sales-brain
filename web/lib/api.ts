@@ -1,6 +1,6 @@
 /** Shared handlers behind both the REST routes (/api/v1/*) and the MCP tools (/api/mcp).
  *  One implementation, two transports, so the Dwight extension and an MCP client see identical behaviour. */
-import { searchAssets, allAssets, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, trustNote, assetLink, assetLocation, VERTICALS, type Asset } from "./cards";
+import { searchAssets, allAssets, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, trustNote, assetLink, assetLocation, internalLink, VERTICALS, type Asset } from "./cards";
 import { ask as askAgent, type AskResult } from "./agent";
 import { logEvent, recentEvents, realOnly } from "./events";
 
@@ -12,6 +12,8 @@ export function card(a: Asset, why?: string) {
     products: a.products, use_for: a.use_for, brief: (a.brief || a.key_problem || "").slice(0, 400), key_outcomes: a.key_outcomes.slice(0, 5),
     year: yearOf(a), stale: isStale(a), trust: trustNote(a), pages: a.file?.pages ?? null, file_path: a.file?.path ?? null,
     visibility: a.public_url ? "public" : "internal", public_url: a.public_url, location: assetLocation(a),
+    // Separate from public_url on purpose: this one needs an Accops login and must never be forwarded.
+    internal_link: internalLink(a),
     shareable_externally: Boolean(a.public_url), ...(why ? { why_match: why } : {}),
   };
 }

@@ -11,13 +11,15 @@ import { VERTICALS, PRODUCTS } from "@/lib/cards";
 export const maxDuration = 60;
 
 const text = (v: unknown) => ({ content: [{ type: "text" as const, text: JSON.stringify(v, null, 2) }] });
-// The SDK puts the verified AuthInfo on the handler context; the exact context type is not exported, so read it defensively.
-const who = (extra: unknown) => (extra as { authInfo?: { clientId?: string } })?.authInfo?.clientId ?? "mcp-anonymous";
+// withMcpAuth sets req.auth, mcp-handler passes it to the SDK as fetch(req, { authInfo }), and SDK v2
+// hands it to tools as ctx.http.authInfo - NOT ctx.authInfo, which is where v1 put it and where this
+// used to look, so every authenticated call was logged as mcp-anonymous.
+const who = (ctx: { http?: { authInfo?: { clientId?: string } } }) => ctx.http?.authInfo?.clientId ?? "mcp-anonymous";
 
 const handler = createMcpHandler((server) => {
   server.registerTool("search_assets", {
     title: "Search collateral",
-    description: "Search Accops sales and marketing collateral (case studies, whitepapers) with optional filters. Returns ranked asset cards with why each matched, visibility (internal/public) and links. Use audience=external to get only assets safe to send outside Accops.",
+    description: "Search Accops sales and marketing collateral (case studies, whitepapers) with optional filters. Returns ranked asset cards with why each matched, visibility (internal/public), public_url (sendable) and internal_link (SharePoint, needs an Accops login, never forward outside Accops). Use audience=external to get only assets safe to send outside Accops.",
     inputSchema: z.object({
       query: z.string().describe("Plain-language need: use case, competitor, regulator, persona"),
       vertical: z.enum(Object.keys(VERTICALS) as [string, ...string[]]).optional(),
@@ -45,7 +47,7 @@ const handler = createMcpHandler((server) => {
 
   server.registerTool("public_link", {
     title: "Get public link",
-    description: "Given an asset title or file path, return its public URL if one exists, or status private_only with the internal SharePoint link and a note not to forward it externally.",
+    description: "Given an asset title or file path, return its public URL if one exists, or status private_only with where it sits in SharePoint (filename and folder) and a note not to forward it externally. For the SharePoint link itself, use internal_link from search_assets - internal only.",
     inputSchema: z.object({ asset: z.string().describe("Asset title or file path from a previous result") }),
     annotations: { readOnlyHint: true, openWorldHint: false },
   }, async ({ asset }) => text(apiPublicLink(asset)));
