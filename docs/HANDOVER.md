@@ -1,6 +1,38 @@
 # Handover: next session
 
-**Written 7 September 2026.** Paste the prompt at the bottom into a fresh session.
+**Written 7 September 2026, updated 25 September 2026.** Paste the prompt at the bottom into a fresh session.
+The 25 September section below supersedes anything older it contradicts.
+
+---
+
+## 25 September 2026: state after one long session
+
+Scope is fixed: SAM is Accops' sales & marketing brain. Siddharth said explicitly not to widen it to
+other departments. The website chatbot is P8, the last phase: see `NOTE-website-chatbot.md`.
+
+| | |
+|---|---|
+| Answer quality, real model | **89% hit@3** in the paced production eval (was 64% this morning). The two remaining non-content misses were fixed after that run and verified individually; a full re-run would project 27/28. The one remaining miss (Q8) is a genuine gap: no public government VDI asset |
+| Invented documents | **0**: a code-enforced grounding guard (`finish()` in `web/lib/agent.ts`). `prototype/eval.mjs` also fails the run on any ungrounded name |
+| How answers work now | The rep's own words are always searched first (`seedSearch`, the "retrieval floor"), handed to the model as a tool result; the model can add up to 2 searches; the last round is forced to answer. Audience (internal/external) is decided server-side. A denial that names no document is a gap with no cards |
+| Tokens per question | ~1,260 (was ~5-6k) |
+| Groq capacity | **Real ceiling.** `gpt-oss-120b` hits a tokens-per-DAY limit; 25 Sep testing exhausted it and `gpt-oss-20b` (the automatic fallback, `OPENAI_COMPAT_FALLBACK_MODEL`) answered most of the final eval, scoring 89% itself. Expect ~150 questions/day on 120b before the fallback takes over |
+| Dashboard | `/admin` rebuilt: Overview, Usage, Quality, Content, System, Conversations. Aggregates come from Postgres (`sam_dashboard` RPC, `docs/supabase-sam-observability.sql`). Test traffic excluded by default: `is_test` column, `x-sam-test: 1` header, `SAM_TEST_USERS` (default `dwight-test,dwight-siddharth`), and anything from `next dev` |
+| Error logging | Every question records `error_kind` (provider_error, fallback_retrieval, timeout, empty_answer, step_exhausted, server_error), `model`, `answer`, `result_titles`. Rates count only `schema_version = 2` rows |
+| Real usage | Still ~1 person. Nobody but Siddharth has used SAM; the demo to reps has not happened |
+| Carding queue | `sam_carding_queue` view + `GET /api/v1/carding-queue`: 367 files need a card, including 2 new since 8 Sep |
+| Renames | Cards are bound to the registry `item_id` by `load_cards.py`, so a SharePoint rename no longer splits a card from its link |
+| Deletions | `POST /api/channels/sharepoint/snapshot` (guarded: refuses empty, truncated, capped or <90% listings). Power Automate flow "SAM - daily SharePoint snapshot" (`7fe4a4f0-301a-43b3-8c47-928752f4f822`) exists but is **STOPPED with a placeholder secret**: Siddharth must paste it (`TASK-snapshot-flow.md`), then run report mode, then switch to write |
+| Registry cleanup | 209 rows under `_to_delete` folders archived; temp/shortcut/CSV files no longer answer. 511 answerable assets |
+
+**Needs Siddharth:**
+1. Paste the webhook secret into the snapshot flow (1 minute; `TASK-snapshot-flow.md`).
+2. The production web password no longer matches `web/.env.deploy.local`, so no agent could test the chat UI as a logged-in user in production. Sign in once; update the file if Claude should run browser tests.
+3. What is `Company Certifications/SOC-Accops.pdf`? One model run called it "SOC 2 compliance"; the Gartner card says ISO 27001 only.
+4. Run the rep demo (`DEMO-SCRIPT.md`): real questions are what the eval, feedback and gap reports need. Space questions ~30 s apart and avoid heavy testing the same day (Groq's daily limit).
+5. Optional: `NO_PRICING` in `web/lib/agent.ts` says "check with your sales manager"; replace with whoever owns pricing.
+
+**For Claude:** the Vercel CLI token on this laptop has expired (`vercel login`); verify deploys by behaviour instead (the trace step "the rep's own words" proves the current build). Check scripts: `node web/lib/{agent,cards,metrics,snapshot}.check.mjs`. Paced eval: `SAM_API_TOKEN=... node prototype/eval.mjs` (~11 min).
 
 ---
 
