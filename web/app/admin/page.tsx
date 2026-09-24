@@ -188,9 +188,9 @@ async function DeletionBanner() {
   if (ageH !== null && ageH <= 36) return null;
   return (
     <div className="notice">
-      Deleted files were last checked {ageH === null ? "never" : `${Math.round(ageH)} hours ago`}. The SharePoint delete
-      trigger needs a site-collection-admin connection, so deletions are caught by a reconcile instead:
-      run <code>python prototype/sp_reconcile.py --write</code>. Until then SAM may still point people at files that have gone.
+      Deleted files were last checked {ageH === null ? "never" : `${Math.round(ageH)} hours ago`}. Deletions are caught by
+      the daily Power Automate flow <b>SAM - daily SharePoint snapshot</b>, and only a run in write mode counts as a
+      check. Until one succeeds, SAM may still point people at files that have gone. Setup: <code>docs/TASK-snapshot-flow.md</code>.
     </div>
   );
 }
@@ -490,7 +490,7 @@ async function System({ includeTest }: { includeTest: boolean }) {
       note: "The Power Automate flow writes a registry row whenever a file is added or changed. Weeks of silence usually means the flow is off, not that nobody changed anything." },
     { name: "Deletion check", state: delAgeH === null || delAgeH > 36 ? "bad" : "ok",
       value: sync?.last_run ? `Last run ${fmtTime(sync.last_run)} (${ago(sync.last_run)})` : "Never run",
-      note: <>{sync?.last_result ? <>Result: {sync.last_result}. </> : null}Deletions are caught by <code>prototype/sp_reconcile.py</code>, which is blocked while Microsoft Graph is behind Conditional Access. Stale after 36 hours.</> },
+      note: <>{sync?.last_result ? <>Result: {sync.last_result}. </> : null}Deletions are caught by the daily Power Automate snapshot flow; report-mode and refused runs show a result here but do not count as a check. Stale after 36 hours.</> },
     { name: "Registry cache", state: reg.count ? "ok" : "bad", value: `${num(reg.count)} rows`, note: reg.loadedAt ? `Loaded ${fmtTime(new Date(reg.loadedAt).toISOString())} on this server instance` : "Not loaded" },
     { name: "Card cache", state: cards.count ? "ok" : "bad", value: `${num(cards.count)} cards`, note: cards.loadedAt ? `Loaded ${fmtTime(new Date(cards.loadedAt).toISOString())} on this server instance` : "Not loaded" },
   ];
