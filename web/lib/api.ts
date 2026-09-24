@@ -3,6 +3,7 @@
 import { searchAssets, allAssets, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, trustNote, assetLink, assetLocation, internalLink, VERTICALS, type Asset } from "./cards";
 import { ask as askAgent, type AskResult } from "./agent";
 import { logEvent, recentEvents, realOnly } from "./events";
+import { ready } from "./registry-cache";
 
 export type Channel = "web" | "api" | "mcp" | "whatsapp";
 
@@ -20,6 +21,9 @@ export function card(a: Asset, why?: string) {
 
 export async function apiSearch(p: { query?: string; asset_type?: string; vertical?: string; product?: string; audience?: "internal" | "external"; limit?: number }, who: string, channel: Channel) {
   const t0 = Date.now();
+  // Every channel's search comes through here, so this is where a cold instance waits for the
+  // library. Only /api/ask used to, and the first REST search after a deploy ranked 66 assets, not 513.
+  await ready();
   const { results, considered } = searchAssets({ ...p, limit: Math.min(Math.max(p.limit ?? 5, 1), 10) });
   // runtime "search" latency is excluded from every latency figure: it is an in-memory ranking, not a
   // model round trip, and mixing the two made p50 look like 156 ms.
@@ -36,7 +40,9 @@ export async function apiSearch(p: { query?: string; asset_type?: string; vertic
 export async function askAndLog(question: string, who: string, channel: Channel, history: { role: "user" | "assistant"; content: string }[] = [], sessionId?: string | null) {
   const t0 = Date.now();
   let r: AskResult;
-  try { r = await askAgent(question, history); }
+  // Same as apiSearch: web, REST, MCP and WhatsApp all ask through here, so all of them wait for a
+  // cold library. Returns at once when warm.
+  try { await ready(); r = await askAgent(question, history); }
   catch (err) {
     await logEvent({ user_id: who, channel, session_id: sessionId ?? null, kind: "query", query: question, intent: "other", result_count: 0,
       latency_ms: Date.now() - t0, error_kind: "server_error", error_detail: (err as Error)?.stack ?? String(err) });
