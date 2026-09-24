@@ -113,4 +113,7 @@ assert.ok(titles("Accops vs Omega").every(t => /omega/i.test(t)), "accops and vs
 assert.ok(titles("pharma").includes("Zeta pharmaceutical brochure"), "long tokens prefix-match");
 assert.ok(titles("zeta brochures").includes("Zeta pharmaceutical brochure"), "plural type word still matches");
 
+// 9. A Deck filter includes battlecards (a battlecard is a deck to a rep).
+assert.ok(searchAssets({ query: "omega", asset_type: "Deck", limit: 10 }).results.some(r => r.asset.title === "Zeta vs Omega"), "deck filter keeps battlecards");
+
 console.log("cards.check: ok");

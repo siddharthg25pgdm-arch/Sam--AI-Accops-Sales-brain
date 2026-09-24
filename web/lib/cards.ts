@@ -318,7 +318,11 @@ export function searchAssets(args: SearchArgs): { results: SearchHit[]; consider
   const out: SearchHit[] = [];
   const pool = allAssets();
   for (const a of pool) {
-    if (args.asset_type && typeGroup(a).toLowerCase() !== args.asset_type.toLowerCase() && !a.asset_type.toLowerCase().includes(args.asset_type.toLowerCase())) continue;
+    // A battlecard IS a deck to a rep: "which deck has the Citrix comparison?" filtered to Deck and
+    // dropped both Citrix battlecards, answering with a licensing spreadsheet-deck instead.
+    const wantType = args.asset_type?.toLowerCase();
+    if (wantType && typeGroup(a).toLowerCase() !== wantType && !a.asset_type.toLowerCase().includes(wantType)
+        && !(wantType === "deck" && typeGroup(a) === "Battlecard")) continue;
     if (args.vertical && verticalOf(a).toLowerCase() !== args.vertical.toLowerCase()) continue;
     if (args.product && !productsOf(a).some(p => p.toLowerCase() === args.product!.toLowerCase())) continue;
     if (args.audience === "external" && !a.public_url) continue;
