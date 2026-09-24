@@ -11,6 +11,7 @@
 import crypto from "node:crypto";
 import { apiAsk } from "./api";
 import { logEvent } from "./events";
+import { heuristicFilters } from "./agent";
 
 const GRAPH = "https://graph.facebook.com/v21.0";
 
@@ -89,10 +90,13 @@ export async function markRead(messageId: string) {
     body: JSON.stringify({ messaging_product: "whatsapp", status: "read", message_id: messageId, typing_indicator: { type: "text" } }) }).catch(() => {});
 }
 
-/** Render SAM's answer for a phone: verdict, then at most three assets, public links first, private links marked. */
-export function renderForWhatsApp(answer: string, assets: { title: string; link: string | null; location: string | null; visibility: string; why: string; year: string | null; trust?: string | null }[], gap: boolean): string {
+/** Render SAM's answer for a phone: verdict, then at most three assets, private links marked.
+ *  Public assets go first only when the rep is asking for something to SEND (publicFirst). Otherwise
+ *  relevance order stands: for "iso certificate" a weakly matching public datasheet used to outrank
+ *  the certificate itself, just because it happened to be public. */
+export function renderForWhatsApp(answer: string, assets: { title: string; link: string | null; location: string | null; visibility: string; why: string; year: string | null; trust?: string | null }[], gap: boolean, publicFirst = false): string {
   const lines = [answer.trim()];
-  const ordered = [...assets].sort((a, b) => Number(b.visibility === "public") - Number(a.visibility === "public")).slice(0, 3);
+  const ordered = (publicFirst ? [...assets].sort((a, b) => Number(b.visibility === "public") - Number(a.visibility === "public")) : [...assets]).slice(0, 3);
   ordered.forEach((a, i) => {
     // A link only when we have a real one - see assetLink() in lib/cards.ts, which returns the public URL
     // when there is one and otherwise the verified SharePoint link. Label by visibility: an internal
@@ -127,7 +131,7 @@ export async function handleInbound(m: InboundText): Promise<void> {
   // non-empty means the same one continuing. Derived rather than stored, so there is no second
   // piece of state to keep in step with the window - and it resets exactly when context does.
   const r = await apiAsk(m.text, user, "whatsapp", history, sessionFor(m.from, h.length === 0));
-  const body = renderForWhatsApp(r.answer, r.assets, r.gap);
+  const body = renderForWhatsApp(r.answer, r.assets, r.gap, heuristicFilters(m.text).audience === "external");
   h.push({ role: "user", content: m.text, at: Date.now() }, { role: "assistant", content: r.answer, at: Date.now() });
   hist.set(m.from, h.slice(-8));
   await sendText(m.from, body);
