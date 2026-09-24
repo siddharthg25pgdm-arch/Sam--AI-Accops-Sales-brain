@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import type { SlimAsset, Facets, Gap } from "@/lib/types";
+import { TrustNote } from "./Chat";
 
 type View = "all" | "latest" | "missing";
 
@@ -115,9 +116,10 @@ function Doc({ a }: { a: SlimAsset }) {
         <div className="tags">
           <span className={`tag ${a.visibility}`}>{a.visibility === "public" ? "Public link" : "Internal only"}</span>
           {!a.link && a.location && <span className="tag where">{a.location}</span>}
-          {a.stale && <span className="tag stale">Older than 2 years</span>}
+          {a.stale && !a.trust && <span className="tag stale">Older than 2 years</span>}
           {!a.inventoried && <span className="tag gap">Not in inventory</span>}
         </div>
+        <TrustNote note={a.trust} />
       </div>
     </Wrap>
   );
