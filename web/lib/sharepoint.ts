@@ -310,7 +310,21 @@ export async function cardRows(limit = 2000): Promise<CardRow[]> {
   return (await rest(`sam_asset_cards?select=${CARD_COLS}&limit=${limit}&order=source`)) as CardRow[];
 }
 
-export type SyncRow = { scope: string; last_run: string | null; last_result: string | null };
+export type CardingQueueRow = {
+  item_id: string; filename: string; folder: string; web_url: string;
+  modified_at: string | null; modified_by: string | null;
+  reason: "uncarded" | "changed_since_card" | "renamed"; card_updated_at: string | null;
+};
+
+/** Files that need a card written or re-checked: the sam_carding_queue view (docs/supabase-sam-carding-queue.sql).
+ *  Newest change first, so a carding session starts with what just moved. */
+export async function cardingQueue(reason?: string, limit = 2000): Promise<CardingQueueRow[]> {
+  if (!configured()) return [];
+  const f = reason ? `reason=eq.${encodeURIComponent(reason)}&` : "";
+  return (await rest(`sam_carding_queue?${f}select=*&order=modified_at.desc.nullslast&limit=${limit}`)) as CardingQueueRow[];
+}
+
+export type SyncRow ={ scope: string; last_run: string | null; last_result: string | null };
 
 /** When deletions were last reconciled.
  *
