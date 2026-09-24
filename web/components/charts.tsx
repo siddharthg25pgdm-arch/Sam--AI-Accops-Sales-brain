@@ -11,11 +11,12 @@ const nf = new Intl.NumberFormat("en-IN");
 export const num = (n: number | null | undefined) => (n == null ? "–" : nf.format(n));
 export const ms = (v: number | null | undefined) => (v == null ? "–" : v >= 1000 ? `${(v / 1000).toFixed(1)} s` : `${v} ms`);
 
-/** Round up to 1, 2 or 5 x 10^k so axis ticks are clean numbers. */
+/** Round up to a clean step x 10^k, fine-grained enough that the tallest bar fills most of the plot. */
 function niceMax(v: number) {
   if (v <= 1) return 1;
   const p = 10 ** Math.floor(Math.log10(v)), m = v / p;
-  return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p;
+  // Only steps whose half is a whole number, because the middle gridline is labelled.
+  return ([1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10].find(s => m <= s && Number.isInteger((s * p) / 2)) ?? 10) * p;
 }
 
 export function Sparkline({ values, label }: { values: number[]; label: string }) {

@@ -359,7 +359,7 @@ function Quality({ d }: { d: Dashboard }) {
         </Section>
       </div>
 
-      <Section title="Runtime and model" sub="Which path wrote each answer. Before 25 Sep 2026 the Groq path was logged as “claude”, so older rows under Claude may be Groq.">
+      <Section title="Runtime and model" sub="Which path wrote each answer. Releases before 25 Sep 2026 logged the Groq path as “claude”, so Claude rows with no model may be Groq.">
         {d.runtime.length === 0 ? <Empty>No questions in this period.</Empty> : (
           <table><thead><tr><th>Runtime</th><th>Model</th><th className="r">Questions</th><th className="r">p50</th></tr></thead>
             <tbody>{d.runtime.map(x => <tr key={`${x.runtime}-${x.model}`}><td>{RUNTIMES[x.runtime] ?? x.runtime}</td><td>{x.model ?? "–"}</td><td className="r">{x.n}</td><td className="r">{ms(x.p50)}</td></tr>)}</tbody></table>
@@ -523,6 +523,7 @@ async function Conversations({ sp, days, includeTest, href }: { sp: SP; days: nu
   await ready();
   const titleOf = new Map<string, string>();
   for (const a of allAssets()) if (a.file?.path) titleOf.set(a.file.path, a.title);
+  const tu = testUsers();
   const FILTERS: [ConvFilter, string][] = [["all", "All"], ["errors", "Errors"], ["fallbacks", "Fallbacks"], ["gaps", "Gaps"]];
   return (
     <>
@@ -550,7 +551,7 @@ async function Conversations({ sp, days, includeTest, href }: { sp: SP; days: nu
                     <span className="tnum">{fmtTime(r.created_at)}</span><span>{r.user_id}</span><span>{channelName(r.channel)}</span>
                     <span>{r.model ?? RUNTIMES[r.runtime ?? "unknown"] ?? r.runtime}</span>
                     {r.latency_ms != null && r.runtime !== "search" && <span className="tnum">{ms(r.latency_ms)}</span>}
-                    {r.is_test && <span className="pill">test</span>}
+                    {(r.is_test || tu.includes(r.user_id.toLowerCase())) && <span className="pill">test</span>}
                     <span className="spacer" />
                     {r.error_kind && <span className="pill bad">{r.error_kind.replace(/_/g, " ")}</span>}
                     {gap && <span className="pill warn">gap</span>}
@@ -562,7 +563,7 @@ async function Conversations({ sp, days, includeTest, href }: { sp: SP; days: nu
                     r.answer.length > 240
                       ? <details className="ca"><summary>{r.answer.slice(0, 240)}…</summary><p>{r.answer}</p></details>
                       : <p className="ca">{r.answer}</p>
-                  ) : <p className="ca muted">{(r.schema_version ?? 0) >= 2 ? "No answer text (catalogue search)." : "Answer text was not stored before 25 Sep 2026."}</p>}
+                  ) : <p className="ca muted">{(r.schema_version ?? 0) >= 2 ? "No answer text (catalogue search)." : "No answer text: logged by a release that did not record it."}</p>}
                   {titles.length > 0 && <ul className="cassets">{titles.map((t, i) => <li key={i}>{t}</li>)}</ul>}
                   {r.error_detail && <code className="detail block">{r.error_detail}</code>}
                 </li>

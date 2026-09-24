@@ -101,9 +101,12 @@ export async function ask(question: string, history: { role: "user" | "assistant
   const t0 = Date.now(), deadline = t0 + MODEL_BUDGET_MS;
   const failures: { model: string; message: string; timeout: boolean }[] = [];
   const failed = (model: string, err: unknown) => {
-    const e = err as Error;
+    const e = err as Error & { cause?: { code?: string; message?: string } };
     console.error(`${model} failed, falling back`, e);
-    failures.push({ model, message: e?.message ?? String(err), timeout: e?.name === "TimeoutError" || e?.name === "APIConnectionTimeoutError" || /timed? ?out/i.test(e?.message ?? "") });
+    // fetch() reports network failures as a bare "fetch failed"; the reason is on .cause.
+    const cause = e?.cause ? `${e.cause.code ?? ""} ${e.cause.message ?? ""}`.trim() : "";
+    const message = [e?.message ?? String(err), cause].filter(Boolean).join(": ");
+    failures.push({ model, message, timeout: e?.name === "TimeoutError" || e?.name === "APIConnectionTimeoutError" || /time(d)? ?out/i.test(message) });
   };
   // A model that answers after an earlier provider failed keeps its own error if it has one (an
   // empty answer outranks a recovered outage); otherwise the recovered failure is what gets recorded.

@@ -31,7 +31,7 @@ for (const [scheme, width, only] of [["light", 1440, null], ["dark", 1440, null]
     if (only && !only.includes(t)) continue;
     await page.goto(`${base}/admin?tab=${t}${extra ? `&${extra}` : ""}`);
     await page.waitForSelector(".dash");
-    await page.screenshot({ path: `${out}/${t}-${scheme}-${width}.png`, fullPage: true });
+    await page.screenshot({ path: `${out}/${t}-${scheme}-${width}.png`, fullPage: width > 500 });
   }
   await ctx.close();
 }
