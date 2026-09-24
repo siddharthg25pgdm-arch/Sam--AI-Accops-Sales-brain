@@ -294,11 +294,14 @@ export type CardRow = {
   publish_year: string | null; expired: boolean; expiry_date: string | null;
   stale_risk: string; superseded_by: string; visibility: string; internal_reason: string;
   public_url: string; confidence: number; needs_human: string; batch: string;
+  /** The registry row this card was written for, bound by load_cards.py. Survives a rename, which
+   *  the filename does not - see allAssets(). Null when no single live row could be resolved. */
+  item_id: string | null;
 };
 
 const CARD_COLS = "source,filename,title,asset_type,industry,client,products,competitors,personas," +
   "regulations,key_problem,key_outcomes,brief,use_for,publish_year,expired,expiry_date,stale_risk," +
-  "superseded_by,visibility,internal_reason,public_url,confidence,needs_human,batch";
+  "superseded_by,visibility,internal_reason,public_url,confidence,needs_human,batch,item_id";
 
 /** Every asset card. Explicit column list rather than select=*, so client_actual cannot arrive by
  *  accident when someone adds a column later. */
@@ -307,7 +310,21 @@ export async function cardRows(limit = 2000): Promise<CardRow[]> {
   return (await rest(`sam_asset_cards?select=${CARD_COLS}&limit=${limit}&order=source`)) as CardRow[];
 }
 
-export type SyncRow = { scope: string; last_run: string | null; last_result: string | null };
+export type CardingQueueRow = {
+  item_id: string; filename: string; folder: string; web_url: string;
+  modified_at: string | null; modified_by: string | null;
+  reason: "uncarded" | "changed_since_card" | "renamed"; card_updated_at: string | null;
+};
+
+/** Files that need a card written or re-checked: the sam_carding_queue view (docs/supabase-sam-carding-queue.sql).
+ *  Newest change first, so a carding session starts with what just moved. */
+export async function cardingQueue(reason?: string, limit = 2000): Promise<CardingQueueRow[]> {
+  if (!configured()) return [];
+  const f = reason ? `reason=eq.${encodeURIComponent(reason)}&` : "";
+  return (await rest(`sam_carding_queue?${f}select=*&order=modified_at.desc.nullslast&limit=${limit}`)) as CardingQueueRow[];
+}
+
+export type SyncRow ={ scope: string; last_run: string | null; last_result: string | null };
 
 /** When deletions were last reconciled.
  *
@@ -321,4 +338,133 @@ export async function syncStatus(scope = "sales"): Promise<SyncRow | null> {
   if (!configured()) return null;
   const rows = (await rest(`sam_sharepoint_sync?scope=eq.${scope}&select=scope,last_run,last_result`)) as SyncRow[] | null;
   return rows?.[0] ?? null;
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * Deletion reconcile from a Power Automate snapshot.
+ *
+ * The delete trigger never fires without site-collection-admin, and sp_reconcile.py's Graph walk is
+ * blocked by Conditional Access. What still works is Siddharth's own SharePoint connection in Power
+ * Automate, so a daily flow lists every file under the scope root ("Get files (properties only)",
+ * nested, paginated) and POSTs the list here. Rows whose list item id is missing from it are gone.
+ *
+ * The danger is the one sp_reconcile.py already walked into on 8 September: a listing that FAILED
+ * looks exactly like "everything was deleted", and it reported 874 of 874 rows to tombstone. So a
+ * snapshot has to prove it is whole before absence is allowed to mean anything, and every guard
+ * below refuses rather than guesses. Soft delete only, list_item_id only (exact, stable across
+ * rename and move - never filename), and a row that reappears is restored.
+ * ------------------------------------------------------------------------------------------- */
+
+export type SnapshotFile = { id?: number | string; name?: string; path?: string; isFolder?: boolean | string };
+export type Snapshot = {
+  scope?: string; mode?: "report" | "write";
+  /** Set by the flow only when "Get files" ran with pagination on. Absent or false = refuse. */
+  complete?: boolean;
+  /** length() of the raw listing inside the flow, before it was serialised. A mismatch means the
+   *  body was truncated on the way here. */
+  count?: number;
+  files?: SnapshotFile[];
+};
+export type SnapRow = { item_id: string; list_item_id: number | null; folder: string; filename: string; deleted: boolean };
+export type SnapshotDiff = {
+  refused: string | null;
+  listed: number; live: number; matched: number; unverifiable: number;
+  tombstone: SnapRow[]; restore: SnapRow[]; unknown: SnapshotFile[];
+};
+
+const truthy = (v: unknown) => v === true || v === "true" || v === "True";
+/** At least this share of live rows must be present in the snapshot, by count and by id. */
+const MIN_SHARE = 0.9;
+/** Power Automate's pagination limit on this licence ("Maximum: 5000", from the flow save error).
+ *  A listing that reaches it may have been cut off silently, and count would still match. */
+const PAGE_CAP = 5000;
+
+/** Pure: what a snapshot would change, or why it must not be trusted. No IO - the check exercises it. */
+export function diffSnapshot(rows: SnapRow[], snap: Snapshot): SnapshotDiff {
+  const raw = Array.isArray(snap.files) ? snap.files : [];
+  const files = raw.filter(f => !truthy(f.isFolder));
+  const ids = new Set<number>();
+  let badIds = 0;
+  for (const f of files) {
+    const n = num(f.id);
+    if (n == null) badIds++; else ids.add(n);
+  }
+  const live = rows.filter(r => !r.deleted);
+  const checkable = live.filter(r => r.list_item_id != null);
+  const tombstone = checkable.filter(r => !ids.has(r.list_item_id!));
+  const restore = rows.filter(r => r.deleted && r.list_item_id != null && ids.has(r.list_item_id));
+  const known = new Set(rows.map(r => r.list_item_id).filter((n): n is number => n != null));
+  const out: SnapshotDiff = {
+    refused: null, listed: ids.size, live: live.length, matched: checkable.length - tombstone.length,
+    // Rows with no list item id can never be proven gone, so they are never tombstoned here.
+    unverifiable: live.length - checkable.length,
+    tombstone, restore,
+    // In SharePoint but not in the registry: files the change flow missed. Reported, not added.
+    unknown: files.filter(f => { const n = num(f.id); return n != null && !known.has(n); }),
+  };
+  const refuse = (why: string) => ({ ...out, refused: why });
+  if (!Array.isArray(snap.files)) return refuse("no files array");
+  if (!files.length) return refuse("snapshot lists 0 files - a failed listing, not an empty library");
+  if (!truthy(snap.complete)) return refuse("snapshot not marked complete (pagination must be on in the flow)");
+  if (snap.count == null || Number(snap.count) !== raw.length) {
+    return refuse(`count ${snap.count ?? "missing"} does not match ${raw.length} items received - truncated or unverifiable`);
+  }
+  if (raw.length >= PAGE_CAP) return refuse(`listing reached the ${PAGE_CAP}-item pagination cap - may be cut off`);
+  if (badIds) return refuse(`${badIds} file(s) have no numeric list item id - the flow's field mapping is wrong`);
+  if (ids.size < MIN_SHARE * live.length) {
+    return refuse(`snapshot lists ${ids.size} files but the registry has ${live.length} live - under ${MIN_SHARE * 100}%, so assume a partial listing`);
+  }
+  if (checkable.length && out.matched < MIN_SHARE * checkable.length) {
+    return refuse(`only ${out.matched} of ${checkable.length} live rows found by id - more than ${Math.round((1 - MIN_SHARE) * 100)}% would be tombstoned, so assume the wrong folder or library`);
+  }
+  return out;
+}
+
+const brief = (r: SnapRow) => ({ item_id: r.item_id, list_item_id: r.list_item_id, folder: r.folder, filename: r.filename });
+
+/** Diff a snapshot against the registry and, in write mode with every guard passed, apply it.
+ *
+ *  sam_sharepoint_sync is stamped on every run: last_result always (so a refusal is visible on the
+ *  dashboard), last_run only when deletions were actually applied. last_run drives the "deletions
+ *  not checked in 36 hours" banner, and a report-mode or refused run has not removed a single dead
+ *  link - stamping it would be the green-but-broken signal this project keeps getting caught by. */
+export async function applySnapshot(snap: Snapshot) {
+  const scope = snap.scope || "sales";
+  const mode = snap.mode === "write" ? "write" : "report";
+  const rows = (await rest(`sam_sharepoint_files?scope=eq.${encodeURIComponent(scope)}` +
+    `&select=item_id,list_item_id,folder,filename,deleted&limit=5000`)) as SnapRow[];
+  const d = diffSnapshot(rows ?? [], snap);
+  const now = new Date().toISOString();
+
+  let applied = false;
+  if (!d.refused && mode === "write") {
+    const idList = (xs: SnapRow[]) => xs.map(r => r.list_item_id).join(",");
+    if (d.tombstone.length) {
+      await rest(`sam_sharepoint_files?scope=eq.${encodeURIComponent(scope)}&deleted=is.false&list_item_id=in.(${idList(d.tombstone)})`, {
+        method: "PATCH", body: JSON.stringify({ deleted: true, deleted_at: now }),
+      });
+    }
+    if (d.restore.length) {
+      await rest(`sam_sharepoint_files?scope=eq.${encodeURIComponent(scope)}&deleted=is.true&list_item_id=in.(${idList(d.restore)})`, {
+        method: "PATCH", body: JSON.stringify({ deleted: false, deleted_at: null }),
+      });
+    }
+    applied = true;
+  }
+
+  const result = d.refused
+    ? `snapshot ${mode} REFUSED: ${d.refused}`
+    : `snapshot ${mode}: ${d.tombstone.length} ${applied ? "tombstoned" : "would tombstone"}, ` +
+      `${d.restore.length} ${applied ? "restored" : "would restore"}, ${d.listed} listed, ${d.unknown.length} unknown`;
+  await rest(`sam_sharepoint_sync?scope=eq.${encodeURIComponent(scope)}`, {
+    method: "PATCH", body: JSON.stringify(applied ? { last_run: now, last_result: result } : { last_result: result }),
+  });
+
+  return {
+    ok: !d.refused, mode, applied, refused: d.refused, result,
+    listed: d.listed, live: d.live, matched: d.matched, unverifiable: d.unverifiable,
+    tombstone_count: d.tombstone.length, tombstone: d.tombstone.slice(0, 100).map(brief),
+    restore_count: d.restore.length, restore: d.restore.slice(0, 100).map(brief),
+    unknown_count: d.unknown.length, unknown: d.unknown.slice(0, 50),
+  };
 }

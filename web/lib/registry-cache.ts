@@ -61,6 +61,8 @@ export function rowToAsset(r: RegistryRow): Asset {
     // The whole point of the registry. Verified against Graph, never constructed - unlike the 71
     // URLs in asset_cards.json, which were invented against the wrong tenant and all 404.
     sharepoint_url: safeLink(r.web_url),
+    // Stable across rename; bound cards merge on it (allAssets).
+    item_id: r.item_id,
   };
 }
 

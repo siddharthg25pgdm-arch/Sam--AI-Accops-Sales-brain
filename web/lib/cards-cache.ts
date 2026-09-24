@@ -67,6 +67,8 @@ export function cardToAsset(r: CardRow): Asset {
     sharepoint_url: null,
     // Provenance, set once here. allAssets() trusts this over the path, which it rewrites.
     carded: true,
+    // The registry row this card was bound to at load time; allAssets() merges on it.
+    item_id: r.item_id ?? undefined,
   };
 }
 
@@ -98,7 +100,11 @@ export async function refreshCards(): Promise<number> {
   try {
     const rows = await cardRows(2000);
     g.__samCards = rows.map(cardToAsset);
-    g.__samCardMeta = new Map(rows.map(r => [r.filename.toLowerCase(), r]));
+    // Two keys per card: `id:<item_id>` survives a rename, the filename covers unbound cards.
+    g.__samCardMeta = new Map(rows.flatMap(r => [
+      [r.filename.toLowerCase(), r] as [string, CardRow],
+      ...(r.item_id ? [[`id:${r.item_id}`, r] as [string, CardRow]] : []),
+    ]));
     g.__samCardsAt = Date.now();
     return g.__samCards.length;
   } catch (e) {
