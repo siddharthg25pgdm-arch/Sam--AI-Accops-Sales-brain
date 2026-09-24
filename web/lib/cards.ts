@@ -15,6 +15,10 @@ export type Asset = {
    *  through the merge, because the merge rewrites `file.path` to the registry's real folder and
    *  provenance must not depend on a string we deliberately overwrite. */
   carded?: boolean;
+  /** Registry item_id: the row's own on a registry asset, the bound row's on a card. This, not the
+   *  filename, is what joins a card to its file, because a SharePoint rename changes the filename and
+   *  keeps the item_id. */
+  item_id?: string;
 };
 
 const data = raw as unknown as { counts: Record<string, number>; assets: Asset[] };
@@ -86,8 +90,15 @@ function richness(a: Asset): number {
 export function allAssets(): Asset[] {
   const usable = data.assets.filter(a => a.asset_type !== "Data File" && a.asset_type !== "Content Calendar");
   const best = new Map<string, Asset>();
-  for (const a of [...usable, ...registryAssets(), ...cardAssets()]) {
-    const k = dedupeKey(a);
+  const reg = registryAssets();
+  // A bound card merges under its registry row's CURRENT key, not its own filename. Keyed by filename
+  // alone, a rename split one document into two entries: the card with the description and no link,
+  // and the bare row with the link. Using the row's key (rather than matching item_id directly) keeps
+  // PDF/PPTX twins collapsing exactly as dedupeKey already does. An unbound card - or one whose row
+  // has gone - falls back to its filename, which is the old behaviour.
+  const regKey = new Map(reg.filter(a => a.item_id).map(a => [a.item_id!, dedupeKey(a)]));
+  for (const a of [...usable, ...reg, ...cardAssets()]) {
+    const k = (a.carded && a.item_id && regKey.get(a.item_id)) || dedupeKey(a);
     const seen = best.get(k);
     if (!seen) { best.set(k, a); continue; }
     const winner = richness(a) > richness(seen) ? a : seen;
@@ -110,6 +121,9 @@ export function allAssets(): Asset[] {
     best.set(k, {
       ...winner,
       carded: winner.carded || other.carded,
+      // The card's binding when there is one, so trustNote() still finds the card's expiry after the
+      // merge rewrote file.path to the registry's (possibly renamed) filename.
+      item_id: (carded(winner) ? winner.item_id : carded(other) ? other.item_id : undefined) ?? winner.item_id ?? other.item_id,
       section: filed,
       sharepoint_url: verified(winner) ? winner.sharepoint_url : (verified(other) ? other.sharepoint_url : winner.sharepoint_url),
       // A public URL is a fact wherever it came from, and it is what makes an asset sendable.
@@ -204,7 +218,9 @@ export function isStale(a: Asset): boolean {
 const DATED_RECORD = new Set(["Certification", "Certificate", "Award", "Analyst Report"]);
 
 export function trustNote(a: Asset): string | null {
-  const m = cardMeta().get((a.file?.path ?? "").split("/").pop()?.toLowerCase() ?? "");
+  const meta = cardMeta();
+  const m = (a.item_id ? meta.get(`id:${a.item_id}`) : undefined)
+    ?? meta.get((a.file?.path ?? "").split("/").pop()?.toLowerCase() ?? "");
   if (m?.expired) {
     return `EXPIRED${m.expiry_date ? ` on ${m.expiry_date}` : ""} - do not send. ${m.needs_human || ""}`.trim();
   }

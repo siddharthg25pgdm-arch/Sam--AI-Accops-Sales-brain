@@ -294,11 +294,14 @@ export type CardRow = {
   publish_year: string | null; expired: boolean; expiry_date: string | null;
   stale_risk: string; superseded_by: string; visibility: string; internal_reason: string;
   public_url: string; confidence: number; needs_human: string; batch: string;
+  /** The registry row this card was written for, bound by load_cards.py. Survives a rename, which
+   *  the filename does not - see allAssets(). Null when no single live row could be resolved. */
+  item_id: string | null;
 };
 
 const CARD_COLS = "source,filename,title,asset_type,industry,client,products,competitors,personas," +
   "regulations,key_problem,key_outcomes,brief,use_for,publish_year,expired,expiry_date,stale_risk," +
-  "superseded_by,visibility,internal_reason,public_url,confidence,needs_human,batch";
+  "superseded_by,visibility,internal_reason,public_url,confidence,needs_human,batch,item_id";
 
 /** Every asset card. Explicit column list rather than select=*, so client_actual cannot arrive by
  *  accident when someone adds a column later. */
