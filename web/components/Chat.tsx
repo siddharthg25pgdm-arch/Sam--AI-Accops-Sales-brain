@@ -82,6 +82,20 @@ function Answer({ turn, onBrowse }: { turn: ChatTurn; onBrowse: (f: { vertical?:
   );
 }
 
+/** The asset's trust warning (EXPIRED, a newer edition, age), shown on the card itself so a rep sees it
+ *  whether or not the model repeated it. Red for EXPIRED, amber otherwise. Renders nothing when null. */
+export function TrustNote({ note }: { note?: string | null }) {
+  if (!note) return null;
+  const hard = /^EXPIRED/.test(note);
+  return (
+    <div role="note" style={{ marginTop: 6, padding: "4px 8px", borderRadius: 6, fontSize: 12.5, lineHeight: 1.35,
+      color: hard ? "var(--red)" : "var(--amber)", background: hard ? "var(--red-soft)" : "var(--amber-soft)" }}>
+      {/* An EXPIRED note already says "do not send"; only the softer ones get a label. */}
+      {!hard && <b style={{ display: "inline", fontSize: "inherit" }}>Check first: </b>}{note}
+    </div>
+  );
+}
+
 function ResultCard({ a, eventId }: { a: ChatAsset; eventId?: number | null }) {
   const type = a.asset_type.toLowerCase().includes("case") ? "Case Study" : a.asset_type.toLowerCase().includes("white") ? "Whitepaper" : "Other";
   function opened() { fetch("/api/open", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: a.path, source: "chat", eventId }) }); }
@@ -92,10 +106,11 @@ function ResultCard({ a, eventId }: { a: ChatAsset; eventId?: number | null }) {
         <b>{a.title}</b>
         <small>{a.asset_type}{a.industry ? ` · ${a.industry}` : ""}{a.year ? ` · ${a.year}` : ""}</small>
         <div className="why">{a.why}</div>
+        <TrustNote note={a.trust} />
       </div>
       <div className="side">
         <span className={`tag ${a.visibility === "public" ? "public" : "internal"}`}>{a.visibility === "public" ? "Public link" : "Internal only"}</span>
-        {a.stale && <span className="tag stale">Older than 2 years</span>}
+        {a.stale && !a.trust && <span className="tag stale">Older than 2 years</span>}
         {a.link ? <a className="open" href={a.link} target="_blank" rel="noreferrer" onClick={opened}>Open</a> : <span className="where" title={a.location ?? undefined}>{a.location ? `In SharePoint: ${a.location}` : "Search SharePoint by title"}</span>}
       </div>
     </div>

@@ -1,5 +1,5 @@
 import raw from "@/data/asset_cards.json";
-import { registryAssets } from "./registry-cache";
+import { registryAssets, safeLink } from "./registry-cache";
 import { cardAssets, cardMeta } from "./cards-cache";
 
 export type AssetFile = {
@@ -100,47 +100,72 @@ export function allAssets(): Asset[] {
   for (const a of [...usable, ...reg, ...cardAssets()]) {
     const k = (a.carded && a.item_id && regKey.get(a.item_id)) || dedupeKey(a);
     const seen = best.get(k);
-    if (!seen) { best.set(k, a); continue; }
-    const winner = richness(a) > richness(seen) ? a : seen;
-    const other = winner === a ? seen : a;
-    // Whichever wins, a verified SharePoint link and a real date beat their absence. verified()
-    // is true only for registry-sourced URLs, so a constructed one can never overwrite a real one.
-    //
-    // The year is the same kind of question - provenance, not precedence. A carded year was read
-    // out of the document body; a registry year is inferred from the filename or created date, and
-    // is ALWAYS set, so `winner.year ?? other.year` would let a guess beat a fact whenever the
-    // registry row won on richness. "2026-06-11-Accops vs other VDI providers.pptx" is dated
-    // 29 NOV 2022 on its own title slide: the filename is a SharePoint touch, four years out.
-    const dated = carded(winner) ? winner : (carded(other) ? other : null);
-    // A card's `section` is its corpus prefix - "sharepoint" or "public" - which is where the FILE
-    // sits on disk, not where the document lives in SharePoint. The registry knows the real folder
-    // ("Competition/VDI and DaaS"), and that is what a rep needs to be told, so keep the real one.
-    const filed = !carded(winner) && winner.section ? winner.section
-                : !carded(other) && other.section ? other.section
-                : winner.section;
-    best.set(k, {
-      ...winner,
-      carded: winner.carded || other.carded,
-      // The card's binding when there is one, so trustNote() still finds the card's expiry after the
-      // merge rewrote file.path to the registry's (possibly renamed) filename.
-      item_id: (carded(winner) ? winner.item_id : carded(other) ? other.item_id : undefined) ?? winner.item_id ?? other.item_id,
-      section: filed,
-      sharepoint_url: verified(winner) ? winner.sharepoint_url : (verified(other) ? other.sharepoint_url : winner.sharepoint_url),
-      // A public URL is a fact wherever it came from, and it is what makes an asset sendable.
-      public_url: winner.public_url ?? other.public_url,
-      file: winner.file && other.file
-        ? {
-            ...winner.file,
-            // Keep the registry's real folder path too - it is what assetLocation() prints and what
-            // searchAssets() matches on, so "Competition" stays a findable word.
-            path: carded(winner) && other.file.path ? other.file.path : winner.file.path,
-            year: dated?.file?.year ?? winner.file.year ?? other.file.year,
-            modified: winner.file.modified ?? other.file.modified,
-          }
-        : (winner.file ?? other.file),
-    });
+    best.set(k, seen ? merge(seen, a) : a);
   }
-  return [...best.values()];
+  // Second pass: one public URL is one document, whatever the files are called. "Accops BFSI
+  // Integrated Case Study" and "Two Leading Indian Private Banks" are the same downloads.accops.com
+  // PDF under two titles (a hand-written card and a carded re-read of the V2 file), so a "BFSI case
+  // study to send" answer spent two of its three slots on it. Runs AFTER the filename pass so PDF/PPTX
+  // twins and item_id bindings have already merged and just ride along.
+  const byUrl = new Map<string, Asset>();
+  for (const [k, a] of best) {
+    const u = publicKey(a.public_url);
+    const key = u ? `url:${u}` : k;
+    const seen = byUrl.get(key);
+    byUrl.set(key, seen ? merge(seen, a) : a);
+  }
+  return [...byUrl.values()];
+}
+
+/** A public URL reduced to what identifies the document: no scheme, query, fragment, trailing slash,
+ *  case or percent-encoding. */
+function publicKey(url: string | null): string | null {
+  if (!url) return null;
+  let u = url.trim();
+  try { u = decodeURI(u); } catch { /* keep as is */ }
+  return u.toLowerCase().replace(/^https?:\/\//, "").replace(/[?#].*$/, "").replace(/\/+$/, "") || null;
+}
+
+/** Two assets that are the same document -> one. */
+function merge(seen: Asset, a: Asset): Asset {
+  const winner = richness(a) > richness(seen) ? a : seen;
+  const other = winner === a ? seen : a;
+  // Whichever wins, a verified SharePoint link and a real date beat their absence. verified()
+  // is true only for registry-sourced URLs, so a constructed one can never overwrite a real one.
+  //
+  // The year is the same kind of question - provenance, not precedence. A carded year was read
+  // out of the document body; a registry year is inferred from the filename or created date, and
+  // is ALWAYS set, so `winner.year ?? other.year` would let a guess beat a fact whenever the
+  // registry row won on richness. "2026-06-11-Accops vs other VDI providers.pptx" is dated
+  // 29 NOV 2022 on its own title slide: the filename is a SharePoint touch, four years out.
+  const dated = carded(winner) ? winner : (carded(other) ? other : null);
+  // A card's `section` is its corpus prefix - "sharepoint" or "public" - which is where the FILE
+  // sits on disk, not where the document lives in SharePoint. The registry knows the real folder
+  // ("Competition/VDI and DaaS"), and that is what a rep needs to be told, so keep the real one.
+  const filed = !carded(winner) && winner.section ? winner.section
+              : !carded(other) && other.section ? other.section
+              : winner.section;
+  return {
+    ...winner,
+    carded: winner.carded || other.carded,
+    // The card's binding when there is one, so trustNote() still finds the card's expiry after the
+    // merge rewrote file.path to the registry's (possibly renamed) filename.
+    item_id: (carded(winner) ? winner.item_id : carded(other) ? other.item_id : undefined) ?? winner.item_id ?? other.item_id,
+    section: filed,
+    sharepoint_url: verified(winner) ? winner.sharepoint_url : (verified(other) ? other.sharepoint_url : winner.sharepoint_url),
+    // A public URL is a fact wherever it came from, and it is what makes an asset sendable.
+    public_url: winner.public_url ?? other.public_url,
+    file: winner.file && other.file
+      ? {
+          ...winner.file,
+          // Keep the registry's real folder path too - it is what assetLocation() prints and what
+          // searchAssets() matches on, so "Competition" stays a findable word.
+          path: carded(winner) && other.file.path ? other.file.path : winner.file.path,
+          year: dated?.file?.year ?? winner.file.year ?? other.file.year,
+          modified: winner.file.modified ?? other.file.modified,
+        }
+      : (winner.file ?? other.file),
+  };
 }
 
 /** A SharePoint URL is trustworthy only if it came from Graph. The registry writes the real tenant;
@@ -248,10 +273,48 @@ export function blob(a: Asset): string {
 export type SearchArgs = { query?: string; asset_type?: string; vertical?: string; product?: string; audience?: "internal" | "external"; limit?: number };
 export type SearchHit = { asset: Asset; score: number; why: string };
 
+// Words that carry no retrieval signal. "accops" is in nearly every blob, so "Accops vs Forcepoint"
+// matched the whole library on it; "vs"/"versus" and question words likewise.
+const STOP = new Set(["the", "for", "and", "with", "need", "want", "any", "have", "our", "case", "study", "studies", "whitepaper",
+  "please", "pls", "can", "you", "find", "give", "send", "show", "accops", "vs", "versus", "what", "which", "does", "about",
+  "something", "anything", "from", "that", "this", "some", "latest", "newest", "recent", "current"]);
+// Words naming a KIND of document. They still score (typeHit below depends on them), but an asset
+// matching only these has matched nothing the rep asked about: "do we have a SOC 2 report" should
+// not return every analyst report. When a query is nothing but type words ("decks"), they qualify.
+const TYPE_WORDS = /^(deck|datasheet|brochure|battlecard|report|presentation|slides?|ebook|webinar|competitive)s?$/;
+// Two-letter words worth keeping; everything else that short is noise ("a", "we", "do").
+const SHORT_KEEP = new Set(["ai"]);
+
+/** Query -> tokens. A 1-2 digit number joins the word before it, so "SOC 2" is the phrase "soc 2"
+ *  rather than "soc" (which then found social-media banners) with the "2" thrown away. */
+export function queryTokens(query: string): string[] {
+  const words = (query.toLowerCase().match(/[a-z0-9][a-z0-9.+]*/g) ?? []).map(w => w.replace(/\.+$/, ""));
+  const out: string[] = [];
+  for (const w of words) {
+    if (/^\d{1,2}$/.test(w) && out.length && /[a-z]$/.test(out[out.length - 1])) { out[out.length - 1] += ` ${w}`; continue; }
+    if ((w.length > 2 || SHORT_KEEP.has(w)) && !STOP.has(w)) out.push(w);
+  }
+  return out;
+}
+
+/** Word-start matcher for one token. Substring matching let "soc" hit "Social-Media-Banners".
+ *  Now a token must start a word; short tokens (<=4) must also END it, allowing plural/-ing
+ *  ("bank" -> "banking"), while longer ones prefix-match ("pharma" -> "pharmaceutical"). A letter
+ *  followed by a digit is a boundary, so "iso" still finds "iso27001". Phrase spaces match space,
+ *  hyphen, underscore or nothing: "soc 2" finds "SOC 2", "SOC-2" and "SOC2". */
+export function tokenMatcher(t: string): RegExp {
+  // A long token prefix-matches anyway, so drop a plural "s" and "decks" finds "Deck" ("access" keeps its "ss").
+  if (t.length >= 5 && /[^s]s$/.test(t)) t = t.slice(0, -1);
+  const body = t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "[\\s_-]?");
+  const end = /\d$/.test(t) ? "(?!\\d)" : t.length >= 5 ? "" : "(?:s|es|ing|ed)?(?![a-z])";
+  return new RegExp(`(?<![a-z0-9])${body}${end}`);
+}
+
 export function searchAssets(args: SearchArgs): { results: SearchHit[]; considered: number } {
-  const q = (args.query ?? "").toLowerCase().trim();
-  const stop = new Set(["the", "for", "and", "with", "need", "want", "any", "have", "our", "case", "study", "studies", "whitepaper", "please", "pls", "can", "you", "find", "give", "send", "show"]);
-  const tokens = (q.match(/[a-z0-9][a-z0-9.+-]*/g) ?? []).filter(t => t.length > 2 && !stop.has(t));
+  const tokens = queryTokens(args.query ?? "");
+  const res = tokens.map(tokenMatcher);
+  const content = tokens.map(t => !TYPE_WORDS.test(t));
+  const onlyTypes = !content.some(Boolean);
   const out: SearchHit[] = [];
   const pool = allAssets();
   for (const a of pool) {
@@ -259,9 +322,10 @@ export function searchAssets(args: SearchArgs): { results: SearchHit[]; consider
     if (args.vertical && verticalOf(a).toLowerCase() !== args.vertical.toLowerCase()) continue;
     if (args.product && !productsOf(a).some(p => p.toLowerCase() === args.product!.toLowerCase())) continue;
     if (args.audience === "external" && !a.public_url) continue;
-    const b = blob(a);
-    const hits = tokens.filter(t => b.includes(t));
-    const titleHits = tokens.filter(t => a.title.toLowerCase().includes(t)).length;
+    const b = blob(a), title = a.title.toLowerCase();
+    const hit = res.map(r => r.test(b));
+    const hits = tokens.filter((_, i) => hit[i]);
+    const titleHits = res.filter(r => r.test(title)).length;
     const fresh = isStale(a) ? 0 : 0.4;
     // Matching EVERY token is a different kind of answer from matching one of them, and the old
     // flat score could not say so. "hysecure datasheet" over 702 assets returned a government
@@ -277,7 +341,7 @@ export function searchAssets(args: SearchArgs): { results: SearchHit[]; consider
     const typeToken = tokens.some(t => typeGroup(a).toLowerCase().includes(t) || a.asset_type.toLowerCase().includes(t));
     const typeHit = typeToken && hits.length > 1 ? 3 : 0;
     const score = hits.length * 2 + titleHits * 1.5 + complete + typeHit + fresh;
-    if (tokens.length && hits.length === 0) continue;
+    if (tokens.length && !hit.some((h, i) => h && (content[i] || onlyTypes))) continue;
     out.push({ asset: a, score, why: hits.length ? `matched ${hits.slice(0, 5).join(", ")}` : "matched your filters" });
   }
   out.sort((x, y) => y.score - x.score || (yearOf(y.asset) ?? "").localeCompare(yearOf(x.asset) ?? ""));
@@ -324,7 +388,7 @@ export function slim(a: Asset): SlimAsset {
   return {
     key: assetKey(a), title: a.title, type: typeGroup(a), asset_type: a.asset_type, industry: a.industry, vertical: verticalOf(a),
     products: productsOf(a), use_for: a.use_for, brief: a.brief || a.key_problem || "", year: yearOf(a), modified: a.file?.modified ?? null,
-    stale: isStale(a), visibility: a.public_url ? "public" : "internal", link: assetLink(a), location: assetLocation(a), ext: a.file?.ext ?? null,
+    stale: isStale(a), visibility: a.public_url ? "public" : "internal", link: assetLink(a), trust: trustNote(a), location: assetLocation(a), ext: a.file?.ext ?? null,
     pages: a.file?.pages ?? null, inventoried: a.inventory_id !== null,
   };
 }
@@ -348,7 +412,13 @@ export function slim(a: Asset): SlimAsset {
  *  and the caller prints assetLocation() instead. */
 export function assetLink(a: Asset): string | null {
   if (a.public_url) return a.public_url;
-  return verified(a) ? a.sharepoint_url : null;
+  return internalLink(a);
+}
+
+/** The verified SharePoint link on its own, whether or not a public one exists. Needs an Accops login;
+ *  never to be forwarded outside Accops. Null when the only URL on file was constructed. */
+export function internalLink(a: Asset): string | null {
+  return verified(a) && a.sharepoint_url ? safeLink(a.sharepoint_url) : null;
 }
 
 /** Where to find the document when there is no link: filename, and the folder it sits in.

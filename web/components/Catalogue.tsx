@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import type { SlimAsset, Facets, Gap } from "@/lib/types";
+import { TrustNote } from "./Chat";
 
 type View = "all" | "latest" | "missing";
 
@@ -103,7 +104,12 @@ function Wrap({ a, opened, children }: { a: SlimAsset; opened: () => void; child
   return <div className="doc nolink" data-type={a.type} title={a.location ?? undefined}>{children}</div>;
 }
 
+// ponytail: matches trustNote()'s generic age sentence in lib/cards.ts. Half the catalogue carries it,
+// and a box on every other tile drowns the warnings that matter, so that one stays the small tag.
+const GENERIC_AGE = /^Published \d{4}; over two years old/;
+
 function Doc({ a }: { a: SlimAsset }) {
+  const note = a.trust && !GENERIC_AGE.test(a.trust) ? a.trust : null;
   function opened() { fetch("/api/open", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: a.key, source: "catalogue" }) }); }
   return (
     <Wrap a={a} opened={opened}>
@@ -115,9 +121,10 @@ function Doc({ a }: { a: SlimAsset }) {
         <div className="tags">
           <span className={`tag ${a.visibility}`}>{a.visibility === "public" ? "Public link" : "Internal only"}</span>
           {!a.link && a.location && <span className="tag where">{a.location}</span>}
-          {a.stale && <span className="tag stale">Older than 2 years</span>}
+          {a.stale && !note && <span className="tag stale">Older than 2 years</span>}
           {!a.inventoried && <span className="tag gap">Not in inventory</span>}
         </div>
+        <TrustNote note={note} />
       </div>
     </Wrap>
   );

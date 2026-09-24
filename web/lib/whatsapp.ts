@@ -90,14 +90,20 @@ export async function markRead(messageId: string) {
 }
 
 /** Render SAM's answer for a phone: verdict, then at most three assets, public links first, private links marked. */
-export function renderForWhatsApp(answer: string, assets: { title: string; link: string | null; location: string | null; visibility: string; why: string; year: string | null }[], gap: boolean): string {
+export function renderForWhatsApp(answer: string, assets: { title: string; link: string | null; location: string | null; visibility: string; why: string; year: string | null; trust?: string | null }[], gap: boolean): string {
   const lines = [answer.trim()];
   const ordered = [...assets].sort((a, b) => Number(b.visibility === "public") - Number(a.visibility === "public")).slice(0, 3);
   ordered.forEach((a, i) => {
-    // A link only when we have a real one. Until SharePoint ingestion supplies Graph's webUrl, private
-    // assets get a findable location instead of a constructed URL that 404s - see assetLink() in lib/cards.ts.
-    const where = a.link ? `public link: ${a.link}` : a.location ? `in SharePoint: ${a.location}` : "internal only, search SharePoint by title";
-    lines.push(`\n${i + 1}. *${a.title}*${a.year ? ` (${a.year})` : ""}\n${a.why}\n${where}`);
+    // A link only when we have a real one - see assetLink() in lib/cards.ts, which returns the public URL
+    // when there is one and otherwise the verified SharePoint link. Label by visibility: an internal
+    // SharePoint link must never read as something a rep can forward.
+    const where = a.link
+      ? (a.visibility === "public" ? `sendable link: ${a.link}` : `internal link, don't forward: ${a.link}`)
+      : a.location ? `in SharePoint: ${a.location}` : "internal only, search SharePoint by title";
+    // The trust warning goes on the asset itself, not only wherever the model chose to repeat it.
+    // An EXPIRED note already says "do not send", so only the softer notes get a prefix.
+    const trust = a.trust ? `\n_${/^EXPIRED/.test(a.trust) ? "" : "Check first: "}${a.trust}_` : "";
+    lines.push(`\n${i + 1}. *${a.title}*${a.year ? ` (${a.year})` : ""}\n${a.why}${trust}\n${where}`);
   });
   if (ordered.length && ordered.every(a => a.visibility !== "public")) lines.push("\nNone of these has a public version yet. Find it in SharePoint and ask marketing to publish before sending anything to a customer.");
   if (gap) lines.push("\nLogged as a content gap for marketing.");
