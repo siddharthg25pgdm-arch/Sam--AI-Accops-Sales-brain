@@ -47,7 +47,7 @@ export type Dashboard = {
   people: { key: string; questions: number; answered: number; errors: number; opens: number; channels: string[] | null; last_seen: string; first_seen: string | null; top: string | null }[];
   top_questions: { key: string; n: number; people: number; answered: number }[];
   gaps: { kind: string; query: string | null; filters: Record<string, unknown> | null; user_id: string; created_at: string }[];
-  first_event_at: string | null; instrumented_since: string | null;
+  first_event_at: string | null; last_event_at: string | null; instrumented_since: string | null;
 };
 
 export const LATENCY_BUCKETS = ["< 1 s", "1–2 s", "2–4 s", "4–8 s", "8–16 s", "16 s +"];

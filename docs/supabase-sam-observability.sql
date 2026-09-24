@@ -239,6 +239,8 @@ select jsonb_build_object(
   'gaps',       (select coalesce(jsonb_agg(to_jsonb(t)), '[]') from (
       select kind, query, filters, user_id, created_at from ev where per = 'cur' and kind = 'gap' order by created_at desc limit 1000) t),
   'first_event_at', (select min(created_at) from sam_events where not (is_test or user_id = any(p_test_users))),
+  'last_event_at',  (select max(created_at) from sam_events where kind in ('query', 'catalogue_open')
+                       and (p_include_test or not (is_test or user_id = any(p_test_users)))),
   'instrumented_since', (select min(created_at) from sam_events where schema_version >= 2)
 )
 $$;
