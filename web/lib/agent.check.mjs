@@ -112,9 +112,11 @@ ok(namedTitles("The HyID Technical Whitepaper covers it.").includes("HyID Techni
 // 2a. A model that never stops searching: round 4 has tools off, and the rep gets a real answer.
 run([call({ query: "citrix" }), call({ query: "citrix vdi" }), call({ query: "citrix horizon" }), call({ query: "again" })]);
 r = await ask("which deck has the Citrix comparison?");
-ok(bodies.length === 4, `expected 3 search rounds + 1 forced round, got ${bodies.length}`);
-ok(bodies.slice(0, 3).every(b => b.tool_choice === "auto") && bodies[3].tool_choice === "none", "final round forces an answer");
-ok(bodies[3].messages.some(m => m.role === "system" && /budget used/i.test(m.content)), "final round is told why");
+// The seed search (the rep's own words) is the first of the 3, so the model gets 2 searching rounds.
+ok(bodies.length === 3, `expected seed + 2 model search rounds + 1 forced round = 3 calls, got ${bodies.length}`);
+ok(bodies[0].messages.some(m => m.role === "tool" && m.tool_call_id === "seed"), "the model sees the seed search before its first turn");
+ok(bodies.slice(0, 2).every(b => b.tool_choice === "auto") && bodies[2].tool_choice === "none", "final round forces an answer");
+ok(bodies[2].messages.some(m => m.role === "system" && /budget used/i.test(m.content)), "final round is told why");
 ok(!/ran out of steps/i.test(r.text) && r.text.length > 0 && r.assets.length > 0, `no "ran out of steps": ${r.text}`);
 ok(r.error?.kind === "step_exhausted", "still logged as step_exhausted for the dashboard");
 

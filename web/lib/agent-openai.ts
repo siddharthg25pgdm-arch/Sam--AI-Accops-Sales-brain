@@ -11,7 +11,7 @@
  *  "openai-compatible" with the model name - it used to say "claude", which made every dashboard
  *  number about "Claude" actually about Groq. */
 import { VERTICALS, PRODUCTS, type SearchHit } from "./cards";
-import { SYSTEM, ASSET_TYPES, MAX_SEARCHES, BUDGET_USED, runSearch, finish, type AskResult } from "./agent";
+import { SYSTEM, ASSET_TYPES, MAX_SEARCHES, BUDGET_USED, SEED_STEP, runSearch, seedSearch, finish, type AskResult } from "./agent";
 import type { AskError } from "./events";
 
 type Msg = { role: "system" | "user" | "assistant" | "tool"; content: string | null; tool_calls?: ToolCall[]; tool_call_id?: string; name?: string };
@@ -63,7 +63,15 @@ export async function askOpenAICompat(question: string, history: { role: "user" 
   const messages: Msg[] = [{ role: "system", content: SYSTEM }, ...history.slice(-4).map(h => ({ role: h.role, content: h.content }) as Msg), { role: "user", content: question }];
   const trace: AskResult["trace"] = [];
   const pool: SearchHit[] = [];
-  let filters: Record<string, unknown> = {}, calls = 0, tokens = 0;
+  // The retrieval floor (see seedSearch): the rep's own words, searched before the model says anything.
+  const seed = seedSearch(question);
+  if (seed) {
+    pool.push(...seed.hits);
+    trace.push({ step: SEED_STEP, detail: JSON.stringify(seed.input) }, { step: "tool result", detail: `${seed.hits.length} of ${seed.considered} assets${seed.note ? ` - ${seed.note}` : ""}` });
+    messages.push({ role: "assistant", content: null, tool_calls: [{ id: "seed", type: "function", function: { name: "search_assets", arguments: JSON.stringify({ query: question }) } }] },
+      { role: "tool", tool_call_id: "seed", name: "search_assets", content: seed.payload });
+  }
+  let filters: Record<string, unknown> = seed ? { ...seed.input } : {}, calls = seed ? 1 : 0, tokens = 0;
   const done = (text: string, error: AskError | null) => {
     trace.push({ step: "model", detail: `${model} (openai-compatible) · ${((Date.now() - t0) / 1000).toFixed(1)}s · ${tokens} tokens` });
     return finish({ question, text, pool, calls, runtime: "openai-compatible", model, trace, filters, error });

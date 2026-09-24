@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, type SearchHit, type SearchArgs, type Asset } from "./cards";
+import { searchAssets, queryTokens, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, type SearchHit, type SearchArgs, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured, compatModels } from "./agent-openai";
 import { providerFailure, type AskError } from "./events";
 
@@ -28,11 +28,12 @@ workspace vendor: HySecure (ZTNA), HyID (MFA/SSO), HyWorks (VDI/DaaS), HyLabs, H
 
 - Name ONLY documents search_assets returned, by exact title. Never invent a document, client, number or price.
   If nothing returned fits, say so plainly in one sentence.
-- One search in the rep's words is usually enough. Set asset_type only when the rep names a type. The server widens a
-  filter that finds nothing and decides internal vs external from the rep's wording, so never repeat a search reworded.
-  At most 3 searches.
+- A search in the rep's own words has already run; its results are above. Search again only if none of them fit.
+  Set asset_type only when the rep names a type. The server widens a filter that finds nothing and decides internal
+  vs external from the rep's wording, so never repeat a search reworded. At most 2 more searches.
 - The library has case studies, whitepapers, decks, brochures and datasheets, certificates, and competitive battlecards
-  (vs Citrix, VMware Horizon, Omnissa, Zscaler, Cisco AnyConnect and others).
+  (vs Citrix, VMware Horizon, Omnissa, Zscaler, Cisco AnyConnect and others). A battlecard IS a deck: when a rep asks
+  for a deck and a battlecard fits, recommend it as the deck.
 - visibility "public" may be sent outside Accops; "internal" must not leave Accops. Say which.
 - trust is a warning to pass on: EXPIRED means do not send it; a newer edition means recommend that one; an age note
   goes in that asset's line.
@@ -251,6 +252,20 @@ function plainAnswer(cards: AskResult["assets"], question: string): string {
  *    2. The prose names a document no search returned -> the prose is replaced by plainAnswer().
  *    3. Cards come from EVERY search this turn, not just the last (the prose draws on all of them):
  *       the documents the prose names, in its order, then the best of the rest. Max 3. */
+/** The retrieval floor. Plain search on the rep's own words scored 93% hit@3 while the model, left to
+ *  write its own queries and filters, scored 64-71%: it rewrote "public sector bank case study" and
+ *  "proxmox" into searches that missed what the words alone found. So this search always runs first,
+ *  its results go to the model as an already-made tool call, and they join the card pool. The model
+ *  can now only add to what plain search finds, not replace it. */
+export function seedSearch(question: string): SearchRun | null {
+  // Nothing searchable ("hi", "thanks"): an empty query matches the whole library, and a greeting
+  // would come back with three random assets under it.
+  if (!queryTokens(question).length) return null;
+  const f = heuristicFilters(question);
+  return runSearch({ query: question, asset_type: f.asset_type, vertical: f.vertical, product: f.product }, question);
+}
+export const SEED_STEP = "tool call: search_assets (the rep's own words)";
+
 export function finish(p: {
   question: string; text: string; pool: SearchHit[]; calls: number; runtime: AskResult["runtime"]; model: string | null;
   trace: AskResult["trace"]; filters: Record<string, unknown>; error: AskError | null;
@@ -336,7 +351,14 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
   const messages: Anthropic.MessageParam[] = [...history.slice(-4), { role: "user", content: question }];
   const trace: AskResult["trace"] = [];
   const pool: SearchHit[] = [];
-  let filters: Record<string, unknown> = {}, calls = 0;
+  const seed = seedSearch(question);
+  if (seed) {
+    pool.push(...seed.hits);
+    trace.push({ step: SEED_STEP, detail: JSON.stringify(seed.input) }, { step: "tool result", detail: `${seed.hits.length} of ${seed.considered} assets${seed.note ? ` - ${seed.note}` : ""}` });
+    messages.push({ role: "assistant", content: [{ type: "tool_use", id: "seed", name: "search_assets", input: { query: question } }] },
+      { role: "user", content: [{ type: "tool_result", tool_use_id: "seed", content: seed.payload }] });
+  }
+  let filters: Record<string, unknown> = seed ? { ...seed.input } : {}, calls = seed ? 1 : 0;
   // Same shape as askOpenAICompat: up to MAX_SEARCHES searching rounds, then one with tools off.
   for (let round = 0; ; round++) {
     const final = calls >= MAX_SEARCHES || round >= MAX_SEARCHES;
