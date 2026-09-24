@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How SAM works · System map</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #faf7f2; --paper-2: #f2ede4; --ink: #1c1917; --muted: #57534e; --soft: #78716c;
+      --rule: rgba(28,25,23,0.12); --accent: #b5523a; --accent-tint: rgba(181,82,58,0.08); --link: #2563eb;
+      --sans: 'Geist', system-ui, sans-serif; --serif: 'Instrument Serif', 'Times New Roman', serif;
+      --mono: 'Geist Mono', ui-monospace, Menlo, monospace;
+    }
+    body { font-family: var(--sans); background: var(--paper); color: var(--ink); padding: 3rem 2rem; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .eyebrow { font-family: var(--mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.75rem, 3vw + 1rem, 2.5rem); letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 0.5rem; }
+    h2 { font-family: var(--serif); font-weight: 400; font-size: 1.6rem; letter-spacing: -0.01em; margin: 3.5rem 0 0.4rem; }
+    .subtitle, .lede { color: var(--muted); font-size: 1rem; line-height: 1.55; max-width: 72ch; }
+    .lede { margin-bottom: 1.25rem; font-size: 0.95rem; }
+    .diagram { background: var(--paper-2); border: 1px solid var(--rule); border-radius: 8px; padding: 1.5rem; overflow-x: auto; }
+    svg { width: 100%; min-width: 960px; display: block; }
+    .cards { display: grid; gap: 1rem; margin-top: 1.25rem; }
+    .c3 { grid-template-columns: 1.15fr 1fr 0.95fr; }
+    .c2 { grid-template-columns: 1.2fr 1fr; }
+    @media (max-width: 860px) { .c3, .c2 { grid-template-columns: 1fr; } }
+    .card { background: #fff; border: 1px solid var(--rule); border-radius: 6px; padding: 1.25rem; }
+    .card .eyebrow { font-size: 0.55rem; margin-bottom: 0.5rem; }
+    .card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(28,25,23,0.08); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .dot.ink { background: var(--ink); } .dot.muted { background: var(--muted); } .dot.coral { background: var(--accent); } .dot.link { background: var(--link); }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card p, .card li { color: var(--muted); font-size: 0.8125rem; line-height: 1.55; }
+    .card p + p { margin-top: 0.5rem; }
+    .card ul { list-style: none; }
+    .card li { padding-left: 0.875rem; position: relative; margin-bottom: 0.3rem; }
+    .card li::before { content: '—'; position: absolute; left: 0; color: rgba(28,25,23,0.25); font-size: 0.75rem; }
+    .card b { color: var(--ink); font-weight: 600; }
+    code { font-family: var(--mono); font-size: 0.75rem; color: var(--ink); background: rgba(28,25,23,0.05); padding: 0 0.25rem; border-radius: 3px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; margin-top: 1.25rem; font-size: 0.8125rem; }
+    th { font-family: var(--mono); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 0.75rem 1rem; background: var(--paper-2); border-bottom: 1px solid var(--rule); }
+    td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(28,25,23,0.07); color: var(--muted); line-height: 1.5; vertical-align: top; }
+    td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+    tr:last-child td { border-bottom: 0; }
+    .bad { color: var(--accent); font-weight: 500; }
+    .ok { color: var(--ink); }
+    .stats { display: flex; flex-wrap: wrap; gap: 2.5rem; margin-top: 1.25rem; padding: 1rem 1.25rem; border: 1px solid var(--rule); border-radius: 6px; background: #fff; }
+    .stat b { display: block; font-family: var(--serif); font-size: 1.9rem; font-weight: 400; line-height: 1; }
+    .stat span { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .stat.accent b { color: var(--accent); }
+    .footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid rgba(28,25,23,0.10); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <p class="eyebrow">SAM · System map · 24 September 2026</p>
+    <h1>How SAM works</h1>
+    <p class="subtitle">Three views of SAM, traced from the code in <code>web/</code> and <code>prototype/</code> rather than from the design doc. The numbers come from the live database today.</p>
+  </div>
+
+  <!-- ============================================================ 1. BIG PICTURE -->
+  <h2>1 · Two pipelines feed one catalogue</h2>
+  <p class="lede">SAM has two separate sources of knowledge. One updates itself and records <em>where</em> each file is. The other is written by hand and records <em>what the file says</em>. Every answer comes from the two merged together.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1120 452" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="dots1" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.9" fill="rgba(28,25,23,0.10)"/></pattern>
+        <marker id="a1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#57534e"/></marker>
+        <marker id="a1c" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#b5523a"/></marker>
+        <marker id="a1l" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
+      </defs>
+      <rect width="100%" height="100%" fill="#faf7f2"/>
+      <rect width="100%" height="100%" fill="url(#dots1)" opacity="0.55"/>
+
+      <!-- boundary: file bodies -->
+      <rect x="16" y="152" width="432" height="208" rx="8" fill="rgba(181,82,58,0.04)" stroke="rgba(181,82,58,0.5)" stroke-width="1" stroke-dasharray="4,4"/>
+      <text x="32" y="348" fill="#b5523a" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">FILE CONTENTS NEVER LEAVE THIS BOX</text>
+
+      <!-- row eyebrows -->
+      <text x="272" y="60" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">A · AUTOMATIC — WHERE EACH FILE IS, AND ITS LINK</text>
+      <text x="272" y="252" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">B · BY HAND — WHAT EACH FILE SAYS</text>
+
+      <!-- arrows -->
+      <path d="M176 184 H224 V104 H268" fill="none" stroke="#57534e" stroke-width="1.2" marker-end="url(#a1)"/>
+      <line x1="432" y1="104" x2="524" y2="104" stroke="#2563eb" stroke-width="1.2" marker-end="url(#a1l)"/>
+      <path d="M176 216 H224 V296 H268" fill="none" stroke="#57534e" stroke-width="1.2" marker-end="url(#a1)"/>
+      <line x1="432" y1="296" x2="524" y2="296" stroke="#57534e" stroke-width="1.2" marker-end="url(#a1)"/>
+      <path d="M688 104 H736 V192 H780" fill="none" stroke="#57534e" stroke-width="1.2" marker-end="url(#a1)"/>
+      <path d="M688 296 H736 V208 H780" fill="none" stroke="#57534e" stroke-width="1.2" marker-end="url(#a1)"/>
+      <line x1="928" y1="200" x2="956" y2="200" stroke="#57534e" stroke-width="1.2" marker-end="url(#a1)"/>
+      <line x1="1016" y1="232" x2="1016" y2="308" stroke="#2563eb" stroke-width="1.2" marker-end="url(#a1l)"/>
+      <line x1="1048" y1="312" x2="1048" y2="236" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#a1l)"/>
+
+      <!-- arrow labels -->
+      <rect x="196" y="132" width="56" height="12" rx="2" fill="#faf7f2"/>
+      <text x="224" y="141" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">EVERY EDIT</text>
+      <rect x="452" y="88" width="56" height="12" rx="2" fill="#faf7f2"/>
+      <text x="480" y="97" fill="#2563eb" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">WEBHOOK</text>
+      <rect x="184" y="248" width="80" height="12" rx="2" fill="#f7efe7"/>
+      <text x="224" y="257" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">YOU DOWNLOAD</text>
+      <rect x="460" y="280" width="40" height="12" rx="2" fill="#faf7f2"/>
+      <text x="480" y="289" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">LOAD</text>
+      <rect x="696" y="144" width="80" height="12" rx="2" fill="#faf7f2"/>
+      <text x="736" y="153" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">MERGED · 5 MIN</text>
+      <rect x="996" y="264" width="72" height="12" rx="2" fill="#faf7f2"/>
+      <text x="1032" y="273" fill="#2563eb" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">CARDS ONLY</text>
+
+      <!-- SharePoint (external) -->
+      <rect x="32" y="164" width="144" height="72" rx="6" fill="#faf7f2"/>
+      <rect x="32" y="164" width="144" height="72" rx="6" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.30)"/>
+      <rect x="40" y="172" width="28" height="12" rx="2" fill="none" stroke="rgba(28,25,23,0.22)" stroke-width="0.8"/>
+      <text x="54" y="181" fill="#78716c" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">EXT</text>
+      <text x="104" y="208" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">SharePoint</text>
+      <text x="104" y="224" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Sales Collateral · 876</text>
+
+      <!-- Power Automate (backend) -->
+      <rect x="272" y="72" width="160" height="64" rx="6" fill="#fff" stroke="#1c1917"/>
+      <rect x="280" y="80" width="32" height="12" rx="2" fill="none" stroke="rgba(28,25,23,0.40)" stroke-width="0.8"/>
+      <text x="296" y="89" fill="#57534e" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">FLOW</text>
+      <text x="352" y="108" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Power Automate</text>
+      <text x="352" y="124" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">runs on your login</text>
+
+      <!-- Registry (store) -->
+      <rect x="528" y="72" width="160" height="64" rx="6" fill="#faf7f2"/>
+      <rect x="528" y="72" width="160" height="64" rx="6" fill="rgba(28,25,23,0.05)" stroke="#57534e"/>
+      <rect x="536" y="80" width="24" height="12" rx="2" fill="none" stroke="rgba(87,83,78,0.40)" stroke-width="0.8"/>
+      <text x="548" y="89" fill="#57534e" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DB</text>
+      <text x="608" y="108" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Registry</text>
+      <text x="608" y="124" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">sam_sharepoint_files</text>
+
+      <!-- Carding (focal) -->
+      <rect x="272" y="264" width="160" height="64" rx="6" fill="#faf7f2"/>
+      <rect x="272" y="264" width="160" height="64" rx="6" fill="rgba(181,82,58,0.08)" stroke="#b5523a"/>
+      <rect x="280" y="272" width="28" height="12" rx="2" fill="none" stroke="rgba(181,82,58,0.50)" stroke-width="0.8"/>
+      <text x="294" y="281" fill="#b5523a" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">YOU</text>
+      <text x="352" y="300" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Carding</text>
+      <text x="352" y="316" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Claude reads, writes card</text>
+
+      <!-- Cards (store) -->
+      <rect x="528" y="264" width="160" height="64" rx="6" fill="#faf7f2"/>
+      <rect x="528" y="264" width="160" height="64" rx="6" fill="rgba(28,25,23,0.05)" stroke="#57534e"/>
+      <rect x="536" y="272" width="24" height="12" rx="2" fill="none" stroke="rgba(87,83,78,0.40)" stroke-width="0.8"/>
+      <text x="548" y="281" fill="#57534e" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DB</text>
+      <text x="608" y="300" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Asset cards</text>
+      <text x="608" y="316" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">sam_asset_cards · 46</text>
+
+      <!-- Catalogue (backend) -->
+      <rect x="784" y="168" width="144" height="64" rx="6" fill="#fff" stroke="#1c1917"/>
+      <rect x="792" y="176" width="28" height="12" rx="2" fill="none" stroke="rgba(28,25,23,0.40)" stroke-width="0.8"/>
+      <text x="806" y="185" fill="#57534e" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SAM</text>
+      <text x="856" y="204" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">One catalogue</text>
+      <text x="856" y="220" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">allAssets() · 678</text>
+
+      <!-- Channels (input) -->
+      <rect x="960" y="168" width="144" height="64" rx="6" fill="#faf7f2"/>
+      <rect x="960" y="168" width="144" height="64" rx="6" fill="rgba(87,83,78,0.10)" stroke="#78716c"/>
+      <rect x="968" y="176" width="24" height="12" rx="2" fill="none" stroke="rgba(120,113,108,0.40)" stroke-width="0.8"/>
+      <text x="980" y="185" fill="#78716c" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">IN</text>
+      <text x="1032" y="204" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Channels</text>
+      <text x="1032" y="220" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">web · WhatsApp · MCP</text>
+
+      <!-- Groq (external) -->
+      <rect x="960" y="312" width="144" height="56" rx="6" fill="#faf7f2"/>
+      <rect x="960" y="312" width="144" height="56" rx="6" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.30)"/>
+      <rect x="968" y="320" width="28" height="12" rx="2" fill="none" stroke="rgba(28,25,23,0.22)" stroke-width="0.8"/>
+      <text x="982" y="329" fill="#78716c" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">EXT</text>
+      <text x="1032" y="344" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Groq model</text>
+      <text x="1032" y="360" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">openai/gpt-oss-120b</text>
+
+      <!-- callouts -->
+      <text x="608" y="180" fill="#57534e" font-size="14" font-style="italic" font-family="'Instrument Serif', serif" text-anchor="middle">knows a file exists — not what it says</text>
+      <text x="608" y="352" fill="#57534e" font-size="14" font-style="italic" font-family="'Instrument Serif', serif" text-anchor="middle">knows what it says — for 46 files only</text>
+
+      <!-- legend -->
+      <line x1="32" y1="392" x2="1088" y2="392" stroke="rgba(28,25,23,0.10)" stroke-width="0.8"/>
+      <text x="32" y="408" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LEGEND</text>
+      <rect x="32" y="424" width="16" height="12" rx="2" fill="rgba(181,82,58,0.08)" stroke="#b5523a"/>
+      <text x="56" y="434" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Manual step</text>
+      <rect x="172" y="424" width="16" height="12" rx="2" fill="rgba(28,25,23,0.05)" stroke="#57534e"/>
+      <text x="196" y="434" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Database table</text>
+      <rect x="316" y="424" width="16" height="12" rx="2" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.30)"/>
+      <text x="340" y="434" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Outside service</text>
+      <rect x="464" y="424" width="16" height="12" rx="2" fill="rgba(181,82,58,0.04)" stroke="rgba(181,82,58,0.5)" stroke-dasharray="3,2"/>
+      <text x="488" y="434" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Privacy boundary</text>
+      <line x1="620" y1="430" x2="648" y2="430" stroke="#2563eb" stroke-width="1.2" marker-end="url(#a1l)"/>
+      <text x="656" y="434" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Network call</text>
+      <line x1="760" y1="430" x2="788" y2="430" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#a1l)"/>
+      <text x="796" y="434" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Reply</text>
+    </svg>
+  </div>
+
+  <div class="cards c3">
+    <div class="card">
+      <p class="eyebrow">Have we mapped it?</p>
+      <div class="card-header"><span class="dot coral"></span><h3>Half of it</h3></div>
+      <ul>
+        <li><b>Links and filing: yes, and it runs by itself.</b> A new or edited file reaches SAM within a minute or so, with its real SharePoint link.</li>
+        <li><b>What a file says: no.</b> Carding is done by hand, and nothing tells you that a new file needs a card.</li>
+        <li><b>Deletions: the design exists, but it's blocked.</b> See section 3.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Pipeline A</p>
+      <div class="card-header"><span class="dot ink"></span><h3>Automatic: location and link</h3></div>
+      <ul>
+        <li>Power Automate watches Sales Collateral on your login</li>
+        <li>Each add or edit is sent to <code>/api/channels/sharepoint</code></li>
+        <li>Tags are guessed from the <b>folder and filename</b>. The file itself is never opened</li>
+        <li>SAM refreshes its copy every 5 minutes</li>
+      </ul>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Pipeline B</p>
+      <div class="card-header"><span class="dot muted"></span><h3>By hand: what the file says</h3></div>
+      <ul>
+        <li>You download the file</li>
+        <li><code>extract_text.py</code> pulls out the text</li>
+        <li>Claude writes the card (<code>corpus/cards/batch-*.json</code>)</li>
+        <li><code>compare_cards.py</code> quality check</li>
+        <li><code>load_cards.py</code> uploads the cards to Supabase</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============================================================ 2. QUERY -->
+  <h2>2 · What happens when someone asks a question</h2>
+  <p class="lede">This shows the web chat. WhatsApp, REST and MCP go through the same steps; only the way in differs (see the cards below). The whole trip normally takes 1.5 to 3 seconds.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1120 704" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="dots2" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.9" fill="rgba(28,25,23,0.10)"/></pattern>
+        <marker id="a2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#57534e"/></marker>
+        <marker id="a2c" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#b5523a"/></marker>
+        <marker id="a2l" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
+      </defs>
+      <rect width="100%" height="100%" fill="#faf7f2"/>
+      <rect width="100%" height="100%" fill="url(#dots2)" opacity="0.55"/>
+
+      <!-- lifelines -->
+      <line x1="120" y1="128" x2="120" y2="620" stroke="rgba(28,25,23,0.22)" stroke-dasharray="3,3"/>
+      <line x1="360" y1="128" x2="360" y2="620" stroke="rgba(28,25,23,0.22)" stroke-dasharray="3,3"/>
+      <line x1="600" y1="128" x2="600" y2="620" stroke="rgba(28,25,23,0.22)" stroke-dasharray="3,3"/>
+      <line x1="840" y1="128" x2="840" y2="620" stroke="rgba(28,25,23,0.22)" stroke-dasharray="3,3"/>
+      <line x1="1024" y1="128" x2="1024" y2="620" stroke="rgba(28,25,23,0.22)" stroke-dasharray="3,3"/>
+
+      <!-- loop frame -->
+      <rect x="340" y="300" width="528" height="172" rx="4" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.25)" stroke-width="0.8"/>
+      <rect x="376" y="300" width="136" height="16" rx="2" fill="#faf7f2" stroke="rgba(28,25,23,0.25)" stroke-width="0.8"/>
+      <text x="384" y="311" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.08em">LOOP · UP TO 3 SEARCHES</text>
+
+      <!-- activation bars -->
+      <rect x="356" y="176" width="8" height="412" fill="rgba(28,25,23,0.06)" stroke="#57534e" stroke-width="0.8"/>
+      <rect x="836" y="272" width="8" height="64" fill="rgba(28,25,23,0.06)" stroke="#57534e" stroke-width="0.8"/>
+      <rect x="596" y="376" width="8" height="40" fill="rgba(28,25,23,0.06)" stroke="#57534e" stroke-width="0.8"/>
+      <rect x="836" y="448" width="8" height="56" fill="rgba(28,25,23,0.06)" stroke="#57534e" stroke-width="0.8"/>
+      <rect x="1020" y="540" width="8" height="16" fill="rgba(28,25,23,0.06)" stroke="#57534e" stroke-width="0.8"/>
+
+      <!-- messages -->
+      <line x1="124" y1="176" x2="352" y2="176" stroke="#2563eb" stroke-width="1.2" marker-end="url(#a2l)"/>
+      <path d="M364 212 H400 V236 H368" fill="none" stroke="#57534e" stroke-width="1.2" marker-end="url(#a2)"/>
+      <line x1="364" y1="272" x2="832" y2="272" stroke="#2563eb" stroke-width="1.2" marker-end="url(#a2l)"/>
+      <line x1="836" y1="336" x2="368" y2="336" stroke="#57534e" stroke-width="1.2" marker-end="url(#a2)"/>
+      <line x1="364" y1="376" x2="592" y2="376" stroke="#57534e" stroke-width="1.2" marker-end="url(#a2)"/>
+      <line x1="596" y1="416" x2="368" y2="416" stroke="#57534e" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#a2)"/>
+      <line x1="364" y1="448" x2="832" y2="448" stroke="#2563eb" stroke-width="1.2" marker-end="url(#a2l)"/>
+      <line x1="836" y1="504" x2="368" y2="504" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#a2l)"/>
+      <line x1="364" y1="544" x2="1016" y2="544" stroke="#57534e" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#a2)"/>
+      <line x1="356" y1="584" x2="128" y2="584" stroke="#b5523a" stroke-width="1.4" marker-end="url(#a2c)"/>
+
+      <!-- labels + captions -->
+      <rect x="192" y="160" width="96" height="12" rx="2" fill="#faf7f2"/>
+      <text x="240" y="169" fill="#2563eb" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">ASK A QUESTION</text>
+      <rect x="164" y="184" width="152" height="12" rx="2" fill="#faf7f2"/>
+      <text x="240" y="193" fill="#78716c" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">POST /api/ask · last 6 turns</text>
+
+      <rect x="408" y="216" width="92" height="12" rx="2" fill="#faf7f2"/>
+      <text x="454" y="225" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">LOGIN · CACHES</text>
+      <rect x="408" y="232" width="176" height="12" rx="2" fill="#faf7f2"/>
+      <text x="496" y="241" fill="#78716c" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">ready(): cards + registry loaded</text>
+
+      <rect x="672" y="256" width="96" height="12" rx="2" fill="#faf7f2"/>
+      <text x="720" y="265" fill="#2563eb" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">PROMPT + TOOL</text>
+      <rect x="640" y="280" width="160" height="12" rx="2" fill="#faf7f2"/>
+      <text x="720" y="289" fill="#78716c" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">SAM rules + search_assets</text>
+
+      <rect x="672" y="320" width="96" height="12" rx="2" fill="#faf7f2"/>
+      <text x="720" y="329" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">SEARCH_ASSETS</text>
+      <rect x="648" y="344" width="144" height="12" rx="2" fill="#faf7f2"/>
+      <text x="720" y="353" fill="#78716c" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">query + type/vertical/product</text>
+
+      <rect x="440" y="360" width="80" height="12" rx="2" fill="#faf7f2"/>
+      <text x="480" y="369" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">RANK ASSETS</text>
+      <rect x="436" y="400" width="88" height="12" rx="2" fill="#faf7f2"/>
+      <text x="480" y="409" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">TOP 5 + TRUST</text>
+      <rect x="400" y="424" width="160" height="12" rx="2" fill="#faf7f2"/>
+      <text x="480" y="433" fill="#78716c" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">keyword score, no embeddings</text>
+
+      <rect x="680" y="432" width="80" height="12" rx="2" fill="#faf7f2"/>
+      <text x="720" y="441" fill="#2563eb" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">TOOL RESULT</text>
+      <rect x="640" y="456" width="160" height="12" rx="2" fill="#faf7f2"/>
+      <text x="720" y="465" fill="#78716c" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">card text, never the file</text>
+
+      <rect x="680" y="488" width="80" height="12" rx="2" fill="#faf7f2"/>
+      <text x="720" y="497" fill="#2563eb" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">ANSWER TEXT</text>
+
+      <rect x="884" y="528" width="96" height="12" rx="2" fill="#faf7f2"/>
+      <text x="932" y="537" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">LOG QUERY/GAP</text>
+
+      <rect x="188" y="568" width="104" height="12" rx="2" fill="#faf7f2"/>
+      <text x="240" y="577" fill="#b5523a" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">ANSWER + LINKS</text>
+      <rect x="152" y="592" width="176" height="12" rx="2" fill="#faf7f2"/>
+      <text x="240" y="601" fill="#78716c" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">3 assets · trace · feedback</text>
+
+      <!-- actors -->
+      <rect x="40" y="72" width="160" height="56" rx="6" fill="#faf7f2"/>
+      <rect x="40" y="72" width="160" height="56" rx="6" fill="rgba(87,83,78,0.10)" stroke="#78716c"/>
+      <rect x="48" y="80" width="24" height="12" rx="2" fill="none" stroke="rgba(120,113,108,0.40)" stroke-width="0.8"/>
+      <text x="60" y="89" fill="#78716c" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">IN</text>
+      <text x="120" y="104" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Sales rep</text>
+      <text x="120" y="119" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">chat page in browser</text>
+
+      <rect x="280" y="72" width="160" height="56" rx="6" fill="#fff" stroke="#1c1917"/>
+      <rect x="288" y="80" width="28" height="12" rx="2" fill="none" stroke="rgba(28,25,23,0.40)" stroke-width="0.8"/>
+      <text x="302" y="89" fill="#57534e" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">API</text>
+      <text x="360" y="104" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">SAM server</text>
+      <text x="360" y="119" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Next.js on Vercel</text>
+
+      <rect x="520" y="72" width="160" height="56" rx="6" fill="#faf7f2"/>
+      <rect x="520" y="72" width="160" height="56" rx="6" fill="rgba(28,25,23,0.05)" stroke="#57534e"/>
+      <rect x="528" y="80" width="32" height="12" rx="2" fill="none" stroke="rgba(87,83,78,0.40)" stroke-width="0.8"/>
+      <text x="544" y="89" fill="#57534e" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">MEM</text>
+      <text x="600" y="104" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Catalogue search</text>
+      <text x="600" y="119" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">searchAssets() in memory</text>
+
+      <rect x="760" y="72" width="160" height="56" rx="6" fill="#faf7f2"/>
+      <rect x="760" y="72" width="160" height="56" rx="6" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.30)"/>
+      <rect x="768" y="80" width="28" height="12" rx="2" fill="none" stroke="rgba(28,25,23,0.22)" stroke-width="0.8"/>
+      <text x="782" y="89" fill="#78716c" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">EXT</text>
+      <text x="840" y="104" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Groq model</text>
+      <text x="840" y="119" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">gpt-oss-120b</text>
+
+      <rect x="944" y="72" width="160" height="56" rx="6" fill="#faf7f2"/>
+      <rect x="944" y="72" width="160" height="56" rx="6" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.22)" stroke-dasharray="4,3"/>
+      <rect x="952" y="80" width="24" height="12" rx="2" fill="none" stroke="rgba(28,25,23,0.22)" stroke-width="0.8"/>
+      <text x="964" y="89" fill="#78716c" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DB</text>
+      <text x="1024" y="104" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Supabase</text>
+      <text x="1024" y="119" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">sam_events</text>
+
+      <!-- legend -->
+      <line x1="40" y1="644" x2="1088" y2="644" stroke="rgba(28,25,23,0.10)" stroke-width="0.8"/>
+      <text x="40" y="660" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LEGEND</text>
+      <line x1="40" y1="680" x2="68" y2="680" stroke="#b5523a" stroke-width="1.4" marker-end="url(#a2c)"/>
+      <text x="76" y="684" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">What the rep sees</text>
+      <line x1="200" y1="680" x2="228" y2="680" stroke="#2563eb" stroke-width="1.2" marker-end="url(#a2l)"/>
+      <text x="236" y="684" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Network call</text>
+      <line x1="340" y1="680" x2="368" y2="680" stroke="#57534e" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#a2)"/>
+      <text x="376" y="684" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Reply, or background write</text>
+      <rect x="532" y="672" width="4" height="16" fill="rgba(28,25,23,0.06)" stroke="#57534e" stroke-width="0.8"/>
+      <text x="544" y="684" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Busy working</text>
+      <rect x="648" y="674" width="16" height="12" rx="2" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.25)" stroke-width="0.8"/>
+      <text x="672" y="684" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Repeats (the model may search again)</text>
+    </svg>
+  </div>
+
+  <div class="cards c3">
+    <div class="card">
+      <p class="eyebrow">Frontend</p>
+      <div class="card-header"><span class="dot coral"></span><h3>What the rep's screen does</h3></div>
+      <ul>
+        <li>The <b>catalogue panel</b> is built on the server from the same <code>allAssets()</code>. No model is involved</li>
+        <li>The chat sends the question and the last 6 turns to <code>/api/ask</code></li>
+        <li>The answer shows a one-line verdict and up to 3 asset cards with links</li>
+        <li>Clicking a link is logged through <code>/api/open</code></li>
+        <li>A <b>"How SAM got there"</b> panel shows each search the model ran</li>
+        <li>Three feedback buttons are saved through <code>/api/feedback</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Privacy</p>
+      <div class="card-header"><span class="dot ink"></span><h3>What Groq actually sees</h3></div>
+      <p>Only the search results: title, type, industry, the client <em>description</em>, up to 300 characters of summary, up to 4 outcomes, and the trust note (expired, newer edition available, or old).</p>
+      <p>It never sees file text or the real client name. <code>client_actual</code> is never read from the database at all.</p>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Other ways in</p>
+      <div class="card-header"><span class="dot link"></span><h3>Same steps, different front door</h3></div>
+      <ul>
+        <li><b>WhatsApp:</b> Meta calls a webhook. SAM checks the signature, maps the phone number to a user, keeps 6 hours of history, and replies after acknowledging Meta</li>
+        <li><b>REST / MCP:</b> each caller needs its own access token, and it runs the same <code>apiAsk()</code>. MCP's <code>search_assets</code> skips the model entirely</li>
+        <li><b>If Groq fails:</b> SAM falls back to plain search with a stock sentence, and the trace panel says so</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============================================================ 3. UPDATES -->
+  <h2>3 · What happens when a file changes in SharePoint</h2>
+  <p class="lede">This is the part you asked about. Adding and editing files works on its own. Deletions and file contents are where the gaps are.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1120 628" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="dots3" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.9" fill="rgba(28,25,23,0.10)"/></pattern>
+        <marker id="a3" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#57534e"/></marker>
+        <marker id="a3l" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
+      </defs>
+      <rect width="100%" height="100%" fill="#faf7f2"/>
+      <rect width="100%" height="100%" fill="url(#dots3)" opacity="0.55"/>
+
+      <!-- column headers -->
+      <text x="352" y="48" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.18em">A FILE IS ADDED OR EDITED</text>
+      <text x="856" y="48" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.18em">A FILE IS DELETED</text>
+
+      <!-- lanes -->
+      <line x1="24" y1="64" x2="1096" y2="64" stroke="rgba(28,25,23,0.12)"/>
+      <line x1="24" y1="160" x2="1096" y2="160" stroke="rgba(28,25,23,0.12)"/>
+      <line x1="24" y1="256" x2="1096" y2="256" stroke="rgba(28,25,23,0.12)"/>
+      <line x1="24" y1="352" x2="1096" y2="352" stroke="rgba(28,25,23,0.12)"/>
+      <line x1="24" y1="448" x2="1096" y2="448" stroke="rgba(28,25,23,0.12)"/>
+      <line x1="24" y1="544" x2="1096" y2="544" stroke="rgba(28,25,23,0.12)"/>
+      <line x1="176" y1="64" x2="176" y2="544" stroke="rgba(28,25,23,0.12)"/>
+
+      <text x="32" y="112" fill="#1c1917" font-size="8" font-weight="500" font-family="'Geist Mono', monospace" letter-spacing="0.14em">SHAREPOINT</text>
+      <text x="32" y="128" fill="#78716c" font-size="9" font-family="'Geist', sans-serif">a colleague</text>
+      <text x="32" y="208" fill="#1c1917" font-size="8" font-weight="500" font-family="'Geist Mono', monospace" letter-spacing="0.14em">POWER AUTOMATE</text>
+      <text x="32" y="224" fill="#78716c" font-size="9" font-family="'Geist', sans-serif">on your login</text>
+      <text x="32" y="304" fill="#1c1917" font-size="8" font-weight="500" font-family="'Geist Mono', monospace" letter-spacing="0.14em">SAM REGISTRY</text>
+      <text x="32" y="320" fill="#78716c" font-size="9" font-family="'Geist', sans-serif">Supabase</text>
+      <text x="32" y="400" fill="#1c1917" font-size="8" font-weight="500" font-family="'Geist Mono', monospace" letter-spacing="0.14em">SAM ANSWERS</text>
+      <text x="32" y="416" fill="#78716c" font-size="9" font-family="'Geist', sans-serif">what a rep sees</text>
+      <text x="32" y="496" fill="#1c1917" font-size="8" font-weight="500" font-family="'Geist Mono', monospace" letter-spacing="0.14em">YOU + CLAUDE</text>
+      <text x="32" y="512" fill="#78716c" font-size="9" font-family="'Geist', sans-serif">by hand</text>
+
+      <!-- arrows: added / edited -->
+      <line x1="352" y1="140" x2="352" y2="176" stroke="#57534e" stroke-width="1.2" marker-end="url(#a3)"/>
+      <line x1="352" y1="236" x2="352" y2="272" stroke="#2563eb" stroke-width="1.2" marker-end="url(#a3l)"/>
+      <line x1="352" y1="332" x2="352" y2="368" stroke="#57534e" stroke-width="1.2" marker-end="url(#a3)"/>
+      <path d="M472 304 H592 V464" fill="none" stroke="#57534e" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#a3)"/>
+      <path d="M480 496 H352 V432" fill="none" stroke="#57534e" stroke-width="1.2" marker-end="url(#a3)"/>
+      <!-- arrows: deleted -->
+      <line x1="856" y1="140" x2="856" y2="176" stroke="#57534e" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#a3)"/>
+      <line x1="856" y1="236" x2="856" y2="272" stroke="#57534e" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#a3)"/>
+      <line x1="856" y1="332" x2="856" y2="368" stroke="#57534e" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#a3)"/>
+
+      <!-- arrow labels -->
+      <rect x="324" y="152" width="56" height="12" rx="2" fill="#faf7f2"/>
+      <text x="352" y="161" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">TRIGGER</text>
+      <rect x="324" y="248" width="56" height="12" rx="2" fill="#faf7f2"/>
+      <text x="352" y="257" fill="#2563eb" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">WEBHOOK</text>
+      <rect x="320" y="344" width="64" height="12" rx="2" fill="#faf7f2"/>
+      <text x="352" y="353" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">≤ 5 MIN</text>
+      <rect x="552" y="392" width="80" height="12" rx="2" fill="#faf7f2"/>
+      <text x="592" y="401" fill="#b5523a" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">NO TRIGGER</text>
+      <rect x="372" y="480" width="88" height="12" rx="2" fill="#faf7f2"/>
+      <text x="416" y="489" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">ADDS CONTENT</text>
+      <rect x="824" y="152" width="64" height="12" rx="2" fill="#faf7f2"/>
+      <text x="856" y="161" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">NO EVENT</text>
+      <rect x="824" y="248" width="64" height="12" rx="2" fill="#faf7f2"/>
+      <text x="856" y="257" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">BACKUP</text>
+      <rect x="808" y="344" width="96" height="12" rx="2" fill="#faf7f2"/>
+      <text x="856" y="353" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">NOTHING MARKED</text>
+
+      <!-- nodes: added / edited -->
+      <rect x="232" y="84" width="240" height="56" rx="6" fill="#faf7f2"/>
+      <rect x="232" y="84" width="240" height="56" rx="6" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.30)"/>
+      <text x="352" y="108" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">File added or edited</text>
+      <text x="352" y="124" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">by anyone with edit rights</text>
+
+      <rect x="232" y="180" width="240" height="56" rx="6" fill="#fff" stroke="#1c1917"/>
+      <text x="352" y="204" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Change flow runs</text>
+      <text x="352" y="220" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">~1 min · last ran 23 Sep</text>
+
+      <rect x="232" y="276" width="240" height="56" rx="6" fill="#faf7f2"/>
+      <rect x="232" y="276" width="240" height="56" rx="6" fill="rgba(28,25,23,0.05)" stroke="#57534e"/>
+      <text x="352" y="300" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Row added or updated</text>
+      <text x="352" y="316" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">tags from folder + filename</text>
+
+      <rect x="232" y="372" width="240" height="56" rx="6" fill="#fff" stroke="#1c1917"/>
+      <text x="352" y="396" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Findable, with a real link</text>
+      <text x="352" y="412" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">no description until carded</text>
+
+      <rect x="480" y="468" width="224" height="56" rx="6" fill="#faf7f2"/>
+      <rect x="480" y="468" width="224" height="56" rx="6" fill="rgba(181,82,58,0.08)" stroke="#b5523a"/>
+      <text x="592" y="492" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Card it by hand</text>
+      <text x="592" y="508" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">download → extract → write → load</text>
+
+      <!-- nodes: deleted -->
+      <rect x="736" y="84" width="240" height="56" rx="6" fill="#faf7f2"/>
+      <rect x="736" y="84" width="240" height="56" rx="6" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.30)"/>
+      <text x="856" y="108" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">File deleted</text>
+      <text x="856" y="124" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">by anyone with edit rights</text>
+
+      <rect x="736" y="180" width="240" height="56" rx="6" fill="#faf7f2"/>
+      <rect x="736" y="180" width="240" height="56" rx="6" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.22)" stroke-dasharray="4,3"/>
+      <text x="856" y="204" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Delete flow never runs</text>
+      <text x="856" y="220" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">needs a site-admin login</text>
+
+      <rect x="736" y="276" width="240" height="56" rx="6" fill="#faf7f2"/>
+      <rect x="736" y="276" width="240" height="56" rx="6" fill="rgba(181,82,58,0.08)" stroke="#b5523a"/>
+      <text x="856" y="300" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Reconcile script</text>
+      <text x="856" y="316" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">blocked by IT policy · last ran 7 Sep</text>
+
+      <rect x="736" y="372" width="240" height="56" rx="6" fill="#fff" stroke="#1c1917"/>
+      <text x="856" y="396" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Still offers the link</text>
+      <text x="856" y="412" fill="#57534e" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">to a file that no longer exists</text>
+
+      <!-- callout -->
+      <text x="856" y="500" fill="#57534e" font-size="14" font-style="italic" font-family="'Instrument Serif', serif" text-anchor="middle">SAM never writes to SharePoint — it only watches</text>
+
+      <!-- legend -->
+      <line x1="32" y1="568" x2="1088" y2="568" stroke="rgba(28,25,23,0.10)" stroke-width="0.8"/>
+      <text x="32" y="584" fill="#57534e" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LEGEND</text>
+      <rect x="32" y="600" width="16" height="12" rx="2" fill="rgba(181,82,58,0.08)" stroke="#b5523a"/>
+      <text x="56" y="610" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Where it breaks</text>
+      <rect x="180" y="600" width="16" height="12" rx="2" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.22)" stroke-dasharray="3,2"/>
+      <text x="204" y="610" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Built, but never runs</text>
+      <line x1="340" y1="606" x2="368" y2="606" stroke="#57534e" stroke-width="1.2" marker-end="url(#a3)"/>
+      <text x="376" y="610" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Happens automatically</text>
+      <line x1="512" y1="606" x2="540" y2="606" stroke="#57534e" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#a3)"/>
+      <text x="548" y="610" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Should happen, doesn't</text>
+      <line x1="688" y1="606" x2="716" y2="606" stroke="#2563eb" stroke-width="1.2" marker-end="url(#a3l)"/>
+      <text x="724" y="610" fill="#57534e" font-size="9" font-family="'Geist', sans-serif">Network call</text>
+    </svg>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>10</b><span>changes the flow recorded since 8 Sep</span></div>
+    <div class="stat"><b>2</b><span>new files since 8 Sep</span></div>
+    <div class="stat accent"><b>0</b><span>of them carded</span></div>
+    <div class="stat accent"><b>17 days</b><span>since deletions were last checked</span></div>
+  </div>
+
+  <table>
+    <thead><tr><th>Change</th><th>Registry: where it is + link</th><th>Card: what it says</th><th>What a rep gets</th></tr></thead>
+    <tbody>
+      <tr><td>New file</td><td class="ok">Added in about 1 minute. Tags are guessed from the folder and filename</td><td class="bad">None until you card it</td><td>Can find it by name and open it, but SAM can't say what's inside</td></tr>
+      <tr><td>Edited file</td><td class="ok">Dates and link refreshed</td><td class="bad">The old card stays, and nothing marks it out of date</td><td>May be given a description of the previous version</td></tr>
+      <tr><td>Moved folder</td><td class="ok">Row updated with the new folder</td><td class="ok">Still matches, because the filename didn't change</td><td>Works</td></tr>
+      <tr><td>Renamed</td><td class="ok">Same row, new name (matched by SharePoint's item ID)</td><td class="bad">Cards are matched by filename, so the card stops matching the renamed file</td><td>Probably two entries: a described one with no working link, and a bare one with the link. <em>Worked out from the code, not tested live.</em></td></tr>
+      <tr><td>Deleted</td><td class="bad">Not caught: the delete flow never runs, and the reconcile script is blocked</td><td class="bad">The card stays</td><td class="bad">SAM can hand out a dead link</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cards c2">
+    <div class="card">
+      <p class="eyebrow">Gap 1 · contents</p>
+      <div class="card-header"><span class="dot coral"></span><h3>Nothing tells you what needs carding</h3></div>
+      <p>The registry already knows which files have no card. Cards have an <code>updated_at</code> date, so it can also tell which files changed after their card was written. Nothing shows you either list.</p>
+      <p><b>Smallest fix (not built):</b> a "needs carding" list on the admin dashboard, built from one database query. You'd still card by hand, in batches, but you'd have a to-do list.</p>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Gap 2 · deletions</p>
+      <div class="card-header"><span class="dot coral"></span><h3>Two ways out</h3></div>
+      <ul>
+        <li><b>Ask IT</b> to allow SAM through the Graph policy, or to give the delete flow a site-admin login</li>
+        <li><b>Avoid IT (untested):</b> a daily Power Automate flow that lists every file in the folder and sends the list to SAM. SAM marks anything missing from the list as deleted. It runs on the same login that already works for the change flow, so it needs neither Graph nor admin rights</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Traced from web/lib, web/app/api and prototype/ at commit c5d9d53</span>
+    <span>Live counts from Supabase, 24 Sep 2026</span>
+  </div>
+
+</div>
+</body>
+</html>
