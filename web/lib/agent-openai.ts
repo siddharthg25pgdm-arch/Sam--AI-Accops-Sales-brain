@@ -5,7 +5,9 @@
  *    OPENAI_COMPAT_API_KEY=...
  *    OPENAI_COMPAT_MODEL=openai/gpt-oss-120b
  *  Read the provider's data-use terms before pointing it at collateral that names customers: free tiers often
- *  reserve the right to train on prompts. Claude remains the default and recommended path. */
+ *  reserve the right to train on prompts. Production runs this path (Groq), so runtime is reported as
+ *  "openai-compatible" with the model name - it used to say "claude", which made every dashboard
+ *  number about "Claude" actually about Groq. */
 import { searchAssets, VERTICALS, PRODUCTS, type SearchHit } from "./cards";
 import { SYSTEM, toCard, toolPayload, type AskResult } from "./agent";
 
@@ -57,15 +59,19 @@ export function openAICompatConfigured() {
   return process.env.LLM_PROVIDER === "openai-compatible" && Boolean(process.env.OPENAI_COMPAT_API_KEY && process.env.OPENAI_COMPAT_BASE_URL && process.env.OPENAI_COMPAT_MODEL);
 }
 
-export async function askOpenAICompat(question: string, history: { role: "user" | "assistant"; content: string }[], t0: number): Promise<AskResult> {
+/** `deadline` is an absolute ms timestamp. Each call gets whatever time is left, so four slow steps
+ *  cannot add up past the route's 60 s limit - where the function would be killed with nothing logged. */
+export async function askOpenAICompat(question: string, history: { role: "user" | "assistant"; content: string }[], t0: number, deadline = t0 + 40_000): Promise<AskResult> {
   const base = process.env.OPENAI_COMPAT_BASE_URL!.replace(/\/$/, ""), key = process.env.OPENAI_COMPAT_API_KEY!, model = process.env.OPENAI_COMPAT_MODEL!;
   const messages: Msg[] = [{ role: "system", content: SYSTEM }, ...history.slice(-6).map(h => ({ role: h.role, content: h.content }) as Msg), { role: "user", content: question }];
   const trace: AskResult["trace"] = [];
-  let lastHits: SearchHit[] = [], filters: Record<string, unknown> = {}, calls = 0, firstZero = false;
+  const base_ = { runtime: "openai-compatible" as const, model };
+  let lastHits: SearchHit[] = [], filters: Record<string, unknown> = {}, calls = 0;
   for (let i = 0; i < 4; i++) {
     const r = await fetch(`${base}/chat/completions`, {
       method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({ model, messages, tools: toolDef, tool_choice: "auto", temperature: 0.2, max_tokens: 1200 }),
+      signal: AbortSignal.timeout(Math.max(1000, deadline - Date.now())),
     });
     if (!r.ok) throw new Error(`${model} returned ${r.status}: ${(await r.text()).slice(0, 200)}`);
     const j = await r.json();
@@ -73,8 +79,13 @@ export async function askOpenAICompat(question: string, history: { role: "user" 
     if (!m) throw new Error("empty completion");
     if (!m.tool_calls?.length) {
       trace.push({ step: "model", detail: `${model} (openai-compatible) · ${((Date.now() - t0) / 1000).toFixed(1)}s` });
-      return { text: (m.content ?? "").trim() || "No answer was produced.", assets: lastHits.slice(0, 3).map(toCard), trace, runtime: "claude",
-        intent: calls ? (firstZero ? "gap" : "find_asset") : "other", filters, zero: firstZero };
+      const text = (m.content ?? "").trim();
+      return { ...base_, text: text || "No answer was produced.", assets: lastHits.slice(0, 3).map(toCard), trace,
+        // Gap = "ended up with nothing", not "the first search missed" - the same fix agent.ts got on
+        // 8 Sep (the "hysecure datasheet" bug). This path is the one production runs, and it had kept
+        // the old rule, so answered questions were still being logged as content gaps.
+        intent: calls ? (lastHits.length ? "find_asset" : "gap") : "other", filters, zero: calls > 0 && lastHits.length === 0,
+        error: text ? null : { kind: "empty_answer", detail: `${model} finished with no text after ${calls} searches` } };
     }
     messages.push({ role: "assistant", content: m.content ?? null, tool_calls: m.tool_calls });
     for (const tc of m.tool_calls) {
@@ -84,11 +95,11 @@ export async function askOpenAICompat(question: string, history: { role: "user" 
       calls++; filters = { ...input };
       trace.push({ step: "tool call: search_assets", detail: JSON.stringify(input) });
       const { results: hits, considered } = searchAssets(input);
-      if (calls === 1 && hits.length === 0) firstZero = true;
       if (hits.length) lastHits = hits;
       trace.push({ step: "tool result", detail: `${hits.length} of ${considered} assets` });
       messages.push({ role: "tool", tool_call_id: tc.id, name: "search_assets", content: toolPayload(hits, considered) });
     }
   }
-  return { text: "The model ran out of steps before answering.", assets: lastHits.slice(0, 3).map(toCard), trace, runtime: "claude", intent: "other", filters, zero: lastHits.length === 0 };
+  return { ...base_, text: "The model ran out of steps before answering.", assets: lastHits.slice(0, 3).map(toCard), trace, intent: "other", filters, zero: lastHits.length === 0,
+    error: { kind: "step_exhausted", detail: `${model}: 4 steps, ${calls} searches, no final answer` } };
 }

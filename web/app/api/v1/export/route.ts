@@ -1,5 +1,5 @@
 import { resolveCaller, unauthorized } from "@/lib/apiauth";
-import { daily } from "@/lib/metrics";
+import { daily, rollup } from "@/lib/metrics";
 import { registry } from "@/lib/sharepoint";
 import { ready } from "@/lib/registry-cache";
 import { allAssets, assetLink } from "@/lib/cards";
@@ -39,6 +39,9 @@ export async function GET(req: Request) {
     }
     name = "sam-registry";
   } else {
+    // The admin page used to refresh the rollup on every render; it reads sam_dashboard now, so the
+    // export refreshes its own recent window instead. Real traffic only (see the rollup SQL).
+    await rollup(3);
     const d = await daily(90);
     rows = [["day", "channel", "queries", "users", "sessions", "gaps", "zero_results",
              "catalogue_opens", "feedback_total", "feedback_helpful", "p50_ms", "p95_ms", "max_ms"]];

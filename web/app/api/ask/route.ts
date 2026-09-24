@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth";
-import { ask } from "@/lib/agent";
-import { logEvent } from "@/lib/events";
+import { askAndLog } from "@/lib/api";
 import { ready } from "@/lib/registry-cache";
 
 export const maxDuration = 60;
@@ -16,13 +15,11 @@ export async function POST(req: Request) {
   // Block only on a cold start. After that the cache is warm and this returns immediately, so the
   // first question of a session still searches the full registry rather than the 77 cards alone.
   await ready();
-  const t0 = Date.now();
-  const result = await ask(question, history);
-  const eventId = await logEvent({
-    user_id: user.id, session_id: body.sessionId ?? null, kind: "query", query: question, intent: result.intent,
-    filters: result.filters, result_count: result.assets.length, result_ids: result.assets.map(a => a.path ?? a.title),
-    runtime: result.runtime, latency_ms: Date.now() - t0,
-  });
-  if (result.zero) await logEvent({ user_id: user.id, session_id: body.sessionId ?? null, kind: "gap", query: question, filters: result.filters, ref_event_id: eventId });
-  return NextResponse.json({ ...result, eventId });
+  try {
+    const { r, eventId } = await askAndLog(question, user.id, "web", history, body.sessionId ?? null);
+    return NextResponse.json({ ...r, eventId });
+  } catch {
+    // Already logged as a server_error question by askAndLog.
+    return NextResponse.json({ error: "something went wrong on the server, and it has been logged" }, { status: 500 });
+  }
 }

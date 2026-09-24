@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { allAssets, slim, facetCounts, coverageGaps } from "@/lib/cards";
-import { recentEvents } from "@/lib/events";
+import { recentEvents, realOnly } from "@/lib/events";
 import { TopBar } from "@/components/TopBar";
+import { openAICompatConfigured } from "@/lib/agent-openai";
 import { Shell } from "@/components/Shell";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +14,7 @@ export default async function Home() {
   const assets = allAssets().map(slim);
   const facets = facetCounts();
   // Gaps that real people have asked about rank first in "Not available".
-  const events = await recentEvents(500);
+  const events = await recentEvents(500, `kind=eq.gap&${realOnly()}`);
   const askedGaps = events.filter(e => e.kind === "gap");
   const gaps = coverageGaps().map(g => {
     const asked = askedGaps.filter(e => {
@@ -25,7 +26,7 @@ export default async function Home() {
   return (
     <>
       <TopBar user={user} current="home" />
-      <Shell assets={assets} facets={facets} gaps={gaps} hasModel={Boolean(process.env.ANTHROPIC_API_KEY)} />
+      <Shell assets={assets} facets={facets} gaps={gaps} hasModel={Boolean(process.env.ANTHROPIC_API_KEY) || openAICompatConfigured()} />
     </>
   );
 }

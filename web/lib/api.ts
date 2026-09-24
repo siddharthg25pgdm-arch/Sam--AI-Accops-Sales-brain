@@ -2,7 +2,7 @@
  *  One implementation, two transports, so the Dwight extension and an MCP client see identical behaviour. */
 import { searchAssets, allAssets, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, trustNote, assetLink, assetLocation, VERTICALS, type Asset } from "./cards";
 import { ask as askAgent, type AskResult } from "./agent";
-import { logEvent, recentEvents } from "./events";
+import { logEvent, recentEvents, realOnly } from "./events";
 
 export type Channel = "web" | "api" | "mcp" | "whatsapp";
 
@@ -17,20 +17,40 @@ export function card(a: Asset, why?: string) {
 }
 
 export async function apiSearch(p: { query?: string; asset_type?: string; vertical?: string; product?: string; audience?: "internal" | "external"; limit?: number }, who: string, channel: Channel) {
+  const t0 = Date.now();
   const { results, considered } = searchAssets({ ...p, limit: Math.min(Math.max(p.limit ?? 5, 1), 10) });
-  await logEvent({ user_id: who, channel, kind: "query", query: p.query ?? "", intent: "find_asset", filters: p, result_count: results.length,
-    result_ids: results.map(r => r.asset.file?.path ?? r.asset.title), runtime: "search", latency_ms: 0 });
-  if (results.length === 0) await logEvent({ user_id: who, channel, kind: "gap", query: p.query ?? "", filters: p });
+  // runtime "search" latency is excluded from every latency figure: it is an in-memory ranking, not a
+  // model round trip, and mixing the two made p50 look like 156 ms.
+  const eventId = await logEvent({ user_id: who, channel, kind: "query", query: p.query ?? "", intent: "find_asset", filters: p, result_count: results.length,
+    result_ids: results.map(r => r.asset.file?.path ?? r.asset.title), result_titles: results.map(r => r.asset.title), runtime: "search", latency_ms: Date.now() - t0 });
+  if (results.length === 0) await logEvent({ user_id: who, channel, kind: "gap", query: p.query ?? "", filters: p, ref_event_id: eventId });
   return { results: results.map(r => card(r.asset, r.why)), total_considered: considered, filters: p };
 }
 
-export async function apiAsk(question: string, who: string, channel: Channel, history: { role: "user" | "assistant"; content: string }[] = [], sessionId?: string | null) {
+/** Ask, and record what happened - including when it fails. Every channel's question goes through
+ *  here, so the query event always carries the answer, the model, the latency and the error kind.
+ *  A thrown error is logged as a question with error_kind server_error (so it counts in the error
+ *  rate's denominator and numerator alike) and then rethrown, so callers behave as before. */
+export async function askAndLog(question: string, who: string, channel: Channel, history: { role: "user" | "assistant"; content: string }[] = [], sessionId?: string | null) {
   const t0 = Date.now();
-  const r: AskResult = await askAgent(question, history);
+  let r: AskResult;
+  try { r = await askAgent(question, history); }
+  catch (err) {
+    await logEvent({ user_id: who, channel, session_id: sessionId ?? null, kind: "query", query: question, intent: "other", result_count: 0,
+      latency_ms: Date.now() - t0, error_kind: "server_error", error_detail: (err as Error)?.stack ?? String(err) });
+    throw err;
+  }
   const eventId = await logEvent({ user_id: who, channel, session_id: sessionId ?? null, kind: "query", query: question, intent: r.intent, filters: r.filters,
-    result_count: r.assets.length, result_ids: r.assets.map(a => a.path ?? a.title), runtime: r.runtime, latency_ms: Date.now() - t0 });
+    result_count: r.assets.length, result_ids: r.assets.map(a => a.path ?? a.title), result_titles: r.assets.map(a => a.title),
+    runtime: r.runtime, model: r.model, answer: r.text, error_kind: r.error?.kind ?? null, error_detail: r.error?.detail ?? null,
+    latency_ms: Date.now() - t0 });
   if (r.zero) await logEvent({ user_id: who, channel, session_id: sessionId ?? null, kind: "gap", query: question, filters: r.filters, ref_event_id: eventId });
-  return { answer: r.text, assets: r.assets, gap: r.zero, runtime: r.runtime, trace: r.trace, event_id: eventId };
+  return { r, eventId };
+}
+
+export async function apiAsk(question: string, who: string, channel: Channel, history: { role: "user" | "assistant"; content: string }[] = [], sessionId?: string | null) {
+  const { r, eventId } = await askAndLog(question, who, channel, history, sessionId);
+  return { answer: r.text, assets: r.assets, gap: r.zero, runtime: r.runtime, model: r.model, trace: r.trace, event_id: eventId };
 }
 
 export function apiAssets(p: { vertical?: string; type?: string; product?: string }) {
@@ -42,7 +62,7 @@ export function apiAssets(p: { vertical?: string; type?: string; product?: strin
 }
 
 export async function apiGaps() {
-  const asked = (await recentEvents(1000)).filter(e => e.kind === "gap");
+  const asked = await recentEvents(1000, `kind=eq.gap&${realOnly()}`);
   return coverageGaps().map(g => ({
     ...g,
     asked: asked.filter(e => {

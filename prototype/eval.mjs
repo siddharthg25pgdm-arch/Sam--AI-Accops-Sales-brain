@@ -42,7 +42,7 @@ function questions() {
 async function ask(q) {
   const r = await fetch(`${base}/api/v1/ask`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "x-sam-test": "1" },
     body: JSON.stringify({ question: q }),
   });
   if (!r.ok) throw new Error(`${r.status} ${(await r.text()).slice(0, 120)}`);
