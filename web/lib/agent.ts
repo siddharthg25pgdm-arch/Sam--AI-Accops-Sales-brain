@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, type SearchHit, type Asset } from "./cards";
-import { askOpenAICompat, openAICompatConfigured } from "./agent-openai";
+import { searchAssets, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, type SearchHit, type SearchArgs, type Asset } from "./cards";
+import { askOpenAICompat, openAICompatConfigured, compatModels } from "./agent-openai";
 import { providerFailure, type AskError } from "./events";
 
 export type AskResult = {
@@ -20,43 +20,44 @@ export type AskResult = {
   error: AskError | null;
 };
 
-export const SYSTEM = `You are SAM, the sales and marketing brain for Accops, an Indian cybersecurity and digital workspace company
-(HySecure ZTNA, HyID MFA/SSO, HyWorks VDI/DaaS, HyLabs, HyDesk, Browser Isolation). You help salespeople find the right
-collateral fast and tell them how to use it.
+// Tight on purpose: Groq's free tier allows 8,000 tokens a minute, and this prompt is re-sent on
+// every round of every question. No library counts - they went stale twice and a stale "we have no
+// decks" once suppressed correct answers.
+export const SYSTEM = `You are SAM. You help Accops sales reps find collateral. Accops is an Indian cybersecurity and digital
+workspace vendor: HySecure (ZTNA), HyID (MFA/SSO), HyWorks (VDI/DaaS), HyLabs, HyDesk (thin clients), Browser Isolation.
 
-Rules:
-- Recommend ONLY assets returned by search_assets. Never invent a document, client or number.
-- Call search_assets with sensible filters. **You have at most 3 searches.** If a search returns nothing or nothing
-  suitable, do not repeat it with reworded text: drop a filter (asset_type, then product, then vertical) and widen.
-  After 3 searches you must answer from what you have, even if the answer is "we do not have this".
-- The library DOES contain decks, battlecards and competitive comparisons — 552 decks and 8 competitive assets,
-  including Accops vs Citrix, vs VMware Horizon, vs Omnissa, vs Zscaler and vs Cisco AnyConnect. Recommend them
-  when asked. (Both of these were once false and the prompt said so; do not tell a rep a deck does not exist.)
-- SOME assets have a public link and can be forwarded; most cannot. Use the tool result, not an assumption:
-  visibility "public" means sendable, "internal" means it must not leave Accops. When someone asks for something
-  to send to a customer, search with audience "external" first — that filter now returns real results. If it comes
-  back empty, fall back to an internal search and say plainly that nothing is published yet.
-- **trust** on a result is a warning to pass on, in your own words. If it says EXPIRED, say the document must not be
-  sent and why. If it says a newer edition exists, recommend the newer one instead. If it is a note about age, mention
-  it in the one line about that asset. Never recommend an expired document as if it were current.
-- Reply shape: one sentence of verdict, then up to three assets. For each: exact title, one line on why it fits THIS ask.
-  Do not paste links; the interface renders them from your tool results.
-- If nothing fits, say so in the first sentence, offer the two nearest substitutes, and name the gap plainly.
-- Client names in case studies are anonymised in outbound use. Refer to clients by descriptor unless the card says the client is named.
-- Under 120 words. No greetings, no sign-off.`;
+- Name ONLY documents search_assets returned, by exact title. Never invent a document, client, number or price.
+  If nothing returned fits, say so plainly in one sentence.
+- One search in the rep's words is usually enough. Set asset_type only when the rep names a type. The server widens a
+  filter that finds nothing and decides internal vs external from the rep's wording, so never repeat a search reworded.
+  At most 3 searches.
+- The library has case studies, whitepapers, decks, brochures and datasheets, certificates, and competitive battlecards
+  (vs Citrix, VMware Horizon, Omnissa, Zscaler, Cisco AnyConnect and others).
+- visibility "public" may be sent outside Accops; "internal" must not leave Accops. Say which.
+- trust is a warning to pass on: EXPIRED means do not send it; a newer edition means recommend that one; an age note
+  goes in that asset's line.
+- Case-study clients are anonymised: use the descriptor unless the result names the client.
+- Reply: one verdict sentence, then up to 3 lines "- **exact title** - why it fits this ask". No links. Under 100 words.
+  No greeting.`;
+
+/** Searches one question may make. The round after the last one runs with tools switched off, so the
+ *  model has to answer from what it found - "The model ran out of steps" was ~1 in 6 production answers. */
+export const MAX_SEARCHES = 3;
+/** Results per search handed to the model. Three become cards; one spare lets it pick the newer
+ *  edition. Was 5 at 300-char briefs, which made the tool payload most of every question's tokens. */
+const SEARCH_LIMIT = 4;
+export const ASSET_TYPES = ["Case Study", "Whitepaper", "Battlecard", "Deck", "Brochure"];
 
 const tools: Anthropic.Tool[] = [{
   name: "search_assets",
-  description: "Search Accops sales and marketing collateral (case studies, whitepapers). Returns ranked asset cards with why they matched.",
+  description: "Search Accops sales and marketing collateral. Returns ranked assets with why they matched.",
   input_schema: {
     type: "object",
     properties: {
       query: { type: "string", description: "What the salesperson needs, in plain words: use case, competitor, regulator, persona." },
-      asset_type: { type: "string", enum: ["Case Study", "Whitepaper", "Battlecard", "Deck", "Brochure", ""], description: "Optional filter. Battlecard covers competitive comparisons (Citrix, VMware, Omnissa, Zscaler, VPNs)." },
+      asset_type: { type: "string", enum: [...ASSET_TYPES, ""], description: "Only when the rep names a type. Battlecard = competitive comparisons; Brochure includes datasheets." },
       vertical: { type: "string", enum: [...Object.keys(VERTICALS), ""], description: "Optional industry filter." },
       product: { type: "string", enum: [...PRODUCTS, ""], description: "Optional product filter." },
-      audience: { type: "string", enum: ["internal", "external"], description: "external = only assets with a public URL." },
-      limit: { type: "integer", minimum: 1, maximum: 8 },
     },
     required: ["query"],
     additionalProperties: false,
@@ -72,26 +73,211 @@ export function toCard(h: SearchHit) {
     // the ones where sending the wrong copy actually costs something.
     trust: trustNote(a), path: a.file?.path ?? null };
 }
-export function toolPayload(hits: SearchHit[], considered: number) {
-  return JSON.stringify({ total_considered: considered, results: hits.map(h => ({
-    title: h.asset.title, asset_type: h.asset.asset_type, industry: h.asset.industry, client: h.asset.client,
-    products: h.asset.products, use_for: h.asset.use_for, brief: (h.asset.brief || h.asset.key_problem || "").slice(0, 300),
-    key_outcomes: h.asset.key_outcomes.slice(0, 4), year: yearOf(h.asset), stale: isStale(h.asset),
+/** What the model sees of each result. Every field here is re-sent on every later round of the
+ *  question, so it is the biggest token cost SAM has: short brief, two outcomes, empty fields dropped. */
+export function toolPayload(hits: SearchHit[], note: string | null = null) {
+  const keep = (o: Record<string, unknown>) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== null && v !== "" && !(Array.isArray(v) && !v.length)));
+  return JSON.stringify({ ...(note ? { note } : {}), results: hits.map(({ asset: a, why }) => keep({
+    title: a.title, type: a.asset_type, industry: a.industry, client: a.client, products: a.products.join(", "),
+    use_for: a.use_for.slice(0, 100), brief: (a.brief || a.key_problem || "").slice(0, 160),
+    outcomes: a.key_outcomes.slice(0, 2).map(o => o.slice(0, 80)), year: yearOf(a),
     // The model needs the REASON, not just a boolean. "stale: true" cannot distinguish an old but
     // perfectly usable whitepaper from an ISO certificate that expired two years ago, and only one
-    // of those must never be sent to procurement.
-    trust: trustNote(h.asset),
-    visibility: h.asset.public_url ? "public" : "internal", why_match: h.why })) });
+    // of those must never be sent to procurement. trustNote() also carries the age warning.
+    trust: trustNote(a),
+    visibility: a.public_url ? "public" : "internal", matched: why })) });
 }
 
-/** Heuristic slot extraction used by the local fallback and as a hint for logging. */
+// "public sector" is a vertical, not a request to send something outside Accops.
+const EXTERNAL = /\b(send|sending|email|mail|share|forward|give|hand)\b[^.?!]{0,40}\b(customer|client|prospect|buyer|cio|ciso|cto|them|outside)\b|\bfor (a|the|my|our) (customer|client|prospect)\b|customer-facing|client-facing|\bpublic\b(?! sector)|\bexternal(ly)?\b|\bsend to\b|\bshare with\b|\bforward\b/;
+
+/** Heuristic slot extraction used by the local fallback, and the ONLY source of `audience` for the
+ *  models too. Left to the model, the first search was external almost every time - "which deck has
+ *  the Citrix comparison?" made four identical public-only searches and ran out of steps. External
+ *  now means the rep said they are sending it outside Accops; "internal" in the ask always wins. */
 export function heuristicFilters(q: string) {
   const p = q.toLowerCase();
   const vertical = Object.entries(VERTICALS).find(([, words]) => words.some(w => p.includes(w)))?.[0] ?? "";
   const asset_type = /white ?paper|guide|ebook|pov/.test(p) ? "Whitepaper" : /case stud|proof|reference|customer story|deployment/.test(p) ? "Case Study" : "";
   const product = PRODUCTS.find(x => p.includes(x.toLowerCase())) ?? "";
-  const audience: "internal" | "external" = /send to|share with|forward|customer-facing|public|external/.test(p) ? "external" : "internal";
+  const audience: "internal" | "external" = !/\binternal\b|\bmy own\b/.test(p) && EXTERNAL.test(p) ? "external" : "internal";
   return { vertical, asset_type, product, audience };
+}
+
+function pick(value: unknown, options: string[]): string | undefined {
+  const v = String(value ?? "").trim().toLowerCase(); if (!v) return undefined;
+  const exact = options.find(o => o.toLowerCase() === v); if (exact) return exact;
+  const partial = options.find(o => o.toLowerCase().includes(v) || v.includes(o.toLowerCase().split(" ")[0])); if (partial) return partial;
+  const hit = Object.entries(VERTICALS).find(([, words]) => words.some(w => v.includes(w)))?.[0];
+  return hit && options.includes(hit) ? hit : undefined;
+}
+
+/** A free-text asset type as the catalogue groups it, through the same typeGroup() the catalogue
+ *  uses: "datasheet" is a Brochure, "presentation" a Deck, "comparison" a Battlecard. Anything it
+ *  cannot place is no filter at all rather than a wrong one. */
+export function assetTypeOf(value: unknown): string | undefined {
+  const v = String(value ?? "").toLowerCase().replace(/[\s-]+/g, "");
+  if (!v) return undefined;
+  if (/compar|versus|^vs/.test(v)) return "Battlecard";
+  const g = typeGroup({ asset_type: v } as Asset);
+  return g === "Other" ? undefined : g;
+}
+
+/** Asset types the rep's own words ask for. */
+const TYPE_WORDS: [string, RegExp][] = [
+  ["Case Study", /case ?stud|customer stor|reference/],
+  ["Whitepaper", /white ?paper|e-?book|thought leadership|\bpov\b/],
+  ["Battlecard", /battle ?card|competitive|comparison|compare|\bvs\.?\b|versus/],
+  ["Deck", /\bdecks?\b|presentation|\bslides?\b|\bppt/],
+  ["Brochure", /brochure|data ?sheet|leaflet|flyer|one-pager/],
+];
+export function typesNamedIn(q: string): string[] {
+  const p = q.toLowerCase();
+  return TYPE_WORDS.filter(([, re]) => re.test(p)).map(([t]) => t);
+}
+
+export type SearchRun ={ hits: SearchHit[]; considered: number; input: SearchArgs; note: string | null; payload: string };
+
+/** One search as a model asked for it, with what the server knows better applied on top. Both model
+ *  paths call this, so the rules live once:
+ *    - arguments are normalised leniently (open models send "Banking", "datasheet", "5");
+ *    - audience comes from the rep's words, never the model (see heuristicFilters);
+ *    - asset_type applies only when the rep's words name that type. The model added "Whitepaper" to
+ *      datasheet, brochure and certificate asks, and a wrong type filter rarely returns ZERO - it
+ *      returns one irrelevant whitepaper, so widening-on-empty never fires. Unfiltered, the ranking
+ *      already rewards a type word in the query;
+ *    - a filter that finds nothing is dropped here - audience, then asset_type, then product - and
+ *      the model is told which, instead of spending its next round re-asking in reworded text. */
+export function runSearch(raw: Record<string, unknown>, question: string): SearchRun {
+  const wanted = assetTypeOf(raw.asset_type);
+  const notes: string[] = [];
+  if (wanted && !typesNamedIn(question).includes(wanted)) notes.push(`asset_type ${wanted} ignored because the rep did not ask for that type`);
+  let args: SearchArgs = {
+    query: String(raw.query ?? "").trim() || question,
+    asset_type: wanted && typesNamedIn(question).includes(wanted) ? wanted : undefined,
+    vertical: pick(raw.vertical, Object.keys(VERTICALS)),
+    product: pick(raw.product, PRODUCTS),
+    audience: heuristicFilters(question).audience,
+    limit: SEARCH_LIMIT,
+  };
+  let { results, considered } = searchAssets(args);
+  if (!results.length && args.audience === "external") {
+    args = { ...args, audience: "internal" }; ({ results, considered } = searchAssets(args));
+    notes.push("nothing published matches, so these are internal only");
+  }
+  for (const k of ["asset_type", "product"] as const) {
+    if (results.length || !args[k]) continue;
+    notes.push(`nothing matched ${k} ${args[k]}, so that filter was dropped`);
+    args = { ...args, [k]: undefined }; ({ results, considered } = searchAssets(args));
+  }
+  const note = notes.length ? `${notes.join("; ")}.` : null;
+  return { hits: results, considered, input: args, note, payload: toolPayload(results, note) };
+}
+
+// ---- Grounding: a document may be named to a rep only if a search in this turn returned it. ----
+//
+// The prompt already said "never invent a document", and production still named "HyID Product
+// Overview Deck", "HyID vs Okta Battlecard" and "HyID Technical Whitepaper" after three empty
+// searches. So it is enforced on the text here, not requested of the model.
+
+const STOP_T = new Set(["the", "a", "an", "of", "for", "and", "to", "in", "on", "with", "by", "from", "accops", "our", "this", "that", "its", "your"]);
+function toks(s: string): string[] {
+  return s.toLowerCase().replace(/white paper/g, "whitepaper").replace(/data sheet/g, "datasheet").replace(/battle card/g, "battlecard").replace(/e-book/g, "ebook")
+    .split(/[^a-z0-9]+/).map(t => t.replace(/ies$/, "y").replace(/s$/, "")).filter(t => t.length > 1 && !STOP_T.has(t));
+}
+/** Words that make a span a document name rather than emphasis ("**Internal only**" is not a title). */
+const DOC_NOUN = /\b(decks?|battle ?cards?|white ?papers?|brochures?|data ?sheets?|case stud(?:y|ies)|overviews?|guides?|reports?|certificat(?:e|es|ion)|presentations?|comparisons?|e-?books?|briefs?|playbooks?|one-pagers?)\b/i;
+/** A capitalised phrase ending in a document type, for titles written into a sentence unmarked. The
+ *  noun list is narrower than DOC_NOUN because "Guide" and "Report" are ordinary words in a reason. */
+const TITLE_PHRASE = /(?:[A-Z0-9][\w&+.'’-]*[ \t]+){1,7}(?:Deck|Battlecard|Battle Card|Whitepaper|White Paper|Brochure|Datasheet|Data Sheet|Case Study|Presentation|eBook|E-book)s?\b/g;
+const LEAD = /^(?:the|a|an|this|that|our|any|no|its|their|these|those)\s+/i;
+/** "we have no **SOC 2 report**" is the honest answer, not an invented document. */
+const NEGATED = /\b(?:no|not|any|don['’]t|doesn['’]t|isn['’]t|aren['’]t|lacks?|without|never)\s+(?:[\w-]+\s+){0,2}(?:\*\*|__|["“])?$/i;
+
+/** Every span of `text` that reads as a document name: bold or quoted spans with a document noun,
+ *  the lead of each list item (a bold lead always - the reply shape asks for "- **title** - why"),
+ *  and capitalised "... Deck" / "... Whitepaper" phrases. A span straight after a negation is skipped.
+ *  ponytail: a heuristic. An unbolded, unquoted invented title with no document noun gets past it;
+ *  if the eval's grounding column shows that happening, move to index references ("[2]"). */
+export function namedTitles(text: string): string[] {
+  const out = new Set<string>();
+  const add = (s: string, always: boolean, before = "") => {
+    const bare = s.replace(/\*\*|__/g, "").trim();
+    const lead = bare.match(LEAD)?.[0] ?? "";
+    const t = bare.slice(lead.length).trim();
+    if (t.length < 4 || NEGATED.test(before + lead)) return;
+    if (always || DOC_NOUN.test(t)) out.add(t);
+  };
+  for (const line of text.split("\n")) {
+    const item = line.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/);
+    if (!item) continue;
+    const bold = item[1].match(/^\*\*(.+?)\*\*/);
+    add(bold ? bold[1] : item[1].split(/\s[-–—]\s|:\s|\s\(/)[0], Boolean(bold));
+  }
+  const before = (i: number) => text.slice(Math.max(0, i - 40), i);
+  for (const m of text.matchAll(/\*\*(.+?)\*\*|__(.+?)__|["“]([^"”\n]{4,120})["”]/g)) add(m[1] ?? m[2] ?? m[3], false, before(m.index));
+  for (const m of text.matchAll(TITLE_PHRASE)) add(m[0], false, before(m.index));
+  return [...out];
+}
+
+/** True when `name` plausibly refers to `a`: most of its words appear in the title, type or filename.
+ *  Lenient on purpose - a model shortens "Accops Powered VDI vs Citrix VDI" to "the Citrix VDI
+ *  comparison" - because what it must catch is a name that shares almost nothing with any result. */
+export function namesAsset(name: string, a: Asset): boolean {
+  const c = toks(name);
+  if (!c.length) return true;
+  const t = new Set(toks(`${a.title} ${a.asset_type} ${typeGroup(a)} ${a.industry} ${(a.file?.path ?? "").split("/").pop() ?? ""}`));
+  return c.filter(x => t.has(x)).length / c.length >= 0.7;
+}
+
+const GAP_TEXT = "Nothing in the library matches that, and it has been logged as a content gap. Try a broader industry or product, or browse the catalogue.";
+
+/** The answer SAM gives when it will not use the model's prose: plain, and built only from real cards. */
+function plainAnswer(cards: AskResult["assets"], question: string): string {
+  if (!cards.length) return GAP_TEXT;
+  const lines = ["No exact match I can vouch for. Closest in the library:"];
+  if (heuristicFilters(question).audience === "external" && !cards.some(c => c.visibility === "public"))
+    lines.push("None of these is published, so ask marketing before sending anything outside Accops.");
+  for (const c of cards) if (c.trust) lines.push(`- ${c.title}: ${c.trust}`);
+  return lines.join("\n");
+}
+
+/** Close out a model answer. Both model paths end here, so the guarantees hold for either:
+ *    1. No search returned anything -> a plain gap, whatever the model wrote. An empty search is
+ *       exactly when the prose invented documents ("internal brochures contain the cost details").
+ *    2. The prose names a document no search returned -> the prose is replaced by plainAnswer().
+ *    3. Cards come from EVERY search this turn, not just the last (the prose draws on all of them):
+ *       the documents the prose names, in its order, then the best of the rest. Max 3. */
+export function finish(p: {
+  question: string; text: string; pool: SearchHit[]; calls: number; runtime: AskResult["runtime"]; model: string | null;
+  trace: AskResult["trace"]; filters: Record<string, unknown>; error: AskError | null;
+}): AskResult {
+  let hits = best(p.pool), text = p.text.trim();
+  const names = namedTitles(text);
+  const bad = names.filter(n => !hits.some(h => namesAsset(n, h.asset)));
+  if (bad.length) p.trace.push({ step: "grounding guard: answer replaced", detail: `named ${bad.length} document(s) no search returned: ${bad.join("; ")}`.slice(0, 300) });
+  // Named documents without searching at all: search for it, rather than trust what the model remembers.
+  if (bad.length && !p.calls) {
+    const s = runSearch({ query: p.question }, p.question);
+    hits = s.hits;
+    p.trace.push({ step: "tool call: search_assets (grounding)", detail: JSON.stringify(s.input) }, { step: "tool result", detail: `${s.hits.length} of ${s.considered} assets` });
+  }
+  const searched = p.calls > 0 || bad.length > 0;
+  const named = names.map(n => hits.find(h => namesAsset(n, h.asset))).filter((h): h is SearchHit => Boolean(h));
+  const cards = [...new Set([...named, ...hits])].slice(0, 3).map(toCard);
+  if (searched && !hits.length) text = GAP_TEXT;
+  else if (bad.length || !text) text = plainAnswer(cards, p.question);
+  return { text, assets: cards, trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error,
+    // A gap is "we ended up with nothing", not "the first search missed": the first search is often
+    // over-filtered and widened later. No search at all (a greeting) is not a gap either.
+    intent: searched ? (hits.length ? "find_asset" : "gap") : "other", zero: searched && !hits.length };
+}
+
+/** One entry per asset across every search, at its best score, best first. */
+function best(pool: SearchHit[]): SearchHit[] {
+  const m = new Map<string, SearchHit>();
+  for (const h of pool) { const k = assetKey(h.asset), seen = m.get(k); if (!seen || h.score > seen.score) m.set(k, h); }
+  return [...m.values()].sort((a, b) => b.score - a.score);
 }
 
 // Leaves ~20 s of the route's 60 s maxDuration for retrieval, logging and a second provider.
@@ -112,8 +298,14 @@ export async function ask(question: string, history: { role: "user" | "assistant
   // empty answer outranks a recovered outage); otherwise the recovered failure is what gets recorded.
   const withFailures = (r: AskResult): AskResult => ({ ...r, error: r.error ?? providerFailure(failures, true) });
   if (openAICompatConfigured()) {
-    try { return withFailures(await askOpenAICompat(question, history, t0, deadline)); }
-    catch (err) { failed(process.env.OPENAI_COMPAT_MODEL ?? "openai-compatible", err); }
+    // Primary, then a second model on the same provider. Groq's free-tier limits are per model, so
+    // when gpt-oss-120b is out of tokens for the minute (429) gpt-oss-20b usually is not - better a
+    // smaller model than none. Skipped when there is too little time left for a whole answer.
+    for (const model of compatModels()) {
+      if (Date.now() > deadline - 5_000) break;
+      try { return withFailures(await askOpenAICompat(question, history, t0, deadline, model)); }
+      catch (err) { failed(model, err); }
+    }
   }
   if (process.env.ANTHROPIC_API_KEY && Date.now() < deadline) {
     try { return withFailures(await askClaude(question, history, t0, deadline)); }
@@ -130,51 +322,37 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
   const model = process.env.CLAUDE_MODEL ?? "claude-sonnet-5";
   // Effort is supported on Opus/Sonnet 4.6+ and errors on Haiku 4.5, so only send it where it works.
   const effort = /haiku/.test(model) ? {} : { output_config: { effort: "medium" as const } };
-  const messages: Anthropic.MessageParam[] = [...history.slice(-6), { role: "user", content: question }];
+  const messages: Anthropic.MessageParam[] = [...history.slice(-4), { role: "user", content: question }];
   const trace: AskResult["trace"] = [];
-  let lastHits: SearchHit[] = [], filters: Record<string, unknown> = {}, calls = 0;
-  for (let i = 0; i < 4; i++) {
-    const res = await client.messages.create({ model, max_tokens: 2000, system: SYSTEM, tools, messages, ...effort },
+  const pool: SearchHit[] = [];
+  let filters: Record<string, unknown> = {}, calls = 0;
+  // Same shape as askOpenAICompat: up to MAX_SEARCHES searching rounds, then one with tools off.
+  for (let round = 0; ; round++) {
+    const final = calls >= MAX_SEARCHES || round >= MAX_SEARCHES;
+    const res = await client.messages.create({ model, max_tokens: 2000, system: SYSTEM, tools, tool_choice: { type: final ? "none" : "auto" }, messages, ...effort },
       { timeout: Math.max(1000, deadline - Date.now()), maxRetries: 0 });
     const toolUses = res.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
-    if (res.stop_reason !== "tool_use" || toolUses.length === 0) {
+    if (final || res.stop_reason !== "tool_use" || toolUses.length === 0) {
       const text = res.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map(b => b.text).join("\n").trim();
       trace.push({ step: "model", detail: `${model} · ${((Date.now() - t0) / 1000).toFixed(1)}s · ${res.usage.input_tokens} in / ${res.usage.output_tokens} out` });
-      return { text: text || "No answer was produced.", assets: lastHits.slice(0, 3).map(toCard), trace, runtime: "claude", model,
-        error: text ? null : { kind: "empty_answer", detail: `${model} finished with no text after ${calls} searches` },
-        // A gap is "we ended up with nothing", not "the first search missed". The model's opening
-        // search is often over-filtered on purpose - it narrows, then widens - so keying the gap to
-        // it reported a content gap on questions that were answered two searches later. That is how
-        // "hysecure datasheet" showed three assets under a red "Logged as a content gap" banner:
-        // two independent signals disagreeing about the same answer.
-        // No search at all (a greeting, a clarifying reply) is not a gap either.
-        intent: calls ? (lastHits.length ? "find_asset" : "gap") : "other", filters, zero: calls > 0 && lastHits.length === 0 };
+      return finish({ question, text, pool, calls, runtime: "claude", model, trace, filters,
+        error: text ? null : { kind: final ? "step_exhausted" : "empty_answer", detail: `${model} finished with no text after ${calls} searches` } });
     }
     messages.push({ role: "assistant", content: res.content });
-    const results: Anthropic.ToolResultBlockParam[] = [];
+    const results: (Anthropic.ToolResultBlockParam | Anthropic.TextBlockParam)[] = [];
     for (const tu of toolUses) {
-      const input = tu.input as Record<string, string | number>;
-      calls++; filters = { ...input };
-      trace.push({ step: "tool call: search_assets", detail: JSON.stringify(input) });
-      const { results: hits, considered } = searchAssets({ query: String(input.query ?? ""), asset_type: String(input.asset_type ?? "") || undefined,
-        vertical: String(input.vertical ?? "") || undefined, product: String(input.product ?? "") || undefined,
-        audience: (input.audience as "internal" | "external") || "internal", limit: Number(input.limit ?? 5) });
-      if (hits.length) lastHits = hits;
-      trace.push({ step: "tool result", detail: `${hits.length} of ${considered} assets` });
-      results.push({ type: "tool_result", tool_use_id: tu.id, content: toolPayload(hits, considered) });
+      const s = runSearch(tu.input as Record<string, unknown>, question);
+      calls++; filters = { ...s.input };
+      pool.push(...s.hits);
+      trace.push({ step: "tool call: search_assets", detail: JSON.stringify(s.input) }, { step: "tool result", detail: `${s.hits.length} of ${s.considered} assets${s.note ? ` - ${s.note}` : ""}` });
+      results.push({ type: "tool_result", tool_use_id: tu.id, content: s.payload });
     }
+    if (calls >= MAX_SEARCHES) results.push({ type: "text", text: BUDGET_USED });
     messages.push({ role: "user", content: results });
   }
-  // Search budget exhausted. Answer from whatever the searches did find rather than showing an error,
-  // and treat "nothing found" as a genuine gap so it is logged and reported like any other.
-  trace.push({ step: "search budget reached", detail: `${calls} searches; answering from the best results found` });
-  const cards = lastHits.slice(0, 3).map(toCard);
-  const text = cards.length
-    ? `No exact match. The closest ${cards.length === 1 ? "asset" : "assets"} in the library:`
-    : "Nothing in the library matches that. Try an industry, product or competitor, or browse the catalogue.";
-  return { text, assets: cards, trace, runtime: "claude", model, intent: cards.length ? "find_asset" : "gap", filters, zero: cards.length === 0,
-    error: { kind: "step_exhausted", detail: `${model}: search budget reached after ${calls} searches` } };
 }
+
+export const BUDGET_USED = "Search budget used. Answer now from the results above.";
 
 function askLocal(question: string, t0: number): AskResult {
   const f = heuristicFilters(question);
