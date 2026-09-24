@@ -82,4 +82,35 @@ assert.equal(both.length, 2, "renamed pdf+pptx twins still collapse with the car
 const gone = await load([pptx, other], [card("Zeta vs Omega.pdf", "I1")]);
 assert.equal(gone.length, 2, "dead binding: card still collapses with the same-named pptx twin");
 
+// 7. Two differently-named documents behind ONE public URL collapse to one, the richer card winning,
+//    even when the URLs differ in case, encoding or query string. The pdf/pptx twin collapse still holds.
+const pub = (filename, url, brief) => ({ ...card(filename, null), title: filename.replace(/\.\w+$/, ""), visibility: "both", public_url: url, expired: false, brief });
+const url = await load([pdf, pptx, other], [
+  card("Zeta vs Omega.pdf", "I1"),
+  pub("Zeta Bank Study.pdf", "https://downloads.accops.com/Zeta%20Bank.pdf", "short"),
+  pub("Zeta Two Banks.pdf", "https://DOWNLOADS.accops.com/zeta bank.pdf?utm=x", "a much longer and richer brief about two zeta banks"),
+]);
+assert.equal(url.length, 3, "public-url twins collapse; battlecard group and roadmap untouched");
+const shared = url.filter(a => a.public_url);
+assert.equal(shared.length, 1);
+assert.equal(shared[0].title, "Zeta Two Banks", "richer card wins");
+
+// 8. Tokenisation: word-start matching, "SOC 2" as a phrase, stopwords, type words.
+const { queryTokens, searchAssets } = await jiti.import("./cards.ts");
+assert.deepEqual(queryTokens("do we have a SOC 2 report?"), ["soc 2", "report"]);
+assert.deepEqual(queryTokens("Accops vs Forcepoint"), ["forcepoint"]);
+assert.deepEqual(queryTokens("2fa for AI"), ["2fa", "ai"]);
+await load([
+  row("S1", "Brand", "Social-Media-Zeta-Banner.png"), row("S2", "Compliance", "Zeta SOC2 attestation.pdf"),
+  row("S3", "Compliance", "Zeta SOC overview.pdf"), row("S4", "Analyst", "Quarterly report.pdf"),
+  row("S5", "Competition", "Zeta vs Omega.pdf"), row("S6", "Pharma", "Zeta pharmaceutical brochure.pdf"),
+], []);
+const titles = q => searchAssets({ query: q, limit: 10 }).results.map(r => r.asset.title);
+assert.deepEqual(titles("SOC 2"), ["Zeta SOC2 attestation"], "soc 2 is a phrase; social banners and plain SOC do not match");
+assert.ok(titles("soc").includes("Zeta SOC overview") && !titles("soc").includes("Social-Media-Zeta-Banner"), "soc does not match social");
+assert.ok(titles("omega report").every(t => /omega/i.test(t)), "a type word alone does not qualify an asset");
+assert.ok(titles("Accops vs Omega").every(t => /omega/i.test(t)), "accops and vs are stopwords");
+assert.ok(titles("pharma").includes("Zeta pharmaceutical brochure"), "long tokens prefix-match");
+assert.ok(titles("zeta brochures").includes("Zeta pharmaceutical brochure"), "plural type word still matches");
+
 console.log("cards.check: ok");
