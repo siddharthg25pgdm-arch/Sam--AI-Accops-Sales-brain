@@ -231,6 +231,8 @@ export function namesAsset(name: string, a: Asset): boolean {
   return c.filter(x => t.has(x)).length / c.length >= 0.7;
 }
 
+/** An answer whose verdict is "we don't have it". Only acted on when it also names no document. */
+const DENIAL = /^\W*(no\b|none\b|nothing\b|there (is|are) no\b|we (do not|don['’]t) have\b|sam (does not|doesn['’]t) have\b|the library (does not|doesn['’]t) have\b|i (could not|couldn['’]t) find\b|unfortunately\b)/i;
 const GAP_TEXT = "Nothing in the library matches that, and it has been logged as a content gap. Try a broader industry or product, or browse the catalogue.";
 // "what does hyworks cost", "pricing for HyWorks" - not "cost savings case study".
 const PRICE_ASK = /\b(price|prices|pricing|priced|quote|quotation|how much)\b|\bwhat (does|do|would) .{1,40}\bcost\b|\bcost of (a |an |the )?(licen|subscription|hy|accops)/i;
@@ -290,6 +292,13 @@ export function finish(p: {
     return { text: NO_PRICING, assets: [], trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error, intent: "gap", zero: true };
   }
   const named = names.map(n => hits.find(h => namesAsset(n, h.asset))).filter((h): h is SearchHit => Boolean(h));
+  // The model looked at everything found and turned it all down ("No media-industry ZTNA whitepaper
+  // is available.") without naming a substitute. Believe it: the retrieval floor always finds
+  // SOMETHING, and showing social-media banner images under that sentence contradicts it.
+  if (searched && text && !names.length && DENIAL.test(text)) {
+    p.trace.push({ step: "verdict: nothing fits", detail: "the model rejected every result and named none" });
+    return { text, assets: [], trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error, intent: "gap", zero: true };
+  }
   const cards = [...new Set([...named, ...hits])].slice(0, 3).map(toCard);
   if (searched && !hits.length) text = GAP_TEXT;
   else if (bad.length || !text) text = plainAnswer(cards, p.question);

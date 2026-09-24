@@ -104,6 +104,17 @@ r = await ask("pricing for hydesk");
 ok(/^Pricing is not in the collateral library/.test(r.text) && r.assets.length === 0 && r.zero, `pricing is a gap: ${r.text}`);
 ok(!/^Pricing/.test((run([call({ query: "hydesk" }), say("- **Accops HyDesk Brochure V6 2026** - fits")]), await ask("hydesk brochure for cost savings")).text), "'cost savings' is not a pricing ask");
 
+// 1d''. The model turns everything down and names nothing: a gap, no contradicting cards.
+run([say("No media-industry ZTNA whitepaper is available.")]);
+r = await ask("do we have a media industry ZTNA whitepaper?");
+ok(r.zero && r.intent === "gap" && r.assets.length === 0 && /^No media/.test(r.text), `a denial with no named substitute is a gap: ${r.assets.map(a => a.title)}`);
+run([say("No exact match. Closest:\n- **Accops HyDesk Brochure V6 2026** - nearest fit")]);
+r = await ask("hydesk brochure for a new branch office");
+ok(!r.zero && r.assets.some(a => /HyDesk/.test(a.title)), `a denial that names a real substitute keeps its cards: ${r.assets.map(a => a.title)}`);
+run([say("No exact match. Closest:\n- **Accops HyDesk Brochure V6 2026** - nearest fit")]);
+r = await ask("hydesk brochure for media companies");
+ok(!r.zero && r.assets.length > 0, `an unreturned name is replaced by the real results, not turned into a gap: ${r.assets.map(a => a.title)}`);
+
 // 1e. The detector itself: denials and emphasis are not document names; invented titles are.
 ok(namedTitles("We have no **SOC 2 report** on file.").length === 0, "a negated title is an honest gap, not an invention");
 ok(namedTitles("It is **Internal only**.").length === 0, "emphasis is not a title");
