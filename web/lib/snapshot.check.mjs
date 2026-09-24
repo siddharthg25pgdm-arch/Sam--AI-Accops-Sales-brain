@@ -43,6 +43,7 @@ refuses(snap(ids(100), { complete: undefined }), /not marked complete/, "complet
 refuses(snap(ids(100), { count: 5000 }), /does not match/, "truncated body");
 refuses(snap(ids(100), { count: undefined }), /does not match/, "count absent");
 refuses(snap([...ids(99), "abc"]), /no numeric list item id/, "bad id mapping");
+refuses(snap(ids(4999)), /pagination cap/, "4999 files + 1 folder = 5000 raw items: possibly cut off");
 refuses(snap(ids(90)), /under 90%/, "90 of 101 live is under 90%");
 const wrong = refuses(snap(Array.from({ length: 100 }, (_, i) => 1000 + i)), /wrong folder/, "right size, wrong ids");
 assert.equal(wrong.tombstone.length, 100, "a refused wrong-library snapshot would have tombstoned everything");

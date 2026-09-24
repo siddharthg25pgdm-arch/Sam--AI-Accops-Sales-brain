@@ -375,6 +375,9 @@ export type SnapshotDiff = {
 const truthy = (v: unknown) => v === true || v === "true" || v === "True";
 /** At least this share of live rows must be present in the snapshot, by count and by id. */
 const MIN_SHARE = 0.9;
+/** Power Automate's pagination limit on this licence ("Maximum: 5000", from the flow save error).
+ *  A listing that reaches it may have been cut off silently, and count would still match. */
+const PAGE_CAP = 5000;
 
 /** Pure: what a snapshot would change, or why it must not be trusted. No IO - the check exercises it. */
 export function diffSnapshot(rows: SnapRow[], snap: Snapshot): SnapshotDiff {
@@ -406,6 +409,7 @@ export function diffSnapshot(rows: SnapRow[], snap: Snapshot): SnapshotDiff {
   if (snap.count == null || Number(snap.count) !== raw.length) {
     return refuse(`count ${snap.count ?? "missing"} does not match ${raw.length} items received - truncated or unverifiable`);
   }
+  if (raw.length >= PAGE_CAP) return refuse(`listing reached the ${PAGE_CAP}-item pagination cap - may be cut off`);
   if (badIds) return refuse(`${badIds} file(s) have no numeric list item id - the flow's field mapping is wrong`);
   if (ids.size < MIN_SHARE * live.length) {
     return refuse(`snapshot lists ${ids.size} files but the registry has ${live.length} live - under ${MIN_SHARE * 100}%, so assume a partial listing`);
