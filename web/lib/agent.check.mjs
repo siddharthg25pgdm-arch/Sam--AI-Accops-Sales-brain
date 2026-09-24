@@ -98,6 +98,12 @@ run([call({ query: "hydesk brochure" }), call({ query: "zzqq nothing" }),
 r = await ask("hydesk brochure");
 ok(r.assets[0]?.title === "Accops HyDesk Brochure V6 2026" && r.text.includes("HyDesk"), "an earlier search's asset survives a later empty search");
 
+// 1d'. A pricing ask that only finds brochures: a gap, not "the brochures contain the cost details".
+run([call({ query: "hydesk pricing" }), say("The **Accops HyDesk Brochure V6 2026** contains the cost details.")]);
+r = await ask("pricing for hydesk");
+ok(/^Pricing is not in the collateral library/.test(r.text) && r.assets.length === 0 && r.zero, `pricing is a gap: ${r.text}`);
+ok(!/^Pricing/.test((run([call({ query: "hydesk" }), say("- **Accops HyDesk Brochure V6 2026** - fits")]), await ask("hydesk brochure for cost savings")).text), "'cost savings' is not a pricing ask");
+
 // 1e. The detector itself: denials and emphasis are not document names; invented titles are.
 ok(namedTitles("We have no **SOC 2 report** on file.").length === 0, "a negated title is an honest gap, not an invention");
 ok(namedTitles("It is **Internal only**.").length === 0, "emphasis is not a title");
@@ -142,6 +148,9 @@ run([() => ({ status: 429, text: "rate limit" }), () => ({ status: 429, text: "r
 r = await ask("citrix comparison");
 ok(r.runtime === "local" && r.model === null && r.assets.length > 0, "retrieval answers when every model is limited");
 ok(r.error?.kind === "fallback_retrieval" && /429/.test(r.error.detail), `fallback recorded: ${JSON.stringify(r.error)}`);
+run([() => ({ status: 429 }), () => ({ status: 429 })]);
+r = await ask("what does hyworks cost");
+ok(r.runtime === "local" && r.zero && r.assets.length === 0, "retrieval treats a pricing ask as a gap too");
 
 // 4c. OPENAI_COMPAT_FALLBACK_MODEL="" disables the second model.
 process.env.OPENAI_COMPAT_FALLBACK_MODEL = "";

@@ -231,6 +231,9 @@ export function namesAsset(name: string, a: Asset): boolean {
 }
 
 const GAP_TEXT = "Nothing in the library matches that, and it has been logged as a content gap. Try a broader industry or product, or browse the catalogue.";
+// "what does hyworks cost", "pricing for HyWorks" - not "cost savings case study".
+const PRICE_ASK = /\b(price|prices|pricing|priced|quote|quotation|how much)\b|\bwhat (does|do|would) .{1,40}\bcost\b|\bcost of (a |an |the )?(licen|subscription|hy|accops)/i;
+const NO_PRICING = "Pricing is not in the collateral library, so SAM cannot quote it. Check current pricing with your sales manager. This has been logged as a content gap.";
 
 /** The answer SAM gives when it will not use the model's prose: plain, and built only from real cards. */
 function plainAnswer(cards: AskResult["assets"], question: string): string {
@@ -263,6 +266,14 @@ export function finish(p: {
     p.trace.push({ step: "tool call: search_assets (grounding)", detail: JSON.stringify(s.input) }, { step: "tool result", detail: `${s.hits.length} of ${s.considered} assets` });
   }
   const searched = p.calls > 0 || bad.length > 0;
+  // A pricing ask finds real product brochures, and the prose then said "internal brochures contain
+  // the cost details" - a claim about content, which the title guard cannot see. So unless a returned
+  // document is ABOUT price (by title; battlecards mention competitors' price rises in passing), a
+  // pricing ask is a gap. A price list added later passes.
+  if (PRICE_ASK.test(p.question) && !hits.some(h => /\b(price|pricing)\b/i.test(h.asset.title))) {
+    p.trace.push({ step: "grounding guard: pricing", detail: "no returned document is a price list" });
+    return { text: NO_PRICING, assets: [], trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error, intent: "gap", zero: true };
+  }
   const named = names.map(n => hits.find(h => namesAsset(n, h.asset))).filter((h): h is SearchHit => Boolean(h));
   const cards = [...new Set([...named, ...hits])].slice(0, 3).map(toCard);
   if (searched && !hits.length) text = GAP_TEXT;
@@ -382,6 +393,9 @@ function askLocal(question: string, t0: number): AskResult {
   }
   trace.push({ step: "tool result", detail: `${results.length} of ${considered} assets` });
   trace.push({ step: "model", detail: `none, retrieval only · ${Date.now() - t0}ms` });
+  // Same rule as finish(): a pricing ask with no price list is a gap on every path.
+  if (PRICE_ASK.test(question) && !results.some(h => /\b(price|pricing)\b/i.test(h.asset.title)))
+    return { text: NO_PRICING, assets: [], trace, runtime: "local", model: null, intent: "gap", filters: f, zero: true, error: null };
   const label = f.vertical ? ` for ${f.vertical}` : "";
   let text: string;
   const want = [f.vertical, f.product, f.asset_type?.toLowerCase()].filter(Boolean).join(" ");
