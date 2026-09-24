@@ -14,3 +14,4 @@ corpus/*
 # boundary object the design rests on (Claude Enterprise writes it, Groq only ever reads it),
 # so it must be reviewable in a diff. Ignoring it lost 7 cards to one untracked directory.
 !corpus/cards/
+.claude/
