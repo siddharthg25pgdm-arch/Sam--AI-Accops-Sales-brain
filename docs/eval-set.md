@@ -114,12 +114,18 @@ common real ones and the number means something without anybody having to invent
 ## Running it
 
 ```
-node prototype/eval.mjs                    # against production, needs SAM_API_TOKEN
-node prototype/eval.mjs --base http://localhost:3000
+node prototype/eval.mjs                    # against production, needs SAM_API_TOKEN; one question every 20 s
+node prototype/eval.mjs --pace 30000       # slower, if the retrieval-fallback line is not zero
+node prototype/eval.mjs --base http://localhost:3000   # unpaced
 ```
 
-It prints per-question pass/fail and the hit@3 rate, and exits non-zero below 85% so it can gate a
-deploy later.
+It prints per-question pass/fail with what answered (model name or `retrieval`), tokens used and
+library size considered, then hit@3 **separately** for model-answered and retrieval-fallback
+questions. Production is paced because Groq's free tier allows ~8,000 tokens a minute: unpaced,
+most questions were rate-limited into retrieval and the "model" score was really retrieval's. A
+fallback caused by a rate limit is retried once a minute later. It also flags any answer that names
+a document not among its returned assets (GROUNDING). Exits non-zero below 85% (model-answered rate)
+or on any grounding flag.
 
 ## What it does not measure
 
