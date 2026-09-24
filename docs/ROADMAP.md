@@ -416,6 +416,17 @@ Siddharth's plan, 6 September: prove the platform on 10-50 files before ingestin
 
 **What P7 does not need:** embeddings, the full 874, Teams, or Marketing 2.0.
 
+### P8 - Website chatbot (the last phase of the project)
+
+Added 25 September 2026. A public chatbot on the Accops website, with SAM as its brain and
+**restricted access**: public material only, enforced by the database rather than the prompt.
+Page-aware question tree, a Q&A bank as the first layer, a small model as the second, location
+personalisation, a timed pop-up, and a nudge toward an account-manager conversation. First on the
+Citrix LP, then accops.com via GTM.
+
+Requirements, decisions and open questions are in [NOTE-website-chatbot.md](NOTE-website-chatbot.md),
+to be structured in the SAM PRD. Nothing is built.
+
 ### P5 - Deliberately not doing yet
 
 - **Embeddings / pgvector.** Held until the usage log shows keyword search missing things. 21 queries
