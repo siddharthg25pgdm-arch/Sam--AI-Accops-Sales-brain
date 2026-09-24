@@ -287,6 +287,22 @@ This is where the 413 ingestable files become answerable, not just findable.
       `sp_seed_registry.py --write`. Both run on the delegated Azure CLI login, so no IT approval.
 - [ ] **P4.4 Two WhatsApp expiries, both silent failures.** Access token **3 November 2026**, test
       number **early December 2026**. See `TASK-whatsapp-meta-setup.md`.
+- [ ] **P4.5 Corpus freshness, built 25 September 2026. Deletion reconcile is not live yet.**
+      - **Carding queue.** New view `sam_carding_queue` (`docs/supabase-sam-carding-queue.sql`), also at
+        `GET /api/v1/carding-queue`. It lists active, ingestable files that are `uncarded`,
+        `changed_since_card` or `renamed`. On 25 Sep: 366 uncarded, 1 changed (HySecure Datasheet V5
+        2026.pdf, uploaded 9 Sep after its public-copy card), 48 covered, out of 415.
+      - **Renames no longer detach cards.** `load_cards.py` binds each card to its registry `item_id`
+        (39 of 46 bound; the 6 public-only cards and one filename that exists in two folders stay
+        unbound and merge by filename as before). `allAssets()` merges a bound card under its row's
+        current key, so PDF/PPTX twins still collapse. `carded_at` moves only when a card's content
+        hash changes. `updated_at` could not be used for this, because it is frozen at first insert.
+        Checks: `node web/lib/cards.check.mjs`, `python prototype/load_cards.py --self-check`.
+      - **Deletions.** `POST /api/channels/sharepoint/snapshot` diffs a full Power Automate listing
+        against the registry, matching on list_item_id only. It soft-deletes, restores files that
+        reappear, and refuses with a 409 when a snapshot looks incomplete. Flow `SAM - daily SharePoint
+        snapshot` (`7fe4a4f0-...`) is created, **stopped**, in report mode, with its secret still a
+        placeholder. Steps are in `TASK-snapshot-flow.md`. Check: `node web/lib/snapshot.check.mjs`.
 
 ### P6 - Platform completeness, independent of corpus size
 
