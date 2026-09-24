@@ -25,6 +25,9 @@ with **restricted access**: it can only reach public material, never SAM's inter
    pops up an interesting question to draw them into clicking and asking.
 7. **A conversion nudge.** After engaging, the bot nudges the visitor to sign up, or offers a
    personalised approach: "We'll have an account manager connect with you directly."
+8. **An analytics dashboard, a major part of the chatbot** (added 25 September). A backend view of how
+   many people use the bot, who came in and used it, and how many times. It connects to Microsoft
+   Clarity, Google Analytics and PostHog to see more.
 
 ## 2. Already decided (25 September 2026)
 
@@ -76,13 +79,48 @@ approximate country, region and city for free, with no lookup and no stored IP. 
 lead with regionally relevant proof: Indian BFSI case studies for India, and the matching material for
 the Middle East, South-East Asia and Australia (where the KSA, SEA and AU campaigns already run).
 
-**Staging the seven requirements (proposal):**
+**Staging the eight requirements (proposal):**
 
 | Stage | Includes |
 |---|---|
-| 1 | Q&A bank, page-aware questions, the question tree, the small-model fallback, and a "Talk to sales" link. Launched on the Citrix LP |
+| 1 | Q&A bank, page-aware questions, the question tree, the small-model fallback, a "Talk to sales" link, and the **Website tab on the SAM dashboard** plus GA4 and Clarity events, so there's data from day one. Launched on the Citrix LP |
 | 2 | The timed pop-up, location personalisation, and a move to accops.com via GTM |
-| 3 | Lead capture and the account-manager handoff, most likely into GHL, since Accops' sales pipeline already lives there |
+| 3 | Lead capture and the account-manager handoff, most likely into GHL, since Accops' sales pipeline already lives there. Named-visitor analytics become possible here |
+
+## 3b. The analytics dashboard (requirement 8, Claude's proposal)
+
+**Each tool answers a different question.** Using all four for everything would give four
+disagreeing numbers.
+
+| Tool | Answers | Holds |
+|---|---|---|
+| **SAM admin dashboard**, a new "Website" tab | What did visitors ask, and did the bot answer? | Conversations, question clicks, bank hit vs model vs fallback, missed questions, leads. The only place question *text* is kept |
+| **Google Analytics 4** (property 330722232) | Where do chatbot users come from, and do they convert? | Event names only: `chat_opened`, `popup_shown`, `question_clicked`, `lead_submitted`, with page and campaign |
+| **Microsoft Clarity** | What did chatbot users do on the page? | The same events, attached to session recordings, so "sessions where someone opened the bot" can be replayed |
+| **PostHog** | Funnels and cohorts across visits | Optional. It overlaps with GA4 (funnels) and Clarity (replay), so pick it only if it replaces one of them |
+
+**What "who came in" can honestly mean:**
+- **An anonymous visitor ID** in the browser gives unique visitors, repeat visits and "used it 4 times
+  this month". It is not a name.
+- **Company level:** Midbound, already used by the Visitor Route Engine, can say "someone from Bank X".
+- **A named person** only once they hand over details at the lead step (stage 3).
+
+Anything more specific than that for an anonymous visitor isn't possible, and the dashboard should
+say so rather than imply it.
+
+**Three technical points to design in from the start:**
+1. **The iframe hides the bot from page analytics.** The widget runs in an iframe on SAM's domain, so
+   the GA4, Clarity and PostHog scripts on the parent page can't see inside it. The widget has to pass
+   each event out to the page's loader script, which forwards it to all three.
+2. **No question text goes to third parties.** GA4, Clarity and PostHog receive an event name, the
+   page, and a question-bank ID at most. What people actually typed stays in SAM's own database.
+   Visitors type company names, problems and sometimes contact details.
+3. **Consent applies here too** (see item 4 below). Analytics cookies for EU visitors need consent
+   before they're set.
+
+**Dashboard tiles, first version:** visitors, conversations, messages per conversation, repeat visitors,
+pop-up shown → clicked rate, top clicked questions per page, questions the bank missed, leads, and
+visitors by country. These are a website version of tiles the internal dashboard already has.
 
 ## 4. Things the PRD must settle
 
@@ -105,3 +143,6 @@ the Middle East, South-East Asia and Australia (where the KSA, SEA and AU campai
    questions the bank missed (these become the next bank entries), and leads. All reported as a
    "website" channel on the existing admin dashboard.
 8. **Language.** English only, or other languages for the SEA and Middle East markets?
+9. **PostHog: in or out?** Is it already in use at Accops, and would it replace GA4 or Clarity, or sit
+   alongside both? Running three analytics tools on one page slows it down, and three sets of numbers
+   will never agree.
