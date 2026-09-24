@@ -63,7 +63,7 @@ function Answer({ turn, onBrowse }: { turn: ChatTurn; onBrowse: (f: { vertical?:
   return (
     <div className="msg sam">
       <p className="verdict">{turn.content}</p>
-      {turn.assets?.map(a => <ResultCard key={a.path ?? a.title} a={a} />)}
+      {turn.assets?.map(a => <ResultCard key={a.path ?? a.title} a={a} eventId={turn.eventId} />)}
       {turn.zero && <div style={{ marginTop: 8 }}><span className="tag gap">Logged as a content gap</span> <button className="chip" style={{ marginLeft: 6 }} onClick={() => onBrowse({ vertical: f?.vertical })}>Browse nearest in catalogue</button></div>}
       {turn.eventId !== undefined && (
         <div className="feedback">
@@ -82,9 +82,9 @@ function Answer({ turn, onBrowse }: { turn: ChatTurn; onBrowse: (f: { vertical?:
   );
 }
 
-function ResultCard({ a }: { a: ChatAsset }) {
+function ResultCard({ a, eventId }: { a: ChatAsset; eventId?: number | null }) {
   const type = a.asset_type.toLowerCase().includes("case") ? "Case Study" : a.asset_type.toLowerCase().includes("white") ? "Whitepaper" : "Other";
-  function opened() { fetch("/api/open", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: a.path, source: "chat" }) }); }
+  function opened() { fetch("/api/open", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: a.path, source: "chat", eventId }) }); }
   return (
     <div className="result" data-type={type}>
       <div className="spine" aria-hidden="true" />

@@ -1,15 +1,23 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { searchAssets, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, type SearchHit, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured } from "./agent-openai";
+import { providerFailure, type AskError } from "./events";
 
 export type AskResult = {
   text: string;
   assets: { title: string; asset_type: string; industry: string; why: string; link: string | null; location: string | null; visibility: string; year: string | null; stale: boolean; trust: string | null; path: string | null }[];
   trace: { step: string; detail: string }[];
-  runtime: "claude" | "local" | "search";
+  /** Which path answered. "local" = retrieval only, no model. Consumers that only care whether a
+   *  model was involved should test `runtime !== "local"`, never `=== "claude"`. */
+  runtime: "claude" | "openai-compatible" | "local" | "search";
+  /** The model that wrote the reply; null when retrieval answered. */
+  model: string | null;
   intent: string;
   filters: Record<string, unknown>;
   zero: boolean;
+  /** What went wrong, if anything. Retrieval still answers when a model fails, so the person sees a
+   *  reply either way - this is how the failure stays visible to the dashboard. */
+  error: AskError | null;
 };
 
 export const SYSTEM = `You are SAM, the sales and marketing brain for Accops, an Indian cybersecurity and digital workspace company
@@ -86,24 +94,35 @@ export function heuristicFilters(q: string) {
   return { vertical, asset_type, product, audience };
 }
 
+// Leaves ~20 s of the route's 60 s maxDuration for retrieval, logging and a second provider.
+const MODEL_BUDGET_MS = 40_000;
+
 export async function ask(question: string, history: { role: "user" | "assistant"; content: string }[] = []): Promise<AskResult> {
-  const t0 = Date.now();
-  const providerErrors: string[] = [];
+  const t0 = Date.now(), deadline = t0 + MODEL_BUDGET_MS;
+  const failures: { model: string; message: string; timeout: boolean }[] = [];
+  const failed = (model: string, err: unknown) => {
+    const e = err as Error;
+    console.error(`${model} failed, falling back`, e);
+    failures.push({ model, message: e?.message ?? String(err), timeout: e?.name === "TimeoutError" || e?.name === "APIConnectionTimeoutError" || /timed? ?out/i.test(e?.message ?? "") });
+  };
+  // A model that answers after an earlier provider failed keeps its own error if it has one (an
+  // empty answer outranks a recovered outage); otherwise the recovered failure is what gets recorded.
+  const withFailures = (r: AskResult): AskResult => ({ ...r, error: r.error ?? providerFailure(failures, true) });
   if (openAICompatConfigured()) {
-    try { return await askOpenAICompat(question, history, t0); }
-    catch (err) { console.error("openai-compatible path failed, falling back", err); providerErrors.push(`${process.env.OPENAI_COMPAT_MODEL}: ${(err as Error).message}`); }
+    try { return withFailures(await askOpenAICompat(question, history, t0, deadline)); }
+    catch (err) { failed(process.env.OPENAI_COMPAT_MODEL ?? "openai-compatible", err); }
   }
-  if (process.env.ANTHROPIC_API_KEY) {
-    try { return await askClaude(question, history, t0); }
-    catch (err) { console.error("claude path failed, falling back", err); providerErrors.push(`${process.env.CLAUDE_MODEL ?? "claude"}: ${(err as Error).message}`); }
+  if (process.env.ANTHROPIC_API_KEY && Date.now() < deadline) {
+    try { return withFailures(await askClaude(question, history, t0, deadline)); }
+    catch (err) { failed(process.env.CLAUDE_MODEL ?? "claude-sonnet-5", err); }
   }
   const local = askLocal(question, t0);
   // Surface provider failures in the trace so a silent fallback is visible in the UI, API and dashboard.
-  for (const e of providerErrors) local.trace.unshift({ step: "model provider failed, fell back to retrieval", detail: e.slice(0, 300) });
-  return local;
+  for (const f of failures) local.trace.unshift({ step: "model provider failed, fell back to retrieval", detail: `${f.model}: ${f.message}`.slice(0, 300) });
+  return { ...local, error: providerFailure(failures, false) };
 }
 
-async function askClaude(question: string, history: { role: "user" | "assistant"; content: string }[], t0: number): Promise<AskResult> {
+async function askClaude(question: string, history: { role: "user" | "assistant"; content: string }[], t0: number, deadline: number): Promise<AskResult> {
   const client = new Anthropic();
   const model = process.env.CLAUDE_MODEL ?? "claude-sonnet-5";
   // Effort is supported on Opus/Sonnet 4.6+ and errors on Haiku 4.5, so only send it where it works.
@@ -112,18 +131,21 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
   const trace: AskResult["trace"] = [];
   let lastHits: SearchHit[] = [], filters: Record<string, unknown> = {}, calls = 0;
   for (let i = 0; i < 4; i++) {
-    const res = await client.messages.create({ model, max_tokens: 2000, system: SYSTEM, tools, messages, ...effort });
+    const res = await client.messages.create({ model, max_tokens: 2000, system: SYSTEM, tools, messages, ...effort },
+      { timeout: Math.max(1000, deadline - Date.now()), maxRetries: 0 });
     const toolUses = res.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
     if (res.stop_reason !== "tool_use" || toolUses.length === 0) {
       const text = res.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map(b => b.text).join("\n").trim();
       trace.push({ step: "model", detail: `${model} · ${((Date.now() - t0) / 1000).toFixed(1)}s · ${res.usage.input_tokens} in / ${res.usage.output_tokens} out` });
-      return { text: text || "No answer was produced.", assets: lastHits.slice(0, 3).map(toCard), trace, runtime: "claude",
+      return { text: text || "No answer was produced.", assets: lastHits.slice(0, 3).map(toCard), trace, runtime: "claude", model,
+        error: text ? null : { kind: "empty_answer", detail: `${model} finished with no text after ${calls} searches` },
         // A gap is "we ended up with nothing", not "the first search missed". The model's opening
         // search is often over-filtered on purpose - it narrows, then widens - so keying the gap to
         // it reported a content gap on questions that were answered two searches later. That is how
         // "hysecure datasheet" showed three assets under a red "Logged as a content gap" banner:
         // two independent signals disagreeing about the same answer.
-        intent: calls ? (lastHits.length ? "find_asset" : "gap") : "other", filters, zero: lastHits.length === 0 };
+        // No search at all (a greeting, a clarifying reply) is not a gap either.
+        intent: calls ? (lastHits.length ? "find_asset" : "gap") : "other", filters, zero: calls > 0 && lastHits.length === 0 };
     }
     messages.push({ role: "assistant", content: res.content });
     const results: Anthropic.ToolResultBlockParam[] = [];
@@ -147,7 +169,8 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
   const text = cards.length
     ? `No exact match. The closest ${cards.length === 1 ? "asset" : "assets"} in the library:`
     : "Nothing in the library matches that. Try an industry, product or competitor, or browse the catalogue.";
-  return { text, assets: cards, trace, runtime: "claude", intent: cards.length ? "find_asset" : "gap", filters, zero: cards.length === 0 };
+  return { text, assets: cards, trace, runtime: "claude", model, intent: cards.length ? "find_asset" : "gap", filters, zero: cards.length === 0,
+    error: { kind: "step_exhausted", detail: `${model}: search budget reached after ${calls} searches` } };
 }
 
 function askLocal(question: string, t0: number): AskResult {
@@ -188,7 +211,7 @@ function askLocal(question: string, t0: number): AskResult {
   // Only say "internal only" when it is true of what was actually returned. Saying it unconditionally
   // told reps a public case study could not be sent, which is the false-gap defect in reverse.
   if (externalEmpty && results.length) text += " None of these is published yet, so ask marketing before sending anything outside Accops.";
-  return { text, assets: results.map(toCard), trace, runtime: "local", intent: exactZero ? "gap" : "find_asset", filters: f, zero: exactZero };
+  return { text, assets: results.map(toCard), trace, runtime: "local", model: null, intent: exactZero ? "gap" : "find_asset", filters: f, zero: exactZero, error: null };
 }
 
 export function catalogueSummary() { return facetCounts(); }
