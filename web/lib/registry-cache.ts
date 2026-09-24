@@ -19,6 +19,7 @@ import { registry, type RegistryRow } from "./sharepoint";
 import { cardsReady } from "./cards-cache";
 
 const TTL_MS = 5 * 60_000;
+const JUNK_EXT = new Set(["tmp", "lnk", "csv"]);
 
 // One cache per process, not per route bundle. Next.js gives each route its own module instance,
 // so a plain module-level array would leave /api/ask and the catalogue with separate copies -
@@ -83,9 +84,10 @@ export async function refresh(): Promise<number> {
   g.__samRegBusy = true;
   try {
     const rows = await registry("sales", 5000);
-    // Only things a rep could actually use. Images, .lnk shortcuts and archive folders are tracked
-    // in the registry for completeness but must never surface as an answer.
-    const usable = rows.filter(r => r.status !== "archived" && !r.deleted);
+    // Only things a rep could actually use. Archive folders, temp files, shortcuts and CSV exports
+    // are tracked in the registry for completeness but must never surface as an answer. Images and
+    // videos DO stay: they are mostly logos in "Accops Brand Files" and product videos, which reps ask for.
+    const usable = rows.filter(r => r.status !== "archived" && !r.deleted && !JUNK_EXT.has((r.ext ?? "").toLowerCase()));
     g.__samReg = usable.map(rowToAsset);
     g.__samRegAt = Date.now();
     return g.__samReg.length;
