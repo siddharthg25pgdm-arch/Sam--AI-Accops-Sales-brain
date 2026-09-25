@@ -27,7 +27,7 @@ MARKETING_FOLDERS: list[str] = []
 
 DOC_EXT = {"pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "txt", "md", "rtf"}
 # z-prefixed folders are this tenant's convention for "sorted to the bottom, do not use".
-DEAD = re.compile(r"(z*archive|do ?not ?use|donotuse|obsolete|deprecated|backup|to[ _-]?delete|for[ _-]?deletion"
+DEAD = re.compile(r"(z*archive|do ?not ?use|donotuse|obsolete|deprecated|backup|to[ _-]?(be[ _-]?)?delet(e|ed)|for[ _-]?deletion"
                   r"|(^|[ _/(-])(old|wip|draft|drafts|temp|tmp|raw)([ _/)-]|$))", re.I)
 
 
