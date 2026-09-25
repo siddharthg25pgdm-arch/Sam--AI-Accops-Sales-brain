@@ -10,6 +10,7 @@
  *  Without WHATSAPP_ACCESS_TOKEN the channel runs in dry-run mode: replies are logged, not sent. */
 import crypto from "node:crypto";
 import { apiAsk } from "./api";
+import { fileRequest } from "./requests";
 import { logEvent } from "./events";
 import { heuristicFilters } from "./agent";
 
@@ -50,8 +51,19 @@ export function userForNumber(waId: string): string | null {
   return null;
 }
 
+/** The reverse: a SAM user's WhatsApp number, for telling them their request was delivered. */
+export function numberForUser(user: string): string | null {
+  for (const entry of (process.env.SAM_WHATSAPP_USERS ?? "").split(",").map(s => s.trim()).filter(Boolean)) {
+    const [num, id] = entry.split(":");
+    const digits = num?.replace(/\D/g, "");
+    if (digits && id?.toLowerCase() === user.toLowerCase()) return digits;
+  }
+  return null;
+}
+
 // Per-number short memory so follow-ups work, and a seen-set so Meta's retries don't double-answer.
-type Turn = { role: "user" | "assistant"; content: string; at: number };
+// An assistant turn remembers whether the exact thing was missing, so "REQUEST" knows what to file.
+type Turn = { role: "user" | "assistant"; content: string; at: number; missing?: boolean; question?: string; eventId?: number | null };
 const g = globalThis as unknown as { __waHist?: Map<string, Turn[]>; __waSeen?: Set<string> };
 const hist: Map<string, Turn[]> = (g.__waHist ??= new Map<string, Turn[]>()); const seen: Set<string> = (g.__waSeen ??= new Set<string>());
 const TTL = 6 * 60 * 60 * 1000;
@@ -110,9 +122,19 @@ export function renderForWhatsApp(answer: string, assets: { title: string; link:
     lines.push(`\n${i + 1}. *${a.title}*${a.year ? ` (${a.year})` : ""}\n${a.why}${trust}\n${where}`);
   });
   if (ordered.length && ordered.every(a => a.visibility !== "public")) lines.push("\nNone of these has a public version yet. Find it in SharePoint and ask marketing to publish before sending anything to a customer.");
-  if (gap) lines.push("\nLogged as a content gap for marketing.");
+  if (gap) lines.push("\nLogged as a content gap. Reply *REQUEST* to ask marketing to create it (add a note after it, e.g. REQUEST for Axis Bank by Friday).");
   lines.push("\nReply with an industry, product or competitor to narrow it.");
   return lines.join("\n");
+}
+
+/** "REQUEST" or "request <note>": file the last missing ask. Only acted on when one is pending in the
+ *  6-hour history, so a question that starts with the word ("request for proposal template?") is
+ *  still asked normally when nothing is pending.
+ *  ponytail: with a gap pending, "request for proposal template" reads as a command; add a
+ *  confirmation step if reps trip on it. */
+export function requestCommand(text: string): { note: string } | null {
+  const m = text.trim().match(/^request\b[\s:,.-]*([\s\S]*)$/i);
+  return m ? { note: m[1].trim() } : null;
 }
 
 /** Full handling of one inbound text: identity, ask, reply, log. Safe to run after the HTTP response. */
@@ -130,9 +152,21 @@ export async function handleInbound(m: InboundText): Promise<void> {
   // A session is the 6-hour window this history already defines: empty means a new conversation,
   // non-empty means the same one continuing. Derived rather than stored, so there is no second
   // piece of state to keep in step with the window - and it resets exactly when context does.
+  const cmd = requestCommand(m.text);
+  const pending = [...h].reverse().find(t => t.role === "assistant" && t.missing);
+  if (cmd && pending?.question) {
+    const f = await fileRequest({ question: pending.question, note: cmd.note, eventId: pending.eventId }, user, "whatsapp");
+    await sendText(m.from, f.ok ? `Requested: *${f.title}*\n${f.message} You will get the link here when it is ready.` : f.error);
+    return;
+  }
+  if (cmd && !cmd.note) {
+    await sendText(m.from, "There is nothing to request yet. Ask SAM for what you need; if it is not in the library, reply REQUEST.");
+    return;
+  }
   const r = await apiAsk(m.text, user, "whatsapp", history, sessionFor(m.from, h.length === 0));
-  const body = renderForWhatsApp(r.answer, r.assets, r.gap, heuristicFilters(m.text).audience === "external");
-  h.push({ role: "user", content: m.text, at: Date.now() }, { role: "assistant", content: r.answer, at: Date.now() });
+  const body = renderForWhatsApp(r.answer, r.assets, r.missing, heuristicFilters(m.text).audience === "external");
+  h.push({ role: "user", content: m.text, at: Date.now() },
+    { role: "assistant", content: r.answer, at: Date.now(), missing: r.missing, question: m.text, eventId: r.event_id });
   hist.set(m.from, h.slice(-8));
   await sendText(m.from, body);
 }

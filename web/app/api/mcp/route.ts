@@ -7,6 +7,7 @@ import { z } from "zod";
 import { callerFromToken } from "@/lib/apiauth";
 import { apiSearch, apiAsk, apiAssets, apiGaps, apiPublicLink, apiContextForAccount, apiRequestPublish } from "@/lib/api";
 import { VERTICALS, PRODUCTS } from "@/lib/cards";
+import { fileRequest } from "@/lib/requests";
 
 export const maxDuration = 60;
 
@@ -33,7 +34,7 @@ const handler = createMcpHandler((server) => {
 
   server.registerTool("ask_sam", {
     title: "Ask SAM",
-    description: "Ask SAM a question in natural language and get a short verdict plus up to three recommended assets with why-it-fits and links. Says plainly when nothing fits and logs the gap.",
+    description: "Ask SAM a question in natural language and get a short verdict plus up to three recommended assets with why-it-fits and links. When the exact thing is not in the library it says so, returns missing: true with up to two substitutes, and logs the gap; request_content then asks marketing to create it.",
     inputSchema: z.object({ question: z.string().min(3) }),
     annotations: { readOnlyHint: true, openWorldHint: false },
   }, async ({ question }, extra) => text(await apiAsk(question, who(extra), "mcp")));
@@ -52,7 +53,7 @@ const handler = createMcpHandler((server) => {
     annotations: { readOnlyHint: true, openWorldHint: false },
   }, async ({ asset }) => text(apiPublicLink(asset)));
 
-  // The only tool here that writes. readOnlyHint stays FALSE deliberately: MCP clients use it to
+  // One of the two tools that write (with request_content). readOnlyHint stays FALSE deliberately: MCP clients use it to
   // decide what needs confirming, and marking a write read-only would let an agent file publish
   // requests on someone's behalf without asking. Idempotent because a repeat ask for the same asset
   // merges onto the existing open row rather than creating a second one.
@@ -65,6 +66,19 @@ const handler = createMcpHandler((server) => {
     }),
     annotations: { readOnlyHint: false, idempotentHint: true, openWorldHint: false },
   }, async ({ asset, reason }, extra) => text(await apiRequestPublish({ asset, reason }, who(extra), "mcp")));
+
+  // Writes, so readOnlyHint is FALSE for the same reason as request_publish: a client must confirm
+  // before filing on someone's behalf. Idempotent: a repeat ask adds nothing, the same rep counts once.
+  server.registerTool("request_content", {
+    title: "Ask marketing to create content",
+    description: "When SAM has no asset for what the user needs (ask_sam returned missing or gap), ask marketing to create it. Repeat asks for the same thing merge; the result says how many people have asked. Use the user's words for what; put customer, deadline or why in note.",
+    inputSchema: z.object({
+      what: z.string().min(3).describe("The document wanted, in a few words, e.g. 'Remote browser isolation brochure'"),
+      note: z.string().optional().describe("Customer, deadline or why, in one line"),
+      question: z.string().optional().describe("The question originally asked of SAM, if different"),
+    }),
+    annotations: { readOnlyHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ what, note, question }, extra) => text(await fileRequest({ title: what, note, question: question ?? what }, who(extra), "mcp")));
 
   server.registerTool("content_gaps", {
     title: "Content gaps",
