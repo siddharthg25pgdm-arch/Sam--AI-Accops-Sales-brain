@@ -268,6 +268,14 @@ function isType(a: Asset, t: string): boolean {
   return g === t || (t === "Deck" && g === "Battlecard");
 }
 
+/** The asset is ABOUT the product: in its title or its product tags, not only mentioned in a brief. */
+const ALIAS: Record<string, string[]> = { "Browser Isolation": ["browser isolation", "rbi", "vajra"], ZTNA: ["ztna", "hysecure"], HySecure: ["hysecure", "ztna"],
+  MFA: ["mfa", "hyid"], HyID: ["hyid", "mfa"], VDI: ["vdi", "hyworks"], DaaS: ["daas", "hyworks"], HyWorks: ["hyworks", "vdi", "daas"], "Thin Clients": ["thin client", "hydesk"], HyDesk: ["hydesk", "thin client"] };
+export function isAbout(a: Asset, product: string): boolean {
+  const hay = `${a.title} ${a.products.join(" ")}`.toLowerCase();
+  return (ALIAS[product] ?? [product.toLowerCase()]).some(w => new RegExp(`(?<![a-z])${w}`).test(hay));
+}
+
 /** The rep named a document type and nothing SAM is about to show is one: "remote browser isolation
  *  brochure" answered with an eBook has not delivered a brochure, whatever the prose says. */
 export function typeMissing(question: string, hits: SearchHit[]): boolean {
@@ -553,20 +561,35 @@ function askLocal(question: string, t0: number): AskResult {
   if (PRICE_ASK.test(question) && !results.some(h => /\b(price|pricing)\b/i.test(h.asset.title)))
     return { text: NO_PRICING, assets: [], trace, runtime: "local", model: null, intent: "gap", filters: f, zero: true, missing: true, error: null };
   const label = f.vertical ? ` for ${f.vertical}` : "";
-  // Substitutes, when the exact thing is not there: only ones that clear the relevance floor, at most 2.
-  const shown = exactZero ? results.filter(h => substituteFits(question, h.asset)).slice(0, 2) : results;
+  // With no model to read the results, "exact" is mechanical: of the type the rep named, and ABOUT
+  // the product they named (in its title or product tags), not merely mentioning it. The product
+  // filter matches brief text, so "remote browser isolation brochure" found three datasheets for
+  // other products whose briefs mention browser isolation, and called them a fit.
+  const types = typesNamedIn(question);
+  const exact = (a: Asset) => (!types.length || types.some(t => isType(a, t))) && (!f.product || isAbout(a, f.product));
+  const missing = exactZero || !results.some(h => exact(h.asset));
+  let shown = results;
+  if (missing && results.length) {
+    // Substitutes: the product's own documents first, whatever their type, then the rest; only
+    // ones that clear the relevance floor, at most 2.
+    const wide = searchAssets({ ...args, asset_type: undefined, limit: 8 }).results;
+    const pool = [...new Map([...wide, ...results].map(h => [assetKey(h.asset), h])).values()];
+    shown = [...pool.filter(h => f.product && isAbout(h.asset, f.product)), ...pool].filter((h, i, all) => all.indexOf(h) === i)
+      .filter(h => substituteFits(question, h.asset)).slice(0, 2);
+    trace.push({ step: "verdict: no exact match", detail: `nothing returned is ${[f.product, types.join(" or ")].filter(Boolean).join(" ") || "an exact fit"}; ${shown.length} substitute(s)` });
+  }
   let text: string;
-  const want = [f.vertical, f.product, f.asset_type?.toLowerCase()].filter(Boolean).join(" ");
+  const want = [f.vertical, f.product, (types[0] ?? f.asset_type)?.toLowerCase()].filter(Boolean).join(" ");
   if (!results.length) text = `Nothing in the library matches that${label}. Try a broader industry, drop the product, or browse the catalogue on the right.`;
-  else if (exactZero && !shown.length) text = `There is no ${want || "exact match"} in the library, and nothing close enough to suggest instead.`;
-  else if (exactZero) text = `There is no ${want || "exact match"} in the library. Closest substitutes${label}:`;
+  else if (missing && !shown.length) text = `There is no ${want || "exact match"} in the library, and nothing close enough to suggest instead.`;
+  else if (missing) text = `There is no ${want || "exact match"} in the library. Closest substitutes${label}:`;
   else if (results.length === 1) text = `One asset fits${label}.`;
   else text = `${results.length} assets fit${label}. The first is the closest match.`;
   // Only say "internal only" when it is true of what was actually returned. Saying it unconditionally
   // told reps a public case study could not be sent, which is the false-gap defect in reverse.
   if (externalEmpty && shown.length) text += " None of these is published yet, so ask marketing before sending anything outside Accops.";
-  return { text, assets: shown.map(toCard), trace, runtime: "local", model: null, intent: exactZero ? "gap" : "find_asset", filters: f,
-    zero: !shown.length, missing: exactZero, error: null };
+  return { text, assets: shown.map(toCard), trace, runtime: "local", model: null, intent: missing ? "gap" : "find_asset", filters: f,
+    zero: !shown.length, missing, error: null };
 }
 
 export function catalogueSummary() { return facetCounts(); }

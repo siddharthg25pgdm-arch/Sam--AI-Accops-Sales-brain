@@ -228,6 +228,10 @@ run([() => ({ status: 429 }), () => ({ status: 429 })]);
 r = await ask("remote browser isolation brochure");
 ok(r.runtime === "local" && r.missing && !r.zero && r.assets.length >= 1 && r.assets.length <= 2, `local substitutes: ${r.text} ${r.assets.map(a => a.title)}`);
 ok(!r.assets.some(a => /Banners/.test(a.title)) && /^There is no .*brochure in the library\. Closest substitutes/.test(r.text), `local: floor + wording: ${r.text}`);
+ok(r.assets[0]?.title === "Accops Browser Isolation eBook", `local: the product's own document leads the substitutes, not another product's datasheet that mentions it: ${r.assets.map(a => a.title)}`);
+run([() => ({ status: 429 }), () => ({ status: 429 })]);
+r = await ask("hydesk brochure");
+ok(r.runtime === "local" && !r.missing && r.assets[0]?.title === "Accops HyDesk Brochure V6 2026", `local: a real HyDesk brochure is an exact fit: ${r.text}`);
 // 7e. apiAsk logs a gap when the thing is missing even though substitutes were shown.
 logged = [];
 run([say(`No Browser Isolation brochure exists yet.
