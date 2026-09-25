@@ -1571,6 +1571,188 @@
       "visibility": "internal",
       "internal_reason": "Names customers (HDFC Bank, Flipkart) and shows their architectures.",
       "needs_human": "A .pptx twin exists (Jun 2023). Confirm the named customers have approved being cited before this is shown externally."
+    },
+    {
+      "source": "sharepoint/SOC-Accops.pdf",
+      "title": "Auditor Letter on SOC 1 / SOC 2, GDPR and PCI-DSS Applicability to Accops Products (Mirox Cyber Security, Jan 2022) - Not a SOC 2 Report",
+      "asset_type": "Certification",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HySecure",
+        "DaaS",
+        "ZTNA"
+      ],
+      "competitors": [],
+      "personas": [
+        "procurement",
+        "CISO",
+        "Head of Compliance"
+      ],
+      "regulations": [
+        "SOC 1",
+        "SOC 2",
+        "GDPR",
+        "PCI DSS",
+        "CERT-In"
+      ],
+      "key_problem": "RFPs and security questionnaires ask Accops for SOC 1 / SOC 2, GDPR or PCI-DSS certification, which Accops does not hold for its software products.",
+      "key_outcomes": [
+        "Letter ref MI-CERT/IND-002/2022 dated 6 January 2022 from Mirox Cyber Security & Technology, a CERT-In empanelled auditor appointed by Accops",
+        "Auditor's opinion: SOC 1, SOC 2 and GDPR certifications apply only to service offerings such as DaaS on cloud managed by Accops, not to standalone software products",
+        "PCI-DSS is not applicable: Accops is not a payments company and its products do not collect, store or transmit financial / PII data",
+        "States HySecure (all variants) is a pass-through VPN product that encrypts but does not store or process application data",
+        "Computer-generated, unsigned; authenticity verifiable via info@miroxindia.com"
+      ],
+      "brief": "A one-page 'To whomsoever it may concern' letter from a CERT-In empanelled Indian security auditor, dated 6 January 2022. Despite the filename, it is not a SOC report or a certificate. It states the auditor's opinion that SOC 1, SOC 2 and GDPR certifications are relevant only to services Accops runs for customers (for example DaaS from Accops' data centre or cloud tenants), not to on-premises software products, and that PCI-DSS does not apply because Accops products do not handle payment data. It describes HySecure as a pass-through encrypting gateway that does not store application data.",
+      "use_for": "Answering an RFP or security questionnaire that asks for SOC 2 / SOC 1 / PCI-DSS on an on-premises Accops product: this is the explanation of why those certifications do not apply. It does NOT prove SOC 2 compliance - for a DaaS / managed-service deal where SOC 2 genuinely applies, escalate.",
+      "publish_year": "2022",
+      "expired": false,
+      "expiry_date": null,
+      "stale_risk": "Dated January 2022 with no stated validity. It says SOC 2 would apply to Accops-managed DaaS - since Accops now sells DaaS, a buyer may ask whether a SOC 2 report exists for that service. The filename 'SOC-Accops' misleads reps into expecting a SOC 2 report.",
+      "superseded_by": "",
+      "confidence": 0.95,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Marked 'Mirox - Confidential & Authorized Authority only'. Can be shared with a buyer on request, but no public URL.",
+      "needs_human": "Answers the content-gap question 'what is SOC-Accops.pdf': it is an applicability letter, not a SOC 2 report. Marketing: rename the file (e.g. 'SOC-PCI Applicability Letter - Mirox 2022') and confirm whether Accops DaaS has, or plans, a SOC 2 Type 2 report."
+    },
+    {
+      "source": "sharepoint/Accops HySecure 5.3 Pen Testing Certificate.pdf",
+      "title": "HySecure Gateway v5.3.6.0 'Safe to Host' Application Security Certificate - Indusface VAPT (May 2020)",
+      "asset_type": "Certification",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HySecure",
+        "ZTNA"
+      ],
+      "competitors": [],
+      "personas": [
+        "procurement",
+        "CISO",
+        "IT head"
+      ],
+      "regulations": [
+        "OWASP Top 10",
+        "SANS Top 25"
+      ],
+      "key_problem": "Government and BFSI buyers ask for third-party penetration-testing evidence that the HySecure gateway is free of high and critical vulnerabilities before it is internet-facing.",
+      "key_outcomes": [
+        "Indusface 'Safe to Host' certificate dated 22 May 2020 for HySecure Gateway v5.3.6.0 (application gateway / SSL VPN)",
+        "Audit period 15 January to 21 May 2020 on a test URL; passed all high, critical and medium vulnerability tests",
+        "Low-severity findings documented only in the separate audit report shared with Accops",
+        "Scope: OWASP Top 10, SANS Top 25, logical checks and Indusface-defined checks (SSL ciphers, port scanning, HTTP methods, cookie attributes)",
+        "Methodology: OWASP, OSSTMM and SANS guidelines with manual and automated testing"
+      ],
+      "brief": "A third-party application security certificate from Indusface, an Indian web-application security firm, for HySecure Gateway version 5.3.6.0. It certifies that the tested version is free of severe vulnerabilities and safe to host, having passed high, critical and medium tests, and lists the OWASP Top 10, SANS Top 25, logical and vendor-specific checks performed plus Indusface's audit methodology (module enumeration, test case development, validation, test database).",
+      "use_for": "An RFP or security review asking for VAPT / pen-test evidence for HySecure - but only as historical evidence; the buyer will want a report for the current version.",
+      "publish_year": "2020",
+      "expired": false,
+      "expiry_date": null,
+      "stale_risk": "Tests HySecure 5.3.6.0 as of May 2020. No validity period is stated, but a pen-test certificate applies to the tested version only, and HySecure has had several major releases since. The content-gap report flags it as the only HySecure pen-test certificate (2021 in SharePoint). Giving it to a buyer evaluating a current release invites the question 'where is the current one?'.",
+      "superseded_by": "",
+      "confidence": 0.93,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Marked 'Proprietary and Confidential' by the auditor; can be shared with a buyer on request.",
+      "needs_human": "Marketing / product: obtain a current-version VAPT certificate (the HySecure product decks mention VAPT by a CERT-In empanelled lab) and replace this file."
+    },
+    {
+      "source": "sharepoint/Accops Product Editions 2026.pdf",
+      "title": "Accops Product Editions 2026: Bronze / Silver / Gold / Platinum Feature Matrix for Digital Workspace, HySecure, HyID and HyLabs Editions",
+      "asset_type": "Datasheet",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "HyLabs",
+        "Vajra",
+        "BioAuth",
+        "VDI",
+        "ZTNA",
+        "MFA",
+        "Browser Isolation"
+      ],
+      "competitors": [],
+      "personas": [
+        "procurement",
+        "IT head",
+        "CIO",
+        "partner / reseller"
+      ],
+      "regulations": [],
+      "key_problem": "Reps, partners and buyers need to know which features come in which edition of each Accops product, and what is an add-on, to scope a quote or answer 'what are the editions'.",
+      "key_outcomes": [
+        "Digital Workspace editions: Bronze (device-licensed, thin-client VDI), Silver (VDI + basic ZTNA, named or concurrent), Gold (most recommended: VDI, private and SaaS app access, DLP, posture), Platinum (everything incl. biometrics)",
+        "HySecure editions: Bronze (agentless web / RDP / VNC), Silver (app tunnels, basic posture and MFA), Gold (most popular: contextual access, micro-segmentation), Platinum (full ZTNA + IAM, CARTA, API)",
+        "HyID editions: Bronze (MFA for 1 app, 1 connector), Silver (3 apps, 2 connectors, named users), Gold and Platinum (unlimited apps, SSO, password-less, lifecycle)",
+        "HyLabs Education vs Corporate editions (LMS integration, curriculum labs vs assessments, white-labelling)",
+        "Feature rows include hypervisors (VMware, Nutanix, Proxmox, Hyper-V, Azure; OpenShift, Azure Stack HCI, OpenStack; AWS, OCI, GCP), FSLogix, AppAttach, PCoIP add-ons, Vajra browser, Secure File Vault, Internet Security Broker, face auth with deepfake detection",
+        "Licensing: named, concurrent or device; perpetual or subscription"
+      ],
+      "brief": "The 2026 product editions reference (10 pages), describing editions 'released in June 2025'. For each suite it gives a one-paragraph description of each edition and a feature-availability table marking features as included, excluded or add-on: Accops Digital Workspace (VDI features, user experience, high graphics, VDI security and administration, ZTNA, posture checks, endpoint controls, contextual policies, IAM, reporting, licensing), HySecure (application support, access modes, posture checks, endpoint controls, IAM, reporting), HyID (application and connector counts, MFA tokens, password-less, integration, security) and HyLabs Education and Corporate editions. It notes that entitlements may be trust-based rather than software-enforced and refers to the separate Accops Licensing Guide.",
+      "use_for": "Answering 'what are the editions / what's in Gold vs Platinum', scoping a quote or BoQ, partner enablement, and checking whether a feature (e.g. face auth, session recording, Linux VDI, OpenShift) is included or an add-on. The content-gap report suggests this as the approved answer to edition questions. No prices.",
+      "publish_year": "2026",
+      "expired": false,
+      "stale_risk": "Current. Content is identical to the October 2025 V2 edition apart from the copyright year. Virtual Browser is listed as a suite in the introduction but has no edition table.",
+      "superseded_by": "",
+      "confidence": 0.95,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL confirmed; licensing reference that may be shared with partners and buyers.",
+      "needs_human": "Could this be made public / sendable? It contains no prices. The Virtual Browser editions promised in the introduction are missing."
+    },
+    {
+      "source": "sharepoint/Accops Product Editions 2025.V2.October.pdf",
+      "title": "Accops Product Editions (Version Oct 2025): Edition Feature Matrix for Digital Workspace, HySecure, HyID and HyLabs",
+      "asset_type": "Datasheet",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "HyLabs",
+        "Vajra",
+        "BioAuth",
+        "VDI",
+        "ZTNA",
+        "MFA"
+      ],
+      "competitors": [],
+      "personas": [
+        "procurement",
+        "IT head",
+        "partner / reseller"
+      ],
+      "regulations": [],
+      "key_problem": "Same need as the 2026 edition: which features are in which Bronze / Silver / Gold / Platinum edition.",
+      "key_outcomes": [
+        "Same edition descriptions and feature tables as the 2026 document (Digital Workspace, HySecure, HyID, HyLabs)",
+        "Only difference found: copyright 2025 and 'Version Oct 2025' label"
+      ],
+      "brief": "The October 2025 (V2) release of the Accops product editions reference. Text comparison shows it is identical to 'Accops Product Editions 2026' except for the copyright year and version label: the same edition descriptions and feature-availability tables for Digital Workspace, HySecure, HyID and HyLabs.",
+      "use_for": "Use the 2026 edition instead.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "Superseded by the 2026 edition, which has the same content.",
+      "superseded_by": "sharepoint/Accops Product Editions 2026.pdf - same content, newer copyright.",
+      "confidence": 0.95,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Superseded edition.",
+      "needs_human": "Retire or move to an archive folder so reps don't send the older label."
     }
   ]
 }
