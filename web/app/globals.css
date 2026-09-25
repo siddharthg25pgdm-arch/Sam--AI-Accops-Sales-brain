@@ -448,6 +448,7 @@ details.ca[open] summary { display: none; }
   .reqs > li { grid-template-columns: 44px minmax(0, 1fr); gap: 4px 12px; padding: 16px; }
   .demand b { font-size: 22px; }
   .rq-form { grid-template-columns: 1fr; } .rq-form .half { grid-column: auto; }
+  .card-head { flex-wrap: wrap; }
   .kpis.three { grid-template-columns: 1fr; }
   .myreqs > li, .list-h { padding-left: 16px; padding-right: 16px; }
 }

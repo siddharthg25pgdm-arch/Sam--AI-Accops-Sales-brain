@@ -36,25 +36,30 @@ const log = (...a) => console.log(...a);
   await page.fill("input[aria-label='Ask SAM']", ASK);
   await page.keyboard.press("Enter");
   await page.waitForSelector(".msg.sam .verdict", { timeout: 60_000 });
-  log("verdict:", (await page.textContent(".msg.sam .verdict"))?.slice(0, 160));
+  log("verdict:", (await page.textContent(".msg.sam .verdict"))?.slice(0, 160), "scrollY:", await page.evaluate(() => window.scrollY));
   log("cards:", await page.$$eval(".msg.sam .result b", els => els.map(e => e.textContent)));
   log("trace:", await page.$$eval(".trace div", els => els.map(e => e.textContent.slice(0, 160))));
   await page.waitForSelector(".askmkt", { timeout: 5_000 });
   await shot(page, "1-missing-light-1440");
   await page.click("text=Ask marketing to create this");
   await page.waitForSelector(".askmkt.form input");
-  log("prefilled title:", await page.inputValue(".askmkt.form input"));
+  log("prefilled title:", await page.inputValue(".askmkt.form input"), "scrollY after opening:", await page.evaluate(() => window.scrollY));
   await page.fill(".askmkt.form textarea", "For a BFSI prospect, needed before the 3 Oct demo");
   await shot(page, "2-form-light-1440");
   await page.keyboard.press("Escape");                       // keyboard: Esc closes the form
   await page.waitForSelector(".askmkt:not(.form)");
-  log("esc closed form, focus on:", await page.evaluate(() => document.activeElement?.textContent));
-  await page.click("text=Ask marketing to create this");
+  log("esc closed form, focus on:", await page.evaluate(() => document.activeElement?.textContent), "scrollY:", await page.evaluate(() => window.scrollY));
+  await page.keyboard.press("Enter");                        // keyboard: Enter on the focused button reopens it
+  await page.waitForSelector(".askmkt.form");
+  log("scrollY after reopening by keyboard:", await page.evaluate(() => window.scrollY));
   await page.fill(".askmkt.form textarea", "For a BFSI prospect, needed before the 3 Oct demo");
+  log("scrollY before submit:", await page.evaluate(() => window.scrollY));
   await page.focus(".askmkt.form input");
+  log("scrollY after focusing the title:", await page.evaluate(() => window.scrollY));
   await page.keyboard.press("Enter");                        // keyboard: Enter submits
   await page.waitForSelector(".askmkt.sent", { timeout: 20_000 });
   log("confirmation:", await page.textContent(".askmkt.sent"));
+  log("window scrollY after sending:", await page.evaluate(() => window.scrollY));
   await shot(page, "3-sent-light-1440");
   await ctx.close();
 }

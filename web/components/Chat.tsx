@@ -103,7 +103,10 @@ function RequestBox({ turn, open, onOpen, onClose, onBrowse }: { turn: ChatTurn;
   const [filed, setFiled] = useState<Extract<Filed, { ok: true }> | null>(null);
   const doneRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => { if (filed) doneRef.current?.focus(); }, [filed]);
+  const titleRef = useRef<HTMLInputElement>(null);
+  // Focus moves with the flow, without scrolling the page (autoFocus scrolled the catalogue pane too).
+  useEffect(() => { if (filed) doneRef.current?.focus({ preventScroll: true }); }, [filed]);
+  useEffect(() => { if (open && !filed) titleRef.current?.focus({ preventScroll: true }); }, [open, filed]);
   const missing = turn.missing || turn.zero;
 
   async function submit() {
@@ -132,10 +135,10 @@ function RequestBox({ turn, open, onOpen, onClose, onBrowse }: { turn: ChatTurn;
   if (open) return (
     <form className="askmkt form" aria-label="Ask marketing to create this"
       onSubmit={e => { e.preventDefault(); submit(); }}
-      onKeyDown={e => { if (e.key === "Escape") { e.preventDefault(); onClose(); requestAnimationFrame(() => openerRef.current?.focus()); } }}>
+      onKeyDown={e => { if (e.key === "Escape") { e.preventDefault(); onClose(); requestAnimationFrame(() => openerRef.current?.focus({ preventScroll: true })); } }}>
       <label>
         <span>What should marketing create?</span>
-        <input value={title} onChange={e => setTitle(e.target.value)} maxLength={120} autoFocus required />
+        <input ref={titleRef} value={title} onChange={e => setTitle(e.target.value)} maxLength={120} required />
       </label>
       <label>
         <span>Note for marketing <i>optional</i></span>

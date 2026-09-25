@@ -268,11 +268,14 @@ function isType(a: Asset, t: string): boolean {
   return g === t || (t === "Deck" && g === "Battlecard");
 }
 
-/** The asset is ABOUT the product: in its title or its product tags, not only mentioned in a brief. */
-const ALIAS: Record<string, string[]> = { "Browser Isolation": ["browser isolation", "rbi", "vajra"], ZTNA: ["ztna", "hysecure"], HySecure: ["hysecure", "ztna"],
+/** The asset is ABOUT the product: in its title or its FIRST product tag (the primary one). Cards tag
+ *  every product a document mentions - the HySecure Gateway datasheet lists seven, Browser Isolation
+ *  among them - so any-tag matching made it "a Browser Isolation brochure". ("rbi" is not an alias:
+ *  in this library it is the Reserve Bank of India.) */
+const ALIAS: Record<string, string[]> = { "Browser Isolation": ["browser isolation", "vajra", "virtual browser"], ZTNA: ["ztna", "hysecure"], HySecure: ["hysecure", "ztna"],
   MFA: ["mfa", "hyid"], HyID: ["hyid", "mfa"], VDI: ["vdi", "hyworks"], DaaS: ["daas", "hyworks"], HyWorks: ["hyworks", "vdi", "daas"], "Thin Clients": ["thin client", "hydesk"], HyDesk: ["hydesk", "thin client"] };
 export function isAbout(a: Asset, product: string): boolean {
-  const hay = `${a.title} ${a.products.join(" ")}`.toLowerCase();
+  const hay = `${a.title} ${a.products[0] ?? ""}`.toLowerCase();
   return (ALIAS[product] ?? [product.toLowerCase()]).some(w => new RegExp(`(?<![a-z])${w}`).test(hay));
 }
 
