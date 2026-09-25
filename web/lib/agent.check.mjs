@@ -282,4 +282,21 @@ const s = await apiSearch({ query: "hyid datasheet" }, "check", "api");
 ok(s.results.some(x => x.title === "Accops HyID Datasheet 2026"), "cold apiSearch saw the registry");
 regDelay = 0;
 
+// Sending guard: an internal document recommended in sending language gets an explicit warning.
+{
+  const { guardSending } = await jiti.import("./agent.ts");
+  const hit = (title, public_url = null) => ({ asset: { title, asset_type: "Brochure", industry: "", public_url, file: { path: `${title}.pdf` } }, score: 1, why: "" });
+  const internal = hit("Accops HyID: Identity and Access Management Datasheet (V5, 2026)");
+  const pub = hit("Accops HySecure Gateway: Zero Trust Remote Access Datasheet", "https://downloads.accops.com/x.pdf");
+  const prod = "- **Accops HyID: Identity and Access Management Datasheet (V5, 2026)** – internal one-pager covering MFA, SSO and IAM features; suitable for emailing prospects.";
+  let g = guardSending(prod, [internal]);
+  ok(g.fixed === 1 && /Internal only: do not send outside Accops\.$/.test(g.text), `internal + 'emailing prospects' is warned: ${g.text}`);
+  g = guardSending("- **Accops HySecure Gateway: Zero Trust Remote Access Datasheet** – public; fine to email a prospect.", [pub]);
+  ok(g.fixed === 0, "a public asset in sending language is left alone");
+  g = guardSending("- **Accops HyID: Identity and Access Management Datasheet (V5, 2026)** – internal; do not send it to customers.", [internal]);
+  ok(g.fixed === 0, "a line that already says not to send is left alone");
+  g = guardSending("- **Accops HyID: Identity and Access Management Datasheet (V5, 2026)** – covers MFA and SSO features.", [internal]);
+  ok(g.fixed === 0, "an internal asset described without sending language is left alone");
+}
+
 console.log(`agent.check: ${n} assertions passed`);

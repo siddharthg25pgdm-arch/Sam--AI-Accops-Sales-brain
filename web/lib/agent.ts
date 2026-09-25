@@ -423,6 +423,9 @@ export function finish(p: {
     }
     if (heuristicFilters(p.question).audience === "external" && !subs.some(h => h.asset.public_url))
       out += "\nNone of these is published, so ask marketing before sending anything outside Accops.";
+    const g = guardSending(out, subs);
+    if (g.fixed) p.trace.push({ step: "guard: internal asset in sending language", detail: `${g.fixed} line(s) marked internal only` });
+    out = g.text;
     return { text: out, assets: subs.map(toCard), trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error,
       intent: "gap", zero: false, missing: true };
   }
@@ -435,8 +438,31 @@ export function finish(p: {
   const zero = searched && !hits.length;
   const missing = zero || (searched && typeMissing(p.question, shown));
   if (missing && !zero) p.trace.push({ step: "verdict: type missing", detail: `asked for ${typesNamedIn(p.question).join(" or ")}; none of the results is one` });
+  const g = guardSending(text, shown);
+  if (g.fixed) p.trace.push({ step: "guard: internal asset in sending language", detail: `${g.fixed} line(s) marked internal only` });
+  text = g.text;
   return { text, assets: cards, trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error,
     intent: searched ? (missing ? "gap" : "find_asset") : "other", zero, missing };
+}
+
+const SEND_WORDS = /\b(e-?mail(ing)?|send(ing)?|shar(e|ing)|forward(ing)?|prospects?|customer-facing|client-facing)\b/i;
+const NEGATED_SEND = /\b(do not|don['’]t|not|never|must not|cannot|can['’]t|before)\b[^.]{0,40}\b(send|share|forward|e-?mail)/i;
+
+/** Production wrote "internal one-pager ... suitable for emailing prospects" about an internal-only
+ *  datasheet: a line that tells a rep to send a document that must not leave Accops. The card says
+ *  "Internal only", but the prose is what gets read. So any line that names an INTERNAL asset in
+ *  sending language, without already saying not to, gets the warning appended - in code, because the
+ *  model's wording cannot be relied on for this. Over-warning an internal document is harmless;
+ *  under-warning is how a confidential deck reaches a customer. */
+export function guardSending(text: string, shown: SearchHit[]): { text: string; fixed: number } {
+  let fixed = 0;
+  const lines = text.split("\n").map(line => {
+    const hit = namedTitles(line).map(n => shown.find(h => namesAsset(n, h.asset))).find(Boolean);
+    if (!hit || hit.asset.public_url || !SEND_WORDS.test(line) || NEGATED_SEND.test(line)) return line;
+    fixed++;
+    return `${line.replace(/[.\s]+$/, "")}. Internal only: do not send outside Accops.`;
+  });
+  return { text: lines.join("\n"), fixed };
 }
 
 /** One entry per asset across every search, at its best score, best first. */
