@@ -1968,6 +1968,645 @@
    "visibility": "internal",
    "internal_reason": "Names many customers and displaced-competitor wins; licensing structure; no verified public URL.",
    "needs_human": "Is this still used as an intro deck, or should it move to _archieved now that the Aug 2026 corporate deck exists? The biometric-in-VDI and VDI-firewall slides deserve a place in a current technical deck."
+  },
+  {
+   "source": "sharepoint/Internal-MFA for Legacy Apps for Vendors.pptx",
+   "title": "MFA for Internet-Facing Legacy Apps for Vendors - Internal Solution Deck (June 2023): BFSI Loan-Origination Apps, Three MFA Architectures (ZTNA Reverse Proxy, LDAP Push), Edition Feature Matrices, Part Codes, Sizing and POC Prerequisites",
+   "asset_type": "Deck",
+   "industry": "BFSI",
+   "client": "A BFSI customer profile (legacy loan-origination and other internet-facing apps used by vendors); demo screenshots are from a large private bank's LOS app",
+   "client_actual": "The web-server log slide shows a demo of HDFC Bank's LOS application (paths 'LOSHDFC')",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "MFA",
+    "HySecure",
+    "ZTNA",
+    "Reverse Proxy Gateway",
+    "Reporting Server",
+    "BioAuth"
+   ],
+   "competitors": [],
+   "personas": [
+    "CISO",
+    "IT head",
+    "Application owner",
+    "Presales engineer"
+   ],
+   "regulations": [
+    "RBI"
+   ],
+   "key_problem": "Banks expose legacy apps such as loan origination (FinOne/LOS) to vendors and agents over the internet with username-and-password only; the apps cannot take SAML, OAuth or FIDO, and vendors use unmanaged devices.",
+   "key_outcomes": [
+    "Customer profile and problem (slides 2-3, 9): BFSI legacy apps with AD/LDAP or a local user DB, vendor and third-party users over the internet; credential sharing, theft, internet exposure, helpdesk password resets",
+    "Where authentication, SSO and MFA can hook in for apps with a local store, an external directory, modern IdP or OS logon (slides 5-8)",
+    "Technical needs mapped to BoQ (10-11) and three architectures (12): #1 MFA via a ZTNA reverse-proxy gateway, #2 MFA via LDAP proxy and push notification, with SAML/OAuth/RADIUS mentioned but out of scope",
+    "Reverse-proxy solution detail (13-24): geolocation and device-ID checks, system and reporting-server architecture, UAT, phase 1/2 and DC-DR production designs, separate vendor LDAP",
+    "Feature matrices (25, 47-49): HyID Silver/Gold with gateway vs HySecure Gold, clientless vs client-based access, endpoint scan and data controls, edition-by-edition MFA capabilities and add-on modules",
+    "Commercials (39-41): BOM options with Accops part codes (HyID Silver/Gold subscription, reverse-proxy gateway, Reporting Server); sample sizing for 10,000 concurrent of 20,000 named users (7 gateways, 2 MFA, 2 LDAP, 3 reporting VMs); exclusions; 'Accops advantage' incl. quarterly payment terms and spike licensing",
+    "POC design and prerequisites (43-45): 2 gateway VMs (4 vCPU/16 GB), reporting VM, 3 internal IPs, 1 public IP with 443 NAT"
+   ],
+   "brief": "A 48-slide presales solution deck (last saved June 2023) for adding MFA to internet-facing legacy BFSI applications used by vendors, built around a bank's loan-origination system. It is the 'Internal' expansion of the March 2023 'MFA for Legacy Apps for Vendors' deck: it adds the customer profile, integration-point diagrams, a BoQ slide, edition feature matrices and add-on modules. Both editions carry the commercials, sizing, POC prerequisites and a raw web-server log slide.",
+   "use_for": "Presales design for 'we need MFA on FinOne/LOS or another legacy web app our vendors use': slide 12 (which architecture to pick), slides 25 and 28 (clientless vs client-based feature comparison), slide 41 (sizing for 10,000 concurrent users), slides 44-45 (POC prerequisites). Related to the HDFC Bank MFA decks and the MFA commercial SoW (batch 10).",
+   "publish_year": "2023",
+   "expired": false,
+   "stale_risk": "June 2023. Part codes, editions and add-on packaging have since changed (see Product Editions 2026).",
+   "superseded_by": "",
+   "confidence": 0.84,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Contains part codes, commercial terms, sizing and a slide of raw web-server logs with client IP addresses and a bank application's internal paths; no verified public URL.",
+   "needs_human": "Slide 31 pastes raw web-server logs with a client public IP address and the bank's LOS application paths - the same problem flagged for the MFA commercial SoW; remove it from both MFA-for-legacy-apps decks."
+  },
+  {
+   "source": "sharepoint/MFA for Legacy Apps for Vendors.pptx",
+   "title": "MFA for Internet-Facing Legacy Apps for Vendors (March 2023): Reverse-Proxy and Push-Notification Architectures, Clientless vs Client Comparison, BOM with Part Codes, Sizing and POC - Earlier, Shorter Edition",
+   "asset_type": "Deck",
+   "industry": "BFSI",
+   "client": "Same BFSI legacy-app scenario; demo screenshots from a large private bank's LOS app",
+   "client_actual": "The web-server log slide shows a demo of HDFC Bank's LOS application (paths 'LOSHDFC')",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "MFA",
+    "HySecure",
+    "ZTNA",
+    "Reverse Proxy Gateway",
+    "Reporting Server"
+   ],
+   "competitors": [],
+   "personas": [
+    "CISO",
+    "IT head",
+    "Application owner",
+    "Presales engineer"
+   ],
+   "regulations": [
+    "RBI"
+   ],
+   "key_problem": "Legacy BFSI apps exposed to vendors over the internet rely on username and password and cannot adopt modern authentication.",
+   "key_outcomes": [
+    "39 slides; 31 are also in the June 2023 'Internal' edition",
+    "Same two architectures (ZTNA reverse proxy; LDAP proxy with push), solution and deployment diagrams, clientless vs client-based comparison, benefits of central MFA vs building MFA into each app",
+    "Also includes the commercials, part codes, 10,000-user sizing, exclusions, POC prerequisites and the raw web-server log slide",
+    "Lacks the internal edition's customer profile, integration-point diagrams, BoQ mapping and edition feature matrices"
+   ],
+   "brief": "The March 2023 version of the MFA-for-legacy-vendor-apps solution deck (39 slides). Despite having no 'Internal' prefix it is not a customer-safe edition: it carries the same commercials, part codes and log slide as the June 2023 internal deck, which expanded it.",
+   "use_for": "Prefer the June 2023 'Internal-' edition, which contains everything here plus the edition matrices.",
+   "publish_year": "2023",
+   "expired": false,
+   "stale_risk": "March 2023; superseded by the June 2023 expansion.",
+   "superseded_by": "sharepoint/Internal-MFA for Legacy Apps for Vendors.pptx - the June 2023 expansion of this deck.",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Carries part codes, commercial terms and raw web-server logs with a client IP address; no verified public URL.",
+   "needs_human": "The file name suggests a customer-facing edition, but it is not safe to send (commercials, part codes, IP-address log slide). Either rename it or strip those slides."
+  },
+  {
+   "source": "sharepoint/Accops - Technical Solution - MFA for PaloAlto-v2.pptx",
+   "title": "Enable MFA for Palo Alto GlobalProtect: Accops HyID Integration Guide (v2, May 2020) - LDAP Proxy, NPS/RADIUS, Contextual Access and SAML IdP Options, Control Flows, Production Sizing, Licensing",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Case studies: a top private bank (biometric 2FA without app changes), a small-finance bank and a banking-software firm (OTP MFA on servers and network devices)",
+   "client_actual": "Axis Bank, FinCare, Infrasoft (slides 28-30)",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "MFA",
+    "SSO",
+    "BioAuth",
+    "Reporting Server"
+   ],
+   "competitors": [
+    "Palo Alto Networks"
+   ],
+   "personas": [
+    "Network/security engineer",
+    "CISO",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Organisations running Palo Alto GlobalProtect VPN need MFA (OTP, push, biometric, FIDO) and device context on VPN logins without replacing the firewall.",
+   "key_outcomes": [
+    "Four integration options (slide 2, 8): HyID LDAP proxy, RADIUS proxy / NPS plug-in, contextual access via the Accops Device Messenger Service, and HyID as SAML IdP",
+    "Token support matrix per integration type (7) - OTP.Password in the password field for LDAP/RADIUS, push for all, full token range via SAML",
+    "Step-by-step control flows and production deployments for each option (9-19): 2 HyID nodes (8 vCPU, 16 GB), optional reporting server (4 vCPU, 16 GB, 500 GB), 3 virtual IPs",
+    "Licensing (21): named-user or device base licence, subscription or perpetual, connectors via LDAP/RADIUS/SAML, professional services, maintenance from year 2",
+    "User onboarding for mobile tokens (33), modular deployment layouts with DMZ reverse proxy for registration (32)"
+   ],
+   "brief": "A 33-slide integration guide, marked 'Accops Confidential' (v2, last saved May 2020), for adding Accops HyID MFA to Palo Alto GlobalProtect. It explains four integration methods with control flows, token support and production sizing, then licensing, logon screenshots, the 2020 company profile and three MFA case studies. A generic 'MFA for third-party VPN' version was made from it at the same time.",
+   "use_for": "Presales answer to 'can Accops add MFA to our GlobalProtect VPN, and how?': slide 7 (which tokens work with which integration) and slides 9-19 (flows and sizing). It is the only Palo Alto-specific material besides the 2026 CVE slides in the Forcepoint webinar (content-gaps item 7) - but it is integration, not competition.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "May 2020: company slide shows 500+ customers and 90+ team; product naming ('SSL VPN') and licensing have changed. A find-and-replace turned 'VPN' into 'PaloAlto' on slide 27 ('ZTNA/SDP/SSL PaloAlto').",
+   "superseded_by": "",
+   "confidence": 0.82,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Accops Confidential'; names bank customers; no verified public URL.",
+   "needs_human": "Fix the 'SSL PaloAlto' find-and-replace error on slide 27. Is there a current (2025-26) HyID + GlobalProtect guide, and does Accops now position HySecure to replace GlobalProtect instead?"
+  },
+  {
+   "source": "sharepoint/Accops - Technical Solution - MFA for third-party VPN.pptx",
+   "title": "Enable MFA for VPNs and Firewalls: Accops HyID Integration Guide (May 2020) - LDAP Proxy, TACACS, NPS/RADIUS, Contextual Access and SAML Options for Any Third-Party VPN",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Same case studies as the Palo Alto guide (a top private bank, a small-finance bank, a banking-software firm)",
+   "client_actual": "Axis Bank, FinCare, Infrasoft",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "MFA",
+    "SSO",
+    "BioAuth",
+    "Reporting Server"
+   ],
+   "competitors": [],
+   "personas": [
+    "Network/security engineer",
+    "CISO",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Any firewall or VPN (Fortinet, Cisco, Check Point, SonicWall and others) that authenticates against AD/LDAP, TACACS or RADIUS needs MFA without replacing the device.",
+   "key_outcomes": [
+    "34 slides; 25 match the Palo Alto guide, generalised to 'VPN & firewalls'",
+    "Adds a TACACS integration path (VPN gateway -> TACACS -> Accops HyID LDAP proxy -> AD) with its control flow (slides 11-12) to the LDAP proxy, NPS/RADIUS, contextual-access and SAML options",
+    "Same token matrix, production sizing, licensing and onboarding slides"
+   ],
+   "brief": "The vendor-neutral version (34 slides, 'Accops Confidential', last saved May 2020) of the HyID MFA integration guide for VPNs and firewalls, cut from the Palo Alto GlobalProtect guide and adding a TACACS option.",
+   "use_for": "'Can Accops add MFA to our Fortinet / Cisco / Check Point VPN?' - the integration options and flows apply to any VPN that uses LDAP, TACACS, RADIUS or SAML. Use the Palo Alto version when the customer runs GlobalProtect.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "May 2020; company figures and product naming are dated.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Accops Confidential'; names bank customers; no verified public URL.",
+   "needs_human": "A refreshed vendor-neutral 'MFA for any VPN' guide would also cover the Fortinet gap noted in content-gaps item 7 (from the integration side)."
+  },
+  {
+   "source": "sharepoint/Accops - Solution for Security- All Use Cases.pptx",
+   "title": "Secure End User Computing: All Security Use Cases (2018) - Access Gateway, Network Segmentation/NAC, 2FA for Legacy Apps, Desktops and Servers, Critical-App and Internet Isolation, Thin Clients, Vendor/BYOD/WFH",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "2018 customer and partner lists (Japanese municipalities and universities, European companies)",
+   "client_actual": "Global customers list incl. Kyoto University, Ibaraki Prefectural, Fresenius Kabi, Ravago, Continental Foods and others; Indian partner/SI list",
+   "client_named": true,
+   "products": [
+    "HySecure",
+    "HyID",
+    "HyWorks",
+    "HyDesk",
+    "Virtual Browser"
+   ],
+   "competitors": [],
+   "personas": [
+    "CISO",
+    "IT head",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "When the same corporate desktop runs business apps, personal browsing and helpdesk tools, one infected download can compromise the whole organisation; knee-jerk fixes (physical isolation, blocking internet) hurt productivity.",
+   "key_outcomes": [
+    "Threat framing (slides 5-9): what runs on corporate desktops, mixed-risk profiles, 'one click away from infection', threat vectors, knee-jerk measures",
+    "Gateway and 2FA use cases (10-18): anywhere access, vendor access from unmanaged PCs, role-based segmentation as NAC, SaaS conditional access, 2FA for legacy apps via gateway or via an agent that intercepts app launches, 2FA for desktops and for server access with AAA logs",
+    "Virtualisation use cases (19-29): SWIFT-style critical-app isolation, non-critical app access for critical users, internet isolation via a virtual browser in the DMZ, thin-client computing, vendor, BYOD, WFH and sandboxed SaaS access",
+    "2018 company slide (500+ customers, 75+ partners, 80+ team) and leadership slide"
+   ],
+   "brief": "A 37-slide security use-case catalogue from 2018 (last saved June 2018): each slide is a diagram of one Accops security scenario - gateway access, segmentation, 2FA for legacy apps, desktops and servers, critical-app and internet isolation, thin clients, vendor, BYOD and WFH access. The ideas are still current; the product names and company data are not.",
+   "use_for": "Background for explaining the classic isolation use cases (slides 20-24 on critical-app and internet isolation). For customer use, the 2025-26 decks cover the same scenarios with current products.",
+   "publish_year": "2018",
+   "expired": false,
+   "stale_risk": "2018: 'SSL VPN' and 'OTP MFA' product naming, 500+ customers, old leadership slide.",
+   "superseded_by": "",
+   "confidence": 0.78,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Old internal deck with customer, partner and leadership lists; no verified public URL.",
+   "needs_human": "Archive candidate; the leadership slide lists people and roles from 2018."
+  },
+  {
+   "source": "sharepoint/Accops - VDI Architecture - Comparison.pptx",
+   "title": "VDI Architecture Comparison (2018): Centralised Datacentre VDI vs VDI at the Local Office - Two Diagrams and Pros/Cons",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "None",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HyDesk"
+   ],
+   "competitors": [],
+   "personas": [
+    "IT architect",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Multi-site organisations must choose between running VDI centrally (users stream over WAN/MPLS) or locally at each office (only application traffic crosses the WAN).",
+   "key_outcomes": [
+    "Slide 2: central-datacentre VDI - thin clients at branches, VDI traffic over leased line/MPLS or site-to-site link",
+    "Slide 4: VDI at the local office - local Accops VDI cluster, only application traffic to the datacentre",
+    "Slides 3 and 5: pros and cons of each (image-only, so the actual pros/cons are not captured)"
+   ],
+   "brief": "A 6-slide 'technical literature' deck from 2018 comparing two VDI placement architectures. The pros/cons slides are images, so the card captures only the two architecture descriptions.",
+   "use_for": "A quick visual for a branch-heavy customer (banks, retail) deciding where to host VDI. Open the file for the pros/cons tables.",
+   "publish_year": "2018",
+   "expired": false,
+   "stale_risk": "2018 (last saved May 2018); architecture principles still hold.",
+   "superseded_by": "",
+   "confidence": 0.55,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal technical literature; no verified public URL.",
+   "needs_human": "Pros/cons are images - add them as text if this is still used."
+  },
+  {
+   "source": "sharepoint/Understanding different VDIs.pptx",
+   "title": "Understanding VDI: Shared vs Personal Desktops, App vs Desktop Virtualization, Windows vs Linux VDI - Licensing and Cost Comparisons (June 2023)",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "None",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI"
+   ],
+   "competitors": [
+    "Microsoft AVD",
+    "Windows 365"
+   ],
+   "personas": [
+    "IT head",
+    "IT architect",
+    "Presales engineer",
+    "Procurement"
+   ],
+   "regulations": [],
+   "key_problem": "Customers confuse shared and personal desktops, app and desktop virtualization, and assume Linux or app virtualization will cut costs - which drives wrong designs and licence budgets.",
+   "key_outcomes": [
+    "Shared (session/RDS) vs personal desktops: names, OS, Microsoft licences (RDS server + CALs vs Windows 10/11 VDA, Windows 365 on Azure) and when to use each (slides 3-4)",
+    "Cost comparison of four models incl. Windows 10 multi-session on Azure, with indicative INR prices (Windows Server approx. Rs 60,000 per VM; RDS CAL approx. Rs 12,000) (slide 5)",
+    "App vs desktop virtualization (6-12): same platform, same OS and same Microsoft licensing - 'there is no cost benefit' in switching to app virtualization, and UX suffers for long-hours users",
+    "Windows vs Linux VDI (13-18): Linux server OS approx. Rs 25,000 vs Windows Rs 50,000 per VM a year, no RDS CAL (Windows approx. Rs 9,000 per user), but app compatibility and effort limit it; 'Linux is great for servers but neither the best nor the cheapest for desktops'; use it for single apps (e.g. Tally on WINE) or all-Linux estates"
+   ],
+   "brief": "A 19-slide explainer (June 2023) that compares the ways to deliver virtual apps and desktops and their Microsoft licensing and costs, and concludes when app virtualization or Linux-based VDI actually saves money. Its last seven slides were saved separately as 'VDI on Linux.pptx'.",
+   "use_for": "Answering a customer's 'should we use shared or personal desktops / app virtualization / Linux to save cost?': slide 5 (cost of the four models), slide 12 (why app virtualization does not save licence cost), slides 15-18 (Linux savings and limits).",
+   "publish_year": "2023",
+   "expired": false,
+   "stale_risk": "June 2023 indicative INR prices; Microsoft licensing terms change. The RDS CAL is Rs 12,000 on slide 5 and Rs 9,000 on slide 15.",
+   "superseded_by": "",
+   "confidence": 0.82,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal explainer with indicative pricing; no verified public URL.",
+   "needs_human": "Pick one RDS CAL price (Rs 12,000 vs Rs 9,000). A tidy version could be a customer-facing 'choosing a VDI model' guide - the content is vendor-neutral and useful."
+  },
+  {
+   "source": "sharepoint/VDI on Linux.pptx",
+   "title": "Path to Cost Saving with Linux-Based Virtualization (June 2023) - The Windows vs Linux VDI Section of 'Understanding different VDIs'",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "None",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI"
+   ],
+   "competitors": [],
+   "personas": [
+    "IT head",
+    "IT architect",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Customers expect Linux-based VDI to be much cheaper than Windows, without accounting for app compatibility and migration effort.",
+   "key_outcomes": [
+    "7 slides, identical in text to slides 13-19 of 'Understanding different VDIs.pptx'",
+    "Linux server OS approx. Rs 25,000 vs Windows Rs 50,000 per VM a year; no per-user RDS CAL (Windows approx. Rs 9,000); paid Linux support still needed",
+    "Conclusion: Linux suits single/limited app virtualization (e.g. Tally on WINE) or estates already 100% Linux-compatible"
+   ],
+   "brief": "A 7-slide extract saved the same day (11 June 2023) as the fuller 'Understanding different VDIs' deck, covering only the Windows vs Linux virtualization comparison.",
+   "use_for": "Use the fuller deck; this one is a quick send-alone for a Linux VDI cost question.",
+   "publish_year": "2023",
+   "expired": false,
+   "stale_risk": "June 2023 indicative prices.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal explainer with indicative pricing; no verified public URL.",
+   "needs_human": "Duplicate content of 'Understanding different VDIs.pptx' slides 13-19 - keep only one?"
+  },
+  {
+   "source": "sharepoint/Accops DaaS - DIY and AMD v2.pptx",
+   "title": "DaaS Powered by Accops (v2, 2023): DIY DaaS vs Accops Managed Desktops (AMD) - Best-Fit Customers, Azure Architecture and Sizing, BOMs, Accops vs AWS WorkSpaces Pricing, AVD Comparison, Microsoft Licensing Guide, Sizing Calculator Help",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Microsoft DIY DaaS and AMD customer logo slide (image only)",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "DaaS",
+    "Accops Managed Desktops",
+    "HyWorks",
+    "HySecure",
+    "HyID",
+    "Reporting Server",
+    "BioAuth"
+   ],
+   "competitors": [
+    "AWS WorkSpaces",
+    "Microsoft AVD",
+    "Citrix"
+   ],
+   "personas": [
+    "Partner presales",
+    "Cloud architect",
+    "IT head",
+    "Microsoft partner"
+   ],
+   "regulations": [],
+   "key_problem": "Partners and customers need to decide when to deliver desktops as a service, whether to build it themselves in their own cloud tenant or buy Accops' managed service, and how it compares on cost and features with AVD and AWS WorkSpaces.",
+   "key_outcomes": [
+    "Who fits DaaS (slides 7-11): born-in-cloud firms, capex-averse SMEs, those exiting on-prem infrastructure, seasonal/contract workforces, outsourcing providers with geo-fencing needs",
+    "DIY DaaS (in customer/partner tenant) vs AMD (Accops-owned tenant, pay per resource unit) (15) and five reasons a partner brings Accops over plain AVD: holistic platform, endpoint control, hybrid console, managed service, broker customisation (16-21)",
+    "Competitive (34-38): feature table vs other Azure and non-Azure DaaS; Accops vs AWS WorkSpaces features, add-on cost gaps (e.g. USD 2/user/month for DLP) and absolute monthly TCO for a 2 vCPU/8 GB Mumbai desktop (slide 38): always-on AWS USD 108 vs Accops USD 105 (on-demand), 92 (1-year RI) or 85 (3-year RI); for 200 hours a month AWS USD 186 vs Accops USD 65",
+    "DIY design (40-49): component stack, small and scalable Azure architectures, control-plane sizing, BOM for 50 personal + 50 pooled desktops and for 150 users, commercial exclusions, VDI host sizing",
+    "AMD (50-54): features, user access flow from Accops' Azure tenant, commercial construct (one-time, fixed monthly, variable per user)",
+    "Cloud vs on-prem (55-58) incl. a 5-year infrastructure TCO for 500 personal desktops; Microsoft licensing guide for Windows Server, Windows 10 and Office on Azure vs AWS/GCP, Shared Computer Activation by Office edition (59-65); Azure VM series and sizing (66-68); AVD vs Accops on Azure and feature comparison vs WVD and Citrix on Azure (69-77); cloud support matrix (78); AMD sizing calculator help (79-81)"
+   ],
+   "brief": "An 82-slide partner and presales reference on Accops DaaS (v2, last saved March 2023), covering both delivery models - DIY DaaS in a customer or partner cloud tenant and Accops Managed Desktops in Accops' Azure tenant. It combines positioning, Azure architecture and sizing, BOMs and commercial constructs, competitive pricing against AWS WorkSpaces, AVD/WVD comparisons, a Microsoft licensing guide for cloud VDI and help for the AMD sizing calculator.",
+   "use_for": "The most complete DaaS design and pricing reference: slides 36-38 answer 'how does Accops compare with AWS WorkSpaces on features and price' (content-gaps item 7 lists only a 2022 spreadsheet), slides 61-65 'what Microsoft licences do we need for VDI on Azure vs AWS', slides 45-47 give ready BOMs, slide 15 explains DIY vs managed.",
+   "publish_year": "2023",
+   "expired": false,
+   "stale_risk": "March 2023. About slide (600+ customers, 150+ team) predates Reliance; AWS/Azure prices, Microsoft licensing (Windows 10, WVD naming) and Accops packaging have changed. Market slide is 'source: third party'.",
+   "superseded_by": "",
+   "confidence": 0.83,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Partner presales reference with BOMs, commercial constructs and competitive pricing; no verified public URL.",
+   "needs_human": "Refresh the AWS WorkSpaces pricing comparison and licensing guide for 2026 - the structure is good and there is no newer equivalent. Does it answer the DaaS data-residency question (content-gaps item 8)? Only that Accops-managed DaaS runs in Accops' Azure tenant, with Central India recommended."
+  },
+  {
+   "source": "sharepoint/Accops - Cloud vs On-premise -Cost Comparison.pptx",
+   "title": "Cloud vs On-Premise VDI TCO Comparison (2020): 3-Year TCO for Shared Hosted Desktops - Traditional 3-Tier, HCI and Azure, With and Without DR; Accops-in-Azure Case Studies",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Accops-in-Azure deployments: 1,000 insurance agents and call-centre users, 6,000+ WFH users on Windows 10 multi-session, Dynamics CRM for 300+ users, 800+ data analysts at a financial-services firm, a Japanese board of education (1,000 faculty and students)",
+   "client_actual": "Bajaj Finserv (800+ data analysts), Fukuoka Board of Education (slide 10)",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "DaaS",
+    "HySecure",
+    "HyID"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CFO",
+    "IT head",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Customers choosing where to run VDI need a like-for-like cost view of on-prem 3-tier, on-prem HCI and Azure, including DR.",
+   "key_outcomes": [
+    "User profile (slide 2): shared hosted desktop, medium user, 4 users per vCPU, 1.5 GB RAM, 5 GB profile",
+    "3-year TCO with one DC (slide 3, sized for about 20,000 users): 3-tier Rs 8.61 crore (Rs 1,196/user/month, excludes network, DR, monitoring, DC cost), HCI Rs 10.85 crore (Rs 1,507), Azure Rs 12.61 crore (Rs 1,751, all-inclusive)",
+    "With DR: 3-tier Rs 10.76 crore (Rs 1,494), HCI Rs 15.51 crore (Rs 2,154), Azure Rs 14.93 crore (Rs 2,073, 25% DR always available) - Azure beats HCI once DR is included",
+    "DR assumptions (slides 5, 7, 9): 100% hardware at the on-prem DR site with 10% Accops licences; Azure DR passive with 15% of VMs running",
+    "Accops in Azure case studies (10) and workspace-as-a-service / managed DaaS slides (11-12)"
+   ],
+   "brief": "A 13-slide TCO comparison marked 'Accops Confidential' (last saved July 2020) that prices shared-hosted-desktop VDI three ways - traditional 3-tier hardware, HCI, and Azure - for one site and with DR, then lists Accops-in-Azure customers.",
+   "use_for": "Showing a customer how a cloud-vs-on-prem VDI cost comparison should be structured, and that cloud looks dearer until DR is counted (slide 3). Rebuild the numbers before quoting - they are 2020 prices.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "July 2020 prices for hardware, Microsoft licences and Azure; the per-user figures should not be quoted today.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Accops Confidential'; contains pricing assumptions and a named customer; no verified public URL.",
+   "needs_human": "A 2026 refresh would pair well with the DaaS Rs 1,333 offer and the 2,000-PC TCO slide used in 2026 decks, which use different assumptions."
+  },
+  {
+   "source": "sharepoint/Accops - Technical Solution - GCP-v1.pptx",
+   "title": "Work from Anywhere: Accops Remote Access and VDI Solution Deck (2020) - Filed as the 'GCP' Technical Solution but Contains No Google Cloud Content",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "2020 case list (PAM access, vendor access, developer DLP, biometric 2FA for 1 lakh bank users, Salesforce DLP) and Accops-in-cloud cases; a South Indian private bank's Dynamics CRM story",
+   "client_actual": "South Indian Bank (Dynamics CRM over 600 branches, slide 46), Fukuoka Board of Education and Bajaj Finserv (cloud cases); Japanese, European and Indian partner lists",
+   "client_named": true,
+   "products": [
+    "HySecure",
+    "HyWorks",
+    "HyID",
+    "HyDesk",
+    "HyLabs",
+    "Turbo",
+    "DaaS"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "IT head",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "In 2020 organisations needed to move staff to work from anywhere quickly - remote access to apps, office PCs and graphics workstations, VDI and DaaS - securely from personal devices.",
+   "key_outcomes": [
+    "2020 company (500+ customers, 400,000+ users, ISA Technical Innovation 2020) and 'top 3 in APAC' analyst quote (slides 4-5)",
+    "Zero-trust access model and SDP architecture (9-10); DaaS for instant WFH, multi-cloud proximity-based workspace, remote access with HySecure, office-PC access from home, graphics workstation access (12-17)",
+    "Accops Turbo private-access protocol built on the Noise framework, Curve25519, ChaCha20-Poly1305 and BLAKE2, with performance charts (21-22)",
+    "Value proposition 'PC to VDI, VDI to simpler VDI' (still showing a Cisco-managed HCI stack) and comparison vs VPNs and other VDI (23-24)",
+    "Product sections for HyWorks, HySecure, HyID, HyLabs and HyDesk (30-41); South Indian Bank Dynamics CRM story brought by Microsoft partners (46); USPs and 'Why Accops' (47-50)"
+   ],
+   "brief": "A 50-slide 'Work from Anywhere' deck (marked Accops Confidential, v1, last saved July 2020) filed in the 'Google Cloud - GCP' technical-solutions folder. Nothing in it mentions GCP or Google: it is a generic 2020 WFH remote-access and VDI deck with the Turbo protocol, product sections and case lists.",
+   "use_for": "Not a GCP answer. Useful only for the Turbo protocol explanation (slides 21-22) and the South Indian Bank CRM story (slide 46). For 'does Accops run on GCP?' use the DaaS DIY/AMD deck's cloud support matrix or the 2026 decks (GCP deployments slide in Reference Customers July 2025).",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "July 2020 company data, leadership slide and product naming (SSL VPN, SPAN).",
+   "superseded_by": "",
+   "confidence": 0.75,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Accops Confidential'; names customers and partners and has a 2020 leadership slide; no verified public URL.",
+   "needs_human": "Mislabelled: the 'GCP' folder's only deck has no GCP content. Either rename it or add a real Accops-on-GCP solution note if reps are asked about Google Cloud."
+  },
+  {
+   "source": "sharepoint/Accops - Technical Solution - for o365-v1.pptx",
+   "title": "Secure Access to Office 365 (2018): Conditional Access and MFA for O365 via Accops HyID with an ADFS Plug-in - Agentless and Agent-Based Device Controls",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "None",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyID",
+    "MFA",
+    "HySecure"
+   ],
+   "competitors": [
+    "Microsoft Azure AD"
+   ],
+   "personas": [
+    "IT head",
+    "Messaging/O365 admin",
+    "CISO"
+   ],
+   "regulations": [],
+   "key_problem": "Anyone with valid credentials can reach Office 365 mail from anywhere on any device, and O365's own conditional access needs E3 plus Azure AD Premium.",
+   "key_outcomes": [
+    "SaaS threat vector and limits of built-in SaaS security (slides 4-5); O365 access methods and modern vs basic authentication (7)",
+    "Architecture (10-13): federate O365 to ADFS; the Accops HyID ADFS plug-in adds MFA and device control, with a 9-step control flow",
+    "Agentless policies (14-15): allow, block or step-up by OS, browser, trusted location/country and device type",
+    "HyID agent (16-18): continuous device health (OS, MAC, hardware ID, Windows updates, AV/firewall), blocking unmanaged or non-domain devices; host-scan results and a login heat-map dashboard"
+   ],
+   "brief": "A 37-slide solution deck (v1, last saved August 2018) on securing Office 365 access with Accops HyID through an ADFS plug-in, with agentless and agent-based device policies. Many later slides are screenshots with little text.",
+   "use_for": "Background for 'can Accops add MFA / device control to Office 365?'. Microsoft has since moved customers from ADFS to Entra ID (Azure AD) and retired basic authentication, so the architecture needs checking before reuse.",
+   "publish_year": "2018",
+   "expired": false,
+   "stale_risk": "2018. Relies on ADFS federation and discusses basic authentication, which Microsoft has since retired for Exchange Online; product naming ('SSL VPN') is old.",
+   "superseded_by": "",
+   "confidence": 0.75,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Old internal solution deck; no verified public URL.",
+   "needs_human": "Is there a current HyID + Microsoft 365 / Entra ID integration note? The 'Accops-Sample-O365-new' document (carded earlier) still says Propalms."
+  },
+  {
+   "source": "sharepoint/Accops - Technical Solution - for DynamicsCRM-v3.pptx",
+   "title": "Secure Browser Solution for Microsoft Dynamics CRM (2018, v3): Virtual Browser to Cut Per-User Bandwidth from 400 to ~64 Kbps, Access Gateway for Device Control and 2FA, BOM and Sizing",
+   "asset_type": "Deck",
+   "industry": "BFSI",
+   "client": "Designed for branch users on low bandwidth (the related South Indian Bank Dynamics CRM deployment is described in other decks)",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "Virtual Browser",
+    "HyWorks",
+    "HySecure",
+    "HyID"
+   ],
+   "competitors": [],
+   "personas": [
+    "IT head",
+    "CRM owner",
+    "CISO",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Dynamics CRM needs about 400 Kbps per user session and is slow at remote branches and on mobile networks, while its cloud endpoint can be reached by anyone with valid (or stolen) credentials.",
+   "key_outcomes": [
+    "Problem (slides 2-4): bandwidth (400 Kbps per session), session hijacking and credential misuse from public locations",
+    "Option 1 - Accops Virtual Browser (6-9): Chrome runs on Accops/RDS instances in Azure next to CRM, users need about 64-65 Kbps; BOM per 200/1,000/50 concurrent users; no agent or RDS client on the PC",
+    "Option 2 - Access Gateway (11-14): route CRM traffic through HySecure with 2FA and device restrictions, CRM IP-restricted to the gateway; 1 instance per 500 concurrent sessions",
+    "Hybrid architecture and three-way comparison of direct access, virtual browser and gateway on bandwidth (400 / 64 / 420 Kbps), device restriction and security (16-17); Linux secure browser to avoid RDS cost (18)"
+   ],
+   "brief": "A 27-slide solution document (v3, last saved June 2018) for delivering Microsoft Dynamics CRM to low-bandwidth branch users through the Accops Virtual Browser, and/or securing it behind the Accops access gateway, with architectures, BOMs, sizing and a comparison of access methods.",
+   "use_for": "The design behind the '100x faster CRM at 96 kbps branches' bank story used in other decks: slide 17 compares the three access methods, slides 8 and 14 give sizing. Good for any 'our web CRM/LOS is slow at branches' conversation.",
+   "publish_year": "2018",
+   "expired": false,
+   "stale_risk": "2018: Windows Server 2012 and CentOS in the BOM, company slide shows 350+ customers.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Old internal solution document with sizing; no verified public URL.",
+   "needs_human": "Other decks say the CRM speed-up is '70x' or '100x'; this document gives 400 Kbps to 64 Kbps (about 6x less bandwidth). Align the claim."
+  },
+  {
+   "source": "sharepoint/Accops - Technical Solution - 2FA for any application.pptx",
+   "title": "MFA for Any LDAP/AD-Integrated Application (Accops Confidential, last saved 2023): HyID Directory-Proxy Architecture - OTP in Password Field, Push to Laptop/Mobile, Biometric Push - Comparison and Licensing",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "None (examples use an IceWarp mail server and a CRM)",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyID",
+    "MFA",
+    "BioAuth"
+   ],
+   "competitors": [],
+   "personas": [
+    "IT head",
+    "Application owner",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Legacy and web apps that authenticate only against AD/LDAP cannot add 2FA without costly development, and SaaS apps offer limited or paid 2FA.",
+   "key_outcomes": [
+    "Business requirements, 2FA challenges and needs (slides 5-7)",
+    "Architecture (10-11): the app server points to the Accops Directory Server as if it were AD/LDAP; HyID adds the second factor with no app change",
+    "Three user experiences with flows (12-21): OTP appended to the password; push consent on laptop or mobile with PIN (IceWarp mail example); biometric check via push (CRM example)",
+    "Comparison of the three options on client software, tokens and security (22); HyID agent and mobile app device data (23-24); licensing - named users for 2FA, device-based when the agent does health checks (25); other uses: desktop and server login MFA (26)"
+   ],
+   "brief": "A 36-slide technical deck marked 'Accops confidential' (content from about 2018-19; last saved May 2023) that covers one integration pattern in depth: adding MFA to any application that authenticates against AD/LDAP by putting the HyID directory proxy in the middle, with three user-experience options.",
+   "use_for": "Presales explanation of 'MFA without touching the app' for LDAP-integrated apps: slide 11 (architecture) and slide 22 (choose OTP, push or biometric). For RBI core-banking cases pair with the 2020 RBI-compliant banking deck.",
+   "publish_year": "2019",
+   "expired": false,
+   "stale_risk": "Undated in the body; product-suite slide says 'SSL VPN' and 'MFA with OTP' (2018-19 era) although the file was last saved May 2023 - year set from the content with lowered confidence.",
+   "superseded_by": "",
+   "confidence": 0.7,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Accops confidential'; no verified public URL.",
+   "needs_human": "Confirm the date; the product slides look 2018-19 even though the file was re-saved in 2023."
+  },
+  {
+   "source": "sharepoint/Accops - Technical Solution - Data Compliance.pptx",
+   "title": "Secure End User Computing for Data Security & Compliance (2019): Keeping Outsourced and Remote Data Processing Compliant (GDPR-Style) with VDI - Vendor, KPO/BPO, WFH, Remote Developer and Remote IT Scenarios",
+   "asset_type": "Deck",
+   "industry": "IT & ITES",
+   "client": "2019 customer and partner lists",
+   "client_actual": "Global customers list incl. Kyoto University, Ibaraki Prefectural, Fresenius Kabi and others; Indian partner/SI list",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "HyID",
+    "HyDesk"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "DPO",
+    "Compliance officer",
+    "Outsourcing / vendor manager"
+   ],
+   "regulations": [
+    "GDPR"
+   ],
+   "key_problem": "Data owners and processors who outsource to vendors, KPOs and BPOs, or let staff work from home, must audit access, stop unauthorised copies, delete data on request and keep it within borders - impossible when data sits on end-user PCs.",
+   "key_outcomes": [
+    "Target audience and compliance requirements (slides 4-5): audit all access, prevent unauthorised access and copies, track copies, delete on request, data localisation",
+    "Use cases (6): outsourced processing, KPO analytics, BPO customer support, WFH, independent consultants",
+    "Traditional PC vs virtual computing architecture and why compliance is easier when data stays in the datacentre (7-12)",
+    "Five business scenarios with solution designs (13-17): secure vendor access on shared hosted desktops, vendor infrastructure/WFH in cloud, in-country isolated desktops for foreign customers' data, remote developers (source code stays in DC), remote application maintenance via PAM as a virtual app",
+    "Endpoint options incl. HyDesk thin clients and a 'coming up' SecureKey USB OS (18-20); 2019 company slide (500+ customers)"
+   ],
+   "brief": "A 28-slide deck marked 'Accops Confidential' (last saved August 2019) arguing that virtual desktop computing is the simplest way to meet data-protection obligations when data is processed by vendors, outsourcers or remote staff, with five scenario designs. It predates India's DPDP Act but maps directly onto it.",
+   "use_for": "Structure for a DPDP or GDPR data-processor conversation with a KPO/BPO/GCC or an outsourcing buyer: slide 5 (requirements) and slides 13-17 (scenario designs). For India today, pair with the 2026 DPDP slides in the Hyderabad/Bangalore CIO decks.",
+   "publish_year": "2019",
+   "expired": false,
+   "stale_risk": "2019: GDPR-only framing (no DPDP Act), SecureKey shown as 'coming up' (it became NanoOS/HyDesk Nano), company figures out of date.",
+   "superseded_by": "",
+   "confidence": 0.78,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Accops Confidential'; customer and partner lists; no verified public URL.",
+   "needs_human": "Worth refreshing as a DPDP data-processor deck (content-gaps item 4 lists a DPDP whitepaper with no link; item 9 a GCC pitch)."
   }
  ]
 }
