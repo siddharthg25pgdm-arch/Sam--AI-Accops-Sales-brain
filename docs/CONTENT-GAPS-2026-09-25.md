@@ -297,3 +297,63 @@ only RBI clause mapping. The Healthcare deck (2021) cites DISHA and the PDP Bill
 
 **Helps close earlier gaps:** the "Single-Slider Case Studies" deck names 9 pharma customers (gap
 3). The Nigeria deck is the only Africa material. The GATES Bali deck has the ASEAN channel plan.
+
+### Added after carding the partner, event and Nutanix decks
+
+**The "public" and "sharable" partner decks are not safe to share.** This is the most important
+finding of the whole exercise, because partners forward these decks.
+- The CEO personal-identifiers slide (see above) is in *every* sharable partner bootcamp edition:
+  both Oct 2025 Japan "Sharable" decks, the May 2026 PUBLIC-SHARABLE bootcamp, the June 30
+  Public-Shareable bootcamp, the MEA "Public Version" bootcamp, and Forcepoint webinar v03.
+- The May 2026 PUBLIC-SHARABLE Partner CXO deck and the MEA "Public Version" still show the Vision
+  2030 **USD 500M ARR target**, general-availability dates for unreleased products (IRIS on
+  15 Dec 2026), and licensed Gartner market-sizing data.
+- The MEA "Public Version" also keeps the partner tier revenue thresholds (USD 15K-500K by country
+  group) and the money-back offer. Only the discount table was removed.
+- The Japan "Sharable" edition anonymised its case-study headings but still names Flipkart, Kotak,
+  TCS and NI in the text, and keeps TCS, Sharda Hospital and Kerzner in the headings.
+
+**Staff mobile numbers in event decks.** Every 2026 Sovereign CIO Conclave city deck ends with 8 to
+20 "Meet" slides giving named staff their mobile numbers. The Chennai deck also has the wrong email
+on one person's card.
+
+**More data to scrub:** the NIC deck (slide 32) shows a real employee username and a password-style
+string. Both "MFA for Legacy Apps" decks paste raw web-server logs with a client IP and a bank's
+application paths; the "external" edition also carries part codes and commercials, so it is not
+safe to send either.
+
+**Launch dates contradict between editions:** Forcepoint SSE is 15 May in the internal edition and
+15 July in the public one; NComputing is 15 May vs 15 June. Decide which is right before partners
+announce either.
+
+**More figures told differently:** Customer Workshop Mar 2025 contradicts itself between slides 11
+and 137 (VDI 10k vs 30k users, MFA 90k vs 60k, government 500k vs 250k). The free legacy-SSO offer
+is 3 months and 6 months within the same Bangalore deck. TCO saving is "up to 40%" in the Nutanix
+intro vs 13% or 16% elsewhere. The RDS CAL price is Rs 12,000 and Rs 9,000 in the same deck. The
+350k-user customer is both the "world's largest" and the "2nd largest" service provider. Two case
+slides in the ETCISO and IBA decks carry "Source: Gartner" on Accops' own customer stories.
+
+**Claims to verify before anyone repeats them:** "Citrix & VMware exited India & APAC" (Nutanix mini
+deck, 2024); "80% of Indian insurers / 90% of central government employees use Accops"; Nutanix
+Frame "discontinued" and the NetScaler CVE claims (Customer Deck SEA 1.0); the Nayara/Microsoft,
+Unit 8200 and Hikvision slides; the March 2026 AWS UAE/Bahrain strike slides.
+
+**Mislabelled and duplicated:** the only deck in the "GCP" folder has no GCP content. A
+find-and-replace turned "SSL VPN" into "SSL PaloAlto" in the Palo Alto guide. Japan bootcamp slide
+8 still has "X customers, Y partners" placeholders and another slide says DRAFT. Exact duplicates:
+the two .NEXT 2024 SUBMITTED copies, the VMware Alternative stack and its 0424 copy, and the two
+"Why VDI" Nutanix decks (only the titles differ). The General Presentations archive folder is
+spelled "_archieved", which is why SAM treated 48 archived decks as live until 26 September.
+
+**Personal data in a spreadsheet:** "Customers' detals for MFA webinar" (sic) holds customer
+details. SAM no longer offers it; consider moving it out of Sales Collateral.
+
+**Help for earlier gaps:**
+- *Customer Deck SEA 1.0* has no SEA customer story (gap 6 stands), but it has the most current VDI
+  competitive section: 2026 landscape vs Citrix, Omnissa, AVD and AWS (gap 7).
+- *DaaS DIY/AMD v2* has the only Accops vs AWS WorkSpaces pricing.
+- The *.NEXT 2024* backup slides list Fortinet, Zscaler, F5 and Cisco VPN displacements.
+- *Forcepoint webinar v03* has the Palo Alto GlobalProtect CVE handling story.
+- The Hyderabad CIO deck (slide 32) maps each product to DPDP principles; with the 2019 Data
+  Compliance deck it could seed a DPDP pitch (gaps 4 and 9).
+- *.Next 2026 "When VDI Is Not Enough"* is the current answer to the Nutanix integration gap (gap 8).
