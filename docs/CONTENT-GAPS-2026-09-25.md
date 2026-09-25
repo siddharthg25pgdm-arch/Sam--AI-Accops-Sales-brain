@@ -176,3 +176,80 @@ The metadata items marked **(marketing)** are yours.
 - The old HySecure Datasheet V3 (2025) still sits next to V5 2026 in `Brochures & Datasheets/New`.
 - The HyID "Outdated-...-Internal-Training" architecture deck is still answerable.
 - The healthcare whitepaper's introduction (see item 3).
+
+---
+
+## Update, 26 September: what carding the library found
+
+On 26 September SAM read another 128 documents in full (174 are now carded, up from 46). Reading
+the documents themselves turned up things the file names never would. None of this needs SAM to
+change. It needs the file owners to act.
+
+### Fix before these documents reach a customer
+
+- **Personal and sensitive data inside documents.** The NanoOS tech doc prints the default
+  installer username and password. The HyID biometric proposal template has Accops' bank account
+  details and the CEO's mobile number. The UCB industry document lists individual sales staff phone
+  numbers. Three HMIL sample reports contain real Accops employees' usernames and working hours.
+  Remove or replace with dummy data.
+- **Third-party product name in an Accops deck.** HyMobile V2 2026, slide 23, reads "Connect
+  Scalefusion OneIdP". Customers will read that as HyMobile being someone else's product.
+- **An expired certification claim.** The Europe value proposition says "ISO 27001". The only
+  certificate on file expired on 20 September 2024. The same applies to every deck that cites it.
+- **An unverified competitor claim.** The Aug 2023 product presentation says "Citrix exited India &
+  APAC". Check it before anyone repeats it to a customer.
+
+### Answers to open questions
+
+- **`Company Certifications/SOC-Accops.pdf` is not a SOC 2 report.** It is a January 2022 letter
+  from Mirox (a CERT-In empanelled auditor) saying SOC 1 and SOC 2 apply only to services Accops
+  runs for customers, such as DaaS, and that PCI-DSS does not apply. So the honest answer to "do we
+  have a SOC 2 report?" is no. Rename the file so nobody mistakes it for one, and decide whether
+  Accops DaaS needs a SOC 2 Type 2 report.
+- **The HySecure penetration-test certificate covers version 5.3.6.0, May 2020** (Indusface). It
+  has no expiry date, but it describes a release customers no longer run. A test of the current
+  version is needed.
+
+### Licensing
+
+- **The 2024 Gartner Magic Quadrant for DaaS in SharePoint is watermarked for a Gartner employee's
+  personal use**, not for an Accops subscriber. Do not send it to anyone. The 2023 MQ and both
+  Voice of the Customer reports are licensed to Accops staff.
+- The Global CIO Forum's "Book of Titans" and the Economic Times clipping are third-party
+  copyright with personal profiles: internal use only.
+
+### The same number, told differently
+
+Reps quoting these to the same customer will contradict each other. Pick one figure for each:
+
+| Claim | Figures found |
+|---|---|
+| Private bank MFA users | 60,000 and 90,000 |
+| Remote browser isolation users | 350,000 and 600,000 |
+| TCS users | 150,000 and 350,000 |
+| Kyoto University | "2nd largest", "5th largest" and "2nd oldest"; 20,000 / 25,000 / 30,000 / 35,000 students |
+| DSCI award year | 2024 and 2025 |
+| Gartner MQ mentions | HyMobile and HyLabs 2026 decks say "2023 & 2024" on one slide and "2025 and 2026" on the next |
+
+### Duplicates and old versions that can go
+
+- Identical copies: "Why VDI for WFH" and "VDI for WFH"; About Accops V1 and V2; Product Editions
+  Oct 2025 and 2026 (only the copyright year differs); `2026-06-11-Accops vs other VDI providers`
+  and the 2022 file it copies (keep the 2022 name, it is honest about the date).
+- Superseded: WFH Solutions v8 (by v9), Nutanix AHV integration v1 (by v2), Graphics Workstation v2
+  (by v3), Turbo Architecture v1 (by v2).
+- Many files carry a `2021-01-01-` prefix from a bulk rename; several are really from 2017-18
+  (the Workspace Virtualization comparison, the VMware brochure). The WVD one-pager predates the
+  rename to Azure Virtual Desktop, the "Why VDI" deck still has a Cisco HyperFlex slide (the product
+  is discontinued), and the O365 note still says Propalms.
+
+### Content that exists but reps could not find
+
+- *The Shield* (Sept 2022) has a full Zulekha Hospital story. It is the source for a proper
+  Zulekha card and for any UAE healthcare reference.
+- A Dataquest story on a global content-services firm (6,000 users in 7 countries, VPN replaced
+  with ZTNA) is the closest thing to a South-East Asia customer reference.
+- The Zero Trust Access Gateway deck compares Accops against Fortinet, Palo Alto, Cisco, OpenVPN
+  and WireGuard. Dated, but the only material on Fortinet and Palo Alto.
+- Four Dataquest magazine stories were published in print and a Nutanix solution brief is
+  Nutanix-branded. If they are online, send SAM the links and they become sendable.
