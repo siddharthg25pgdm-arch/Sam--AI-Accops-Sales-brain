@@ -1,0 +1,610 @@
+{
+  "generated_by": "Claude, in-session, 25 September 2026",
+  "note": "Batch 08: the uncarded SharePoint PDFs and Word documents (paid-media case studies, competition, technical solution documents, certifications, product editions, Gartner / third-party). Written from corpus/text/*.txt; every document read before carding. For pdf/docx twins that extract to the same text, one card is written against the PDF and the docx twin clears from the queue by stem. The four 'DQ' files are whole Dataquest magazine issues with one sponsored Accops customer story inside; the card describes that story, and needs_human notes that the file is the full issue.",
+  "schema_notes": {
+    "needs_human": "A question only Siddharth or marketing can answer (canonical variant, whether a draft should be retired, a figure that looks like a typo).",
+    "client_actual": "Real customer names printed in the document. Supabase only, never in a model prompt."
+  },
+  "model_visible": [
+    "title",
+    "asset_type",
+    "industry",
+    "client",
+    "products",
+    "competitors",
+    "personas",
+    "use_for",
+    "publish_year",
+    "visibility",
+    "superseded_by"
+  ],
+  "cards": [
+    {
+      "source": "sharepoint/DQ August 2022_NAV BAck Office.pdf",
+      "title": "Fund Administration Back Office: Work-from-Home Rollout in 48 Hours, 500 to 2,000 Users (Dataquest, Aug 2022)",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "An Indian back-office accounting and fund administration firm serving hedge fund administrators",
+      "client_actual": "NAV Fund Administration Group / NAV Back Office (Back Office IT Solutions Pvt Ltd); quotes Ashish Sharma, VP-IT & Engineering",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "HyWorks",
+        "HyID",
+        "ZTNA",
+        "VDI",
+        "MFA"
+      ],
+      "competitors": [
+        "VMware",
+        "Citrix"
+      ],
+      "personas": [
+        "IT head",
+        "CIO",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "A firm that had never allowed work from home had to move fund-accounting staff home overnight during the pandemic; its client VPN was obsolete, VMware and Citrix POCs were slow and complex, and delays were causing late reports, SLA breaches and reputation risk.",
+      "key_outcomes": [
+        "Installed and running in under 48 hours with no significant network change; Accops Customer Success walked the install",
+        "Scaled from 500 to 2,000 user licences (4x) without infrastructure changes - 'at the click of a button'",
+        "Client base grew 100% and team size 3x during the period; 'did not lose a single hour of business productivity'",
+        "HySecure (zero-trust gateway) + HyWorks (digital workspace) + HyID (MFA): any device, data stays where the firm chooses",
+        "Fewer helpdesk calls, one-click access to internal apps, faster deliveries; now hiring staff in other countries",
+        "Chosen over VMware and Citrix after their POCs 'did not match our expectations'"
+      ],
+      "brief": "A sponsored customer story in Dataquest (CyberMedia), August 2022, pages 28-30. The client is a back-office accounting firm doing independent fund accounting, reporting and analytics for hedge fund administrators. During the pandemic it evaluated VMware and Citrix, found both POCs complex and slow, and ran a makeshift home-working setup until it found Accops. It wanted a simple, secure web gateway that plugged into existing infrastructure without changing how users work. HySecure, HyWorks and HyID were deployed in under 48 hours; the VP-IT credits the Customer Success team and post-sales support. The firm grew from 500 to 2,000 licences, doubled its client base and tripled its team, and now hires remotely across countries; next it is exploring MFA for remote access.",
+      "use_for": "Proof for a financial-services back office, KPO or fund-accounting firm that needs work from home fast, especially where a VMware or Citrix evaluation stalled. Good for 'how quickly can you deploy' and 'can it scale without re-architecture'.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "August 2022 and pandemic-framed. Figures (500 to 2,000 licences) are as of 2022; confirm the customer is still active before naming it.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No verified public URL. The file is the full Dataquest magazine issue, not a standalone case study.",
+      "needs_human": "The file is the whole August 2022 Dataquest issue (dozens of unrelated articles); the Accops story is pages 28-30. Since it was published in print, it is presumably sendable - consider extracting the three pages as a standalone PDF or linking the dqindia.com article, then marking it public."
+    },
+    {
+      "source": "sharepoint/DQ Dec 2022 _Straive.pdf",
+      "title": "Global Content and Data Services Provider: VPN Replaced with ZTNA for 6,000 Remote Users in 7 Countries (Dataquest, Dec 2022)",
+      "asset_type": "Case Study",
+      "industry": "ITeS / Content Services",
+      "client": "A global content outsourcing, eLearning and data-solutions provider for publishers, with delivery centres in India, the Philippines, Vietnam, the US, Nicaragua, the UK and Singapore",
+      "client_actual": "Straive; quotes Sitaram Dhuri, Associate VP - IT",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "ZTNA",
+        "MFA",
+        "HyWorks"
+      ],
+      "competitors": [],
+      "personas": [
+        "IT head",
+        "CISO",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "Content and IP sat in on-premises homegrown and legacy applications that could not move to the cloud, and the existing layer-3 VPN firewall let any connected user move laterally with nobody checking activity.",
+      "key_outcomes": [
+        "6,000+ users across the globe connected; about 8 Indian offices on HySecure",
+        "Replaced the existing VPN with ZTNA, restricting users to specific resources and applications",
+        "On-premises workforce down 50%, overheads down 20%",
+        "Self-service onboarding: download, install, AD password, MFA via smartphone or email - usable by non-technical authors and academics",
+        "Works over ordinary 4G / low-bandwidth links; BYOD split into trusted and untrusted endpoints with pre-access device checks",
+        "Business continuity through recurring volcano and cyclone lockdowns in the Philippines; new joiners productive days sooner"
+      ],
+      "brief": "A sponsored customer story in Dataquest, December 2022 (pages 107-109), 'Connecting the Remote Dots'. The client produces educational and research content for publishers and universities and is moving into data, ML and AI services; its data sits in on-premises homegrown applications for IP and compliance reasons. During COVID there was no time to move workloads to the cloud, so Accops Digital Workspace and HySecure were deployed for secure remote access. The IT lead explains why the layer-3 VPN was replaced ('once you connect the door is open') with ZTNA, how users were migrated in batches by splitting trusted and untrusted (BYOD) endpoints, and the device-posture pre-checks. Results: 6,000+ users, 50% fewer people on premises, 20% lower overheads, easier third-party onboarding and compliance, and a unique continuity story for staff in disaster-prone parts of the Philippines.",
+      "use_for": "A VPN-replacement or ZTNA conversation with an ITeS, KPO, publishing or GCC-style company with distributed, non-technical workers and on-prem legacy applications. Also a Philippines / South-East Asia delivery-centre reference and a business-continuity story.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "December 2022 and COVID-framed. Confirm the customer is still active before naming it.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No verified public URL. The file is the full Dataquest magazine issue.",
+      "needs_human": "Whole December 2022 Dataquest issue; the Accops story is pages 107-109. Published in print, so likely sendable once extracted as a standalone PDF. This is also the closest thing the library has to an SEA (Philippines) customer proof point - worth a proper case-study edition."
+    },
+    {
+      "source": "sharepoint/DQ February 2023_Shriram Capital.pdf",
+      "title": "Large Indian NBFC and Insurance Group: 30-35% Productivity Gain with ZTNA and VDI for 3,000+ Endpoints (Dataquest, Feb 2023)",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "The holding company of a large Indian conglomerate in retail lending (NBFC), life and general insurance",
+      "client_actual": "Shriram Capital Ltd (Shriram Group; flagship Shriram Finance); quotes Sendil Kumar Venkatesan, CTO",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "HyWorks",
+        "ZTNA",
+        "VDI",
+        "MFA",
+        "Thin Clients"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "A closed-environment NBFC whose B2B applications and source code were only reachable on premises had to open up for work from home as an essential service, and two earlier vendors' solutions wasted server resources and had no API for productivity reporting.",
+      "key_outcomes": [
+        "Minimum 30-35% improvement in productivity and resource utilisation (CTO's conservative estimate)",
+        "3,000+ machines (desktops, laptops, thin clients) segmented by role; contact-centre staff on thin clients",
+        "Phased rollout: HySecure ZTNA gateway first at one group company, then HyWorks VDI across departments",
+        "Usage reports integrated via API with HR for employee-productivity insight",
+        "OTP-based MFA, DLP blocking screenshots and copying, MAC-based device whitelisting",
+        "Developers work through VDI - previously thought impossible; scale-in / scale-out server allocation from one dashboard",
+        "Group evaluating Accops hardware and extending to other group companies"
+      ],
+      "brief": "A sponsored 'Industry Case Study' in Dataquest, February 2023 (pages 28-30), headlined '30% improvement in productivity at Shriram Capital with Accops solution'. Before COVID the group ran entirely closed: B2B applications and source code were on-premises only. As an insurer it was an essential service and had to keep claims running remotely. Two prominent earlier vendors failed - one needed ever more cloud servers, another lacked an API for productivity reporting. Accops offered a POC; the group deployed HySecure first (phased, one company at a time), then HyWorks for application and desktop virtualisation, with OTP MFA, DLP and device whitelisting. Usage data feeds HR reports. The CTO reports 30-35% better productivity and utilisation across 3,000+ endpoints, including developers on VDI, and is evaluating Accops thin-client hardware.",
+      "use_for": "NBFC, insurance or lending prospects; any CIO/CTO who wants productivity reporting from remote-access logs, or who has been burned by a VDI that over-consumed servers. The only Shriram Capital story with a SharePoint link.",
+      "publish_year": "2023",
+      "expired": false,
+      "stale_risk": "February 2023. Figures are the CTO's 2023 estimates. A separate Shriram Capital case study exists only in the local asset library (no SharePoint link) - reconcile the two before quoting numbers.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No verified public URL. The file is the full Dataquest magazine issue.",
+      "needs_human": "Whole February 2023 Dataquest issue; the story is pages 28-30. The content-gap report lists a separate 'Shriram Capital' case study (title misspelt 'Shrira') with no SharePoint link - decide which is canonical and upload one standalone, sendable PDF."
+    },
+    {
+      "source": "sharepoint/DQ Nov 2022 _Ecom Express.pdf",
+      "title": "Leading Indian E-commerce Logistics Company: Software ZTNA for 2,300 Concurrent Users and New Sites in a Day (Dataquest, Nov 2022)",
+      "asset_type": "Case Study",
+      "industry": "Logistics / E-commerce",
+      "client": "A leading Indian technology-enabled e-commerce logistics provider with 50,000+ staff across 2,750+ towns and 27,000+ PIN codes",
+      "client_actual": "Ecom Express Limited; quotes Jaideep Singh, IT Infrastructure Head",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "ZTNA"
+      ],
+      "competitors": [],
+      "personas": [
+        "IT head",
+        "Head of Infrastructure",
+        "CISO"
+      ],
+      "regulations": [
+        "PCI DSS"
+      ],
+      "key_problem": "A fast-growing logistics network adding 200+ locations at peak had to secure access to its Oracle and cloud ERP from unpatched personal laptops and untrusted networks, pass customer and PCI audits, and refused hardware-dependent security that would not scale.",
+      "key_outcomes": [
+        "Grew from a handful of licences to about 2,300 concurrent licences by 2022",
+        "New business sites onboarded in a day; hundreds of delivery centres added a year 'at the click of a button'",
+        "Software-only solution saved 20%+ in direct costs versus hardware security",
+        "Deployed in the customer's cloud; AD integration gives single sign-on",
+        "HySecure Turbo gives priority access to core apps from any device including Android",
+        "Meets marketplace customers' cybersecurity mandates and periodic VA/PT audits; PCI compliance non-negotiable"
+      ],
+      "brief": "A sponsored 'Industry Case Study' in Dataquest, November 2022 (pages 14-16), 'Accops empowers Ecom Express to enable seamless WFH and secure endpoint connectivity'. Laid out as challenges, solution and benefits, then the IT infrastructure head's account. Cybersecurity became a condition of keeping its largest marketplace customers, PCI compliance was mandatory, IT resources were thin and the company wanted cloud, not an on-prem data centre. It rejected hardware-based security as unable to keep pace with rapid site expansion. HySecure was deployed in the company's cloud with AD-based SSO; it scaled from a trial to around 2,300 concurrent licences, onboards new sites in a day, and saved over 20% in direct costs. Quote: 'The IT department is faster than the business.'",
+      "use_for": "Logistics, retail, e-commerce or any multi-site business that expands quickly and needs software-only ZTNA rather than VPN appliances; deals where PCI or customer-driven security audits are the trigger.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "November 2022. An older 'Accops - Ecom Express - Case Study.pdf' sits in 'zCase Studies (Archive_DONOTUSE)'. Confirm the customer is still active before naming it.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No verified public URL. The file is the full Dataquest magazine issue.",
+      "needs_human": "Whole November 2022 Dataquest issue; the story is pages 14-16. This is newer than the archived 'Accops - Ecom Express - Case Study.pdf' (2021, zCase Studies) - if the story is still usable, extract it as a standalone sendable PDF."
+    },
+    {
+      "source": "sharepoint/The-Shield-September-2022.pdf",
+      "title": "UAE Multi-Hospital Group: Doctors' Secure Remote Access to HIMS and Patient Records (The Shield, Sep 2022)",
+      "asset_type": "Case Study",
+      "industry": "Pharma / Healthcare",
+      "client": "One of the largest private healthcare networks in the Gulf: two multidisciplinary hospitals in Dubai and Sharjah, three medical centres and three pharmacies, 3,000+ staff including 300+ doctors",
+      "client_actual": "Zulekha Hospital / Zulekha Healthcare Group (UAE); quotes Aliasgar Bohari, Senior Director-IT. Magazine published by Bulwark Technologies (Accops distributor, Dubai)",
+      "client_named": true,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "VDI",
+        "ZTNA",
+        "MFA"
+      ],
+      "competitors": [],
+      "personas": [
+        "IT head",
+        "CIO",
+        "CISO"
+      ],
+      "regulations": [],
+      "key_problem": "Doctors on call at odd hours had to reach the hospital information system (HIMS) and patient records from their own devices over unstable home networks, and the existing VPN was slow on low bandwidth and had no endpoint, device-entry or data-leakage controls, risking regulatory violations.",
+      "key_outcomes": [
+        "Rolled out first for specific doctors to reach HIMS, then extended to the entire workforce",
+        "In place four years before COVID, so hundreds of staff moved to work-from-anywhere within days",
+        "Sandboxed access to office PCs and VDI; compute-heavy apps delivered over low-bandwidth home Wi-Fi",
+        "Secure application access gateway, MFA, device-entry control and persona-based contextual access",
+        "Endpoint data-leakage prevention; access from old personal devices secured, unknown users and devices blocked",
+        "360-degree visibility of who accessed what, when and from where; usage reports used to plan IT spend"
+      ],
+      "brief": "The Accops article in 'The Shield', the September 2022 customer magazine of Bulwark Technologies, Accops' Middle East distributor. Most of the issue is other vendors (SendQuick, Utimaco, RiskXchange) and Bulwark news; the Accops piece is a two-page customer story plus an Accops advert. The client is a Gulf private hospital group. Doctors needed round-the-clock access to HIMS and patient records from personal devices; the incumbent VPN struggled on home networks and lacked endpoint control. After evaluating several vendors the group chose Accops, first for selected doctors, then for all staff and for IT support out of hours. The story lists challenges (regulatory exposure, unpatched devices, no visibility, high infra cost), the solution (digital workspace with sandboxed PC/VDI access, gateway, MFA, device-entry control, DLP) and benefits (better patient care, endpoint risk removed by VDI, monitoring and capacity planning). The issue's event list also records the Accops Partner Summit 2022 (UAE), 21 June 2022.",
+      "use_for": "Hospital and healthcare prospects - clinicians needing remote access to HIMS / EMR on BYOD - and Middle East / UAE deals needing a regional reference. Substantiates the Zulekha Hospital case study, whose existing SAM card was written without the document.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "September 2022. The file is a distributor magazine with many non-Accops articles; the Accops content is pages 11-13.",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No verified public URL. Third-party (distributor) magazine containing other vendors' content.",
+      "needs_human": "The content-gap report says the Zulekha Hospital case-study card was written from guesses ('likely covers...'). This article is a real, detailed source - use it to rewrite that card. Also consider extracting pages 11-13 as a sendable one-pager."
+    },
+    {
+      "source": "sharepoint/2021-01-01-Accops & Other Workspace Virtualization Vendors Comparison.pdf",
+      "title": "Accops vs Microsoft, Citrix and VMware: Workspace Virtualization Feature Comparison Table (2018)",
+      "asset_type": "Battlecard",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyDesk",
+        "HyLite",
+        "HyID",
+        "VDI",
+        "Thin Clients",
+        "Browser Isolation",
+        "MFA"
+      ],
+      "competitors": [
+        "Microsoft",
+        "Citrix",
+        "VMware"
+      ],
+      "personas": [
+        "IT head",
+        "Head of Infrastructure",
+        "procurement"
+      ],
+      "regulations": [],
+      "key_problem": "Buyers comparing VDI and application-delivery vendors need a single yes/no grid showing which capabilities each vendor actually ships versus leaves to third parties.",
+      "key_outcomes": [
+        "About 40 rows of Y/N comparison: Accops vs Microsoft RDS, Citrix and VMware",
+        "Accops-only claims: own thin / zero clients, integrated endpoint management, built-in 2FA, device-based desktop assignment for shift desks, 100% USB peripheral support, making non-RDS-friendly apps multi-user, privileged access management, onsite OEM support",
+        "Linux VDI and Linux shared desktops / apps supported (Microsoft: no)",
+        "Enhanced HTML5 clientless access with file transfer, USB, printer and scanner support",
+        "Admits gaps at the time: no own hypervisor, no app streaming (App-V), cloud workspace portal and federated authentication 'upcoming 2017'",
+        "Display protocol: enhanced RDP 8.1 with RemoteFX vs Citrix ICA and VMware PCoIP"
+      ],
+      "brief": "A two-page feature comparison table of Accops against Microsoft (RDS), Citrix and VMware for application and desktop delivery, with green/red style Y/N cells and one-line explanations per feature. It covers endpoints (thin and zero clients, endpoint management, BYOD clients), hosted Windows and Linux desktops and apps, SSL gateway (HySecure vs NetScaler vs Windows service), built-in two-factor authentication, HTML5 and virtual-browser access, hypervisor ownership, provisioning and linked clones, display protocols, printing, profile management, load balancing, USB support, endpoint security and device controls, MDM, cloud workspace portal, federated authentication and privileged access management. Ends with a disclaimer that competitor information is from the public domain.",
+      "use_for": "Background only: a quick reminder of Accops' long-standing VDI differentiators (own thin clients, built-in MFA, device-based assignment for shift workers, USB support). Do not send - it is from about 2017-18.",
+      "publish_year": "2018",
+      "expired": false,
+      "stale_risk": "Copyright 2018, and rows marked 'upcoming 2017' show the content is older still. Competitor columns (Microsoft RDS rather than AVD, VMware before the Broadcom acquisition and the Omnissa spin-off) and Accops' own gaps (cloud portal, federation) have all changed. The filename date '2021-01-01' is a bulk rename, not the publication date. For current VDI comparisons use 'Accops vs Citrix-VMware Updated April 2024' or the Omnissa Horizon VVF analysis (2026).",
+      "superseded_by": "sharepoint/Accops vs Citrix-VMware_ Updated April 2024.pptx - the current Citrix / VMware comparison (carded in batch-03).",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Competitive comparison with named vendors; outdated.",
+      "needs_human": "Candidate for retirement - content dates from 2017-18 despite the 2021 filename."
+    },
+    {
+      "source": "sharepoint/2021-01-01-Accops Value Comparison - v1.pdf",
+      "title": "Accops: Delivering Choice - Company Value Proposition and Competitive Comparison vs WVD, Citrix, VMware, Zscaler, F5, Okta (2021)",
+      "asset_type": "Solution Document",
+      "industry": "",
+      "client": "Largest deployments named: a top private bank (35,000 WFH users, 60,000 MFA), Government of India (100,000 users), a Japanese prefecture (25,000), an e-commerce major (15,000), an engineering conglomerate (10,000)",
+      "client_actual": "Axis Bank, Government of India, Ibaraki Prefecture (Japan), Walmart (Flipkart), L&T",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "HyWorks",
+        "HyID",
+        "HyDesk",
+        "HyLite",
+        "Nano",
+        "HyLabs",
+        "ZTNA",
+        "VDI",
+        "MFA",
+        "BioAuth",
+        "Thin Clients",
+        "DaaS"
+      ],
+      "competitors": [
+        "Microsoft",
+        "Citrix",
+        "VMware",
+        "Zscaler",
+        "McAfee",
+        "F5",
+        "Palo Alto Networks",
+        "Okta",
+        "Cisco",
+        "AWS WorkSpaces"
+      ],
+      "personas": [
+        "CIO",
+        "CISO",
+        "IT head",
+        "procurement"
+      ],
+      "regulations": [
+        "RBI"
+      ],
+      "key_problem": "Secure work from home normally means integrating 4-5 point products (VPN, VDI, MFA, SSO, device control, thin clients) from different vendors, which takes weeks, complicates support and raises cost; Accops argues it offers the choice of delivery mode that single-category vendors deny customers.",
+      "key_outcomes": [
+        "Company profile: founded 2012 in Pune by the NeoAccel founders (SSL VPN acquired by VMware in 2011); 600+ customers; 150+ staff; 10 distributors",
+        "Reference scale: 35,000 WFH + 60,000 MFA users at a top private bank, 100,000 government users, 25,000 at a Japanese prefecture; 10 of India's top 20 insurers use Accops for WFH",
+        "Credentials: Azure CSP and Gold Partner with co-sell listing; Nutanix AHV certified; RBI remote-work report cites Accops; GeM preferential market access; Nasscom Emerge50 2020",
+        "Business-need grid vs MS WVD, Citrix/VMware, Zscaler/McAfee, F5/Palo Alto, Okta/Cisco Duo: on-prem or SaaS, VDI, DaaS, ZTNA, MFA for any app, biometrics, thin clients, secure BYOD OS, data copy protection",
+        "Digital workspace feature table vs Citrix, VMware, WVD / AWS WorkSpaces: UX monitoring, contextual access, hypervisor agnostic, device-based assignment, hardware-ID binding, dynamic cloud power management, FIDO / facial MFA, MSIX app attach, universal licence portable across on-prem and cloud",
+        "One-paragraph descriptions of HySecure, HyWorks, HyID, HyDesk (5-15 W devices), HyLite, Nano and HyLabs"
+      ],
+      "brief": "A 2021 Word/PDF positioning document, 'Accops: Delivering Choice to Organizations'. It opens with the company story (founders' SSL VPN background at NeoAccel, sold to VMware), the integrated-suite USP plus Accops professional services, the customer and deployment scale, OEM partnerships (Microsoft Azure, VMware, Hyper-V, Nutanix, Cisco, Teradici; tested with Palo Alto, Fortinet, Okta, OneLogin, Duo, RSA), awards, and the channel model with global SIs. It then describes each product and closes with two comparison tables: a business-need grid against WVD, Citrix/VMware, Zscaler/McAfee, F5/Palo Alto and Okta/Cisco Duo, and a detailed digital-workspace feature comparison against Citrix, VMware and WVD / AWS WorkSpaces, with a public-domain disclaimer.",
+      "use_for": "Internal briefing or an early-stage, multi-vendor comparison where the prospect is weighing VDI, ZTNA and MFA vendors separately against an integrated suite. Useful for the 'why one vendor' argument and for the competitor matrix across categories. Check numbers before quoting.",
+      "publish_year": "2021",
+      "expired": false,
+      "stale_risk": "Copyright 2021. Company numbers (600+ customers, 150+ people) are below current figures (900+ customers). 'MS WVD' is now Azure Virtual Desktop; VMware EUC is now Omnissa; Zscaler 'SaaS only' and competitor capability cells are 2021 positions. Names customers.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Names customers and makes comparative claims about named competitors.",
+      "needs_human": "A .docx twin with identical text sits in the same folder (Competition/General); the PDF is the one to keep."
+    },
+    {
+      "source": "sharepoint/Vanquishing VMware - Battlecard - 05082022.pdf",
+      "title": "Vanquishing VMware: Broadcom Acquisition Battlecard and VDI Attack Scenarios (Jul 2022)",
+      "asset_type": "Battlecard",
+      "industry": "",
+      "client": "",
+      "client_actual": "Mentions an SBI Life co-existence case study",
+      "client_named": true,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "HyDesk",
+        "VDI",
+        "MFA",
+        "Thin Clients",
+        "BioAuth"
+      ],
+      "competitors": [
+        "VMware",
+        "Broadcom",
+        "Microsoft"
+      ],
+      "personas": [
+        "IT head",
+        "Head of Infrastructure",
+        "CIO",
+        "procurement"
+      ],
+      "regulations": [],
+      "key_problem": "After Broadcom's $61B VMware acquisition, customers outside VMware's top accounts face subscription-only licensing, price rises and reduced support, and sellers need a script for when and how to displace VMware Horizon.",
+      "key_outcomes": [
+        "Broadcom context: $61B deal, move from perpetual to subscription / SaaS, target of $8.5B EBITDA a year, focus on the top 600 customers",
+        "Accops USPs vs VMware: in-house code, single GUI console (vs Horizon + vROps), no JSON-configured access point, no multi-vendor stack, one maintenance contract instead of SA + SnS",
+        "Claims Accops delivers app and desktop virtualisation, gateway, MFA, DLP and load balancer at 50% less cost",
+        "Deep Device Postural Check on device type, WAN IP, MAC, time, motherboard / CPU / HDD IDs and geo-location - Horizon has no device pre-check",
+        "Three attack scenarios with illustrative 100- and 1,000-user pricing: VDI-only price-sensitive, add-on VDI price-sensitive (Hyper-V + HyWorks), large business-critical (co-exist with Horizon, add HySecure)",
+        "Guidance: target digital-workspace deals where server virtualisation is not the main requirement; don't attack head-on"
+      ],
+      "brief": "An internal seller battlecard (version VMwareBattlecard/22072022.01) written just after Broadcom announced its VMware acquisition. Part one summarises the deal and Broadcom's likely strategy - subscription transition, cost cutting, focus on the largest customers - and what it means for smaller VMware customers. Part two gives the Accops pitch and USPs against VMware Horizon: originality of code, simplicity, contextual security, single vendor, licensing cost, maintenance contracts, built-in MFA with face and fingerprint, customisation support and endpoint device control. Part three, 'How and when to attack VMware', explains vSphere and Horizon licensing (free vSphere bundled with Horizon) and three attack scenarios with example price comparisons, including co-existing with Horizon in large accounts. Marked confidential, not for public circulation.",
+      "use_for": "Seller preparation for a VMware Horizon displacement - especially SME / mid-market customers hit by Broadcom licensing changes - and for framing a Hyper-V + HyWorks alternative. Pair with the newer VMware replacement deck and the Omnissa analysis for current facts.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "Written July 2022, before the acquisition closed (Nov 2023) and before VMware EUC was sold and became Omnissa (2024). Broadcom predictions here have since played out differently in detail. Horizon is now an Omnissa product, so 'attack VMware' framing needs updating. Example prices are illustrative.",
+      "superseded_by": "sharepoint/Omnissa Horizon VVF Analysis.docx - the Feb 2026 Omnissa / VMware analysis (batch-03); see also 0424-AccopsDeck-VMWareReplacement.pptx (2024).",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Marked 'confidential document, not meant for public circulation' on every page; contains attack pricing scenarios.",
+      "needs_human": "A companion 'VMware Attack Scenarios-05082022.pptx' sits in Competition/Omnissa. Decide whether to retire both now that the Omnissa analysis exists."
+    },
+    {
+      "source": "sharepoint/2021-01-01-Accops-MS-WVD.pdf",
+      "title": "Accops vs Microsoft Windows Virtual Desktop (WVD): Limitations and Accops Value-Add (One-Pager)",
+      "asset_type": "Battlecard",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "HyLite",
+        "VDI",
+        "DaaS",
+        "MFA",
+        "Thin Clients"
+      ],
+      "competitors": [
+        "Microsoft",
+        "Azure Virtual Desktop"
+      ],
+      "personas": [
+        "IT head",
+        "Head of Infrastructure",
+        "procurement"
+      ],
+      "regulations": [],
+      "key_problem": "Microsoft WVD brokering is free with the right licences, but it consumes more Azure resources and lacks web-client file transfer, USB redirection, SSO, printing, Linux, non-Azure deployment, delegated admin, audit logs and data-security controls.",
+      "key_outcomes": [
+        "WVD limitations listed: a VM serves either apps or desktops not both; per-user cost for Azure AD Premium and MFA; 64-bit server OS only; Azure only; no Linux guest or client",
+        "End-user gaps: no web upload/download, no USB redirection, no SSO for RDP, no web printing, no app self-service",
+        "Admin gaps: PowerShell-heavy console, no delegated helpdesk admin, no user or admin activity logs, no watermark or copy-paste control",
+        "Accops integration: its broker, load balancer and gateway run in Azure on top of WVD / Windows 10 multi-session; Azure and licence costs unchanged plus Accops service",
+        "Accops value-add: same VMs for apps and desktops, concurrent-licensed contextual MFA and zero trust, HTML5 client with file transfer and USB, legacy 16/32-bit apps, Linux, any cloud or on-prem, thin clients, watermark, device entry control"
+      ],
+      "brief": "A single-page comparison of Accops against Microsoft Windows Virtual Desktop. It summarises what WVD gives (free brokering with O365 / SA licences, Windows 10 multi-session), then lists its limitations in cost, end-user experience, platform, device support, administration and data security. It explains that Accops can run on top of WVD in Azure (brokering, load balancing, gateway, provisioning and power management) and lists the Accops value-add for each limitation.",
+      "use_for": "Background for an Azure Virtual Desktop competitive conversation or an 'Accops on Azure' pitch - the structure (cost, UX, platform, admin, data security) still works. Verify every WVD limitation against current AVD before using any of it with a customer.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "No date in the document; the SharePoint PDF was last modified December 2019. WVD was renamed Azure Virtual Desktop in 2021 and many listed gaps have since been closed (web client file transfer, printing, SSO, Windows 11 multi-session, Azure Stack HCI / on-prem). The 25 Sep content-gap test flagged AVD comparison as very old. Using these claims today risks being contradicted by a Microsoft partner.",
+      "superseded_by": "",
+      "confidence": 0.85,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Competitive claims about Microsoft, and outdated.",
+      "needs_human": "A .docx twin with the same text exists in Competition/VDI and DaaS. Marketing: an updated Accops vs Azure Virtual Desktop comparison is a known gap (hospital and BFSI scenarios)."
+    },
+    {
+      "source": "sharepoint/2021-01-01-Accops-VMware-Comparison-Brochure.pdf",
+      "title": "Your Best Alternative to VMware: Accops vs VMware Horizon Comparison Brochure (2018)",
+      "asset_type": "Brochure",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "HyDesk",
+        "HyLite",
+        "VDI",
+        "Thin Clients",
+        "MFA",
+        "DaaS"
+      ],
+      "competitors": [
+        "VMware"
+      ],
+      "personas": [
+        "IT head",
+        "Head of Infrastructure",
+        "CIO",
+        "procurement"
+      ],
+      "regulations": [],
+      "key_problem": "VMware Horizon is overkill for most SMB and mid-market VDI needs: complex architecture and consoles, licensing split across vSphere / Horizon / vROps, dual maintenance contracts, forced upgrades at end of life, and third-party thin clients, MFA and gateways.",
+      "key_outcomes": [
+        "Claims 50% lower cost for the same application / desktop delivery and 3x less hardware",
+        "350+ enterprise customers and 400,000 users daily (at the time)",
+        "Single maintenance contract covers new versions and updates (vs VMware Software Assurance + Support)",
+        "100% USB support including dot-matrix printers and biometric devices",
+        "Device pre-check by device type, IP, MAC, time and geo-location for BYOD",
+        "Feature table: app virtualisation incl. Server 2003, single console, own thin clients (HyDesk), built-in 2FA (HyID), integrated remote access (HySecure), device-based assignment, multi-tenant DaaS - VMware 'requires 3rd party'"
+      ],
+      "brief": "A two-page customer-facing brochure positioning Accops as the cost-effective, simpler alternative to VMware for virtual end-user computing. It argues three themes: total cost of ownership (licensing, maintenance contracts, hardware and operations costs), complexity (multiple consoles, multi-vendor support, licensing models) and completeness (thin clients, 2FA, secure remote access and HTML5 access in one suite). Differentiators include product customisation, single vendor, enhanced clientless HTML5 access, Linux SSL VPN versus VMware's Windows security server / JSON-configured access point, 100% USB support and endpoint device control. A 20-row feature table compares Accops and VMware.",
+      "use_for": "Historical reference only for VMware Horizon displacement messaging (TCO, complexity, single vendor). For anything customer-facing use the current VMware replacement material.",
+      "publish_year": "2018",
+      "expired": false,
+      "stale_risk": "Copyright 2018 (SharePoint file dated May 2018). Customer numbers (350+ / 400,000) are far below current figures. VMware Horizon references (security server, Access Point, Server 2003 support) are obsolete, and Horizon now belongs to Omnissa. The 2021 filename date is a bulk rename.",
+      "superseded_by": "sharepoint/0424-AccopsDeck-VMWareReplacement.pptx - the 2024 VMware replacement deck (batch-03); for 2026 facts see Omnissa Horizon VVF Analysis.docx.",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Outdated competitive brochure; no public URL.",
+      "needs_human": "Candidate for retirement (2018 content)."
+    },
+    {
+      "source": "sharepoint/2021-01-01-ZScaler Comparison Document_CJ-JV.pdf",
+      "title": "Accops HySecure Trumps Zscaler: On-Prem ZTNA vs Zscaler Private Access Comparison Document (2022)",
+      "asset_type": "Battlecard",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HySecure",
+        "HyID",
+        "ZTNA",
+        "MFA",
+        "Browser Isolation"
+      ],
+      "competitors": [
+        "Zscaler",
+        "Pulse Secure",
+        "Cisco",
+        "Palo Alto Networks",
+        "Check Point",
+        "F5",
+        "Citrix"
+      ],
+      "personas": [
+        "CISO",
+        "IT head",
+        "Network architect",
+        "procurement"
+      ],
+      "regulations": [],
+      "key_problem": "Zscaler Private Access is SaaS-only and multi-tenant, so the customer gives up control of policy, encryption and logs, adds a hop between branch and data centre, pays per feature, and loses access entirely when the subscription lapses.",
+      "key_outcomes": [
+        "Positions HySecure as a replacement for Zscaler ZPA, Pulse Connect Secure, Cisco AnyConnect, Palo Alto GlobalProtect, Check Point, F5 APM and Citrix NetScaler ADC",
+        "Ten technology contrasts: on-prem vs SaaS-only, perpetual licences, customer-specific policy, no extra hop, local log retention at no cost, customer-controlled encryption",
+        "SPAN technology drops broadcast / ARP traffic at the endpoint; IP camouflage hides internal application IPs",
+        "Built-in concurrent MFA, TeamViewer-like remote support, password self-service, HRMS integration for WFH at banks",
+        "30-point 'Why HySecure' list: context-aware access, hardware-ID device binding, URL whitelisting, DLP (copy / screenshot / recording), NAC, PAM with OTP, identity-based segmentation",
+        "Architecture diagrams for on-prem and cloud-hosted branch-office connectivity; portal and 2FA screenshots"
+      ],
+      "brief": "A six-page confidential comparison document, 'Accops HySecure Trumps Zscaler'. It frames the problem (MPLS cost, VPN limits), introduces Accops and HySecure with HyID, shows on-premises and cloud branch-office architectures, lists some 30 reasons customers choose HySecure, and shows portal, two-factor and privileged-access screens. It then describes Zscaler (ZPA and ZIA) and contrasts the two on deployment model, licensing continuity, tenancy, branch connectivity and hops, unwanted traffic, IP exposure, encryption control and log retention. It finishes with features 'beyond competition', professional-services positioning, and the no-hidden-charges argument that SaaS ZTNA vendors charge separately for access, MFA, data-centre connectivity and audit logs.",
+      "use_for": "A deal where the prospect is evaluating Zscaler ZPA or another SaaS ZTNA and wants on-premises control, data residency, perpetual licensing or local logs - common in Indian BFSI and government. Also lists the VPN products HySecure replaces.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "Copyright 2022. Zscaler claims (SaaS-only, no dedicated instance, log-retention charges) were 2022 positions and some may have changed - Zscaler now offers private service edges. The 2021 filename date is a bulk rename. A newer feature battlecard, 'Accops HySecure vs Zscaler Private Access v3.3' (2024), exists.",
+      "superseded_by": "sharepoint/Accops HySecure vs Zscaler Private Access v 3.3.pptx - the 2024 feature-by-feature ZPA battlecard (batch-03).",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Marked 'CONFIDENTIAL DOCUMENT' on every page; competitive claims about Zscaler.",
+      "needs_human": "Is this the prose companion to the v3.3 deck or an older edition that can be retired?"
+    },
+    {
+      "source": "sharepoint/Deep Research_ Quantum Implementation with Zscaler.pdf",
+      "title": "Deep Research Note: Post-Quantum Cryptography Gaps in Zscaler and a Multi-Vendor ZTNA Pitch for Banks (Oct 2025)",
+      "asset_type": "Battlecard",
+      "industry": "Banking (Private Sector)",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HySecure",
+        "ZTNA"
+      ],
+      "competitors": [
+        "Zscaler",
+        "Palo Alto Networks",
+        "Netskope",
+        "Appgate",
+        "Cloudbrink",
+        "Systancia"
+      ],
+      "personas": [
+        "CISO",
+        "CIO",
+        "Network architect"
+      ],
+      "regulations": [
+        "TEC 910018 (PQC migration)",
+        "GDPR",
+        "India data localisation"
+      ],
+      "key_problem": "Banks migrating to post-quantum cryptography cannot rely on Zscaler alone: as of October 2025 Zscaler can only report PQC usage, not decrypt and inspect PQC-encrypted traffic, and its cloud-routed model worries banks on latency, ATM / branch resilience and data residency.",
+      "key_outcomes": [
+        "Zscaler PQC roadmap as of Oct 2025: phase 1 visibility reporting (X25519MLKEM768 detection) live; phase 2 PQC TLS inspection in development; phase 3 PQC signatures future",
+        "Recommended hybrid: Zscaler ZIA for internet / SaaS, ZPA for ordinary private apps, Accops ZTNA in parallel for ATM / branch links, core banking, payment gateways and legacy apps needing quantum-safe wrapping now",
+        "Cites TEC 910018 (2025) guidance to use quantum-safe VPN tunnels during PQC migration",
+        "Multi-vendor rationale: third-party / single-vendor risk, regulator vendor-tiering, ZIA/ZPA two-console complexity, cloud dependency for ATMs, sub-10 ms latency needs",
+        "Positioning line: 'not replacement, but strategic augmentation'; use-case table Zscaler vs Accops ZTNA (quantum-enabled)"
+      ],
+      "brief": "An AI-assisted 'deep research' note from October 2025 prepared for a bank presentation. It summarises Zscaler's published post-quantum cryptography posture (visibility and reporting only, inspection and signatures still on the roadmap) and the resulting blind spot for banks that must inspect TLS traffic. It then proposes positioning Accops ZTNA as complementary to Zscaler rather than a replacement: quantum-wrapped tunnels for ATM and branch networks, core banking and payment gateways, legacy apps and local Indian deployment for data residency, citing India's TEC PQC migration report. Further sections cover why banks adopt multi-vendor SSE / ZTNA, Zscaler's general weaknesses (logging, cloud dependency, separate consoles, a client-connector configuration decryption finding), and competitors (Palo Alto Prisma Access, Netskope, Appgate, Cloudbrink). Sources are listed and include vendor blogs, Reddit threads and market-research sites.",
+      "use_for": "Internal preparation for a bank or financial-services deal where Zscaler is the incumbent and the CISO is asking about post-quantum readiness; gives the 'augment, don't replace' framing and ATM / branch use case. Not a customer document.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "A snapshot of Zscaler's PQC roadmap as of October 2025 - Zscaler may have shipped phase 2 since. The note is machine-generated research: some sources are Reddit threads and blogs, and statements such as 'Accops provides PQC wrapping today' are the note's claims, not verified product documentation. Confirm HySecure's actual PQC capability (the HySecure datasheets mention quantum-safe algorithms) before quoting.",
+      "superseded_by": "",
+      "confidence": 0.85,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Internal research note with unverified claims about a named competitor; not for customers.",
+      "needs_human": "Product team should confirm which PQC algorithms HySecure ships today before this positioning is used with a bank."
+    }
+  ]
+}
