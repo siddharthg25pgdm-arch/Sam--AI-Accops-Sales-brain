@@ -242,6 +242,15 @@ export function isStale(a: Asset): boolean {
  *  meaningless for them. An explicit expiry or a stale_risk on the card still applies. */
 const DATED_RECORD = new Set(["Certification", "Certificate", "Award", "Analyst Report"]);
 
+/** The newer file a card's superseded_by points at. The field reads "sharepoint/<file.ext> - why", and
+ *  splitting on the first " - " broke every filename that itself contains one ("Accops - Turbo
+ *  Architecture-v2.pdf" showed as "A newer edition exists: Accops"). So cut at the first document
+ *  extension instead. Free-text values with no filename give null, and the note stays generic. */
+export function supersedingFile(s: string): string | null {
+  const m = s.match(/^(?:[a-z]+\/)?(.+?\.(?:pdf|pptx|docx|ppt|doc|xlsx))(?=\s|$)/i);
+  return m ? m[1].split("/").pop()!.replace(/\.(pdf|pptx|docx|ppt|doc|xlsx)$/i, "") : null;
+}
+
 export function trustNote(a: Asset): string | null {
   const meta = cardMeta();
   const m = (a.item_id ? meta.get(`id:${a.item_id}`) : undefined)
@@ -249,10 +258,7 @@ export function trustNote(a: Asset): string | null {
   if (m?.expired) {
     return `EXPIRED${m.expiry_date ? ` on ${m.expiry_date}` : ""} - do not send. ${m.needs_human || ""}`.trim();
   }
-  if (m?.superseded_by) {
-    const newer = m.superseded_by.split(" - ")[0].split("/").pop();
-    return `A newer edition exists${newer ? `: ${newer}` : ""} - prefer that one.`;
-  }
+  if (m?.superseded_by) return `A newer edition exists${supersedingFile(m.superseded_by) ? `: ${supersedingFile(m.superseded_by)}` : ""} - prefer that one.`;
   if (m?.stale_risk) return m.stale_risk;
   // The generic age note is about product literature going out of date - a 2022 brochure may
   // describe a release the customer will not get. It does not apply to a certificate, an award or

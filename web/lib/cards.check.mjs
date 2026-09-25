@@ -116,4 +116,13 @@ assert.ok(titles("zeta brochures").includes("Zeta pharmaceutical brochure"), "pl
 // 9. A Deck filter includes battlecards (a battlecard is a deck to a rep).
 assert.ok(searchAssets({ query: "omega", asset_type: "Deck", limit: 10 }).results.some(r => r.asset.title === "Zeta vs Omega"), "deck filter keeps battlecards");
 
+// 10. superseded_by pointers whose filenames contain " - " (the old split cut them to "Accops").
+{
+  const { supersedingFile } = await jiti.import("./cards.ts");
+  assert.equal(supersedingFile("sharepoint/Accops - Turbo Architecture-v2.pdf - expanded edition of the same deck."), "Accops - Turbo Architecture-v2");
+  assert.equal(supersedingFile("public/Accops Hysecure Datasheet V5 2026.pdf - current, public and far more complete."), "Accops Hysecure Datasheet V5 2026");
+  assert.equal(supersedingFile("sharepoint/Accops Solutions for Govt. V1 '26.pdf - broader and dated 2026."), "Accops Solutions for Govt. V1 '26");
+  assert.equal(supersedingFile("A newer edition of the same document exists. SAM should prefer that one."), null);
+}
+
 console.log("cards.check: ok");
