@@ -1639,6 +1639,723 @@
    "visibility": "internal",
    "internal_reason": "Internal brand reference; no verified public URL.",
    "needs_human": "Can this be shared with partners and agencies as-is? If so, mark it as partner-shareable."
+  },
+  {
+   "source": "sharepoint/for ICICI - Omnissa Horizon VVF Analysis.pptx",
+   "title": "Why Omnissa's 'Free' VVF Hypervisor Is No Use to a Large Private Bank: 2-Slide Account-Specific Rebuttal",
+   "asset_type": "Battlecard",
+   "industry": "BFSI",
+   "client": "A large Indian private bank running a dual-hypervisor platform and planning to leave Broadcom",
+   "client_actual": "ICICI Bank (named in the file name and slide title)",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "Digital Workspace",
+    "VDI",
+    "BioAuth"
+   ],
+   "competitors": [
+    "Omnissa",
+    "VMware",
+    "Broadcom"
+   ],
+   "personas": [
+    "CIO",
+    "Head of Infrastructure",
+    "IT head",
+    "procurement"
+   ],
+   "regulations": [],
+   "key_problem": "Omnissa bundles VMware vSphere Foundation (VVF) 'free' for VDI workloads to keep Horizon customers, and a bank evaluating it needs to see the catches.",
+   "key_outcomes": [
+    "VVF-for-VDI covers only VDI workloads; mixing it with the bank's general VVF/VCF licences is complex, and the bank already plans to move off Broadcom",
+    "Support split between Omnissa and Broadcom portals, different renewal cycles and existing version incompatibility",
+    "Limited feature set: no NSX, no Aria, vSAN capped at 100 GB per core",
+    "Broadcom can restrict entitlement or support for the bundled vSphere/vSAN at any time",
+    "Other objections: Omnissa's limited India/APAC focus, 24x7 support routed through several countries, no built-in face authentication, low willingness to customise"
+   ],
+   "brief": "A three-slide account deck prepared for a specific large private bank, arguing why Omnissa Horizon's bundled VVF hypervisor offer does not help that bank and listing further reasons not to choose Omnissa, closing with the line 'If you're not paying for the product, then you are the product.' It is the slide version of the argument in the longer 'Omnissa Horizon VVF Analysis' document.",
+   "use_for": "Countering an Omnissa Horizon + free VVF offer at a bank or any enterprise that runs mixed workloads or is leaving Broadcom. Re-title before reuse - it names the target account.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "Undated in the body; the Omnissa VVF-for-VDI bundle dates it to 2025-26 (the companion analysis document is carded as 2026). Omnissa licensing terms change often - verify the vSAN cap and bundle rules before quoting.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Account-specific competitive material naming a prospect bank.",
+   "needs_human": "Publish year inferred from content (Omnissa VVF bundle), not stated. Companion to 'Omnissa Horizon VVF Analysis.docx' (batch-03). Remove the bank's name if this becomes a general battlecard."
+  },
+  {
+   "source": "sharepoint/VMware Attack Scenarios-05082022.pptx",
+   "title": "VMware Attack Scenarios (Aug 2022): Three Deal Patterns for Winning Against Free vSphere + Horizon Bundles - Internal Sales Play",
+   "asset_type": "Battlecard",
+   "industry": "",
+   "client": "",
+   "client_actual": "SBI Life (cited as a co-existence win on deep device posture check)",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "HySecure",
+    "VDI",
+    "DaaS"
+   ],
+   "competitors": [
+    "VMware",
+    "Broadcom",
+    "Microsoft Hyper-V"
+   ],
+   "personas": [
+    "Account executive",
+    "Sales manager",
+    "partner"
+   ],
+   "regulations": [],
+   "key_problem": "VMware was discounting Horizon VDI with 'free' vSphere in year one, then recovering the cost through recurring fees; Accops sellers needed a play for each customer type.",
+   "key_outcomes": [
+    "Target 01 - small customers needing VDI only: illustrative VMware bundle ($20,000 year 1, then $70,000/yr OPEX) vs Hyper-V + HyWorks at about $10,000/yr for 100 users; pitch managed VDI",
+    "Target 02 - price-sensitive customers wanting VDI only as a fallback (e.g. pandemic): same economics; secure remote access as an add-on",
+    "Target 03 - large customers with business-critical Horizon: avoid head-on replacement; win through co-existence by adding HySecure to vSphere + Horizon (illustrative $100,000 Accops revenue on a 1,000-user deal)",
+    "All prices labelled 'for example purposes only'"
+   ],
+   "brief": "A three-slide internal sales-strategy deck from 5 August 2022 describing how VMware's free-first-year bundles work and where Accops should compete, with illustrative dollar figures for three customer segments and a recommendation to co-exist rather than replace in large VMware estates. It is the companion to the 'Vanquishing VMware' battlecard of the same date.",
+   "use_for": "Internal coaching for sellers and partners on qualifying VMware/Omnissa accounts: when to push replacement, when to lead with managed VDI, and when to sell HySecure alongside Horizon. Never show to a customer.",
+   "publish_year": "2022",
+   "expired": false,
+   "stale_risk": "August 2022, before Broadcom closed the VMware acquisition and sold Horizon to KKR (Omnissa). The 'free vSphere' bundle mechanics described no longer apply as stated. Illustrative prices only.",
+   "superseded_by": "",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal deal-strategy material with illustrative pricing and a named customer.",
+   "needs_human": "Batch-08 flagged this with the 'Vanquishing VMware' battlecard: both pre-date Omnissa. Retire both, or refresh for the Omnissa VVF bundle?"
+  },
+  {
+   "source": "sharepoint/Accops vs VMware Features-Ver02-19072022-CJ.pptx",
+   "title": "Accops Digital Workspace vs VMware Horizon: 27-Row Feature Comparison (v02, July 2022)",
+   "asset_type": "Battlecard",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "Digital Workspace",
+    "HyWorks",
+    "HySecure",
+    "HyID",
+    "HyDesk",
+    "VDI",
+    "MFA"
+   ],
+   "competitors": [
+    "VMware",
+    "Omnissa"
+   ],
+   "personas": [
+    "CIO",
+    "IT head",
+    "Head of Infrastructure",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Buyers comparing Accops VDI with VMware Horizon need a feature-by-feature view.",
+   "key_outcomes": [
+    "Rows where Accops says 'Yes' and Horizon 'No': built-in secure remote access, vendor thin/zero clients, endpoint lock-down, device-based desktop assignment for shift desks, integrated endpoint management, hypervisor-agnostic (Hyper-V/ESX/AHV)",
+    "Deep Device Postural Check (CPU, motherboard, HDD IDs), endpoint security for BYOD, Linux virtual apps, privileged access management, endpoint internet control",
+    "Make non-RDS-friendly legacy apps work on RDS, DLP (copy/paste, screen capture/recording, watermark, block TeamViewer/Ammyy), bundled TLS gateway, full MFA, biometric and facial authentication",
+    "Customisation, 100% USB peripheral support, full VPN from VDI to third-party datacentres for ODCs, native cloud hosting, flexible licensing, clientless reverse-proxy access, onsite OEM support",
+    "Shared desktop delivery marked 'Yes' for both; value-proposition slide: in-house code, cloud-agnostic, simple GUI, security, all-in-one cost"
+   ],
+   "brief": "A seven-slide comparison deck (version 02, 19 July 2022) that lists about 27 capabilities of Accops Digital Workspace against VMware Horizon, almost all shown as Accops-only, followed by a value-proposition slide.",
+   "use_for": "A quick feature checklist when a prospect is on VMware Horizon / Omnissa. Verify each 'No' against current Omnissa Horizon before sending - several are contestable today.",
+   "publish_year": "2022",
+   "expired": false,
+   "stale_risk": "July 2022. Horizon is now Omnissa Horizon and has gained features (e.g. multi-hypervisor and cloud options); some 'No' claims (hypervisor-agnostic, native cloud, clientless access) are out of date or overstated. Newer comparisons: 'Accops vs Citrix-VMware Updated April 2024'.",
+   "superseded_by": "sharepoint/Accops vs Citrix-VMware_ Updated April 2024.pptx - newer Citrix/VMware comparison (carded earlier).",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Competitive comparison with unverified claims about a competitor.",
+   "needs_human": "Confirm the April 2024 Citrix-VMware comparison fully replaces this; if so, retire this one."
+  },
+  {
+   "source": "sharepoint/0424-VMWare Alternative stack-Accops and Nutanix.pptx",
+   "title": "Nutanix + Accops as the VMware Alternative Stack (April 2024): Customer Pitch for a Telecom Equipment Major - Three Full-Stack Replacement Options",
+   "asset_type": "Deck",
+   "industry": "",
+   "client": "A global telecom-equipment company (the deck's title account), pitched with a European partner",
+   "client_actual": "Ericsson (title 'Nutanix and Accops at Ericsson'); partner contact at greydv.com, Spain",
+   "client_named": true,
+   "products": [
+    "Digital Workspace",
+    "HyWorks",
+    "HySecure",
+    "VDI"
+   ],
+   "competitors": [
+    "VMware",
+    "Broadcom",
+    "Nutanix",
+    "Microsoft Hyper-V",
+    "Red Hat OpenStack",
+    "Citrix"
+   ],
+   "personas": [
+    "CIO",
+    "Head of Infrastructure",
+    "IT head",
+    "partner"
+   ],
+   "regulations": [],
+   "key_problem": "When VMware vSphere/vSAN is replaced after the Broadcom acquisition, Horizon stops working because it needs vSphere, so the VDI layer and the hypervisor must be replaced together.",
+   "key_outcomes": [
+    "Three replacement stacks with architecture diagrams: Accops + Nutanix AHV/HCI/Prism (option 1), Accops + Microsoft Hyper-V/SCVMM/S2D (option 2), Accops + Red Hat OpenStack/KVM (option 3, with Accops managed services)",
+    "Why Nutanix: AHV included, Flow security, Files, multi-site DR, NC2 hybrid cloud, automation",
+    "Joint Accops + Nutanix customer outcomes: 15,000+ WFH users (5,000 concurrent), 200+ SWIFT users, 1,250 secure-browsing users, 100 defence staff internet isolation, 1 lakh web-VPN users, 1,000 factory users across 84+ sites, 500+ branches",
+    "2024 company slide: part of Reliance group from Sep 2023, 800+ customers, 300+ team, 2M+ users; Gartner mentions"
+   ],
+   "brief": "A 15-slide April 2024 deck prepared for a named multinational with a Spanish partner, positioning Accops Digital Workspace with Nutanix as the replacement for a VMware Horizon + vSphere/vSAN stack. It explains the business and IT value, why Nutanix, the three stack options with before/after diagrams, the reasoning that Horizon cannot survive a vSphere exit, joint customer results and a 'better together' summary. It is an account-specific variant of the 0424 'VMware Replacement' deck.",
+   "use_for": "VMware-exit conversations, especially with Nutanix or with European partners; the joint Nutanix customer-results slide is useful proof. Remove the account name before reusing.",
+   "publish_year": "2024",
+   "expired": false,
+   "stale_risk": "April 2024; company figures (800+ customers) are lower than current (1,000+). Predates Omnissa's VVF bundle and Accops' Proxmox offering (see the Proxmox V2.0 deck).",
+   "superseded_by": "",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Account-specific pitch naming a prospect and a partner contact.",
+   "needs_human": "Near-duplicate of '0424-AccopsDeck-VMWareReplacement.pptx' (batch-03) with the prospect's name and partner contact added. Keep the generic one as canonical?"
+  },
+  {
+   "source": "sharepoint/2022-11-30-Accops vs other VDI providers.pptx",
+   "title": "Accops Powered VDI vs the Field (29 Nov 2022): Tier 1 (Citrix, VMware), Public Cloud (AVD, AWS WorkSpaces) and Tier 2 (Workspot, Parallels RAS, dinCloud) - Original Dated Copy",
+   "asset_type": "Battlecard",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "HySecure",
+    "HyID",
+    "Turbo",
+    "Nano",
+    "HyDesk",
+    "VDI",
+    "DaaS"
+   ],
+   "competitors": [
+    "Citrix",
+    "VMware",
+    "Azure Virtual Desktop",
+    "AWS WorkSpaces",
+    "Workspot",
+    "Parallels RAS",
+    "dinCloud",
+    "Cisco Duo",
+    "Cisco AnyConnect"
+   ],
+   "personas": [
+    "CIO",
+    "IT head",
+    "Head of Infrastructure",
+    "procurement"
+   ],
+   "regulations": [],
+   "key_problem": "Buyers shortlisting VDI need a like-for-like capability view across tier-1 vendors, public-cloud VDI and smaller DaaS providers.",
+   "key_outcomes": [
+    "Three comparison tables of about 25 rows each: user experience, endpoint controls, data security, network security, deployment/administration, procurement and after-sales",
+    "Accops-only rows include DNS-based URL whitelisting on the endpoint, hardened OS to repurpose PCs, biometric MFA, thin-client supply and management, and India-based leadership, development and support",
+    "Citrix shown as needing add-on licences or NetScaler for screen-capture blocking, ZTNA, MFA and VPN; AVD needing Azure AD P1/P2 for conditional access and advanced MFA; AWS WorkSpaces limited to personal VMs"
+   ],
+   "brief": "A five-slide comparison dated 29 November 2022 with three tables: Accops vs Citrix DaaS/CVAD and VMware Horizon; Accops vs Azure Virtual Desktop and AWS WorkSpaces; and Accops vs Workspot, Parallels RAS and dinCloud. Its text is identical to the file named '2026-06-11-Accops vs other VDI providers.pptx' carded in batch-03; this is the correctly dated original.",
+   "use_for": "A broad VDI competitor checklist (including the only AWS WorkSpaces and Tier-2 DaaS comparisons). Check each competitor row against today's products before sending.",
+   "publish_year": "2022",
+   "expired": false,
+   "stale_risk": "November 2022. VMware Horizon is now Omnissa; Citrix packaging and AVD features have changed since. Nearly four years old.",
+   "superseded_by": "",
+   "confidence": 0.88,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Competitive comparison with unverified competitor claims.",
+   "needs_human": "Exact duplicate of '2026-06-11-Accops vs other VDI providers.pptx' (whose filename date misleadingly says 2026 - flagged in the content-gap report). Delete the 2026-named copy and keep this one, or refresh the content and re-date it."
+  },
+  {
+   "source": "sharepoint/Accops HyMobile.V2 2026.pptx",
+   "title": "Accops HyMobile UEM Product Presentation V2 (2026): MDM for Android, iOS, macOS and Windows 11 plus Zero-Trust Device Access",
+   "asset_type": "Deck",
+   "industry": "",
+   "client": "Install-base highlights (a top-3 private bank, India's federal-government IT division, a top-10 global life insurer, India's largest e-commerce firm, the UK's largest TPA, a Japanese university)",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyMobile",
+    "MDM",
+    "UEM",
+    "HyID",
+    "SSO"
+   ],
+   "competitors": [
+    "Scalefusion"
+   ],
+   "personas": [
+    "IT head",
+    "Head of Infrastructure",
+    "CISO",
+    "Field operations head"
+   ],
+   "regulations": [],
+   "key_problem": "Organisations with corporate and BYOD phones, tablets, kiosks, POS devices and PCs need one console to enrol, secure and support them, and to use device signals for zero-trust access.",
+   "key_outcomes": [
+    "Current company slide: 1,000+ customers, 200+ partners, 350+ team, 2M+ users; 'two consecutive years in the Gartner MQ for DaaS 2026 & 2025'; 2023-2025 award wall (GEC, FWS, DSCI, NASSCOM, GCC Security Symposium)",
+    "MDM/MAM/MCM: enterprise store, Play/App/Windows Business Store deployment, FileDock content, digital-signage presentation mode, remote cast and control with voice, communication suite",
+    "Enrolment by email, Android zero-touch, Apple DEP, URL, QR, Office 365, IMEI/serial, ROM; DLP policies, compliance tracking, custom payloads, certificates, geofence alerts, browser kiosks",
+    "Per-OS slides: Android (non-GMS/AOSP, POS, ELD, signage, frontline), iOS, macOS (FileVault, Gatekeeper), Windows 11 (Azure AD join, BitLocker, Defender, Windows Hello, MSI/EXE/PowerShell store, OS update control)",
+    "Zero-trust add-ons: conditional SSO, just-in-time admin, device authentication with IdP credentials, company user portal, identity federation"
+   ],
+   "brief": "A 24-slide 2026 product presentation for HyMobile, now positioned as unified endpoint management. After the standard 2026 company, Gartner, awards and customer slides, it covers MDM, application and content management, key and other features, deployment, security and monitoring, browser/app/content management, and dedicated slides for Android, iOS, macOS and Windows 11, ending with zero-trust device access and SSO features.",
+   "use_for": "The current answer to 'do you have MDM / UEM?' - field-force devices, kiosks, POS, shared tablets, Windows 11 PC management - and bundling HyMobile with HySecure/HyID. Replaces the 2019 and 2022 HyMobile decks.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "2026 and current. Internal inconsistency: the About slide still says 'in 2023 & 2024 Gartner MQ' while the next slide says 2025 and 2026.",
+   "superseded_by": "",
+   "confidence": 0.88,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "No verified public URL.",
+   "needs_human": "Slide 23 says 'Connect Scalefusion OneIdP with your Identity Provider' - a third-party (OEM) product name has leaked into an Accops-branded deck. Fix before any customer sees it, and confirm whether HyMobile is an OEM of Scalefusion. Also fix the Gartner years on the About slide."
+  },
+  {
+   "source": "sharepoint/Accops HyLabs PPT MCTE - V3.pptx",
+   "title": "Accops HyLabs Labs Virtualization Deck V3 (2026, Prepared for a Military Engineering College): Virtual ICT Labs, Kyoto and Middlesex Dubai Cases, 200-PC TCO Model",
+   "asset_type": "Deck",
+   "industry": "Education",
+   "client": "Prepared for a military technical college (per file name); cases from a top Japanese university and a UK university's Dubai campus",
+   "client_actual": "MCTE (file name; Military College of Telecommunication Engineering); cases: Kyoto University, Middlesex University Dubai; education references include IIT Delhi, IIT Bombay, Ashoka University, Kansai University, Extramarks, Aptech, Okayama University, AIST",
+   "client_named": true,
+   "products": [
+    "HyLabs",
+    "HyWorks",
+    "HySecure",
+    "HyID",
+    "Thin Clients",
+    "VDI"
+   ],
+   "competitors": [],
+   "personas": [
+    "University IT head",
+    "Registrar",
+    "Dean / Faculty",
+    "Director (training institute)",
+    "procurement"
+   ],
+   "regulations": [
+    "NIRF",
+    "NAAC"
+   ],
+   "key_problem": "Physical ICT labs lock capital into department-owned PCs that sit idle, restrict access to lab hours and campus, and cannot deliver high-configuration machines for AI/ML or new courses quickly.",
+   "key_outcomes": [
+    "Why virtual labs: reduce ICT capex/opex, improve sustainability, attract students and improve NIRF/NAAC rankings, placements and research collaboration, start distance and cross-domain courses",
+    "HyLabs features (lab management, self-service, orchestration, anywhere access, security, reporting), on-prem deployment, comparison with thick-PC labs and generic VDI",
+    "Case studies in Problem/Challenge/Need/Solution/Benefits form: Kyoto University (centralised, LMS-integrated self-service labs) and Middlesex University Dubai (browser-based labs with HyID MFA)",
+    "Full VDI, HySecure access-control (TLS 1.3, QRNG and PQC) and endpoint-control feature lists",
+    "Worked 'ABC Institute' model: 8 labs x 25 PCs, 800 students; two private-cloud proposals (100 or 50 thin clients, 240-core servers); '50% saving over 5 years and 70% over 10 years, up to 70-85% with more labs'; ~60% 5-year saving for a 200-PC lab"
+   ],
+   "brief": "The newest HyLabs deck (2026, V3), apparently tailored for a military engineering college. It combines the 2026 company, Gartner and awards slides with education references, the physical-vs-virtual lab argument, HyLabs features and deployment, two new-format case studies, detailed VDI/HySecure feature lists and an example institute's lab-sizing and 5- and 10-year TCO proposals.",
+   "use_for": "University, engineering college, defence training establishment or corporate training-lab pitch; the ABC Institute TCO model is the most detailed HyLabs costing in the library. Remove the MCTE reference in the title before reusing with another institute.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "2026. Contains typos in the education-reference slide ('Kyoto University, Bombay', 'Middlesex University, London' vs the Dubai case). About slide says 'in 2023 & 2024 Gartner MQ' while slide 4 says 2025 and 2026.",
+   "superseded_by": "",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Account-tailored deck; no verified public URL.",
+   "needs_human": "Canonical current HyLabs deck? (The content-gap report named it 'HyLabs deck (MCTE V3, Sep 2026)'.) Fix the reference-slide typos. The .pptx is 41 MB."
+  },
+  {
+   "source": "sharepoint/Accops HyLab PPT Jan 2025.pptx",
+   "title": "Accops HyLabs Deck (January 2025): Virtual ICT Labs for Indian Institutions - NIRF/NAAC/NEP Impact, 68% First-Year Saving Model, Kyoto University Case",
+   "asset_type": "Deck",
+   "industry": "Education",
+   "client": "A top Japanese university (about 35,000 students) as the case study",
+   "client_actual": "Kyoto University; Prof. Shoji Kajita",
+   "client_named": true,
+   "products": [
+    "HyLabs",
+    "HyWorks",
+    "HySecure",
+    "HyID",
+    "Thin Clients",
+    "VDI"
+   ],
+   "competitors": [],
+   "personas": [
+    "University IT head",
+    "Registrar",
+    "Dean / Faculty",
+    "Vice-Chancellor",
+    "procurement"
+   ],
+   "regulations": [
+    "NIRF",
+    "NAAC",
+    "NEP",
+    "AICTE"
+   ],
+   "key_problem": "Indian colleges carry high capex and opex for department ICT labs used a few hours a day, with no off-campus access, no visibility of utilisation and pressure to improve rankings and employability.",
+   "key_outcomes": [
+    "Physical vs virtual lab architecture, challenges and how virtual labs overcome them; demo slide; HySecure-cluster deployment diagram",
+    "Cost-benefit model for 'ABC Institute' (800 students, 8 labs, 200 PCs): 240-core, 150-VM private cloud; replacing 8 physical labs with 2 virtual labs of 25 thin clients gives a stated 68% first-year saving",
+    "Stakeholder benefits for students, faculty and IT; impact on NIRF parameters (faculty-student ratio etc., citing the NIRF 2024 report); employability; alignment with NEP, AICTE and NAAC",
+    "Kyoto University case with challenges, solutions, benefits and links to two published university papers",
+    "How to purchase: responsibility split for servers, storage, virtualisation software, HyLabs, Microsoft licences, thin clients, data-centre space; related Jio services (managed Wi-Fi, leased lines)"
+   ],
+   "brief": "A 58-slide January 2025 HyLabs presentation aimed at Indian higher-education buyers. It adds India-specific arguments (NIRF rankings, NAAC, NEP, AICTE, employability, brand equity) and a detailed ABC Institute cost-benefit walkthrough with lab-run scenarios and self-study usage, to the standard HyLabs features, Kyoto University case and a buying checklist.",
+   "use_for": "Indian universities, engineering colleges and education groups, especially when the buyer cares about NIRF/NAAC rankings or a cost justification; use alongside or behind the 2026 V3 deck.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "January 2025. Kyoto University is described as 'second oldest' with ~35,000 students here, 'second largest' with 30,000 elsewhere. The 68% first-year saving differs from the 2026 deck's 50%/70% (5/10-year) figures for a similar model - quote with its assumptions.",
+   "superseded_by": "",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "No verified public URL.",
+   "needs_human": "Is this superseded by 'Accops HyLabs PPT MCTE - V3' (2026), or kept as the India/NIRF edition? Reconcile the Kyoto University figures and the saving percentages across HyLabs decks."
+  },
+  {
+   "source": "sharepoint/Accops-Proxmox V2.0.pptx",
+   "title": "Accops Digital Workspace on Proxmox V2.0 (Dec 2024): Replacing VMware Horizon + vSphere, with Accops-Supported Proxmox Editions",
+   "asset_type": "Deck",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "Digital Workspace",
+    "HyWorks",
+    "HySecure",
+    "Proxmox",
+    "VDI"
+   ],
+   "competitors": [
+    "VMware",
+    "Broadcom",
+    "Omnissa",
+    "Nutanix",
+    "Microsoft Hyper-V",
+    "Citrix"
+   ],
+   "personas": [
+    "CIO",
+    "Head of Infrastructure",
+    "IT head",
+    "Education IT head"
+   ],
+   "regulations": [],
+   "key_problem": "Broadcom's changes (focus on top 2,000 customers, price rises, partner cuts, Horizon sold to KKR) leave VMware VDI customers facing higher cost and uncertainty, and Horizon only runs on vSphere.",
+   "key_outcomes": [
+    "What changed at VMware after Broadcom, and why to replace Horizon: vSphere lock-in, uncertainty under KKR, loss of hardware and thin-client ecosystem ('Citrix recently stopped selling licences under 250 users')",
+    "Three full-stack options, with Accops + Proxmox now option 1 (then Nutanix, then Hyper-V); architecture diagram",
+    "Why Proxmox: KVM, web console, Ceph HCI, live migration, broad storage, backup, clustering/HA, one point of support from Accops",
+    "Accops + Proxmox editions (marked INTERNAL): Education Silver, Education Gold, Enterprise Gold, Enterprise Platinum - Proxmox SLA none/1 business day/4 hours, update and backup server, Accops support tier, cluster node limits 3/5/10/max, 10 helpdesk tickets; priced per server per year plus setup"
+   ],
+   "brief": "A 10-slide deck presented by the CTO, 'Accops Digital Workspace on Proxmox: Simple, Secure & Seamless Access', last saved December 2024. It argues for leaving VMware Horizon and vSphere together, offers Proxmox as the lowest-cost hypervisor with Accops as the single point of support, and sets out the four Accops-supported Proxmox editions.",
+   "use_for": "VMware/Omnissa exit conversations where cost is the driver, education customers, and 'can you support the hypervisor too?' questions. Pair with the public Accops + Proxmox Brochure V2 (Oct 2025).",
+   "publish_year": "2024",
+   "expired": false,
+   "stale_risk": "Late 2024 (copyright 2024; file last saved Dec 2024). Broadcom/Omnissa claims reflect 2024; the edition slide is marked INTERNAL. The Oct 2025 Proxmox brochure is newer.",
+   "superseded_by": "",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Contains an INTERNAL edition/support slide; no verified public URL.",
+   "needs_human": "Remove the INTERNAL editions slide (8) before sending to customers, or confirm the Proxmox brochure is the customer version."
+  },
+  {
+   "source": "sharepoint/Accops - Digital Workspace Gold.pptx",
+   "title": "Accops Digital Workspace Gold Edition: Partner Training Module and Draft Architecture for an Air Force Network Deployment (c. 2021)",
+   "asset_type": "Deck",
+   "industry": "Government & Defence",
+   "client": "An Indian Air Force network programme (draft deployment)",
+   "client_actual": "AFNET (slides say 'Offered to AFNET' and 'Draft Deployment at AFNET')",
+   "client_named": true,
+   "products": [
+    "Digital Workspace",
+    "HyWorks",
+    "HySecure",
+    "HyID",
+    "Reporting Server",
+    "Turbo",
+    "VDI",
+    "MFA"
+   ],
+   "competitors": [],
+   "personas": [
+    "partner",
+    "Presales engineer",
+    "Government IT officer"
+   ],
+   "regulations": [],
+   "key_problem": "Partners and the customer's team need to understand what the Digital Workspace Gold bundle contains and how it would be deployed.",
+   "key_outcomes": [
+    "Gold edition components: HyWorks (virtual apps and desktops), HySecure gateway with MFA, Accops Reporting Server",
+    "Draft architecture: primary/secondary HyWorks with active/standby DB, RDS/shared hosted desktops for about 2,000 users, active/standby HySecure in the DMZ, separate access, control, resource and server segments",
+    "Function lists for HyWorks (session, persistent/non-persistent VDI, brokering, power management, thin-client management), HySecure (L4 SPAN, L7 reverse proxy, Turbo L3 on Noise/ChaCha20-Poly1305, HTML5 RDP, host scan) and MFA (OTP, hardware tokens, SAML IdP; biometric, push and FIDO out of scope)",
+    "Client features: Windows, macOS, Linux, BharatOS, iOS, Android; copy/print-screen/recording blocking, internet/intranet control, USB and print blocking"
+   ],
+   "brief": "An 18-slide 'Partner Training Module' describing the Accops product suite and the Digital Workspace Gold edition as offered to an Air Force network programme, with a draft deployment diagram and function lists for each component. Undated in the body; file last saved March 2021.",
+   "use_for": "Partner or presales training on what the Gold bundle includes and a reference segmented architecture for a defence/government VDI deployment. Internal only.",
+   "publish_year": "2021",
+   "expired": false,
+   "stale_risk": "Year from file metadata (last saved March 2021), not the body. Edition contents have changed since - use the current edition matrices (Product Editions 2026).",
+   "superseded_by": "",
+   "confidence": 0.7,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Names a defence customer and its draft architecture.",
+   "needs_human": "Publish year inferred from file metadata. Did the AFNET deployment happen? If so, it is a strong defence reference."
+  },
+  {
+   "source": "sharepoint/Turbo performance comparison.pptx",
+   "title": "HySecure Turbo Performance Comparison (2021): Throughput and Latency vs IPsec, OpenVPN and a Palo Alto Hardware Appliance, plus Six-Vendor Feature Grid",
+   "asset_type": "Battlecard",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HySecure",
+    "Turbo",
+    "ZTNA",
+    "HyWorks",
+    "HyID",
+    "Nano"
+   ],
+   "competitors": [
+    "Palo Alto Networks",
+    "IPsec",
+    "OpenVPN",
+    "Microsoft",
+    "Citrix",
+    "VMware",
+    "Zscaler",
+    "McAfee",
+    "F5",
+    "Okta",
+    "Cisco Duo"
+   ],
+   "personas": [
+    "Network architect",
+    "CISO",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Network teams comparing a software ZTNA tunnel with their hardware VPN appliance want performance evidence.",
+   "key_outcomes": [
+    "Turbo overview: Noise protocol, Curve25519, ChaCha20-Poly1305 over UDP 443 with a static virtual IP per user",
+    "Performance charts (images in the deck): Turbo faster than IPsec and 'much faster' than OpenVPN; Turbo on a VM compared with a Palo Alto hardware appliance",
+    "Feature grid vs MS WVD, Citrix/VMware, Zscaler/McAfee, F5/Palo Alto, Okta/Cisco Duo across 17 needs (on-prem or SaaS, VDI, DaaS, ZTNA, MFA, biometrics, thin clients, secure BYOD OS, endpoint DLP, internet control, productivity monitoring, MDM, OEM services, licensing, customisation)"
+   ],
+   "brief": "A five-slide 2021 deck (file created May 2021) with the Turbo explanation, benchmark charts against IPsec/OpenVPN and a Palo Alto hardware appliance, a six-vendor capability grid and a USP slide. The benchmark numbers are in chart images; the related figures (1,011 Mbps vs 825-881 Mbps IPsec and 258 Mbps OpenVPN) appear in the Turbo Architecture v2 deck.",
+   "use_for": "When a prospect runs Palo Alto GlobalProtect or another hardware VPN and asks about throughput; one of the few Palo Alto comparisons in the library.",
+   "publish_year": "2021",
+   "expired": false,
+   "stale_risk": "Year from file metadata (May 2021). 'MS WVD' is now Azure Virtual Desktop; McAfee's SSE business is now Skyhigh; competitor positions are 2021.",
+   "superseded_by": "",
+   "confidence": 0.72,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Competitive benchmarks against named vendors.",
+   "needs_human": "Benchmark values are only in images - carded from slide text. Publish year inferred from file metadata. Are the Palo Alto test conditions documented anywhere?"
+  },
+  {
+   "source": "sharepoint/Accops-BioAuth-Product-Presentation.pptx",
+   "title": "Accops BioAuth: Biometric Authentication for the Workforce - Fingerprint, Face and FIDO Options, Integration Methods, Private Bank 60,000-User Case, Licensing",
+   "asset_type": "Deck",
+   "industry": "BFSI",
+   "client": "A top-3 Indian private bank that replaced a single-vendor biometric system for 60,000 users; other banks, a broker and an AMC using face auth",
+   "client_actual": "Axis Bank (case study); City Union Bank, Karnataka Bank, Motilal Oswal (face auth), LIC MF (face auth)",
+   "client_named": true,
+   "products": [
+    "BioAuth",
+    "Biometric Server",
+    "HyID",
+    "HySecure",
+    "HyWorks",
+    "Reporting Server",
+    "MFA"
+   ],
+   "competitors": [
+    "Idemia",
+    "Safran Morpho",
+    "Citrix",
+    "VMware"
+   ],
+   "personas": [
+    "CISO",
+    "IT head",
+    "Head of Digital Banking",
+    "compliance officer"
+   ],
+   "regulations": [
+    "RBI"
+   ],
+   "key_problem": "Banks must prove that the person logging in is the real user; existing biometric vendors lock them to their own scanners, need per-application API work and Java on every PC, and are slow and costly to extend to new apps.",
+   "key_outcomes": [
+    "All biometric options from one vendor: fingerprint and face against a central database, fingerprint on FIDO devices, phone-based FIDO push with number matching, QR password-less",
+    "Device support: Morpho, BioEnable, Mantra, SecuGen, Tatwik, any WinBio device, Windows Hello; 1:1 and 1:n matching, de-duplication, liveness for face; YubiKey and Feitian FIDO2/U2F",
+    "Integration without app changes: API, HyID connectors (SAML, RADIUS, LDAP proxy), reverse-proxy gateway, domain and workgroup desktop logon",
+    "Selection table: fingerprint scanner ~Rs 1,000-2,000/device, webcam face ~Rs 600, FIDO key >Rs 5,000; adoption across banks",
+    "Bank case: BioAuth connected to the incumbent biometric store for 60,000 users, then phased replacement; 10 apps onboarded within a month via auth proxy, zero source-code change, 3-person onsite team, '3X cost saved' on app customisation",
+    "Licensing by use case: add-on per user for HySecure Gold/Platinum or Digital Workspace Gold/Platinum; full product for Silver; fingerprint SDK per server"
+   ],
+   "brief": "A 26-slide solution presentation on Accops BioAuth (Accops Biometric Server) for workforce authentication. It explains 'who you are' factors, the options Accops supports, application coverage through HyID, the two repository modes (integrate an existing store such as Morpho, or use Accops' own), components, fingerprint/face/FIDO features, enrolment workflows, four integration architectures, a comparison of fingerprint vs face vs FIDO, a private-bank replacement case, other customers, benefits, FAQs on Windows Hello and laptop sensors, and licensing. Last saved November 2024.",
+   "use_for": "Bank, NBFC, broker or AMC prospects needing biometric MFA for core banking, trading or critical apps (RBI/SEBI contexts), or replacing an incumbent biometric vendor; the licensing slide answers 'how is BioAuth sold'.",
+   "publish_year": "2024",
+   "expired": false,
+   "stale_risk": "Year from file metadata (last saved Nov 2024); no date in the body. Device prices and 'upcoming' device lists may be out of date.",
+   "superseded_by": "",
+   "confidence": 0.82,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Confidential'; names customers.",
+   "needs_human": "Publish year inferred from file metadata. Confirm the bank case can be named in customer presentations."
+  },
+  {
+   "source": "sharepoint/Accops BioAuth Architecture and Security Details.pptx",
+   "title": "Accops BioAuth (ABS) Architecture and Security Details: Roles, Enrolment and Approval Workflows, Template Encryption and PKI-Secured Transit",
+   "asset_type": "Technical Guide",
+   "industry": "BFSI",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "BioAuth",
+    "Biometric Server",
+    "HyID",
+    "HySecure",
+    "Reporting Server"
+   ],
+   "competitors": [
+    "Safran Morpho"
+   ],
+   "personas": [
+    "CISO",
+    "Security architect",
+    "Presales engineer",
+    "IT head"
+   ],
+   "regulations": [],
+   "key_problem": "A bank's security team must approve how biometric templates are enrolled, stored, transmitted and matched before a biometric MFA rollout.",
+   "key_outcomes": [
+    "Components: Biometric Server core, enrolment portal, management console, MS SQL biometric and configuration DBs, Redis cache, HyID for authentication, ARS for logs",
+    "Roles with functional and data access profiles (FAP/DAP): administrator, security officer, helpdesk, enroller, approver - scoped by AD group and LDAP-matched attributes (e.g. same branch ID; approver = user's manager)",
+    "Self, administered and maker-checker enrolment and approval workflows, with flowcharts",
+    "Device support via WinBio and Safran Morpho (others upcoming); WSQ and ISO template formats",
+    "Security: Device Registration Service issues certificates to trusted machines; Authorizer issues device and service tokens; portal only reachable through the HySecure/HyID gateway; templates encrypted at rest; payloads PKI-encrypted with SHA-256 hash and signed verification code over TLS"
+   ],
+   "brief": "A technical deck on the Accops Biometric Service (ABS) covering components, user roles and access profiles, functional and system architecture for enrolment and authentication, workflow options, enrolment and approval processes, supported devices and data formats, and a multi-slide security design (device registration, token management, portal isolation, encryption in transit and at rest). Last saved January 2023.",
+   "use_for": "Security-review and RFP questions on biometric data protection: where templates are stored, how they are encrypted, who can enrol or approve, maker-checker controls. Internal / under NDA.",
+   "publish_year": "2023",
+   "expired": false,
+   "stale_risk": "Year from file metadata (last saved Jan 2023); no date in the body. Device list is shorter than the 2024 BioAuth presentation's.",
+   "superseded_by": "",
+   "confidence": 0.78,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Detailed security architecture; internal.",
+   "needs_human": "Publish year inferred from file metadata. Is there a current version reflecting the 2024 device and face-engine support?"
+  },
+  {
+   "source": "sharepoint/Accops-BioAuth-Finacle-Integration.pptx",
+   "title": "Biometric Authentication for Finacle Core Banking (2024): Accops BioAuth Integration Flows - Local-DB API Redirect and AD/LDAP Push Modes",
+   "asset_type": "Solution Document",
+   "industry": "BFSI",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "BioAuth",
+    "Biometric Server",
+    "HyID",
+    "MFA"
+   ],
+   "competitors": [
+    "Infosys Finacle",
+    "Safran Morpho"
+   ],
+   "personas": [
+    "CISO",
+    "IT head",
+    "Core banking head",
+    "Presales engineer"
+   ],
+   "regulations": [
+    "RBI"
+   ],
+   "key_problem": "Banks running Finacle need biometric MFA at login and for specific transactions without breaking standard Finacle workflows.",
+   "key_outcomes": [
+    "Requirement: biometric MFA at Finacle logon and for selected transactions, supporting all standard workflows",
+    "Two integration modes: Finacle with its local user DB calls the BioAuth API (9-step browser redirect, encrypted fingerprint capture by the BioAuth agent, secure token validation); Finacle with AD/LDAP uses the Accops Directory Server LDAP proxy with push via the Device Messenger Service",
+    "BioAuth architecture, repository modes (own Accops store or existing Safran Morpho), enrolment and authentication security flow with encrypted templates and transit",
+    "Same fingerprint/face/FIDO options and HyID token catalogue as the BioAuth product deck"
+   ],
+   "brief": "A 2024 confidential solution presentation on adding Accops BioAuth fingerprint (or face/FIDO) authentication to Infosys Finacle, walking through the business requirement, biometric options, HyID and BioAuth components, architecture, enrolment/authentication security flow, and step-by-step integration flows for Finacle deployments using a local user database or AD/LDAP.",
+   "use_for": "Any bank on Finacle asking 'can you add biometric login to Finacle?' - the only Finacle-specific integration material in the library.",
+   "publish_year": "2024",
+   "expired": false,
+   "stale_risk": "Copyright 2024. Integration steps depend on the bank's Finacle version and authentication set-up.",
+   "superseded_by": "",
+   "confidence": 0.82,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Confidential'.",
+   "needs_human": "Which banks run BioAuth with Finacle today? A named reference would make this much stronger."
+  },
+  {
+   "source": "sharepoint/Accops BioAuth Deployment Details.pptx",
+   "title": "Accops BioAuth Deployment Details (2024): Integration Options, HA and Active-Active Architectures, VM Sizing for POC to 15,000 Users at 35 Logins/Second, Licensing",
+   "asset_type": "Technical Guide",
+   "industry": "BFSI",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "BioAuth",
+    "Biometric Server",
+    "HyID",
+    "HySecure",
+    "Reporting Server"
+   ],
+   "competitors": [
+    "Neurotechnology"
+   ],
+   "personas": [
+    "Presales engineer",
+    "Solution architect",
+    "IT head"
+   ],
+   "regulations": [],
+   "key_problem": "Presales needs reference architectures and server sizing to quote a biometric MFA deployment from POC to enterprise scale.",
+   "key_outcomes": [
+    "HyID integration options by application type; note that a Neurotechnology licence must be bought per deployment for fingerprint matching",
+    "Architectures with HySecure and with business apps via HyID; load-balanced, scalable modular designs",
+    "Sizing templates: POC (fingerprint or face), small HA fingerprint and face set-ups, production fingerprint and face (built-in engine or external SDK), face auth active-passive up to 2,000 and 5,000+ users, active-active",
+    "Worked sizing for 15,000 users at a peak of 35 logins per second",
+    "Authorizer-based integration via LDAP proxy, SAML, API and RADIUS; licensing and use-case-to-component table"
+   ],
+   "brief": "A 41-slide technical deployment deck for Accops BioAuth covering integration options, component roles (core engine, face matching engine in Docker, web portal, API), load-balanced and active-active architectures, VM sizing tables for POC through 15,000-user production, application integration patterns through the Authorizer, a demo environment slide and licensing. Last saved November 2024.",
+   "use_for": "Sizing and architecture answers for a biometric MFA bid ('how many servers for 15,000 users?', 'what is needed for HA?'). Pair with the J&K-style RFP response for wording. Internal only.",
+   "publish_year": "2024",
+   "expired": false,
+   "stale_risk": "Year from file metadata (last saved Nov 2024). Includes a slide marked 'OLD' (demo environment). Sizing depends on engine choice.",
+   "superseded_by": "",
+   "confidence": 0.75,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal technical sizing material.",
+   "needs_human": "A 'Deployment Details-v2' variant is in the ABS/Proposal folder (not yet carded) - decide which is canonical. Publish year inferred from file metadata."
   }
  ]
 }
