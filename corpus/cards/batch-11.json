@@ -891,6 +891,377 @@
    "visibility": "internal",
    "internal_reason": "Names many government, defence and PSU customers and reproduces appreciation letters; contains an employee username and a password-like string on a demo slide; no verified public URL.",
    "needs_human": "Slide 32 (anti-keylogger demo) shows a real employee username and a password-style string in the screenshot text - replace with dummy values or confirm it is not a live credential. Is a current NIC/eOffice deck needed now that this is marked outdated? Reconcile 2.5 lakh vs 350,000 users."
+  },
+  {
+   "source": "sharepoint/v2026-05-16-Accops Partner CXO.pptx",
+   "title": "Winning with Accops in a 'Decentralized World': Partner CXO Keynote, New Delhi, May 2026 (Internal Edition) - Make-in-India Sovereignty, 2026 Business Drivers, Key Wins, Market Size, Vision 2030 ARR Target, Launch Calendar with GA Dates",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Partner audience; anonymised largest-customers slide plus reference, government and 'key wins 2025-26' logo slides",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "HyWorks",
+    "VDI",
+    "DaaS",
+    "Enterprise Browser",
+    "Password-less",
+    "Data-less PC",
+    "Photon",
+    "IRIS",
+    "Forcepoint SSE",
+    "NComputing LeafOS"
+   ],
+   "competitors": [
+    "Citrix",
+    "Omnissa",
+    "Microsoft",
+    "Hikvision"
+   ],
+   "personas": [
+    "Partner CXO",
+    "Partner sales leader",
+    "Distributor"
+   ],
+   "regulations": [
+    "DPDP Act 2023",
+    "US CLOUD Act",
+    "FISA 702"
+   ],
+   "key_problem": "India is the fastest-growing major economy and among the most cyber-attacked, yet spends a fraction of peers on security and depends on foreign access-control vendors that carry kill-switch, black-box and extraterritorial-law risk.",
+   "key_outcomes": [
+    "Sovereignty argument (slides 2-10): India's growth vs cyber-attack exposure and low security spend, ~$200 bn software services vs ~$2 bn product exports, foreign kill switch / black box / CLOUD Act and FISA 702, the 2025 Nayara Energy and Unit 8200 Microsoft service suspensions, how the US, EU, China and France enforce sovereignty",
+    "2026 business drivers (slide 15): AI zero-day exploitation and DPDP driving VDI, password-less adoption, 'India's only VDI & ZTNA product for public sector', DaaS as a desktop alternative, Citrix/Omnissa replacement, higher education",
+    "WFH economics (slide 16): 250 of 500 staff avoiding a 20 km commute saves 13 lakh km, Rs 70.2 lakh fuel, 74,100 litres and 174 tonnes CO2 a year",
+    "Market size from Gartner forecasts (slide 22): VDI + DaaS TAM USD 6.45 bn, ZTNA + IAM TAM USD 22.5 bn, VDI India growing 13% CAGR",
+    "Vision 2030 (slide 23): largest integrated EUC vendor in APJ, USD 500 million ARR, multi-tenant next-generation product line, largest consumer DaaS",
+    "Launch calendar with GA dates (slides 24-40): Accops + Forcepoint SSE (15 May 2026), Enterprise Browser and Password-less (15 July), Data-less PC and Photon protocol (15 June), NComputing Teams-on-Linux, HPE HVM and Red Hat OpenStack/OpenShift (15 May), DaaS + free device at Rs 1,333/user/month (15 June), IRIS multi-tenant SaaS v1.0 (15 Dec 2026)",
+    "Internal-only appendix (slides 43-52): Make-in-India policy asks, 'where is the product's loyalty', the Hikvision CCTV case, cloud-sovereignty risks, Reliance backing, sectors foreign vendors 'won't serve' (R&D, nuclear, aerospace), Kargil GPS and Tejas engine history lessons"
+   ],
+   "brief": "The internal (full) edition of the May 2026 Partner CXO keynote by Accops' co-founder, CEO & CTO, New Delhi ('Winning with Accops in an increased Decentralized World - Putting Make-in-India at the core of cybersecurity'); 52 slides, last saved August 2026. It builds a national-sovereignty case, then gives partners the company, customers, key wins, market sizing, the Vision 2030 target, and a product launch calendar with GA dates. Compared with the 'PUBLIC-SHARABLE' edition it adds the software-export slide, the customer and key-wins slides and a 10-slide sovereignty appendix.",
+   "use_for": "Internal reference for what was told to partners in May 2026: the launch calendar (slides 24-40) answers 'when did Enterprise Browser / Photon / Password-less / IRIS go GA', slide 15 'why would a customer buy Accops in 2026'. Do not send - use the PUBLIC-SHARABLE edition (once scrubbed) for partners.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "May 2026 (filename v2026-05-16; last saved August 2026). The GA dates are forward-looking as of May, and they disagree with the public edition (Forcepoint SSE 15 May here vs 15 July there; NComputing 15 May vs 15 June). Market sizing is from a 2023 Gartner forecast.",
+   "superseded_by": "",
+   "confidence": 0.84,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal edition: carries the Vision 2030 ARR target, GA dates, Gartner forecast data and customer slides; no verified public URL.",
+   "needs_human": "Reconcile the GA dates with the public edition. The Nayara/Microsoft, Unit 8200 and Hikvision slides make claims about named companies - get legal comfort before partners reuse them. Gartner forecast figures may not be licensed for partner distribution."
+  },
+  {
+   "source": "sharepoint/v2026-05-16-PUBLIC-SHARABLE Accops Partner CXO.pptx",
+   "title": "Winning with Accops in a 'Decentralized World': Partner CXO Keynote, May 2026 - PUBLIC-SHARABLE Edition (Still Carries the Vision 2030 $500M ARR Target, GA Dates and Gartner Market Sizing)",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "None named; no customer slides",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "HyWorks",
+    "VDI",
+    "DaaS",
+    "Enterprise Browser",
+    "Password-less",
+    "Data-less PC",
+    "Photon",
+    "IRIS",
+    "Forcepoint SSE",
+    "NComputing LeafOS"
+   ],
+   "competitors": [
+    "Citrix",
+    "Omnissa",
+    "Microsoft"
+   ],
+   "personas": [
+    "Partner CXO",
+    "Partner sales leader",
+    "Distributor"
+   ],
+   "regulations": [
+    "DPDP Act 2023",
+    "US CLOUD Act",
+    "FISA 702"
+   ],
+   "key_problem": "India's rapid digitisation outpaces its security spend, and dependence on foreign access-control vendors exposes enterprises to kill switches, black-box software and foreign law.",
+   "key_outcomes": [
+    "31 slides; the same sovereignty opening, AI-exploit and 'isolate your crown jewels' slides, 2026 business drivers, WFH fuel/CO2 economics and technology partnerships as the internal edition",
+    "Removed versus the internal edition: the software-export slide, reference/government/largest-customers and 'key wins 2025-26' slides, and the 10-slide sovereignty appendix (Hikvision, Reliance backing, Kargil/Tejas)",
+    "Kept although confidential in nature: Gartner-sourced EUC market sizing (slide 17), the Vision 2030 roadmap with the USD 500 million ARR target (slide 18), and the launch calendar with GA dates incl. IRIS v1.0 on 15 Dec 2026 (slides 19-29)",
+    "Adds 'Scan here to watch the demo' QR codes to each launch slide",
+    "GA dates differ from the internal edition: Forcepoint SSE 15 July 2026 (internal: 15 May), NComputing Teams-on-Linux 15 June as a 'new launch' (internal: 15 May, 'key enhancement')"
+   ],
+   "brief": "The 'PUBLIC-SHARABLE' edition of the May 2026 Partner CXO keynote (31 slides, last saved 15 May 2026), cut from the 52-slide internal edition by removing customer slides and the sovereignty appendix. It is presented as safe to share with partners, but it still contains the company's 2030 revenue target, forward-looking GA dates for unreleased products and Gartner forecast data.",
+   "use_for": "The partner-shareable version of the May 2026 CXO keynote - after scrubbing: slide 14 (2026 business drivers) and slide 15 (WFH fuel and CO2 savings) are reusable in partner decks. Until slides 17-18 are removed, treat as internal.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "May 2026. GA dates were forward-looking and conflict with the internal edition; DaaS pricing and launch claims are time-bound.",
+   "superseded_by": "",
+   "confidence": 0.84,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Named 'PUBLIC-SHARABLE' but not safe to send: it carries the USD 500 million 2030 ARR target, unreleased-product GA dates and Gartner forecast data; no verified public URL.",
+   "needs_human": "Before this edition goes to anyone outside Accops: remove the Vision 2030 / USD 500M ARR slide (18), decide whether the GA dates and IRIS roadmap may be public, and check the Gartner forecast (slide 17) may be redistributed. Align the GA dates with the internal edition."
+  },
+  {
+   "source": "sharepoint/v2026-06-22-MEA-Accops Partner CXO MEA.pptx",
+   "title": "Winning in the New Digital Order: Partner CXO Keynote for MEA, Dubai Partner Summit, June 2026 (Internal Edition) - AI-Exploit Threat, Data Sovereignty after the March 2026 UAE Cloud Strikes, Launch Calendar, Partner Program Tiers and Discounts",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "MEA, global, Japan and government reference-customer logo slides; anonymised largest-customers slide (incl. the largest digital payment company in MEA)",
+   "client_actual": "Japan customers incl. Kyoto University, Ibaraki Prefectural, DHC Corporation, Kansai University, NTT Data Hokkaido, Kindai University",
+   "client_named": true,
+   "products": [
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "HyWorks",
+    "VDI",
+    "HyLabs",
+    "Remote Browser Isolation",
+    "AirBridge",
+    "GlassFence",
+    "HyDesk",
+    "Enterprise Browser",
+    "Password-less",
+    "Photon",
+    "CMS",
+    "IRIS",
+    "DaaS",
+    "Forcepoint SSE"
+   ],
+   "competitors": [
+    "Citrix",
+    "Omnissa",
+    "Microsoft AVD",
+    "Okta",
+    "OneLogin",
+    "SSE vendors"
+   ],
+   "personas": [
+    "Partner CXO",
+    "Partner sales leader",
+    "Distributor"
+   ],
+   "regulations": [
+    "US CLOUD Act"
+   ],
+   "key_problem": "In the Middle East, regional conflict, sudden government WFH mandates and physical strikes on hyperscaler data centres make single-region public cloud a continuity risk, while AI-driven exploits outpace patching.",
+   "key_outcomes": [
+    "Threat section (slides 2-15): AI vulnerability discovery, open-source exposure, 'what's wrong with ZTNA / SSE', why AI malware changes the ZTNA debate, and 'what has changed since 2021' (Broadcom/Omnissa, Citrix PE buy-out, bigger bundles and minimums)",
+    "Company (16-20): 1000+ customers, Reliance Jio profile, JioPC 1.6 million users, 2025 Gartner DaaS MQ, awards; MEA, global and Japan reference slides",
+    "EUC market sizing with a Middle East cut (slide 37): ME share of EUC TAM 2028 USD 2.72 bn (9.4% of world); Vision 2030 incl. MEA+APJ and USD 500 million ARR (38); 2026 business drivers (39)",
+    "Launch calendar with GA dates (40-57): Forcepoint SSE, password-less SSO, Enterprise Browser, Photon, Red Hat and HPE support, CMS SaaS for endpoints with DEX, GlassFence, IRIS v1.0 (15 Dec 2026); offers incl. free legacy SSO, free VDI licences and a 100% money-back guarantee (Q3)",
+    "Competitor table (slide 58): Accops vs Citrix, Omnissa, AVD, SSE and Okta/OneLogin on Linux VDI, on-prem, perpetual pricing, integrated gateway, MFA, thin clients, lab virtualisation and hypervisor support",
+    "MEA sovereignty section (61-65): Iran-Israel escalation (March 2026), UAE mandated WFH advisory, drone strikes on two AWS UAE data centres and one in Bahrain, and Accops as 100% on-prem inside UAE data centres under UAE law",
+    "Partner section (67-76): channel map (India, MEA & Africa, Japan distributors), Platinum/Gold/Silver/Authorized benefits, revenue requirements by country group, MRP and deal-registration discount table, partner portal, ACAP certifications"
+   ],
+   "brief": "The internal edition of the Partner CXO keynote for the Dubai Partner Summit (MEA), 22 June 2026, by Accops' co-founder, CEO & CTO: 'Winning in the New Digital Order - Putting Data Sovereignty at the core of cybersecurity'. 76 slides, last saved July 2026. It adapts the May 2026 India partner keynote for the Gulf with a regional-conflict and cloud-continuity story, and adds the full partner programme including tier revenue thresholds and discount percentages.",
+   "use_for": "Internal reference for MEA partner enablement: slides 61-65 are the only material on the 2026 Gulf cloud-continuity/sovereignty argument, slide 58 is a compact competitor table, slides 68-71 answer 'what are the partner tiers, targets and discounts' (internal only). Present, do not send.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "June 2026. GA dates, Q3 offers (money-back, pay by August) and the discount table are time-bound. The About slide says '2023 & 2024 Gartner MQ' next to a 2025 MQ slide.",
+   "superseded_by": "",
+   "confidence": 0.84,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Contains partner discount percentages, tier revenue thresholds, the Vision 2030 ARR target and unreleased-product GA dates; no verified public URL.",
+   "needs_human": "Confirm the March 2026 AWS UAE/Bahrain strike claims are sourced (slides 63-64 cite CNBC/Reuters/FT) before partners repeat them. The 'Public Version' of this deck keeps the revenue thresholds, ARR target and GA dates - see that card."
+  },
+  {
+   "source": "sharepoint/Public Version v2026-06-22-MEA-Accops Partner CXO MEA.pptx",
+   "title": "Winning in the New Digital Order: MEA Partner CXO Keynote, June 2026 - 'Public Version' (Drops Customer Logos and the Discount Table but Keeps the $500M ARR Target, GA Dates, Partner Revenue Thresholds and Money-Back Offer)",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "No customer logo slides; keeps the anonymised largest-customers slide",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "HyWorks",
+    "VDI",
+    "HyLabs",
+    "Remote Browser Isolation",
+    "AirBridge",
+    "Enterprise Browser",
+    "Password-less",
+    "Photon",
+    "CMS",
+    "IRIS",
+    "DaaS",
+    "Forcepoint SSE"
+   ],
+   "competitors": [
+    "Citrix",
+    "Omnissa",
+    "Microsoft AVD",
+    "Okta",
+    "OneLogin",
+    "SSE vendors"
+   ],
+   "personas": [
+    "Partner CXO",
+    "Partner sales leader",
+    "Distributor"
+   ],
+   "regulations": [
+    "US CLOUD Act"
+   ],
+   "key_problem": "Gulf enterprises face conflict-driven WFH mandates and physical risk to hyperscaler data centres, so resilient, sovereign, hybrid end-user computing is a continuity requirement.",
+   "key_outcomes": [
+    "59 slides, every one of them also in the 76-slide internal edition",
+    "Removed: 'what's wrong with ZTNA' and AI-malware slides, 'what has changed since 2021' (Citrix/VMware), JioPC, HyDesk, the product-bundle slide, MEA/global/Japan/government reference-customer slides, the attack-scenario and GlassFence slides, the upcoming-webinar slide and the partner discount table",
+    "Kept although confidential in nature: Vision 2030 with the USD 500 million ARR target, Gartner market sizing with the Middle East cut, the GA-dated launch calendar incl. IRIS (15 Dec 2026), the Q3 100% money-back guarantee, and the partner revenue requirements by country group (Authorized USD 15K to Platinum USD 500K)",
+    "Kept: MEA sovereignty section on the March 2026 regional conflict and AWS data-centre strikes, competitor comparison table, channel map, tier benefits, partner portal and certifications",
+    "Also keeps the anonymised largest-customers install-base slide"
+   ],
+   "brief": "The 'Public Version' of the 22 June 2026 Dubai Partner Summit CXO keynote (59 slides, last saved 26 June 2026). It removes customer logos, the Citrix/VMware market-change slide, some threat slides and the discount table from the internal edition, but leaves in the company revenue target, forward-looking launch dates, the partner revenue thresholds and a time-bound money-back offer.",
+   "use_for": "Candidate partner-shareable version of the MEA keynote once scrubbed: slides 61-65 (Gulf cloud-continuity argument) and the competitor table are the reusable parts. Treat as internal until the ARR target and GA dates are removed.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "June 2026; GA dates and the Q3 offer are time-bound.",
+   "superseded_by": "",
+   "confidence": 0.84,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Labelled 'Public Version' but still carries the USD 500M ARR target, unreleased-product GA dates, partner revenue thresholds and Gartner forecast data; no verified public URL.",
+   "needs_human": "Remove the Vision 2030 / ARR slide and decide on the GA dates, partner revenue thresholds and Gartner market-size slide before this is shared. The companion 'Public Version ... MEA-Confidential ... Bootcamp' file is named both Public and Confidential and still has the CEO's personal identifiers slide."
+  },
+  {
+   "source": "sharepoint/1009-Accops-ForJapan-ENG-PartnerBootcamp-Event-Deck-4Hour-Oct2025.pptx",
+   "title": "Accops Partner Bootcamp Tokyo, October 2025 (English, 4-Hour, Internal Edition) - Zero Trust in Three Stages, HyID/HySecure/VDI with 20 Named Case Studies, Partner Program, Vision 2030, Japan Roadmap (50x Revenue), IRIS",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "About 20 named case studies across banking, manufacturing, aviation, pharma, government, e-commerce, securities, retail, IT services, healthcare, payments, hospitality and shipbuilding; Japan and MEA customer slides",
+   "client_actual": "HDFC Bank, Bharat Forge, Karnataka Bank, Jazeera Airlines, Laurus Labs ('Lauras Labs'), NIC, Flipkart, Kotak Securities, Apparel Group, TCS, IDFC First Bank, Axis Bank, Sharda Hospital, Network International, Kerzner (hospitality, UAE), L&T Shipbuilding; host partner AZTI, Inc",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "BioAuth",
+    "HySecure",
+    "ZTNA",
+    "Vajra",
+    "HyWorks",
+    "VDI",
+    "HyLabs",
+    "Virtual Browser",
+    "AirBridge",
+    "Huddle",
+    "Proxmox",
+    "NanoOS",
+    "Reporting Server",
+    "HyDesk",
+    "IRIS",
+    "Enterprise Browser"
+   ],
+   "competitors": [
+    "Citrix",
+    "Omnissa",
+    "Microsoft AVD",
+    "Okta",
+    "OneLogin",
+    "SSE vendors"
+   ],
+   "personas": [
+    "Partner sales",
+    "Partner presales",
+    "Partner CXO"
+   ],
+   "regulations": [
+    "DPDP Act 2023",
+    "GDPR"
+   ],
+   "key_problem": "Japanese partners need to understand why Accops is a credible alternative to Citrix and VMware after the Broadcom/Omnissa and PE changes, and how to position zero-trust access, identity and VDI to their customers.",
+   "key_outcomes": [
+    "Personal opening for Japan (slides 3-9): the CEO's association with Japan and Accops in Japan ('X customers, Y partners, close to USD 1 million revenue every year' - placeholders left in)",
+    "Market change since 2021 (slide 12), company, Reliance/JioPC, 2025 Gartner MQ, largest customers, Japan and MEA customers, partner ecosystem and Gold/Silver requirements, competitor comparison table (13-31)",
+    "Zero trust in three stages - validate the human, device and intent, then monitor (32-43); slide 38 is the 'many digital identities' slide with the CEO's real identifiers",
+    "HyID section with five named cases and editions/licensing (44-56); HySecure section with five named cases, QRNG, editions and licensing (57-76); VDI section with six named cases, TCO and editions (77-102); other products (103-115)",
+    "Roadmap section (116-136): Vision 2030 (USD 500 million ARR), 'Accops Global Partner Award 2030, Maldives', India roadmap (JioPC to 5 million homes, CRM moved to Salesforce), Japan roadmap (increase Japan revenue 50x, Japan DC, full localisation), product roadmaps, IRIS architecture, Enterprise Browser, ARS 3.0, FHE-enabled AI coding assistants",
+    "Slide 113 is a case study still marked 'DRAFT'"
+   ],
+   "brief": "The internal English edition of the 4-hour Tokyo partner bootcamp (October 2025; 142 slides, last saved July 2026), hosted with the Japanese partner AZTI. It is a complete partner enablement day: company and market context, partner programme, a zero-trust framework, then HyID, HySecure and VDI sections each with named case studies, editions and licensing, other products, and a long confidential roadmap section. The 'Sharable' edition removes the roadmap and anonymises the case-study headers.",
+   "use_for": "Internal slide bank for partner enablement: slides 47-51, 66-70 and 94-99 are named problem/solution case studies per product; slides 53-54, 73-74 and 100-101 describe editions and licensing models. Never send - use the Sharable edition (after scrubbing) for partners.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "October 2025 content (last saved July 2026). Vajra has been renamed Enterprise Browser; roadmap items have dates that are now past; slide 8 still has 'X customers, Y partners' placeholders.",
+   "superseded_by": "",
+   "confidence": 0.83,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal edition: Vision 2030 ARR target, Japan revenue and growth targets, product roadmaps, named customer case studies, a DRAFT case, and the CEO's personal identifiers; no verified public URL.",
+   "needs_human": "Slide 38 carries the CEO's real internal usernames, a bank customer ID and a personal email address - replace in every edition. Fill or delete the 'X customers, Y partners' placeholders. The Japanese-language editions (1009_ and 1008_) and the Japan 2026 bootcamp decks are uncarded - which is the current Japan partner deck?"
+  },
+  {
+   "source": "sharepoint/1009-Sharable-Accops-ForJapan-ENG-PartnerBootcamp-Event-Deck-4Hour-Oct2025.pptx",
+   "title": "Accops Partner Bootcamp Tokyo, October 2025 (English, 4-Hour) - 'Sharable' Edition: Roadmap Removed and Case Headers Anonymised, but CEO Personal Identifiers and Customer Names in Case Text Remain",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "About 20 case studies with anonymised headers (largest bank in India, largest forging company, first non-government airline of Kuwait, large pharma company, Indian government, largest e-commerce player, large securities trading company, large UAE retailer, large shipbuilder)",
+   "client_actual": "Still named in slide text: TCS, Sharda Hospital, Kerzner (UAE), Flipkart and Kotak (case body text), 'NI' (Network International); an HDFC Bank customer ID appears on the digital-identities slide",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "BioAuth",
+    "HySecure",
+    "ZTNA",
+    "Vajra",
+    "HyWorks",
+    "VDI",
+    "HyLabs",
+    "Virtual Browser",
+    "AirBridge",
+    "Huddle",
+    "Proxmox",
+    "NanoOS",
+    "Reporting Server",
+    "HyDesk"
+   ],
+   "competitors": [
+    "Citrix",
+    "Omnissa",
+    "Microsoft AVD",
+    "Okta",
+    "OneLogin",
+    "SSE vendors"
+   ],
+   "personas": [
+    "Partner sales",
+    "Partner presales"
+   ],
+   "regulations": [
+    "DPDP Act 2023",
+    "GDPR"
+   ],
+   "key_problem": "Japanese partners need a shareable enablement deck on Accops' zero-trust, identity and VDI portfolio after the Citrix and VMware market changes.",
+   "key_outcomes": [
+    "113 slides versus 142 in the internal edition: removes the CEO's personal Japan slides, Japan revenue placeholder, largest-customers and customer-logo slides, the DRAFT case and the entire roadmap section (Vision 2030, Japan 50x target, India roadmap, product roadmaps, IRIS, FHE AI)",
+    "Case-study headers anonymised (e.g. 'Largest private sector bank in India', 'Large security trading company'), but several bodies still name the customer (Flipkart, Kotak, TCS, NI) and three headers keep real names (TCS, Sharda Hospital, Kerzner)",
+    "Keeps the zero-trust three-stage framework, HyID/HySecure/VDI sections with editions and licensing, competitor table, partner Gold/Silver requirements",
+    "Keeps an 'updated EUC market size' table and a 'VDI TCO reduction plan' (Bronze device licensing, Proxmox support from 21,000 yen per CPU socket) after a 'Roadmap' divider (slides 105-107)",
+    "Slide 29 ('many digital identities') still shows the CEO's real internal usernames, a bank customer ID and a personal email address"
+   ],
+   "brief": "The 'Sharable' English edition of the October 2025 Tokyo partner bootcamp (113 slides, last saved 9 October 2025). It was cut from the internal edition by removing the roadmap and personal slides and anonymising case-study titles, so it is the version intended for partners - but the anonymisation is incomplete and the CEO personal-identifiers slide is still in it.",
+   "use_for": "Partner enablement in Japan once scrubbed: zero-trust framework (slides 23-33), per-product case stories, editions and licensing slides. Until the fixes below are made, present it rather than send it.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "October 2025. Vajra has been renamed; Gartner years on the About slide lag the 2025 MQ slide.",
+   "superseded_by": "",
+   "confidence": 0.83,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Named 'Sharable' but not safe to send: CEO personal identifiers on slide 29 and customer names left in case-study text; no verified public URL.",
+   "needs_human": "Before sharing: replace the slide-29 personal identifiers with dummy values; finish anonymising (TCS, Sharda Hospital, Kerzner headers; Flipkart, Kotak, NI in body text) or confirm those customers are cleared; decide whether the market-size and Proxmox-pricing slides after the 'Roadmap' divider belong in a partner deck."
   }
  ]
 }
