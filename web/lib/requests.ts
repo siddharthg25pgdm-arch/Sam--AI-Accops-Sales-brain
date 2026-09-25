@@ -71,7 +71,7 @@ export function confirmation(r: { demand: number; new_vote: boolean; status: str
   return msg;
 }
 
-const NEXT: Record<Status, Status[]> = {
+export const NEXT: Record<Status, Status[]> = {
   open: ["planned", "in_progress", "done", "declined"],
   planned: ["open", "in_progress", "done", "declined"],
   in_progress: ["open", "planned", "done", "declined"],

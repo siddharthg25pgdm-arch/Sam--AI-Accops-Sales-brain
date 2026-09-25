@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth";
 import { askAndLog } from "@/lib/api";
 import { ready } from "@/lib/registry-cache";
+import { suggestTitle } from "@/lib/requests";
 
 export const maxDuration = 60;
 
@@ -17,7 +18,8 @@ export async function POST(req: Request) {
   await ready();
   try {
     const { r, eventId } = await askAndLog(question, user.id, "web", history, body.sessionId ?? null);
-    return NextResponse.json({ ...r, eventId });
+    // requestTitle prefills "Ask marketing to create this", on a missing answer or from "doesn't exist".
+    return NextResponse.json({ ...r, eventId, requestTitle: suggestTitle(question) });
   } catch {
     // Already logged as a server_error question by askAndLog.
     return NextResponse.json({ error: "something went wrong on the server, and it has been logged" }, { status: 500 });

@@ -7,4 +7,8 @@ export type SlimAsset = {
 export type Facets = { types: [string, number][]; verticals: [string, number][]; products: [string, number][]; years: [string, number][] };
 export type Gap = { vertical: string; type: "Case Study" | "Whitepaper"; product?: string; asked?: number };
 export type ChatAsset = { title: string; asset_type: string; industry: string; why: string; link: string | null; location: string | null; visibility: string; year: string | null; stale: boolean; trust?: string | null; path: string | null };
-export type ChatTurn = { role: "user" | "assistant"; content: string; assets?: ChatAsset[]; trace?: { step: string; detail: string }[]; eventId?: number | null; runtime?: string; zero?: boolean; filters?: Record<string, string> };
+export type ChatTurn = { role: "user" | "assistant"; content: string; assets?: ChatAsset[]; trace?: { step: string; detail: string }[]; eventId?: number | null; runtime?: string; zero?: boolean; filters?: Record<string, string>;
+  /** The exact thing is not in the library (substitutes may be shown); offers "ask marketing". */
+  missing?: boolean; question?: string; requestTitle?: string };
+/** A request marketing delivered that the rep has not seen yet (the quiet notice in the chat). */
+export type Delivery = { voteId: number; title: string; deliveredTitle: string; url: string };
