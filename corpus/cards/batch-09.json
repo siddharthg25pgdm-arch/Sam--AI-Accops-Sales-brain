@@ -751,6 +751,347 @@
    "visibility": "internal",
    "internal_reason": "Marked 'Accops Confidential'; names defence and government customers with user counts.",
    "needs_human": "Confirm the defence and government customers (HQ IDS, DRDO, Airforce, IGCAR, NPCIL) may be named even to other government prospects."
+  },
+  {
+   "source": "sharepoint/Accops - Techno Commercial Proposal - HyID with Biometric Authentication.docx",
+   "title": "Techno-Commercial Proposal Template: HyID MFA with Network Biometric Authentication for a Large Private Bank (Jan 2019, 30,000-100,000 Named Users)",
+   "asset_type": "Proposal",
+   "industry": "BFSI",
+   "client": "India's third-largest private-sector bank (3,300 branches, 50,000+ staff, about 500 applications) - the document itself uses the placeholder CUSTOMERNAME",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyID",
+    "Biometric Server",
+    "BioAuth",
+    "Reporting Server",
+    "MFA",
+    "SSO",
+    "HySecure",
+    "HyWorks",
+    "HyLite",
+    "HyDesk"
+   ],
+   "competitors": [],
+   "personas": [
+    "CISO",
+    "IT head",
+    "procurement",
+    "Head of Infrastructure"
+   ],
+   "regulations": [],
+   "key_problem": "A large bank wants MFA, including fingerprint biometrics, across about 500 applications (150 AD-integrated, 350 with custom authentication and little vendor support) without changing the applications, with role- and app-based policies, DC/DR high availability and 24x7 support.",
+   "key_outcomes": [
+    "Proposal structure: About Accops, scope of work and customer requirements, HyID proposal, DC/DR design, security assessment, onsite and L4 support, app integration, biometric integration, push notification, password vault, architecture, commercials, terms",
+    "Annual subscription on a 5-year contract in user packs: 30,000, then 60,000, then 100,000 named users",
+    "Microservices deployment: HyID modules as Docker containers on a 3-master Kubernetes cluster, CI/CD with an in-bank Docker repository, active-active DC/DR, UAT environment",
+    "Effort estimates: ~3 months (3 DevOps, 1 QA, 1 support) to design and commission; ~3 months (2 dev, 1 QA, 1 support) to integrate the first 5 application types; ~3 months to build a network biometric server; 6-8 weeks for a new biometric device SDK",
+    "8 onsite L2 engineers for 24x7 support plus L4 engineering from Pune; integration with the bank's existing Morpho biometric database or a new Accops network-based biometric store (double-encrypted, PIN-protected)",
+    "Features described: smart consent push, smart re-authentication, risk-based access, desktop/server/RDP login MFA, privileged-user MFA, ARS audit and SIEM integration; Azure-hosted Accops Push Notification Service; password-vault SSO (excluded)"
+   ],
+   "brief": "A 2019 Word techno-commercial proposal prepared under the CEO's name for a large Indian private bank's HyID rollout, with the customer's name replaced by the placeholder CUSTOMERNAME. It records the bank's requirements (500 apps, biometric for about 50 apps, tunnelling for isolation, SaaS via ADFS, mobile users, idle-timeout honouring, DevOps deployment, DC/DR with no single point of failure, VAPT), then proposes HyID enterprise subscription licences, a Kubernetes-based architecture, integration of existing and new biometric devices, push notifications, support staffing and effort estimates. The commercial table has its prices blanked; the terms cover a 5-year minimum, one-time discounts, 6-8 week delivery and customer-provided infrastructure.",
+   "use_for": "A template or worked example when writing a large-bank MFA / biometric proposal: requirement capture, HA architecture, support staffing, effort estimates and terms. Internal reference only; never send.",
+   "publish_year": "2019",
+   "expired": false,
+   "stale_risk": "January 2019 (quote valid to 31 Jan 2019). Company figures (500+ customers, 80+ team) and product names (HyLite, 'Morphos') are out of date; HyID architecture has moved on. Prices, if ever filled in, would be long expired.",
+   "superseded_by": "",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Customer proposal marked 'Accops Confidential'; contains Accops bank account, PAN/GST details, the CEO's mobile number and a customer's requirements.",
+   "needs_human": "The bank is not named but is unambiguously described (third-largest private bank, registered office Ahmedabad, 3,300 branches) - treat as confidential. Remove Accops' bank-account details and the CEO's mobile number if this is kept as a template. Is a current proposal template available?"
+  },
+  {
+   "source": "sharepoint/J&K Bank Accops MFA Solution Document-v5.docx",
+   "title": "Bank MFA RFP Response / System Requirement Specification (April 2022): HyID Gold with Fingerprint and Face BioAuth for 15,000 Users, Server MFA, DC/DR/UAT Sizing and BOQ",
+   "asset_type": "Proposal",
+   "industry": "BFSI",
+   "client": "A long-established Indian private-sector bank (1,000+ branches, DC in Noida, DR in Mumbai), bid jointly with a global systems integrator",
+   "client_actual": "The Jammu and Kashmir Bank Ltd (J&K Bank), e-RFP JKB/T&D/MFA/2022-273 dated 01-04-2022; partner NTT Global",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "BioAuth",
+    "Biometric Server",
+    "Reporting Server",
+    "HySecure",
+    "MFA",
+    "SSO"
+   ],
+   "competitors": [
+    "Microsoft Authenticator",
+    "Google Authenticator",
+    "Neurotechnology"
+   ],
+   "personas": [
+    "CISO",
+    "IT head",
+    "Head of Infrastructure",
+    "procurement",
+    "partner"
+   ],
+   "regulations": [
+    "RBI",
+    "ISO 19794"
+   ],
+   "key_problem": "A bank's RFP requires MFA across all digital assets: biometric (fingerprint or face) authentication for 15,000 users on critical applications, MFA for 600 Windows/Linux/AIX/Solaris servers used by 300 privileged users, SSO, APIs for custom apps, DC/DR and RBI-compliant biometric storage.",
+   "key_outcomes": [
+    "Full HyID component reference: CIS-hardened HyID OS, Access and Config nodes, RADIUS server, LDAP proxy (ADS), ADFS plug-in, Device Classification Service, Device Messaging Server, Azure-hosted push service, BioAuth portal, core engine, Authorizer, Neurotechnology/Azure/built-in face engines, liveness check, HyID client and mobile app",
+    "Feature detail: TOTP, SMS/email OTP, third-party authenticators, hardware tokens, FIDO keys, push to phone and PC, RADIUS challenge, LDAP OTP.password, SAML IdP, Windows/Linux credential providers (no biometric/FIDO at RDP/SSH), contextual MFA, password-less, device binding",
+    "Three integration methods for apps: LDAP push (no code change), BioAuth API (JS module + REST validation), reverse-proxy gateway",
+    "Infrastructure sizing: DC 33 VMs (216 vCPU, 540 GB RAM, 3.9 TB OS + 5 TB log storage) plus 2 biometric hardware servers; DR 22 VMs (120 vCPU); UAT 11 VMs; OS, MS SQL and Neurotechnology licence needs",
+    "Delivery terms: HA via DNS/GSLB failover and SQL Always On; two-phase in-person training; handover document set; 24x7 remote support with 30-minute first response and P1-P4 classes; release cadence; acceptance criteria",
+    "BOQ for years 1-3 (HyID Gold perpetual, BioAuth fingerprint+face add-on, server site licences, fingerprint scanners) and AMC for years 4-5; Annexure I techno-functional compliance matrix (ISO 19794-2/-4 fingerprint templates, RBI image standards)"
+   ],
+   "brief": "Version 5 (23 April 2022) of the statement of work and system requirement specification Accops wrote with its SI partner in response to a bank's e-RFP for an MFA solution. It explains HyID and every component, the HyID Silver/Gold/Platinum feature grid, the proposed architecture and application-integration methods, detailed VM and hardware sizing for DC, DR and UAT, high availability, logs and reports, scope of work (server MFA for 300 privileged users on 600 servers, biometrics for 15,000 users), DR, upgrades, training, handover, support SLAs, security considerations, acceptance criteria, customer responsibilities, escalation, change requests, a 5-year BOQ, and a line-by-line techno-functional compliance annexure.",
+   "use_for": "Presales reuse when answering a bank or large-enterprise MFA / biometric RFP: component descriptions, sizing tables, SLA and support wording, integration methods and a compliance-matrix pattern. The most detailed HyID architecture and sizing text in the library. Internal only.",
+   "publish_year": "2022",
+   "expired": false,
+   "stale_risk": "April 2022. HyID has since changed (CentOS 7 noted as migrating to Oracle Linux/RHEL 8; editions renamed in the 2025-26 edition matrices). Sizing is for this bank's 15,000-user biometric scope. Company size given as 170+ people.",
+   "superseded_by": "",
+   "confidence": 0.88,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Customer-specific bid document naming the bank and SI partner, with an Accops employee's mobile number; confidential.",
+   "needs_human": "Did Accops win this bid? If yes, a J&K Bank case study would be valuable; if not, keep as a template only. The title page still carries a 2017 'Technologies Private Limited' copyright line and an unrelated document number (ASPL-TP-1718-ABVDI04) copied from another template."
+  },
+  {
+   "source": "sharepoint/Accops Reporting Server - Dashboard and Graphs.pdf",
+   "title": "Accops Reporting Server (ARS): Catalogue of Dashboards, Graphs, Security Heatmaps and Alerts for HySecure and HyWorks (v1.0, January 2020)",
+   "asset_type": "Solution Document",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "Reporting Server",
+    "HySecure",
+    "HyWorks",
+    "HyID"
+   ],
+   "competitors": [],
+   "personas": [
+    "IT head",
+    "CISO",
+    "SOC analyst",
+    "Head of Infrastructure"
+   ],
+   "regulations": [],
+   "key_problem": "Administrators and security teams need visibility of gateway and VDI health, user activity, licence use and attack patterns, which native product logs do not give in one place.",
+   "key_outcomes": [
+    "ARS is built on the Elastic Stack and ingests event logs from Accops products; integrates with customer SIEM",
+    "28 infrastructure views: OS metrics wall for NOC/SOC, concurrent users, CPU/memory per gateway and per process, top users by logins and session time, app usage, licence utilisation, desktop assignment, usage summary with WAN IP city/country and MAC, OTP token success rate",
+    "17 security views: login and app-access failures, OTP failure rate, failed-login list (CSV), world heatmaps of successful and failed logins, failed attempts by city/country/continent, endpoint-security allowed and quarantine logins, geo-location policy failures, admin login activity, powered-on VMs",
+    "Per-user statistics on shared hosted desktops: top resource consumers, per-user and per-process CPU/memory/disk/network, Windows logon breakdown, application usage summary",
+    "Automated e-mail alerts for high CPU, memory and disk usage"
+   ],
+   "brief": "A version 1.0 product document dated 31 January 2020 that walks through every dashboard and graph available in Accops Reporting Server, with a sentence on what each shows and how to use it (screenshots in the original). Sections: infrastructure monitoring for HySecure and HyWorks, security monitoring including brute-force detection by geography, per-user statistics for shared hosted desktops, and automated alerts.",
+   "use_for": "Answering 'what reports / dashboards do we get?', 'can we see failed logins by country?', 'do you have SIEM-style analytics?' or 'how do we track WFH productivity?' in a HySecure or HyWorks evaluation; RFP compliance on reporting.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "January 2020, v1.0 - ARS has gained dashboards since (e.g. UEM and logon-duration metrics listed in the 2023-25 decks). Screenshots, if any, show the 2020 UI.",
+   "superseded_by": "",
+   "confidence": 0.88,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'for restricted circulation'; no verified public URL.",
+   "needs_human": "The .docx in the same folder is the text twin - one card. Is there a newer ARS feature document?"
+  },
+  {
+   "source": "sharepoint/UserApplicationAccessReport-16-06-2020-12_09_02-app.pdf",
+   "title": "Sample HySecure Report: User Application Access Details (8-13 June 2020) - Internal Sample Shared in an Automotive Customer Discussion",
+   "asset_type": "Sample Report",
+   "industry": "Automotive",
+   "client": "An automotive manufacturer that asked to see HySecure reports during a sales discussion",
+   "client_actual": "HMIL (folder name 'RE__Accops_discussion_with_HMIL'); the report data itself is from Accops' own 'ACCOPS' realm",
+   "client_named": true,
+   "products": [
+    "HySecure",
+    "Reporting Server"
+   ],
+   "competitors": [],
+   "personas": [
+    "IT head",
+    "CISO"
+   ],
+   "regulations": [],
+   "key_problem": "A prospect wanted to see what per-user application access reporting HySecure produces.",
+   "key_outcomes": [
+    "Plain-text HySecure report format: per user, per day, application name, last access time and access count",
+    "Generated 16 June 2020 for the interval 8-13 June 2020 from Accops' internal HySecure realm"
+   ],
+   "brief": "One of three sample reports exported from HySecure on 16 June 2020 and filed under an e-mail thread with an automotive prospect. It lists, for one user, which published applications and networks were accessed each day with counts and last-access times. The data is Accops' own internal deployment, including an employee's username and internal development resources.",
+   "use_for": "Internal reference for what a basic HySecure access report looks like. Do not send: it exposes an Accops employee's username and internal system names. Use the ARS Dashboard and Graphs document for customer-facing reporting questions.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "June 2020 export from an old HySecure version; current ARS reporting is much richer.",
+   "superseded_by": "",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Contains an Accops employee's username and internal application/network names; filed under a named customer's discussion.",
+   "needs_human": "Should these raw June 2020 exports stay in the sales library? They carry real employee usernames. If a sample is needed, regenerate one with dummy users."
+  },
+  {
+   "source": "sharepoint/UserSessionDetailReport-16-06-2020-12_08_02-user.pdf",
+   "title": "Sample HySecure Report: User Session Details (8-13 June 2020) - Internal Sample Shared in an Automotive Customer Discussion",
+   "asset_type": "Sample Report",
+   "industry": "Automotive",
+   "client": "An automotive manufacturer that asked to see HySecure reports during a sales discussion",
+   "client_actual": "HMIL (folder name 'RE__Accops_discussion_with_HMIL'); report data is from Accops' own 'ACCOPS' realm",
+   "client_named": true,
+   "products": [
+    "HySecure",
+    "Reporting Server"
+   ],
+   "competitors": [],
+   "personas": [
+    "IT head",
+    "HR",
+    "Head of Operations"
+   ],
+   "regulations": [],
+   "key_problem": "A prospect wanted to see whether HySecure can report login/logout times and active vs idle session time for work-from-home productivity tracking.",
+   "key_outcomes": [
+    "Per-session login time, logout time, active time and session duration for one user, with a total (30 h 31 min over the week)",
+    "Shows the 'active time vs session time' distinction used for WFH attendance and productivity reporting"
+   ],
+   "brief": "A HySecure session-detail export generated 16 June 2020 for 8-13 June 2020, filed with the automotive prospect's e-mail thread. It lists each session of one Accops employee with active and total durations.",
+   "use_for": "Internal reference for session/attendance reporting. Do not send (real employee username).",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "June 2020 export; format superseded by ARS dashboards.",
+   "superseded_by": "",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Contains an Accops employee's username and activity; filed under a named customer's discussion.",
+   "needs_human": "As for the other two HMIL samples: replace with an anonymised sample or remove."
+  },
+  {
+   "source": "sharepoint/UserSessionSummaryReport-16-06-2020-12_02_07.pdf",
+   "title": "Sample HySecure Report: Daily Session Summary for All Users (8-13 June 2020) - Internal Sample Shared in an Automotive Customer Discussion",
+   "asset_type": "Sample Report",
+   "industry": "Automotive",
+   "client": "An automotive manufacturer that asked to see HySecure reports during a sales discussion",
+   "client_actual": "HMIL (folder name 'RE__Accops_discussion_with_HMIL'); report data is from Accops' own 'ACCOPS' realm",
+   "client_named": true,
+   "products": [
+    "HySecure",
+    "Reporting Server"
+   ],
+   "competitors": [],
+   "personas": [
+    "IT head",
+    "HR",
+    "Head of Operations"
+   ],
+   "regulations": [],
+   "key_problem": "A prospect wanted to see a whole-organisation view of who worked remotely, for how long, each day.",
+   "key_outcomes": [
+    "Per user, per day: session count, active time and total session duration, with weekly totals",
+    "Covers dozens of Accops staff over one week, e.g. totals from about 8 to 55 hours per user"
+   ],
+   "brief": "The largest of the three HySecure sample exports (16 June 2020, interval 8-13 June 2020), summarising every user's daily remote sessions in Accops' own realm. Filed with an automotive prospect's e-mail thread as an example of work-from-home attendance reporting.",
+   "use_for": "Internal reference for WFH attendance / productivity reporting. Do not send: it lists many Accops employees' usernames and working hours.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "June 2020 export; superseded by ARS dashboards.",
+   "superseded_by": "",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Lists many Accops employees' usernames and hours worked - personal data; filed under a named customer's discussion.",
+   "needs_human": "Employee activity data in a sales library is a privacy issue - recommend removing these three files or replacing them with a dummy-data sample."
+  },
+  {
+   "source": "sharepoint/Accops - Product Intro - HyLabs -v4.pdf",
+   "title": "Accops HyLabs: ICT Lab Virtualization Product Intro v4 (2020) - Self-Service Virtual Labs, LMS/LTI Integration, 7-Year TCO and Kyoto University Case",
+   "asset_type": "Deck",
+   "industry": "Education",
+   "client": "A top Japanese university (30,000 students, 200+ departments) that chose Accops after testing Fujitsu, Apache VCL, Citrix and VMware",
+   "client_actual": "Kyoto University; quote from Prof. Shoji Kajita (IIMC & ACCMS)",
+   "client_named": true,
+   "products": [
+    "HyLabs",
+    "HyWorks",
+    "HyDesk",
+    "Reporting Server",
+    "VDI",
+    "Thin Clients"
+   ],
+   "competitors": [
+    "Citrix",
+    "VMware",
+    "Fujitsu",
+    "Apache VCL"
+   ],
+   "personas": [
+    "University IT head",
+    "CIO",
+    "Dean / Faculty",
+    "Registrar"
+   ],
+   "regulations": [],
+   "key_problem": "Universities split ICT lab budgets across departments, labs sit idle outside fixed hours, every change waits on IT, students cannot reach labs from home or on their own devices, and there is no utilisation or learning analytics.",
+   "key_outcomes": [
+    "Self-service virtual labs created on the fly: per-lecture and timetable-based resource allocation, faculty scheduling, student self-reservation for self-study, non-persistent linked clones, Windows and Linux",
+    "Browser-based BYOD access on and off campus, LMS integration via IMS-LTI, SSO, role delegation to faculty, course-wise reporting via ARS",
+    "HyLabs vs thick-PC labs vs generic VDI comparison on 8 requirements (sharing, re-imaging, reservation, delegation, portal, BYOD, analytics, customisation)",
+    "7-year TCO for a 400-seat lab: about Rs 2.8 crore for PCs refreshed 100 a year vs about Rs 1.86 crore with HyLabs and thin clients - roughly 34% lower; thin clients 15 W vs 60 W",
+    "Kyoto University case: 30,000 students, 200+ departments; Accops won on time-based provisioning, self-service, delegation, LTI, clientless access and customisation; professor's testimonial",
+    "Screens of student, faculty and admin portals and sample usage reports (e.g. self-study outside lab hours)"
+   ],
+   "brief": "A product introduction deck for Accops HyLabs aimed at universities and training institutes, framed for COVID-era remote learning. It sets out institutional needs and challenges, contrasts traditional and virtualised lab architectures, lists HyLabs features, Azure and on-premise deployment diagrams, a comparison with generic VDI, benefits for the university, faculty and students, a 7-year TCO model for 400 seats, the Kyoto University case with testimonial, and portal screenshots. Slides carry a 2019 copyright but mention COVID-19 and a 2020 award, so it dates from 2020.",
+   "use_for": "University, engineering college or corporate training-lab prospects: the TCO slide and the Kyoto University story are the strongest proof. Filed under 'Older' - use a current HyLabs deck where available and keep this for the Kyoto reference and TCO model.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "Filed in HyLabs/Older. Company figures (500+ customers, 100+ team) are out of date. Kyoto University is described as having 30,000 students here but 25,000 or 20,000 in later decks. TCO uses 2019-20 INR prices.",
+   "superseded_by": "",
+   "confidence": 0.86,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Older internal deck; no verified public URL.",
+   "needs_human": "Which is the current HyLabs deck (the content-gap report mentions a Sep 2026 MCTE V3 deck and a Jan 2025 deck)? Once confirmed, set superseded_by here. Reconcile Kyoto University's student count across decks."
+  },
+  {
+   "source": "sharepoint/Accops - Product Intro - HyMobile MDM.pdf",
+   "title": "Accops HyMobile MDM Product Intro (2019): Cloud Mobile Device, App and Content Management for Android and iOS",
+   "asset_type": "Deck",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyMobile",
+    "MDM"
+   ],
+   "competitors": [],
+   "personas": [
+    "IT head",
+    "Head of Infrastructure",
+    "Field operations head"
+   ],
+   "regulations": [],
+   "key_problem": "Organisations with corporate-owned phones and tablets for field staff need to enrol, lock down, update and support them remotely from one console.",
+   "key_outcomes": [
+    "Cloud MDM, MAM and MCM for corporate-owned Android and iOS devices from one dashboard",
+    "Apple VPP and DEP, Android Enterprise, Samsung KNOX and LG GATE, iOS supervised mode, single- and multi-app kiosk modes",
+    "Enterprise app store, managed Google Play silent installs, Apple App Store publishing; content push to the FileDock app in many formats; presentation mode for digital-signage kiosks",
+    "Remote cast and control with an in-session voice call (Samsung KNOX, Sony, LG, Lenovo, rooted, Android 5.0+)",
+    "HyMobile communication suite (messenger, phone, notifications); geo-fencing, location tracking, website white/blacklists, remote factory reset, bulk enrolment, data-usage monitoring, peripheral lockdown"
+   ],
+   "brief": "A 2019 product introduction for HyMobile, Accops' SaaS MDM. It covers the unified dashboard, multi-OS enrolment programmes, application and content management, remote support with voice, the communication suite and a long list of device controls, followed by a 2019 company profile, 'why Accops' and the other product lines.",
+   "use_for": "Answering 'do you have MDM?' or a field-force / kiosk / shared-tablet requirement (e.g. insurer or bank field agents) where HyMobile would be bundled with HySecure or HyID.",
+   "publish_year": "2019",
+   "expired": false,
+   "stale_risk": "Copyright 2019; company figures (500+ customers, 80+ team) and Android version notes are old. HyMobile features have been summarised in the 2023-25 corporate decks - check current capability before quoting specifics.",
+   "superseded_by": "",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Accops Confidential'; no verified public URL.",
+   "needs_human": "A .pptx twin is in the same folder (clears by stem). Is HyMobile still actively sold? The only current MDM material is two slides in the corporate deck."
   }
  ]
 }
