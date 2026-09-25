@@ -1,0 +1,418 @@
+{
+ "generated_by": "Claude, in-session, 25 September 2026",
+ "note": "Batch 11: SharePoint PowerPoints - the large (>50 MB) decks extracted after batch 10 (Reference Customers July 2025, TCS all-products deck, the Aug-Sep 2026 Sovereign CIO Conclave city decks, ET CISO / IBA CISO 2025, Forcepoint and Secured Vendor Access webinars, SEA Customer Deck 1.0, Customer Workshop Mar 2025, NIC deck), the 2026 partner CXO decks in Public/Sharable and internal editions (India, MEA, Japan), the Nutanix set, and older technical solution decks (MFA for legacy apps, Palo Alto/third-party VPN MFA, security use cases, VDI comparisons, DaaS DIY/AMD, cloud vs on-prem, GCP, O365, Dynamics CRM, Linux VDI). Written from corpus/text/*.txt; every deck read before carding, and near-copies compared slide by slide against their base deck. publish_year comes from the deck body where it states one, otherwise from the pptx last-saved date with confidence lowered and the fact stated in stale_risk. Real customer names appear only in client_actual. Sensitive values found in some decks (staff mobile numbers, personal identifiers) are never copied into a card; the card says the document contains them.",
+ "schema_notes": {
+  "needs_human": "A question only Siddharth or marketing can answer (canonical variant, whether a draft should be retired, a figure that looks like a typo, sensitive data to scrub).",
+  "client_actual": "Real customer names printed in the document. Supabase only, never in a model prompt."
+ },
+ "model_visible": [
+  "title",
+  "asset_type",
+  "industry",
+  "client",
+  "products",
+  "competitors",
+  "personas",
+  "use_for",
+  "publish_year",
+  "visibility",
+  "superseded_by"
+ ],
+ "cards": [
+  {
+   "source": "sharepoint/TCS Deck V1.0 All Products 080726.pptx",
+   "title": "Accops All-Products Customer Workshop Deck for a Global IT Services Provider (8 July 2026) - AI-Exploit Threat, Six-Pillar Platform, HyID/HySecure/VDI/RBI/GlassFence, JAS Offers, DaaS at Rs 1,333",
+   "asset_type": "Deck",
+   "industry": "IT & ITES",
+   "client": "Prepared for a global IT services provider (named only in the filename); body is the generic mid-2026 all-products storyline",
+   "client_actual": "TCS (filename only); the largest-customers slide lists anonymised install-base descriptors",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "HySecure",
+    "ZTNA",
+    "HyWorks",
+    "VDI",
+    "Enterprise Browser",
+    "HyDesk",
+    "UEM",
+    "Remote Browser Isolation",
+    "GlassFence",
+    "DaaS",
+    "Forcepoint SSE"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head",
+    "Head of Infrastructure"
+   ],
+   "regulations": [],
+   "key_problem": "AI models now find and chain software vulnerabilities faster than any patch cycle, legacy and open-source components widen the attack surface, and a multi-vendor hybrid-work stack adds cost, integration gaps and inconsistent policy.",
+   "key_outcomes": [
+    "Threat opening (slides 2-6): Claude Mythos-style AI vulnerability discovery (27-year-old OpenBSD bug, 16-year-old FFmpeg bug, chained Linux privilege escalation); 86% of codebases carry vulnerable open-source, 81% of those high/critical, 5-15% of dependencies end-of-life, 218 new CVEs per EOL component every 6 months; ten AI-era threat types; public-website breach diagram",
+    "Positioning (slides 8-11): 'isolate your crown jewels, reduce the threat vector, validate every access'; a map of where ZTNA, SSE, enterprise browser, IAM, VDI and UEM each fit; vendor-sprawl vs single-vendor benefits",
+    "Company (slides 12-13): 1000+ enterprise customers, 200+ partners, 350+ team, 2M+ users, part of Reliance since Sep 2023; About slide says '2023 & 2024 Gartner MQ' while slide 13 says recognised in the 2025 DaaS MQ",
+    "Largest customers slide (24): VDI & ZTNA for 10,000 and MFA for 90,000 at the 3rd largest private bank, RBI for BYOD 350,000 users, clientless ZTNA with MFA 500,000 users for the Indian federal government IT division, VDI for 100,000 users",
+    "Identity (slides 25-27): 150+ apps per organisation, only 1 in 3 SSO-ready, $250,000/year lost to logins for 10,000 users; HyID six factors plus SSO for SAML, AD/LDAP and native apps via password vault",
+    "Product slides: HySecure on-prem and ZTNA-as-a-service (sovereign cloud logs, DC-DR, 99.99% uptime), Accops + Forcepoint SSE, Digital Workspace VDI on any hypervisor, HyDesk HY1000/4000/6000 spec table, remote browser isolation for internet and for critical apps, GlassFence",
+    "Offers (slides 28, 33, 40): JAS-quarter free SSO for legacy apps for 6 months and 50% discount for FY27 orders; free VDI licences until the existing VDI contract expires; DaaS including endpoint at Rs 1,333/user/month"
+   ],
+   "brief": "A 40-slide all-products deck filed under Customer Workshops, dated 08-07-26 in the filename and opened by Accops' co-founder, CEO & CTO ('Accops: Your Partner in Border-less End User Computing'). Only the filename names the customer; the body is the mid-2026 corporate/CIO-event storyline: AI-accelerated exploitation, the case for isolation and a single vendor, company credentials and largest customers, then one slide per product pillar (HyID, HySecure incl. ZTNA-as-a-service, Forcepoint SSE, VDI, HyDesk, enterprise browser, UEM, RBI, GlassFence), the quarter offers, DaaS pricing and 'Why Accops'.",
+   "use_for": "Preparing for a large IT-services or GCC account workshop: it is the broadest single mid-2026 deck (every pillar on one slide each). Slide 9 answers 'where does ZTNA vs SSE vs VDI fit', slide 24 is the largest-customers proof slide, slide 30 describes ZTNA as a service. Check offers before quoting.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "Dated 8 July 2026 (filename; last saved July 2026). The JAS-quarter offers and FY27 discount are time-bound. HyDesk countries of origin (UK, China, Thailand/Taiwan) sit next to Make-in-India claims.",
+   "superseded_by": "",
+   "confidence": 0.84,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Customer-specific workshop file with time-bound commercial offers and install-base descriptors; no verified public URL.",
+   "needs_human": "Largely the same slides as the July 2026 CIO event deck and the 25 Aug 2026 Corporate Deck; was anything TCS-specific ever added? Reconcile the About-slide Gartner years (2023 & 2024) with slide 13 (2025 MQ). Confirm the offers and Rs 1,333 DaaS price may be quoted."
+  },
+  {
+   "source": "sharepoint/Accops Reference Customers July_2025_Updated.pptx",
+   "title": "Accops Delighted Customers' Catalogue (Reference Customers, July 2025 Update) - Customer Logo Slides by Industry, Region, Business Group, Deployment Type and Indian City",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Logo catalogue of several hundred customers across banking, financial services, insurance, education, healthcare, pharma, government, IT/ITES, manufacturing, retail, logistics and more; Japan, Middle East, Europe and US customers",
+   "client_actual": "Text-level names include Japan (Kyoto University, Ibaraki Prefectural, Okayama University, DHC Corporation, Fukuoka City, Kansai University, Aomori Prefecture, NTT Data Hokkaido, Marubeni Information Systems, University of Fukui and others), Europe/US (Fresenius Kabi, Mphasis, Essel Propack, Cronite Castings, Lunor), global (Fidelity Investments, Envestnet, Telekom Slovenije, AXA, Sharaf Group, Danube Home, Abu Dhabi Fund for Development, Royal Court Affairs, RAK Insurance, Indian Register of Shipping), Malayala Manorama; all other customers appear only as logo images",
+   "client_named": true,
+   "products": [],
+   "competitors": [],
+   "personas": [
+    "Sales rep",
+    "Presales engineer",
+    "Partner"
+   ],
+   "regulations": [],
+   "key_problem": "Reps need to show a prospect that Accops already serves companies like theirs - in the same industry, region, business group, city or cloud.",
+   "key_outcomes": [
+    "About slide (2): Pune HQ and Dubai office, bootstrapped 2012, part of Reliance since Sep 2023, DSCI Security Product Company of the Year 2024, 2023 & 2024 Gartner MQ and 2023 DaaS Market Guide; 900+ enterprise customers, 200+ partners, 300+ team, 2M+ users",
+    "Index slides (5-6) list the catalogue sections, including work-from-home, Azure & AWS, government, Japan, UAE & Middle East, USA/UK/Europe, Tata and Aditya Birla group customers, payment gateways, law firms, AI/ML, fintech, KPO, startups and real estate",
+    "Industry logo slides (7-38): infrastructure, banking (3 slides), financial services, insurance, education, printing & publishing, healthcare (hospitals, diagnostics), pharma, power & chemicals, food processing, logistics, IT & ITES (4 slides), engineering & manufacturing (5), automobile, FMCG/retail/e-commerce, services",
+    "Government reference slides (41-43) including defence, BFSI PSUs and international government customers",
+    "Regional slides: Japan (44-45), UAE & Middle East (46-49), USA/UK/Europe (50), global customers (51-53)",
+    "Group and deployment slides: Aditya Birla, Tata and Bajaj group customers (54-56); on-prem deployments (57-59); Azure, AWS and GCP cloud deployments (60-61)",
+    "City slides for local events: Bengaluru, Hyderabad & Coimbatore, Chennai, Delhi, Mumbai, Pune (62-72); miscellaneous industries (73-76)"
+   ],
+   "brief": "A 77-slide customer logo catalogue ('Delighted Customers' Catalogue'), the newest of 21 dated Reference Customers editions (the other 20 are in the _archieved folder). Almost everything is logo images: the extracted text is only section headings plus a few typed customer names for Japan, Europe and 'global' customers. It is organised by industry, by region, by business group (Tata, Aditya Birla, Bajaj), by deployment (on-prem, Azure, AWS, GCP) and by Indian city. Slide 1 is marked 'Confidential - Not for sharing outside Accops'.",
+   "use_for": "Finding customer logos to put on a slide: 'which banks / pharma / Japanese customers do we have?', 'who do we have in Chennai?' for a city event, 'who runs Accops on Azure or AWS?' (slides 60-61), 'Tata or Aditya Birla group references' (slides 54-55). This is the closest thing to the missing customer logo pack (content-gaps item 9). Internal: confirm a logo is cleared before using it externally.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "July 2025 update (filename); last saved February 2026. Company figures (900+ customers, 300+ team) are lower than the 1000+ / 350+ used in 2026 decks, and it says '2023 & 2024 Gartner MQ' although 2025 and 2026 MQ recognition is claimed elsewhere. Logos are not dated, so some may be former customers.",
+   "superseded_by": "",
+   "confidence": 0.62,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Slide 1 is marked 'Confidential - Not for sharing outside Accops'; a customer list whose logo permissions are not recorded.",
+   "needs_human": "The card is written from headings only - the logos are images, so SAM cannot answer 'is X a customer?' from it. A plain-text customer list (name, industry, product, reference-able yes/no) would make this searchable. Update the About slide figures and the copyright line (still '2022'). Twenty older Reference Customers editions (Jun 2021 to Mar 2025) in _archieved are superseded by this one."
+  },
+  {
+   "source": "sharepoint/CIO Event Bangalore V1.0.pptx",
+   "title": "Sovereign CIO Conclave, Bangalore (Aug-Sep 2026) - AI-Exploit Threat, Isolation, Identity-First Security, DPDP Act, VDI TCO, NIC ZTNA Win, Forcepoint SSE, Quarter Offers (Canonical City Edition)",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Anonymised stories: India's largest private-sector bank (biometric MFA for 90,000 staff), a largest-customers install-base slide, and a Government of India ZTNA order",
+   "client_actual": "NIC (Government of India) ZTNA order won with partner Baydata (slide 51); Reliance group and JioPC (1.6 million users)",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "BioAuth",
+    "HySecure",
+    "ZTNA",
+    "HyWorks",
+    "VDI",
+    "Enterprise Browser",
+    "Remote Browser Isolation",
+    "HyDesk",
+    "NanoOS",
+    "UEM",
+    "DaaS",
+    "Forcepoint SSE"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head",
+    "CTO"
+   ],
+   "regulations": [
+    "DPDP Act 2023",
+    "RBI"
+   ],
+   "key_problem": "AI-assisted attackers find and exploit vulnerabilities faster than EDR, WAF, SSE or patching can respond, while Indian enterprises face DPDP penalties, Windows 10 end-of-life and pressure to buy sovereign, India-built technology.",
+   "key_outcomes": [
+    "Threat section (slides 3-6): AI vulnerability discovery, open-source exposure statistics now sourced (Black Duck 2025, Sonatype 2026, Chainguard 2024), application attack scenario, why EDR/WAF/SSE/segmentation fall short",
+    "Credentials (slides 10-18): 1000+ customers, 350+ team; JioPC 1.6 million users; 'Two consecutive years in the Gartner MQ for DaaS 2026 & 2025' (slide 14) while slide 10 still says 2023 & 2024; awards slide 2023-2025 (DSCI, GEC, FWS, Nasscom, GCC, GATES); largest-customers slide",
+    "Identity (slides 19-26): identity-first statistics (22% of breaches start with credentials, 99% blocked by MFA; Verizon/Microsoft/IBM 2025), 150+ apps and Rs 2.4 crore/year lost to logins for 10,000 users, largest private bank biometric MFA story (15+ apps in 15 minutes), HyID SSO",
+    "DPDP Act slide (30): timeline (assent Aug 2023, rules Nov 2025, full compliance 13 May 2027), six principles, 72-hour breach notice, penalties up to Rs 250 crore",
+    "VDI (slides 29-41): Windows 10 EOL, PC carbon footprint, VDI use cases, 5-year TCO for 2,000 users (VDI Rs 27.21 crore vs desktops Rs 31.20 crore, Rs 3.98 crore or 13% saving), free VDI licences until the incumbent contract expires, DaaS at Rs 1,333/user/month",
+    "Zero trust and sovereignty (slides 43-53): traditional-network weaknesses, HySecure on-prem and as-a-service, 'India's largest-ever ZTNA deployment' for NIC under MeitY's MSE policy (slide 51), Accops + Forcepoint SSE architecture with Accops SaaS ZTNA 'by end of year' (slide 53)",
+    "Close (slides 54-60): enterprise browser, NanoOS/thin clients, UEM, Why Accops, booth invitation, 'Time for preference bias for Make-in-India'; then staff 'Meet' slides"
+   ],
+   "brief": "The Bangalore edition (70 slides, last saved 7 September 2026) of the 'Sovereign CIO Conclave: Driving Secure Enterprise Growth through India-Built Innovation' city roadshow, presented by Accops' co-founder & CEO. It is the latest and fullest of the Aug-Sep 2026 city decks: the AI-exploit threat opening, credentials and awards, identity-first security, DPDP Act, Windows 10 EOL and VDI TCO, zero trust and the NIC sovereignty win, Forcepoint SSE, the remaining product pillars and the quarter offers. It ends with about a dozen slides introducing the local Accops team.",
+   "use_for": "The reference edition of the 2026 city CIO roadshow deck. Slide 30 answers 'what does DPDP mean for us' (penalties, deadlines), slide 38 is the 2,000-user rupee TCO, slide 51 the NIC sovereign ZTNA win, slide 53 how Accops ZTNA works with Forcepoint SWG, slide 20 the cost of password sprawl in rupees.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "Aug-Sep 2026. The JAS-quarter offer appears twice with different terms (free legacy-app SSO for 3 months on slide 26, 6 months on slide 31). Gartner years conflict between slides 10 and 14. 'Accops SaaS ZTNA by end of year' is a roadmap claim.",
+   "superseded_by": "",
+   "confidence": 0.84,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck with time-bound offers, roadmap statements and slides giving named Accops staff their direct mobile numbers; no verified public URL.",
+   "needs_human": "Slides 61-74 give about a dozen named Accops staff with their work emails and direct mobile numbers - remove before the deck is shared with attendees. Pick one JAS offer (3 vs 6 months free SSO). Fix slide 10's Gartner years. The Chennai, Pune and Hyderabad decks are near-copies of this one; Kolkata and Mumbai V2.0 are the earlier July-August variant."
+  },
+  {
+   "source": "sharepoint/CIO Event Chennai V1.0.pptx",
+   "title": "Sovereign CIO Conclave, Chennai (August 2026) - City Copy of the Bangalore CIO Deck (AI-Exploit Threat, Identity, DPDP, VDI TCO, NIC ZTNA Win), Presented by VP Sales",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Same anonymised stories as the Bangalore edition (largest private bank biometric MFA, largest-customers slide, Government of India ZTNA order)",
+   "client_actual": "NIC ZTNA order with partner Baydata; JioPC",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "BioAuth",
+    "HySecure",
+    "ZTNA",
+    "HyWorks",
+    "VDI",
+    "Enterprise Browser",
+    "Remote Browser Isolation",
+    "HyDesk",
+    "UEM",
+    "DaaS",
+    "Forcepoint SSE"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head"
+   ],
+   "regulations": [
+    "DPDP Act 2023",
+    "RBI"
+   ],
+   "key_problem": "AI-accelerated exploitation outpaces patching and endpoint tools; Indian CIOs also face DPDP compliance, Windows 10 EOL and a sovereignty push.",
+   "key_outcomes": [
+    "62 slides; 52 match the Bangalore edition. Differences: presented by Accops' VP Sales, the 'current tools fall short' slide uses an earlier wording, 'Two consecutive years in the Gartner MQ for DaaS 2025 | 2026' (slide 14), local team slides",
+    "Carries the same DPDP Act slide (30), 2,000-user TCO (13% / Rs 3.98 crore saving), NIC ZTNA sovereignty slide (46), Forcepoint SSE slides, DaaS at Rs 1,333 and the JAS offer (free legacy-app SSO for 6 months, 50% off FY27 orders)",
+    "The 'Application Attack Scenario' slide appears twice (slides 5 and 39)"
+   ],
+   "brief": "The Chennai city edition (62 slides, last saved 12 August 2026) of the August 2026 'Sovereign CIO Conclave' roadshow deck, presented by Accops' VP Sales. Its content is the Bangalore edition with minor wording differences, a duplicated attack-scenario slide and a Chennai team section at the end.",
+   "use_for": "Only for following up the Chennai event itself. For any other use take the Bangalore edition, which has the same content and is newer.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "August 2026; carries the same time-bound JAS-quarter offers as the Bangalore deck.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck with time-bound offers and staff direct mobile numbers; no verified public URL.",
+   "needs_human": "Near-copy of 'CIO Event Bangalore V1.0.pptx' - prefer that card. The team section gives named staff their direct mobile numbers (remove before sharing), and slide 64's SDR card carries the Partner Success Manager's email address instead of her own."
+  },
+  {
+   "source": "sharepoint/CIO Event Pune V1.0.pptx",
+   "title": "Sovereign CIO Conclave, Pune (August 2026) - City Copy of the Bangalore CIO Deck (AI-Exploit Threat, Identity, DPDP, VDI TCO, NIC ZTNA Win)",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Same anonymised stories as the Bangalore edition",
+   "client_actual": "NIC ZTNA order with partner Baydata; JioPC",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "BioAuth",
+    "HySecure",
+    "ZTNA",
+    "HyWorks",
+    "VDI",
+    "Enterprise Browser",
+    "Remote Browser Isolation",
+    "HyDesk",
+    "UEM",
+    "DaaS",
+    "Forcepoint SSE"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head"
+   ],
+   "regulations": [
+    "DPDP Act 2023",
+    "RBI"
+   ],
+   "key_problem": "AI-accelerated exploitation outpaces patching and endpoint tools; Indian CIOs also face DPDP compliance, Windows 10 EOL and a sovereignty push.",
+   "key_outcomes": [
+    "63 slides; 50 match the Bangalore edition, and the differences are the local Pune team slides and earlier wording of two threat slides",
+    "Same DPDP Act slide, 2,000-user TCO (13% saving), NIC sovereignty slide, Forcepoint SSE, DaaS at Rs 1,333 and JAS offers (6 months free legacy-app SSO, 50% off FY27)"
+   ],
+   "brief": "The Pune city edition (63 slides, last saved 21 August 2026) of the August 2026 'Sovereign CIO Conclave' roadshow deck, presented by Accops' co-founder & CEO. Content is the Bangalore edition with a Pune team section at the end.",
+   "use_for": "Only for following up the Pune event. Otherwise use the Bangalore edition.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "August 2026; time-bound JAS-quarter offers.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck with time-bound offers and staff direct mobile numbers; no verified public URL.",
+   "needs_human": "Near-copy of 'CIO Event Bangalore V1.0.pptx' - prefer that card. Team slides 58-66 give named staff their direct mobile numbers; remove before sharing."
+  },
+  {
+   "source": "sharepoint/CIO Event Hyderabad V1.0.pptx",
+   "title": "Sovereign CIO Conclave, Hyderabad (August 2026) - CIO Roadshow Deck with a 'How Accops Enables DPDP Compliance' Product Mapping Slide",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Anonymised: largest private bank (biometric MFA), a private bank's 22,000 contractors on agent-less ZTNA, largest-customers slide",
+   "client_actual": "JioPC",
+   "client_named": false,
+   "products": [
+    "HyID",
+    "BioAuth",
+    "HySecure",
+    "ZTNA",
+    "HyWorks",
+    "VDI",
+    "HyDesk",
+    "Enterprise Browser",
+    "Remote Browser Isolation",
+    "UEM",
+    "DaaS",
+    "Forcepoint SSE"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head",
+    "DPO"
+   ],
+   "regulations": [
+    "DPDP Act 2023",
+    "RBI"
+   ],
+   "key_problem": "AI-accelerated exploitation outpaces patching and endpoint tools, and Indian organisations must be DPDP-compliant by May 2027.",
+   "key_outcomes": [
+    "80 slides; 51 match the Bangalore edition. Adds the ten AI-era threat types, the single-vendor slide, distributor/partner logos, 'identity for employees and contractors' and the 22,000-contractor ZTNA bank story; uses the older '2025 Gartner MQ' slide instead of 'two consecutive years'",
+    "Slide 32 'How Accops Enables DPDP Compliance' (only in this edition): HySecure (app-level access, per-session posture, time-bound vendor sessions), HyID (role-based provisioning, just-in-time privileged access, MFA, audit trails) and HyWorks VDI (data stays in the DC, clipboard/print/download blocks, watermarking, session recording) mapped to DPDP principles",
+    "Same DPDP Act overview, TCO, Forcepoint, DaaS at Rs 1,333 and JAS offers as the Bangalore edition; no NIC sovereignty slide"
+   ],
+   "brief": "The Hyderabad edition (80 slides, last saved 21 August 2026) of the August 2026 'Sovereign CIO Conclave' deck, presented by Accops' co-founder & CEO. It blends the Bangalore storyline with slides from the July-August variant (threat types, contractor ZTNA story) and adds the one slide in the city series that maps Accops products to DPDP principles. Ends with a large local team section.",
+   "use_for": "Slide 32 is the best current answer to 'how do Accops products help with DPDP compliance?' in one slide. Otherwise use the Bangalore edition.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "August 2026; time-bound JAS-quarter offers; the Gartner slide is the older 2025-only version.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck with time-bound offers and staff direct mobile numbers; no verified public URL.",
+   "needs_human": "Slide 32 (DPDP product mapping) should be copied into the Bangalore/master deck and could become a DPDP one-pager (content-gaps item 4 lists a DPDP whitepaper with no link). Team slides 66-79 give named staff their direct mobile numbers; remove before sharing."
+  },
+  {
+   "source": "sharepoint/CIO Event Kolkata V1.0.pptx",
+   "title": "Sovereign CIO Conclave, Kolkata (1 Aug 2026) - July-August Variant: AI-Exploit Threat, Identity-First Security, GlassFence Isolation, QRNG ZTNA, Forcepoint SSE, Offers",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Anonymised: India's largest private-sector bank (biometric MFA for 90,000 staff), a private bank's 22,000 contractors on agent-less ZTNA, largest-customers slide",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyID",
+    "BioAuth",
+    "HySecure",
+    "ZTNA",
+    "HyWorks",
+    "VDI",
+    "Remote Browser Isolation",
+    "GlassFence",
+    "HyDesk",
+    "Enterprise Browser",
+    "DaaS",
+    "Forcepoint SSE"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head"
+   ],
+   "regulations": [
+    "RBI"
+   ],
+   "key_problem": "AI-assisted exploitation beats patching and endpoint tools, so critical applications must be isolated from the network and every access validated.",
+   "key_outcomes": [
+    "53 slides; 35 match the July 2026 Sri Lanka/Mumbai CIO deck. Bank stories are anonymised here (the Sri Lanka copy names the banks)",
+    "Adds ten AI-era threat types, 'current tools fall short' (patching, DLP, SSE, harvest-now-decrypt-later), 'isolating the crown jewels' with remote browser isolation and VDI, and GlassFence (slides 32-35)",
+    "Accops ZTNA gateway with QRNG quantum-resistant encryption, Forcepoint SSE joint architecture, distributor/partner logos",
+    "DaaS including endpoint at Rs 1,333/user/month (the Sri Lanka copy says $21.1); JAS offers: free legacy-app SSO for 6 months, 50% off FY27, free VDI licences until the incumbent's expiry"
+   ],
+   "brief": "The Kolkata edition (53 slides, last saved 1 August 2026) of the 'Sovereign CIO Conclave' roadshow, presented by Accops' VP Sales. It is the July-August variant of the city deck: the July 2026 CIO event storyline with anonymised bank stories, plus the AI-threat and GlassFence isolation slides. It has no DPDP, TCO, awards or NIC slides (those came in the later Bangalore/Chennai/Pune editions). Ends with local team slides.",
+   "use_for": "Following up the Kolkata event, or when an 'isolate critical apps from AI-driven exploits' talk track (slides 32-36) is wanted without the DPDP/TCO material. For the fullest current version use the Bangalore edition.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "August 2026; JAS-quarter offers are time-bound.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck with time-bound offers and staff direct mobile numbers; no verified public URL.",
+   "needs_human": "Team slides 46-53 give named staff (including the CEO and co-founder) their direct mobile numbers; remove before sharing. Near-copy of 'CIO Event Mumbai V2.0.pptx' (45 of its slides match)."
+  },
+  {
+   "source": "sharepoint/CIO Event Mumbai V2.0.pptx",
+   "title": "Sovereign CIO Conclave, Mumbai V2.0 (July 2026) - July-August Variant with Public-Website Breach Scenario, GlassFence, QRNG ZTNA and Forcepoint SSE, Presented by the Co-Founder & CSO",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Anonymised: largest private-sector bank (biometric MFA), a private bank's 22,000 contractors on agent-less ZTNA, largest-customers slide",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyID",
+    "BioAuth",
+    "HySecure",
+    "ZTNA",
+    "HyWorks",
+    "VDI",
+    "Remote Browser Isolation",
+    "GlassFence",
+    "HyDesk",
+    "Enterprise Browser",
+    "DaaS",
+    "Forcepoint SSE"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head"
+   ],
+   "regulations": [
+    "RBI"
+   ],
+   "key_problem": "AI-assisted exploitation beats patching and endpoint tools; publicly exposed websites and apps become the path to a full breach.",
+   "key_outcomes": [
+    "69 slides; 45 match the Kolkata edition. Adds the two-slide public-website breach scenario (ports 8443/8080/9090 exposed, then 'all systems compromised', slides 6-7) also used in the TCS deck",
+    "Same identity, GlassFence/remote-browser-isolation, QRNG ZTNA, Forcepoint SSE, DaaS at Rs 1,333 and JAS offer slides as Kolkata",
+    "About 18 local team 'Meet' slides (50-69)"
+   ],
+   "brief": "The Mumbai V2.0 edition (69 slides, last saved 28 July 2026) of the 'Sovereign CIO Conclave' deck, presented by Accops' co-founder & Chief Strategy Officer. Same July-August variant as Kolkata plus the public-website breach scenario, followed by a long Mumbai team section.",
+   "use_for": "Following up the Mumbai Sovereign CIO Conclave. Slides 6-7 (how a public website breach spreads to the whole network) are a good opener for a CISO audience. Otherwise use the Bangalore edition.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "July 2026; JAS-quarter offers are time-bound.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck with time-bound offers and staff direct mobile numbers; no verified public URL.",
+   "needs_human": "Team slides 50-69 give about 18 named staff their direct mobile numbers; remove before sharing. Title slide spells the presenter's surname 'Bhatt' (elsewhere 'Bhat'). Is this the successor to 'CIO Association Event - Mumbai V1.0.pptx' (batch 10) or a different event?"
+  }
+ ]
+}
