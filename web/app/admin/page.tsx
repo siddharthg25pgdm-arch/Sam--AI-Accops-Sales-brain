@@ -10,12 +10,14 @@ import { cardCacheState } from "@/lib/cards-cache";
 import { allAssets, assetLink } from "@/lib/cards";
 import { apiPublishQueue } from "@/lib/api";
 import { openAICompatConfigured } from "@/lib/agent-openai";
+import { listRequests, unrequestedGaps, ACTIVE, NEXT, STATUS_LABEL, type RankedRequest, type Status } from "@/lib/requests";
+import { saveRequest, mergeRequest, promote } from "./actions";
 import { TopBar } from "@/components/TopBar";
 import { Sparkline, Meter, DailyColumns, BarList, Heatmap, Histogram, num, ms } from "@/components/charts";
 
 export const dynamic = "force-dynamic";
 
-const TABS = [["overview", "Overview"], ["usage", "Usage"], ["quality", "Quality"], ["content", "Content"], ["system", "System"], ["conversations", "Conversations"]] as const;
+const TABS = [["overview", "Overview"], ["usage", "Usage"], ["quality", "Quality"], ["content", "Content"], ["requests", "Requests"], ["system", "System"], ["conversations", "Conversations"]] as const;
 type Tab = (typeof TABS)[number][0];
 const PERIODS = [7, 30, 90] as const;
 // A channel is a first-class dimension: the public website chatbot (docs/NOTE-website-chatbot.md)
@@ -49,7 +51,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<SP
   const includeTest = one(sp.test) === "1";
   const href = (o: Record<string, string | number | null>) => {
     const u = new URLSearchParams();
-    const cur: Record<string, string> = { tab, days: String(days), test: includeTest ? "1" : "", f: one(sp.f), ch: one(sp.ch), user: one(sp.user), limit: one(sp.limit) };
+    const cur: Record<string, string> = { tab, days: String(days), test: includeTest ? "1" : "", f: one(sp.f), ch: one(sp.ch), user: one(sp.user), limit: one(sp.limit), rv: one(sp.rv) };
     for (const [k, v] of Object.entries({ ...cur, ...Object.fromEntries(Object.entries(o).map(([k, v]) => [k, v == null ? "" : String(v)])) })) {
       if (v && !(k === "tab" && v === "overview") && !(k === "days" && v === "30")) u.set(k, v);
     }
@@ -83,7 +85,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<SP
           </div>
         </header>
         <nav className="tabs-dash" aria-label="Dashboard sections">
-          {TABS.map(([k, label]) => <Link key={k} href={href({ tab: k, f: null, ch: null, user: null, limit: null })} aria-current={k === tab ? "page" : undefined}>{label}</Link>)}
+          {TABS.map(([k, label]) => <Link key={k} href={href({ tab: k, f: null, ch: null, user: null, limit: null, rv: null })} aria-current={k === tab ? "page" : undefined}>{label}</Link>)}
           <span className="spacer" />
           {/* Retyping a number out of a dashboard is how it gets transcribed wrong into a deck. */}
           <span className="export">CSV <a href="/api/v1/export?set=metrics">metrics</a> <a href="/api/v1/export?set=assets">assets</a> <a href="/api/v1/export?set=gaps">registry</a></span>
@@ -92,10 +94,11 @@ export default async function Admin({ searchParams }: { searchParams: Promise<SP
         {!persistent() && <div className="notice">Events are held in memory only. Add SUPABASE_URL and SUPABASE_SERVICE_KEY, run the docs/supabase-sam-*.sql files, and this becomes permanent.</div>}
         {persistent() && !d && tab !== "conversations" && tab !== "system" && <div className="notice">The dashboard query failed. Check that docs/supabase-sam-observability.sql has been applied; the server log has the status code.</div>}
 
-        {tab === "overview" && d && <Overview d={d} days={days} href={href} />}
+        {tab === "overview" && d && <Overview d={d} days={days} href={href} includeTest={includeTest} />}
         {tab === "usage" && d && <Usage d={d} href={href} />}
         {tab === "quality" && d && <Quality d={d} />}
         {tab === "content" && d && <Content d={d} />}
+        {tab === "requests" && d && <RequestsTab d={d} sp={sp} days={days} includeTest={includeTest} href={href} />}
         {tab === "system" && <System includeTest={includeTest} />}
         {tab === "conversations" && <Conversations sp={sp} days={days} includeTest={includeTest} href={href} />}
 
@@ -197,7 +200,7 @@ async function DeletionBanner() {
 
 // ------------------------------------------------------------------------------------------- overview
 
-async function Overview({ d, days, href }: { d: Dashboard; days: number; href: (o: Record<string, string | number | null>) => string }) {
+async function Overview({ d, days, href, includeTest }: { d: Dashboard; days: number; href: (o: Record<string, string | number | null>) => string; includeTest: boolean }) {
   const c = d.summary.cur, p = d.summary.prev, r = rates(d);
   const pubQueue = await apiPublishQueue();
   const prevLabel = `previous ${days} days`;
@@ -236,6 +239,8 @@ async function Overview({ d, days, href }: { d: Dashboard; days: number; href: (
           deltaEl={<DeltaText d={(c.latency_n ?? 0) >= MIN_N && (p.latency_n ?? 0) >= MIN_N ? delta(c.p95 ?? null, p.p95 ?? null, "%") : null} goodWhen="down" prevLabel={prevLabel} />}
           foot={<>p50 {ms(c.p50)} · n = {num(c.latency_n)}</>} />
       </div>
+
+      <RequestsStrip d={d} includeTest={includeTest} href={href} />
 
       <Section title="Questions per day" sub="Every question on every channel, and how many SAM answered.">
         <DailyColumns days={d.daily} />
@@ -465,6 +470,150 @@ async function Content({ d }: { d: Dashboard }) {
   );
 }
 
+// ------------------------------------------------------------------------------------------- requests
+
+const REQ_CHANNELS: Record<string, string> = { ...CHANNELS, gap: "Asked SAM" };
+const ALL_STATUSES: Status[] = ["open", "planned", "in_progress", "done", "declined", "merged"];
+const facetLine = (r: { asset_type: string | null; product: string | null; vertical: string | null }) => [r.asset_type, r.product, r.vertical].filter(Boolean).join(" · ");
+
+/** The Overview's headline for requests: how many are open, how many reps wait, what is most wanted. */
+async function RequestsStrip({ d, includeTest, href }: { d: Dashboard; includeTest: boolean; href: (o: Record<string, string | number | null>) => string }) {
+  const all = await listRequests({ includeTest, statuses: ALL_STATUSES });
+  if (!all) return null; // table not there yet: say nothing rather than zeros
+  const active = all.filter(r => ACTIVE.includes(r.status));
+  const waiting = new Set(active.flatMap(r => r.votes.map(v => v.user_id))).size;
+  const top = active[0];
+  const unrequested = unrequestedGaps(d.gaps, all.map(r => r.topic_key));
+  return (
+    <div className="kpis three">
+      <Kpi label="Open content requests" value={<b className="kv">{num(active.length)}</b>} foot={<>{num(waiting)} {waiting === 1 ? "rep" : "reps"} waiting · <Link href={href({ tab: "requests" })}>Open the queue</Link></>} />
+      <Kpi label="Most wanted" value={top ? <b className="kv small">{top.title}</b> : <b className="kv muted">–</b>}
+        foot={top ? <>{top.demand} {top.demand === 1 ? "rep" : "reps"} · {STATUS_LABEL[top.status]}</> : "Nothing requested yet"} />
+      <Kpi label="Asked for, never requested" value={<b className="kv">{num(unrequested.length)}</b>} foot="content gaps nobody has turned into a request" />
+    </div>
+  );
+}
+
+async function RequestsTab({ d, sp, days, includeTest, href }: { d: Dashboard; sp: SP; days: number; includeTest: boolean; href: (o: Record<string, string | number | null>) => string }) {
+  const all = await listRequests({ includeTest, statuses: ALL_STATUSES });
+  if (!all) return <div className="notice">Content requests are not set up yet. Apply <code>docs/supabase-sam-content-requests.sql</code>.</div>;
+  const VIEWS = [["active", "Active"], ["done", "Delivered"], ["declined", "Declined"], ["all", "All"]] as const;
+  const view = VIEWS.find(v => v[0] === one(sp.rv))?.[0] ?? "active";
+  const live = all.filter(r => r.status !== "merged");
+  const active = live.filter(r => ACTIVE.includes(r.status));
+  const shown = view === "active" ? active : view === "all" ? live : live.filter(r => r.status === view);
+  const from = new Date(Date.now() - days * 86_400_000).toISOString();
+  const delivered = live.filter(r => r.status === "done" && (r.closed_at ?? "") >= from).length;
+  const waiting = new Set(active.flatMap(r => r.votes.map(v => v.user_id))).size;
+  const gaps = unrequestedGaps(d.gaps, all.map(r => r.topic_key));
+  const backQ = new URLSearchParams(href({}).split("?")[1] ?? "").toString();
+  const ok = one(sp.ok), err = one(sp.err);
+  return (
+    <>
+      {ok && <p className="ok-note" role="status">{ok}</p>}
+      {err && <div className="notice" role="alert">{err}</div>}
+      <div className="kpis three">
+        <Kpi label="Active requests" value={<b className="kv">{num(active.length)}</b>} foot="open, planned or in progress" />
+        <Kpi label="Reps waiting" value={<b className="kv">{num(waiting)}</b>} foot="distinct people on an active request" />
+        <Kpi label={`Delivered, last ${days} days`} value={<b className="kv">{num(delivered)}</b>} foot="each rep who asked was told" />
+      </div>
+
+      <Section title="Requests, ranked by demand" sub="Demand is distinct reps: one person asking five ways counts once. Repeat asks for the same kind of document merge automatically; merge anything the matching missed."
+        aside={<nav className="seg small" aria-label="Show">{VIEWS.map(([k, l]) => <Link key={k} href={href({ rv: k === "active" ? null : k, ok: null, err: null })} aria-current={k === view ? "true" : undefined}>{l}</Link>)}</nav>}>
+        {shown.length === 0 ? <Empty>{view === "active" ? "No open requests. When a rep asks marketing to create something, it appears here." : "Nothing here yet."}</Empty> : (
+          <ol className="reqs">
+            {shown.map(r => <RequestItem key={r.id} r={r} others={active.filter(x => x.id !== r.id)} back={backQ} />)}
+          </ol>
+        )}
+      </Section>
+
+      <Section title="Asked for, never requested" sub="The weaker, automatic signal: people asked SAM for these in this period and did not get them, but nobody asked marketing. Promote one to put it in the queue; the people who asked will hear when it is delivered.">
+        {gaps.length === 0 ? <Empty>Every content gap in this period is already a request, or there were none.</Empty> : (
+          <table><thead><tr><th>Wanted</th><th className="r">People</th><th className="r">Asks</th><th>Last asked</th><th /></tr></thead>
+            <tbody>{gaps.slice(0, 15).map(g => (
+              <tr key={g.key}>
+                <td>{g.title}<div className="subline">{[facetLine(g.facets), g.examples.filter(x => x !== g.title).slice(0, 1).map(x => `“${x}”`)[0]].filter(Boolean).join(" · ")}</div></td>
+                <td className="r">{g.users.length}</td><td className="r">{g.asks}</td><td className="nowrap">{fmtDate(g.lastSeen)}</td>
+                <td className="r">
+                  <form action={promote}>
+                    <input type="hidden" name="key" value={g.key} /><input type="hidden" name="title" value={g.title} />
+                    <input type="hidden" name="users" value={JSON.stringify(g.users)} /><input type="hidden" name="example" value={g.examples[0] ?? ""} />
+                    <input type="hidden" name="back" value={backQ} />
+                    <button className="btn-line" type="submit">Make it a request</button>
+                  </form>
+                </td>
+              </tr>
+            ))}</tbody></table>
+        )}
+      </Section>
+    </>
+  );
+}
+
+function RequestItem({ r, others, back }: { r: RankedRequest; others: RankedRequest[]; back: string }) {
+  const active = ACTIVE.includes(r.status);
+  const options = [r.status, ...NEXT[r.status]];
+  return (
+    <li id={`r${r.id}`}>
+      <div className="demand"><b>{r.demand}</b><span>{r.demand === 1 ? "rep" : "reps"}</span></div>
+      <div>
+        <div className="rq-top">
+          <h3>{r.title}</h3>
+          <span className={`pill ${r.status === "done" ? "good" : r.status === "declined" ? "bad" : r.status === "open" ? "warn" : ""}`}>{STATUS_LABEL[r.status]}</span>
+          {r.source === "gap" && <span className="pill">from a gap</span>}
+          {r.is_test && <span className="pill">test</span>}
+        </div>
+        <div className="rq-meta">
+          {facetLine(r) && <span>{facetLine(r)}</span>}
+          <span>First asked {fmtDate(r.firstAsked)}</span>
+          {r.lastAsked !== r.firstAsked && <span>Last asked {fmtDate(r.lastAsked)}</span>}
+          <span>{r.channels.map(c => REQ_CHANNELS[c] ?? c).join(", ")}</span>
+          {r.owner && <span>Owner {r.owner}</span>}
+          {r.due_date && active && <span>Due {fmtDateY(r.due_date)}</span>}
+        </div>
+        {(r.examples.length > 0 || r.notes_from_reps.length > 0) && (
+          <ul className="rq-ex">
+            {r.examples.map(q => <li key={q}>{q}</li>)}
+            {r.notes_from_reps.map((n, i) => <li key={i} className="note">Note: {n}</li>)}
+          </ul>
+        )}
+        {r.status === "done" && r.delivered_url && <p className="subline">Delivered: <a href={r.delivered_url} target="_blank" rel="noreferrer">{r.delivered_title ?? r.delivered_url}</a> · {fmtDate(r.closed_at)}</p>}
+        {r.status === "declined" && <p className="subline">Declined: {r.decline_reason}</p>}
+        <details className="rq-edit">
+          <summary>{active ? "Update" : "Details"}</summary>
+          <form action={saveRequest} className="rq-form">
+            <input type="hidden" name="id" value={r.id} /><input type="hidden" name="back" value={back} />
+            <label>Status
+              <select name="status" defaultValue={r.status}>{options.map(s => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}</select>
+            </label>
+            <label>Owner<input name="owner" defaultValue={r.owner ?? ""} placeholder="Who in marketing" /></label>
+            <label>Due<input type="date" name="due_date" defaultValue={r.due_date ?? ""} /></label>
+            <label className="half">Delivered asset title<input name="delivered_title" defaultValue={r.delivered_title ?? ""} placeholder="Needed to mark it delivered" /></label>
+            <label>Link to it<input type="url" name="delivered_url" defaultValue={r.delivered_url ?? ""} placeholder="https://" /></label>
+            <label className="wide">Reason, if declining<input name="decline_reason" defaultValue={r.decline_reason ?? ""} placeholder="The reps who asked will read this" /></label>
+            <label className="wide">Notes for marketing<textarea name="notes" rows={2} defaultValue={r.notes ?? ""} /></label>
+            <div className="actions">
+              <button className="btn-accent" type="submit">Save</button>
+              <span className="hint">Delivered needs a title and a link; everyone who asked sees it, on WhatsApp too.</span>
+            </div>
+          </form>
+          {active && others.length > 0 && (
+            <form action={mergeRequest} className="rq-merge">
+              <input type="hidden" name="id" value={r.id} /><input type="hidden" name="back" value={back} />
+              <span>Same as another request?</span>
+              <select name="into" aria-label="Merge into" defaultValue="">
+                <option value="" disabled>Choose one</option>
+                {others.map(o => <option key={o.id} value={o.id}>{o.title} ({o.demand})</option>)}
+              </select>
+              <button className="btn-line" type="submit">Merge into it</button>
+            </form>
+          )}
+        </details>
+      </div>
+    </li>
+  );
+}
+
 // ------------------------------------------------------------------------------------------- system
 
 async function System({ includeTest }: { includeTest: boolean }) {
@@ -557,6 +706,7 @@ async function Conversations({ sp, days, includeTest, href }: { sp: SP; days: nu
                     {gap && <span className="pill warn">gap</span>}
                     {fb.map((x, i) => <span key={i} className={`pill ${x.feedback === "helpful" ? "good" : "warn"}`}>{x.feedback === "helpful" ? "Helpful" : x.feedback === "wrong_asset" ? "Wrong asset" : "Doesn't exist"}</span>)}
                     {opened && <span className="pill good">Opened</span>}
+                    {r.reactions.some(x => x.kind === "request") && <span className="pill good">Asked marketing</span>}
                   </div>
                   <p className="cq">{r.query}</p>
                   {r.answer ? (

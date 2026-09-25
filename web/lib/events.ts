@@ -30,7 +30,7 @@ export function providerFailure(failures: { model: string; message: string; time
 
 export type SamEvent = {
   id?: number; created_at?: string; user_id: string; channel?: string; session_id?: string | null;
-  kind: "query" | "feedback" | "catalogue_open" | "gap";
+  kind: "query" | "feedback" | "catalogue_open" | "gap" | "request";
   query?: string | null; intent?: string | null; filters?: Record<string, unknown> | null;
   result_count?: number | null; result_ids?: string[] | null; runtime?: string | null; latency_ms?: number | null;
   feedback?: "helpful" | "wrong_asset" | "missing" | null; ref_event_id?: number | null; asset_path?: string | null;
@@ -64,6 +64,12 @@ async function isTest(e: SamEvent): Promise<boolean> {
     const { headers } = await import("next/headers");
     return (await headers()).get("x-sam-test") === "1";
   } catch { return false; } // outside a request (cron, script): no header to read
+}
+
+/** The same rule for things that are not events: a content request from local dev or a test identity
+ *  is a test request, and never reaches marketing's queue. */
+export function testTraffic(user_id: string): Promise<boolean> {
+  return isTest({ user_id, kind: "request" });
 }
 
 // One buffer per process, not per route bundle: Next.js gives each route its own module instance,

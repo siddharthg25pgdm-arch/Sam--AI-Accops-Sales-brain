@@ -277,7 +277,8 @@ export type SearchHit = { asset: Asset; score: number; why: string };
 // matched the whole library on it; "vs"/"versus" and question words likewise.
 const STOP = new Set(["the", "for", "and", "with", "need", "want", "any", "have", "our", "case", "study", "studies", "whitepaper",
   "please", "pls", "can", "you", "find", "give", "send", "show", "accops", "vs", "versus", "what", "which", "does", "about",
-  "something", "anything", "from", "that", "this", "some", "latest", "newest", "recent", "current"]);
+  "something", "anything", "from", "that", "this", "some", "latest", "newest", "recent", "current",
+  "newer", "older", "shorter", "longer", "smaller", "else", "instead", "similar"]);
 // Words naming a KIND of document. They still score (typeHit below depends on them), but an asset
 // matching only these has matched nothing the rep asked about: "do we have a SOC 2 report" should
 // not return every analyst report. When a query is nothing but type words ("decks"), they qualify.

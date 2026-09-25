@@ -24,6 +24,8 @@ export const DEFINITIONS: [string, string][] = [
   ["Change", "Compared with the previous period of the same length, ending the same number of hours ago. Counts show % change; rates show the difference in percentage points. No change is shown without a baseline, and rates need at least 10 in both periods."],
   ["Rates with small n", `Below ${MIN_N}, a rate is shown as a fraction (3 of 4) rather than a percentage, because one more question would move it by more than ten points.`],
   ["Time zone", "Days, hours and the activity heatmap are in India Standard Time."],
+  ["Content gap", "A question where the exact thing asked for is not in the library. Since 25 Sep 2026 this includes answers that showed substitutes (\"No Browser Isolation brochure; closest: ...\"), so those count as not answered."],
+  ["Content request", "A rep pressed Ask marketing to create this (or replied REQUEST on WhatsApp, or used the API or MCP tool). Repeat asks for the same kind of document (type, product, industry, topic) merge onto one request. Demand is the number of distinct reps on it."],
 ];
 
 export type Summary = {

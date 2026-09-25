@@ -5,6 +5,7 @@ import { recentEvents, realOnly } from "@/lib/events";
 import { TopBar } from "@/components/TopBar";
 import { openAICompatConfigured } from "@/lib/agent-openai";
 import { Shell } from "@/components/Shell";
+import { unseenDeliveries } from "@/lib/requests";
 
 export const dynamic = "force-dynamic";
 
@@ -23,10 +24,13 @@ export default async function Home() {
     }).length;
     return { ...g, asked };
   }).sort((a, b) => (b.asked ?? 0) - (a.asked ?? 0));
+  // What marketing delivered since this rep last looked: a quiet notice at the top of the chat.
+  const deliveries = (await unseenDeliveries(user.id)).map(m => ({ voteId: m.id, title: m.request.title,
+    deliveredTitle: m.request.delivered_title ?? m.request.title, url: m.request.delivered_url ?? "/requests" }));
   return (
     <>
       <TopBar user={user} current="home" />
-      <Shell assets={assets} facets={facets} gaps={gaps} hasModel={Boolean(process.env.ANTHROPIC_API_KEY) || openAICompatConfigured()} />
+      <Shell assets={assets} facets={facets} gaps={gaps} deliveries={deliveries} hasModel={Boolean(process.env.ANTHROPIC_API_KEY) || openAICompatConfigured()} />
     </>
   );
 }

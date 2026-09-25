@@ -52,13 +52,14 @@ export async function askAndLog(question: string, who: string, channel: Channel,
     result_count: r.assets.length, result_ids: r.assets.map(a => a.path ?? a.title), result_titles: r.assets.map(a => a.title),
     runtime: r.runtime, model: r.model, answer: r.text, error_kind: r.error?.kind ?? null, error_detail: r.error?.detail ?? null,
     latency_ms: Date.now() - t0 });
-  if (r.zero) await logEvent({ user_id: who, channel, session_id: sessionId ?? null, kind: "gap", query: question, filters: r.filters, ref_event_id: eventId });
+  // missing, not zero: substitutes shown for an absent document are still a gap in the library.
+  if (r.missing) await logEvent({ user_id: who, channel, session_id: sessionId ?? null, kind: "gap", query: question, filters: r.filters, ref_event_id: eventId });
   return { r, eventId };
 }
 
 export async function apiAsk(question: string, who: string, channel: Channel, history: { role: "user" | "assistant"; content: string }[] = [], sessionId?: string | null) {
   const { r, eventId } = await askAndLog(question, who, channel, history, sessionId);
-  return { answer: r.text, assets: r.assets, gap: r.zero, runtime: r.runtime, model: r.model, trace: r.trace, event_id: eventId };
+  return { answer: r.text, assets: r.assets, gap: r.zero, missing: r.missing, runtime: r.runtime, model: r.model, trace: r.trace, event_id: eventId };
 }
 
 export function apiAssets(p: { vertical?: string; type?: string; product?: string }) {

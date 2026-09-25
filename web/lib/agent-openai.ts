@@ -11,7 +11,7 @@
  *  "openai-compatible" with the model name - it used to say "claude", which made every dashboard
  *  number about "Claude" actually about Groq. */
 import { VERTICALS, PRODUCTS, type SearchHit } from "./cards";
-import { SYSTEM, ASSET_TYPES, MAX_SEARCHES, BUDGET_USED, SEED_STEP, runSearch, seedSearch, finish, type AskResult } from "./agent";
+import { SYSTEM, ASSET_TYPES, MAX_SEARCHES, BUDGET_USED, SEED_STEP, runSearch, seedSearch, searchText, finish, type AskResult } from "./agent";
 import type { AskError } from "./events";
 
 type Msg = { role: "system" | "user" | "assistant" | "tool"; content: string | null; tool_calls?: ToolCall[]; tool_call_id?: string; name?: string };
@@ -64,17 +64,18 @@ export async function askOpenAICompat(question: string, history: { role: "user" 
   const trace: AskResult["trace"] = [];
   const pool: SearchHit[] = [];
   // The retrieval floor (see seedSearch): the rep's own words, searched before the model says anything.
-  const seed = seedSearch(question);
+  const sq = searchText(question, history); // what to search for: a short follow-up carries the previous question
+  const seed = seedSearch(sq);
   if (seed) {
     pool.push(...seed.hits);
     trace.push({ step: SEED_STEP, detail: JSON.stringify(seed.input) }, { step: "tool result", detail: `${seed.hits.length} of ${seed.considered} assets${seed.note ? ` - ${seed.note}` : ""}` });
-    messages.push({ role: "assistant", content: null, tool_calls: [{ id: "seed", type: "function", function: { name: "search_assets", arguments: JSON.stringify({ query: question }) } }] },
+    messages.push({ role: "assistant", content: null, tool_calls: [{ id: "seed", type: "function", function: { name: "search_assets", arguments: JSON.stringify({ query: sq }) } }] },
       { role: "tool", tool_call_id: "seed", name: "search_assets", content: seed.payload });
   }
   let filters: Record<string, unknown> = seed ? { ...seed.input } : {}, calls = seed ? 1 : 0, tokens = 0;
   const done = (text: string, error: AskError | null) => {
     trace.push({ step: "model", detail: `${model} (openai-compatible) · ${((Date.now() - t0) / 1000).toFixed(1)}s · ${tokens} tokens` });
-    return finish({ question, text, pool, calls, runtime: "openai-compatible", model, trace, filters, error });
+    return finish({ question: sq, text, pool, calls, runtime: "openai-compatible", model, trace, filters, error });
   };
   for (let round = 0; ; round++) {
     // The last round runs with tools off, so the model must answer from what it found. Before, it
@@ -109,7 +110,7 @@ export async function askOpenAICompat(question: string, history: { role: "user" 
       try { raw = JSON.parse(tc.function.arguments || "{}"); } catch { /* bad JSON from the model: treat as empty */ }
       // Parallel calls past the budget get told so rather than run: every result is re-sent each round.
       if (calls >= MAX_SEARCHES) { messages.push({ role: "tool", tool_call_id: tc.id, name: "search_assets", content: JSON.stringify({ note: BUDGET_USED }) }); continue; }
-      const s = runSearch(raw, question);
+      const s = runSearch(raw, sq);
       calls++; filters = { ...s.input };
       pool.push(...s.hits);
       trace.push({ step: "tool call: search_assets", detail: JSON.stringify(s.input) }, { step: "tool result", detail: `${s.hits.length} of ${s.considered} assets${s.note ? ` - ${s.note}` : ""}` });

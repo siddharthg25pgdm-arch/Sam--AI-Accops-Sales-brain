@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
-import type { SlimAsset, Facets, Gap } from "@/lib/types";
+import type { SlimAsset, Facets, Gap, Delivery } from "@/lib/types";
 import { Chat } from "./Chat";
 import { Catalogue } from "./Catalogue";
 
-export function Shell({ assets, facets, gaps, hasModel }: { assets: SlimAsset[]; facets: Facets; gaps: Gap[]; hasModel: boolean }) {
+export function Shell({ assets, facets, gaps, hasModel, deliveries = [] }: { assets: SlimAsset[]; facets: Facets; gaps: Gap[]; hasModel: boolean; deliveries?: Delivery[] }) {
   const [view, setView] = useState<"chat" | "catalogue">("chat");
   const [prefill, setPrefill] = useState<{ vertical?: string; type?: string; product?: string } | null>(null);
   return (
@@ -15,7 +15,7 @@ export function Shell({ assets, facets, gaps, hasModel }: { assets: SlimAsset[];
       </div>
       <main className="shell" data-view={view}>
         <section className="pane-chat" aria-label="Ask SAM">
-          <Chat hasModel={hasModel} onBrowse={(f) => { setPrefill(f); setView("catalogue"); }} />
+          <Chat hasModel={hasModel} deliveries={deliveries} onBrowse={(f) => { setPrefill(f); setView("catalogue"); }} />
         </section>
         <section className="pane-cat" aria-label="Catalogue">
           <Catalogue assets={assets} facets={facets} gaps={gaps} prefill={prefill} />
