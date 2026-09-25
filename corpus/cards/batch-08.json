@@ -1753,6 +1753,471 @@
       "visibility": "internal",
       "internal_reason": "Superseded edition.",
       "needs_human": "Retire or move to an archive folder so reps don't send the older label."
+    },
+    {
+      "source": "sharepoint/VDI Like A Pro Survey EUC 2021.pdf",
+      "title": "VDI Like A Pro: End User Computing State of the Union Survey 2021 (Independent Third-Party Report, 1,647 Respondents)",
+      "asset_type": "Analyst Report",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "VDI",
+        "DaaS"
+      ],
+      "competitors": [
+        "Citrix",
+        "VMware",
+        "Microsoft",
+        "Azure Virtual Desktop",
+        "Nutanix Frame",
+        "AWS WorkSpaces"
+      ],
+      "personas": [
+        "Head of Infrastructure",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "EUC and VDI teams want independent data on what the market actually deploys - brokers, protocols, hypervisors, profiles, GPUs, DaaS adoption and top challenges - rather than vendor claims.",
+      "key_outcomes": [
+        "1,647 respondents worldwide (largest share North America, 11.6% Netherlands); eighth edition since 2012",
+        "DaaS / broker use: Microsoft WVD 26.92%, Citrix combined 30.77% (Citrix VADs 14.93%, Citrix Cloud 11.54%), VMware 9.27%, Nutanix Frame 8.60%, Amazon WorkSpaces 6.79%",
+        "Top reason for DaaS: supporting work from home (23.76%); IT runs the IaaS in 67.05% of cases",
+        "Top on-prem VDI challenges: UC voice / webcam user experience (13.86%), session density (11.11%), cost and security (10.71% each)",
+        "Unified communications in VDI up from 13.4% (2014) to 60.06% (2021); FSLogix at 23.11%; profiles 1-5 GB for 28.64%",
+        "Protocols: Citrix HDX 36.35%, RDP 17.95%, HDX with EDT 11.01%, VMware Blast 9.20%; 52.16% of cloud VDI uses no GPU; 69.39% of apps are Windows apps"
+      ],
+      "brief": "The April 2021 (version 1.0) edition of the independent, community-run 'End User Computing - State of the Union' survey by VDI Like A Pro (authors Ruben Spruijt, Christiaan Brinkhoff, Mark Plettenberg; supported by Login VSI). It reports 1,647 practitioners' answers on operating systems, on-prem session brokers, pooled vs personal desktops, workload location, challenges, hypervisors, server and storage hardware, remoting protocols, GPUs, app layering, profile management and size, imaging, printing, unified communications, app virtualisation, load testing, BCP, patching, monitoring, antivirus, endpoints, displays, workspace portals, browsers and public-cloud DaaS use cases, challenges and strategy. Accops is not mentioned.",
+      "use_for": "Background market data for a VDI / DaaS pitch or content piece - e.g. 'UC performance and session density are the top VDI pain points' or broker market shares. Third-party copyright: the report forbids publishing or distributing its content without approval, so cite, don't forward.",
+      "publish_year": "2021",
+      "expired": false,
+      "stale_risk": "April 2021 data, heavily shaped by pandemic WFH; WVD has since become Azure Virtual Desktop, VMware EUC is now Omnissa, and Citrix packaging has changed. Newer editions of the survey likely exist.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Third-party copyrighted report; the authors prohibit partial publication or distribution without approval. No Accops content.",
+      "needs_human": "Reference material rather than sales collateral; consider whether it should be answerable at all."
+    },
+    {
+      "source": "sharepoint/Magic_Quadrant_for_D_785003_ndx.pdf",
+      "title": "Gartner Magic Quadrant for Desktop as a Service, 5 September 2023 (Inaugural Edition; Accops an Honorable Mention)",
+      "asset_type": "Analyst Report",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "DaaS",
+        "VDI"
+      ],
+      "competitors": [
+        "Microsoft",
+        "Citrix",
+        "VMware",
+        "AWS WorkSpaces",
+        "Alibaba Cloud",
+        "Anunta",
+        "Apporto",
+        "ATSG",
+        "Dizzion",
+        "Flexxible",
+        "Nutanix Frame",
+        "IronOrbit",
+        "oneclick",
+        "Workspot"
+      ],
+      "personas": [
+        "CIO",
+        "Head of Infrastructure",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "Digital-workplace leaders selecting a DaaS vendor need an analyst view of the market; this is Gartner's first Magic Quadrant for DaaS, replacing the Market Guide.",
+      "key_outcomes": [
+        "Gartner document G00785003, published 5 September 2023; first DaaS Magic Quadrant, replacing the Market Guide",
+        "Leaders: Citrix, Microsoft, VMware; Challengers: AWS, ATSG; Niche Players include Alibaba Cloud, Anunta, Apporto, Dizzion, Flexxible, Frame, IronOrbit, oneclick, Workspot",
+        "Accops is an Honorable Mention, 'due to its potential to scale and disrupt, primarily in the Asia and Latin American markets'; did not qualify on DaaS user volume",
+        "Gartner describes Accops as offering VDI, workspace software, zero trust, remote browser isolation, MFA and endpoint hardware, on-prem or public cloud, with DaaS added in 2021; clients mainly India and Japan, expanding to the Middle East",
+        "Planning assumption: by 2026, 80% of DaaS purchases will be vendor-assembled or vendor-managed (vs under 20% in 2023)"
+      ],
+      "brief": "Gartner's inaugural Magic Quadrant for Desktop as a Service (35 pages), licensed to an Accops employee. It defines DaaS, lists must-have and standard capabilities, profiles 14 vendors with strengths and cautions, gives inclusion and exclusion criteria, and names Accops among honorable mentions with the reason it did not qualify (volume of users on its relatively new DaaS service). The other honorable mentions include Nerdio as a DaaS optimisation tool.",
+      "use_for": "Internal context on how Gartner saw the DaaS market and Accops in 2023. For current analyst standing use the 2025 Magic Quadrant, in which Accops is placed.",
+      "publish_year": "2023",
+      "expired": false,
+      "stale_risk": "Superseded twice: the September 2024 MQ (Accops still an Honorable Mention) and the August 2025 MQ (Accops placed). VMware's DaaS business is now Omnissa.",
+      "superseded_by": "sharepoint/MQ for DaaS 2025.pdf - the 11 August 2025 Magic Quadrant for DaaS (carded in batch-05).",
+      "confidence": 0.93,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Licensed Gartner research restricted to the personal use of a named Accops employee; must not be forwarded.",
+      "needs_human": "",
+      "third_party_copyright": "Gartner, Inc. Document G00785003. Licensed research restricted to the named subscriber; Gartner reprint rights needed for any external use."
+    },
+    {
+      "source": "sharepoint/Magic_Quadrant_for_D_802050_ndx.pdf",
+      "title": "Gartner Magic Quadrant for Desktop as a Service, 16 September 2024 (Accops an Honorable Mention)",
+      "asset_type": "Analyst Report",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "DaaS",
+        "VDI"
+      ],
+      "competitors": [
+        "Microsoft",
+        "Citrix",
+        "Omnissa",
+        "AWS WorkSpaces",
+        "Dizzion",
+        "Parallels",
+        "ATSG",
+        "Alibaba Cloud",
+        "Anunta",
+        "Apporto",
+        "Flexxible",
+        "IronOrbit",
+        "oneclick",
+        "Workspot",
+        "Google"
+      ],
+      "personas": [
+        "CIO",
+        "Head of Infrastructure",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "DaaS is now deployed in many organisations but to only a minority of employees; buyers want Gartner's assessment of vendors, with sustainability emerging as a use case alongside secure remote work.",
+      "key_outcomes": [
+        "Gartner document G00802050, 16 September 2024 (second DaaS Magic Quadrant)",
+        "Leaders: AWS, Citrix, Microsoft, Omnissa; Challenger: ATSG; Visionaries: Dizzion, Parallels; Niche Players include Alibaba Cloud, Anunta, Apporto, Flexxible, IronOrbit, oneclick, Workspot",
+        "Accops is an Honorable Mention 'due to its potential to scale and disrupt, primarily in Asian, Middle Eastern and Latin American markets'; did not meet the inclusion criteria for number of users",
+        "Gartner's description of Accops: VDI, workspace software, zero trust, remote browser isolation, MFA, endpoint hardware; DaaS since 2021; clients mainly India, the Middle East and Japan",
+        "Also notes Google's 2024 acquisition of Cameyo among honorable mentions"
+      ],
+      "brief": "The 2024 edition of Gartner's Magic Quadrant for Desktop as a Service (40 pages): market definition, must-have capabilities, 14 vendor profiles with strengths and cautions, inclusion criteria and honorable mentions. Compared with 2023, Accops' honorable-mention text adds the Middle East as a primary client region. The copy in SharePoint is watermarked as licensed to a Gartner staff email address rather than an Accops subscriber.",
+      "use_for": "Internal context only: Gartner's 2024 view of the DaaS market and of Accops. Use the 2025 Magic Quadrant for current standing.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Superseded by the August 2025 Magic Quadrant, in which Accops is placed rather than an honorable mention.",
+      "superseded_by": "sharepoint/MQ for DaaS 2025.pdf - the 11 August 2025 Magic Quadrant for DaaS (carded in batch-05).",
+      "confidence": 0.93,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Licensed Gartner research; this copy is watermarked for the personal use of a Gartner employee and must not be redistributed.",
+      "needs_human": "This copy is licensed to a Gartner staff member's personal use (watermark), not to an Accops subscriber - check with Gartner whether Accops may keep it in a shared library.",
+      "third_party_copyright": "Gartner, Inc. Document G00802050. Licensed research restricted to the named user; reprint rights needed for any external use."
+    },
+    {
+      "source": "sharepoint/Voice_of_the_Custome_772112_ndx.pdf",
+      "title": "Gartner Peer Insights 'Voice of the Customer' for Access Management, 26 April 2023 (Includes an Accops Vendor Summary)",
+      "asset_type": "Analyst Report",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyID",
+        "MFA",
+        "BioAuth"
+      ],
+      "competitors": [
+        "Amazon Web Services",
+        "Cisco",
+        "ForgeRock",
+        "IBM",
+        "Microsoft",
+        "Okta",
+        "One Identity",
+        "Oracle",
+        "Ping Identity",
+        "RSA",
+        "Thales",
+        "WSO2"
+      ],
+      "personas": [
+        "CISO",
+        "IT head",
+        "procurement"
+      ],
+      "regulations": [],
+      "key_problem": "Buyers of access-management (MFA / SSO) tools want peer ratings, not just analyst opinion, when shortlisting vendors.",
+      "key_outcomes": [
+        "Gartner document G00772112, published 26 April 2023; reviews in the 18 months to 28 February 2023",
+        "Accops is one of 13 vendors with enough eligible reviews (20+) to be included, alongside AWS, Cisco, ForgeRock, IBM, Microsoft, Okta, One Identity, Oracle, Ping, RSA, Thales and WSO2",
+        "Includes segment views for midsize enterprise, Asia/Pacific and North America",
+        "Accops decks from 2023 cite this cycle for 'Customers' Choice in Asia-Pacific for Access Management, 94% recommendation' - the figures themselves are images and not in the extracted text"
+      ],
+      "brief": "A Gartner Peer Insights 'Voice of the Customer' synthesis for the access management market (25 pages). It explains the methodology (Overall Experience vs User Interest and Adoption quadrants, Customers' Choice, Strong Performer, Established and Aspiring), shows the overall quadrant, willingness-to-recommend chart and segment quadrants (midsize enterprise, Asia/Pacific, North America), and a vendor summary for each of 13 vendors, beginning with Accops. Licensed to an Accops employee.",
+      "use_for": "Internal proof point behind the 'Gartner Peer Insights Customers' Choice for Access Management (APAC)' claim in Accops decks; verify the exact distinction in the document's charts before quoting, and follow Gartner's Peer Insights citation rules.",
+      "publish_year": "2023",
+      "expired": false,
+      "stale_risk": "April 2023 data; Peer Insights recognitions are refreshed each year, so a newer cycle may say something different. The quadrant placement is only in images, so SAM cannot confirm the distinction from this text.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Licensed Gartner research restricted to a named Accops user.",
+      "needs_human": "Confirm Accops' distinction (Customers' Choice overall or APAC segment) from the charts and whether a 2024 / 2025 Access Management Voice of the Customer exists.",
+      "third_party_copyright": "Gartner, Inc. Document G00772112. Gartner Peer Insights content; reuse must follow Gartner's Peer Insights branding and citation guidelines."
+    },
+    {
+      "source": "sharepoint/Voice_of_the_Custome_809058_ndx.pdf",
+      "title": "Gartner Peer Insights 'Voice of the Customer' for Desktop as a Service, 23 February 2024 (Accops One of Six Vendors)",
+      "asset_type": "Analyst Report",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "DaaS",
+        "VDI"
+      ],
+      "competitors": [
+        "Amazon Web Services",
+        "Apporto",
+        "Broadcom",
+        "VMware",
+        "Citrix",
+        "Microsoft"
+      ],
+      "personas": [
+        "CIO",
+        "Head of Infrastructure",
+        "IT head",
+        "procurement"
+      ],
+      "regulations": [],
+      "key_problem": "DaaS buyers want peer ratings and willingness-to-recommend data on vendors before shortlisting.",
+      "key_outcomes": [
+        "Gartner document G00809058, published 23 February 2024; reviews in the 18 months to 31 December 2023",
+        "Only six vendors met the review threshold: Accops, AWS, Apporto, Broadcom (VMware), Citrix and Microsoft",
+        "Includes an Accops vendor summary (overall rating and category ratings are in images, not extracted text)"
+      ],
+      "brief": "Gartner Peer Insights 'Voice of the Customer' synthesis for Desktop as a Service (12 pages). It describes the methodology and quadrant labels, shows the overall Voice of the Customer quadrant and willingness-to-recommend chart, and gives vendor summaries for the six vendors with 20+ eligible reviews: Accops, AWS, Apporto, Broadcom (VMware), Citrix and Microsoft. Licensed to an Accops employee.",
+      "use_for": "Internal proof that Accops appears alongside Citrix, Microsoft, AWS and VMware in Gartner's peer-review view of DaaS. Check the chart for Accops' quadrant before making any claim, and follow Gartner citation rules.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "February 2024 data. Accops' quadrant and ratings are only in images, so the distinction cannot be confirmed from the text. A newer cycle may exist.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Licensed Gartner research restricted to a named Accops user.",
+      "needs_human": "Record Accops' quadrant / rating from the chart so reps can quote it correctly.",
+      "third_party_copyright": "Gartner, Inc. Document G00809058. Gartner Peer Insights content; reuse must follow Gartner's Peer Insights guidelines."
+    },
+    {
+      "source": "sharepoint/Review_Access Management_Accops_Accops Digital Workspace_Display.pdf",
+      "title": "Gartner Peer Insights Review: Accops Digital Workspace, 4/5 from an Indian Hospital (Jun 2022)",
+      "asset_type": "Analyst Report",
+      "industry": "Pharma / Healthcare",
+      "client": "A healthcare provider in India with USD 250-500M revenue; reviewer a deputy manager in infrastructure and operations",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "VDI"
+      ],
+      "competitors": [
+        "WatchGuard",
+        "Fortinet"
+      ],
+      "personas": [
+        "IT head",
+        "procurement"
+      ],
+      "regulations": [],
+      "key_problem": "A hospital needed a remote-access / digital workspace solution and evaluated Accops against firewall-VPN vendors.",
+      "key_outcomes": [
+        "Overall 4.0; 5/5 for evaluation and contracting, integration and deployment, service and support, product capabilities",
+        "Comment: 'Best service and support for our hospital to enhance the service to the community'",
+        "Liked: robustness; disliked: ticketing",
+        "Alternatives considered: WatchGuard and Fortinet; on-premises deployment in India",
+        "Review invited by the vendor"
+      ],
+      "brief": "A single Gartner Peer Insights review of Accops Digital Workspace (listed under Access Management), submitted 9 June 2022 by a deputy manager in infrastructure and operations at an Indian healthcare provider. It rates Accops 4 overall and 5 in every category, names WatchGuard and Fortinet as the other vendors considered, and gives purchase drivers such as better business outcomes, cost management and strong services expertise.",
+      "use_for": "A quick peer quote for a hospital or healthcare prospect, or evidence that Accops has won against Fortinet / WatchGuard VPNs. Peer Insights reviews are public on Gartner's site; quote within Gartner's rules.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "A single 2022 review, vendor-invited.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Saved copy of a Gartner Peer Insights page; no verified public URL recorded.",
+      "needs_human": "Archived folder. The live review on gartner.com/peer-insights would be the sendable link."
+    },
+    {
+      "source": "sharepoint/Review_Access Management_Accops_Accops HyID_Display (1).pdf",
+      "title": "Gartner Peer Insights Review: Accops HyID, 5/5 - 'An Excellent Choice for Secure Remote Working with Desktop Virtualization + MFA' (Apr 2022)",
+      "asset_type": "Analyst Report",
+      "industry": "",
+      "client": "A professional-services firm in India with USD 3-10B revenue; reviewer a vice president, infrastructure and operations, and an early Accops customer",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyID",
+        "HySecure",
+        "MFA",
+        "VDI"
+      ],
+      "competitors": [
+        "Cisco",
+        "Okta",
+        "VMware"
+      ],
+      "personas": [
+        "IT head",
+        "CISO",
+        "procurement"
+      ],
+      "regulations": [],
+      "key_problem": "A large professional-services firm needed MFA alongside desktop virtualisation for secure remote working.",
+      "key_outcomes": [
+        "Overall 5.0; integration / deployment 5, service / support 5, evaluation 4, capabilities 4",
+        "Quote: 'Product has very good capabilities and the team keep enhancing the features based on the business/market need'",
+        "Liked: met requirements, excellent support; 'one of the initial customers to Accops'",
+        "Alternatives considered: Duo (Cisco), Okta, VMware; on-premises in India"
+      ],
+      "brief": "A Gartner Peer Insights review of Accops HyID, submitted 21 April 2022 by a vice president of infrastructure and operations at an Indian professional-services firm with USD 3-10B revenue. Rated 5 overall, it praises HySecure and HyID capabilities, continuous enhancement and support, and lists Duo, Okta and VMware as the alternatives evaluated.",
+      "use_for": "A peer quote for an MFA deal against Cisco Duo or Okta, or a large-enterprise professional-services / IT-services prospect.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "A single vendor-invited review from 2022.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Saved copy of a Gartner Peer Insights page; no verified public URL recorded.",
+      "needs_human": "Not a duplicate of 'Review_..._HyID_Display.pdf' despite the '(1)' - it is a different review."
+    },
+    {
+      "source": "sharepoint/Review_Access Management_Accops_Accops HyID_Display.pdf",
+      "title": "Gartner Peer Insights Review: Accops HyID, 5/5 from an Indian Media Company CTO - 'Works Very Well in Low Bandwidth' (Jun 2022)",
+      "asset_type": "Analyst Report",
+      "industry": "Media & Entertainment",
+      "client": "A media and publishing company in India with USD 50-250M revenue; reviewer its CTO",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyID",
+        "MFA"
+      ],
+      "competitors": [
+        "SecureAuth"
+      ],
+      "personas": [
+        "CIO",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "A media company needed MFA that performs over poor network links.",
+      "key_outcomes": [
+        "Overall 5.0 and 5/5 in every category",
+        "Liked: 'Works very well in low network bandwidth conditions'; disliked: none",
+        "Comment: 'Good experience overall during deployment and overall usage'",
+        "Alternative considered: SecureAuth; on-premises in India; drivers included overall cost and customer focus"
+      ],
+      "brief": "A Gartner Peer Insights review of Accops HyID submitted 8 June 2022 by the CTO of an Indian media and publishing company. It scores Accops 5 across the board, highlights performance on low bandwidth, and names SecureAuth as the alternative considered.",
+      "use_for": "A short peer quote for an MFA deal in media, or wherever low-bandwidth performance matters.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "A single vendor-invited review from 2022.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Saved copy of a Gartner Peer Insights page; no verified public URL recorded.",
+      "needs_human": ""
+    },
+    {
+      "source": "sharepoint/Review_Desktop as a Service_Accops_Accops HyWorks_Display (1).pdf",
+      "title": "Gartner Peer Insights Review: Accops HyWorks DaaS, 5/5 from an Indian Financial Firm CEO - 'Helped Us Immensely to Scale Up' (Apr 2022)",
+      "asset_type": "Analyst Report",
+      "industry": "BFSI",
+      "client": "A small (under USD 50M) financial-services firm in India; reviewer a director / CEO",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "DaaS",
+        "VDI"
+      ],
+      "competitors": [
+        "AWS WorkSpaces"
+      ],
+      "personas": [
+        "CIO",
+        "CFO",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "A growing financial firm needed secure cloud-hosted virtual desktops to scale remote operations.",
+      "key_outcomes": [
+        "Overall 5.0; service / support 5; evaluation, integration and capabilities 4",
+        "Quote: 'Virtual desktop as a service provided by Accops has helped us immensely to scale up our operations'",
+        "Liked: security, common platform, scalability; praises the team's professionalism and 'personal touch'",
+        "Alternative considered: Amazon Web Services (WorkSpaces); cloud deployment in India"
+      ],
+      "brief": "A Gartner Peer Insights review in the Desktop as a Service category for Accops HyWorks, submitted 21 April 2022 by the CEO / director of a small Indian financial firm running Accops DaaS in the cloud. Rated 5 overall, it credits Accops DaaS with scaling operations securely and names AWS as the alternative.",
+      "use_for": "A peer quote for an Accops DaaS (cloud desktop) pitch, especially to smaller financial firms or when AWS WorkSpaces is the alternative.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "A single vendor-invited review from 2022.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Saved copy of a Gartner Peer Insights page; no verified public URL recorded.",
+      "needs_human": "Not a duplicate of 'Review_..._HyWorks_Display.pdf' despite the '(1)' - it is a different review."
+    },
+    {
+      "source": "sharepoint/Review_Desktop as a Service_Accops_Accops HyWorks_Display.pdf",
+      "title": "Gartner Peer Insights Review: Accops HyWorks, 4/5 from a Medical Equipment Company - 'Alternate Tool to Citrix' (Jun 2022)",
+      "asset_type": "Analyst Report",
+      "industry": "Pharma / Healthcare",
+      "client": "A medical equipment and supplies company in India with USD 250-500M revenue; reviewer a system engineer",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HyID",
+        "VDI",
+        "MFA"
+      ],
+      "competitors": [
+        "Citrix",
+        "VMware"
+      ],
+      "personas": [
+        "IT head",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "A medical-equipment company needed a work-from-home VDI and evaluated Citrix and VMware.",
+      "key_outcomes": [
+        "Overall 4.0; evaluation, integration and capabilities 5, service / support 4",
+        "Quote: 'Very good tool for work from home. Alternate tool to Citrix. Very much user friendly'",
+        "Liked: email and SMS OTP login, application and web UI, user restrictions; disliked: an issue with an old dot-matrix printer",
+        "Alternatives considered: VMware and Citrix; on-premises in India; review invited by Gartner, not the vendor"
+      ],
+      "brief": "A Gartner Peer Insights review of Accops HyWorks (Desktop as a Service category) submitted 3 June 2022 by a system engineer at an Indian medical equipment company. It rates Accops 4 overall, calls it a user-friendly alternative to Citrix for work from home, lists VMware and Citrix as the alternatives evaluated, and notes a dot-matrix printer issue.",
+      "use_for": "A peer quote for a Citrix or VMware Horizon replacement deal, particularly in healthcare / medical devices. Gartner-invited rather than vendor-invited, which makes it slightly more credible.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "A single 2022 review.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Saved copy of a Gartner Peer Insights page; no verified public URL recorded.",
+      "needs_human": ""
     }
   ]
 }
