@@ -2218,6 +2218,147 @@
       "visibility": "internal",
       "internal_reason": "Saved copy of a Gartner Peer Insights page; no verified public URL recorded.",
       "needs_human": ""
+    },
+    {
+      "source": "sharepoint/Creating a Future of Work Strategy.pdf",
+      "title": "Gartner Symposium Session: Creating a Future of Work Strategy (India, 2022) - Third-Party Reading",
+      "asset_type": "Analyst Report",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "policy maker"
+      ],
+      "regulations": [],
+      "key_problem": "Most organisations (62% per a 2021 Gartner HR poll) lack an explicit future-of-work strategy, so they chase trends such as hybrid work, well-being and talent shortage without prioritising them.",
+      "key_outcomes": [
+        "India data points: 49% of Indian respondents more productive in 2021 than 2020; 70% of Indian tech organisations looking at hybrid work; 54% of leaders focused on new skills",
+        "CHRO survey: well-being (52%) and rise in demand for hybrid work (45%) among the biggest expected impacts",
+        "Eight-step process: identify, interpret and prioritise trends; develop and test scenarios; identify initiatives, design programmes, measure progress",
+        "Human-centric measures: deeper connections, radical flexibility, personal growth, holistic well-being, shared purpose",
+        "Recommendation: make the strategy open-source and opt-in, use trend spotters, plan scenarios for the most uncertain trends"
+      ],
+      "brief": "A Gartner symposium presentation by Ranadip Chandra (copyright 2022) on building a future-of-work strategy. It opens with Indian workforce and hybrid-work statistics and CHRO survey trends, defines a future-of-work strategy, walks through Gartner's eight-step trends-analysis, scenario and strategic-planning process, and ends with recommendations and further Gartner research. Accops is not mentioned.",
+      "use_for": "Background reading for marketing or thought-leadership content on hybrid work in India; a source of Gartner statistics to cite (with attribution) in a CIO conversation about hybrid work. Not sales collateral.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "2022 symposium content with 2021 survey data.",
+      "superseded_by": "",
+      "confidence": 0.85,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Gartner copyrighted symposium material; may not be reproduced or distributed without Gartner's permission.",
+      "needs_human": "Reading material, not collateral - consider excluding the 'Past Symposium Presentations for Reading' folder from SAM.",
+      "third_party_copyright": "Gartner, Inc. 2022 symposium presentation; not for redistribution."
+    },
+    {
+      "source": "sharepoint/Future of Cloud 2027_ From Technology to Business Innovation.pdf",
+      "title": "Gartner Symposium Session: Future of Cloud 2027 - From Technology to Business Innovation (2022) - Third-Party Reading",
+      "asset_type": "Analyst Report",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "Cloud is shifting from a technology disruptor to a business disruptor, and enterprises need to plan for multicloud, cloud-native, sovereign and industry clouds without unrealistic expectations.",
+      "key_outcomes": [
+        "Four-stage model: cloud as technology disruptor, capability enabler, innovation facilitator, business disruptor - most organisations at stage 1 in 2022, stage 4 by 2027",
+        "Next cloud chapter: technology core (hyperscalers), capability enhancement and value enhancement layers, with six vendor types",
+        "Prediction: 40% of enterprises' multicloud expectations will be unachievable",
+        "Public cloud influencing on-premises, regional, industry and sovereign clouds, and edge; sustainability and sovereignty as big-picture themes"
+      ],
+      "brief": "A Gartner symposium presentation by Naresh Singh (copyright 2022) on where cloud is heading by 2027. It describes the four stages of cloud's role, the 'next chapter' layered model of technology core, capability enhancement and value enhancement with vendor and enterprise implications, and predictions on multicloud maturity and cloud-native adoption, closing with sustainability and sovereign cloud. Accops is not mentioned.",
+      "use_for": "Background for DaaS or sovereign-cloud positioning (e.g. data-residency arguments for Indian DaaS) and marketing content. Not sales collateral.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "2022 predictions.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Gartner copyrighted symposium material; not for redistribution.",
+      "needs_human": "Reading material, not collateral.",
+      "third_party_copyright": "Gartner, Inc. 2022 symposium presentation; not for redistribution."
+    },
+    {
+      "source": "sharepoint/Signature Series _ CIO and Technology Executive Agenda for 2023.pdf",
+      "title": "Gartner Signature Series: CIO and Technology Executive Agenda for 2023 - Digital Dividends (South/Southeast Asia Cut) - Third-Party Reading",
+      "asset_type": "Analyst Report",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "CFO"
+      ],
+      "regulations": [],
+      "key_problem": "CEOs keep investing in digital, but IT budget growth is eroded by inflation and most digital initiatives are delivered late, so CIOs must focus on the digital dividends that matter.",
+      "key_outcomes": [
+        "2023 Gartner CIO and Technology Executive Survey: 1,976 respondents incl. 69-82 from South/Southeast Asia; expected IT budget changes by region vs OECD inflation",
+        "Most digital initiatives delivered late (2022 barriers-to-digital-execution survey)",
+        "Three steps to deliver digital dividends; CEOs want more technology work done outside IT, and business technologists / fusion teams",
+        "External providers of technology capability and 'strengthen digital foundations' (infrastructure and operations, cloud, security)"
+      ],
+      "brief": "A Gartner 'Signature Series' symposium presentation by Andy Rowsell-Jones (copyright 2022) on the 2023 CIO agenda, with South/Southeast Asia survey cuts. It covers CEO digital investment intentions, expected IT budget changes against inflation, late delivery of digital initiatives, the objectives of digital investments, siloed C-suite priorities, how to identify the most valuable digital dividends, the growing role of business technologists and fusion teams, and the need to strengthen digital foundations. Accops is not mentioned.",
+      "use_for": "Background on Indian / South-East Asian CIO priorities and budgets for 2023 when preparing CIO-level messaging. Not sales collateral.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "Describes the 2023 agenda from 2022 data; now dated.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Gartner copyrighted symposium material; not for redistribution.",
+      "needs_human": "Reading material, not collateral.",
+      "third_party_copyright": "Gartner, Inc. 2022 symposium presentation; not for redistribution."
+    },
+    {
+      "source": "sharepoint/How to Measure Employee Experience, Productivity and Wellbeing.pdf",
+      "title": "Gartner Symposium Session: How to Measure Employee Experience, Productivity and Well-Being in Hybrid Work (2022) - Third-Party Reading",
+      "asset_type": "Analyst Report",
+      "industry": "",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "Digital workplace leaders cannot tell whether hybrid work is working, because surveys only measure what was already assumed important and activity reports say little about real productivity or well-being.",
+      "key_outcomes": [
+        "Draws on the 2021 Gartner Hybrid Work Survey (521 executives, 1,976 individual contributors)",
+        "Defines and separates employee experience, employee productivity (output relative to input) and well-being",
+        "Move beyond surveys: combine data sources, start from the questions to answer, act and measure impact",
+        "Action plan: assess current measurement, build a cross-functional HR / LoB / IT analytics team, set baselines, monitor policy impact, prioritise low-investment interventions"
+      ],
+      "brief": "A Gartner symposium presentation by Pankil Sheth (copyright 2022) on measuring whether hybrid and flexible work is working. It explains what employee experience is, how measurement has moved from direct surveys to combined data sources, what productivity and well-being data can and cannot show, what skills and tools are needed, and an action plan for digital workplace leaders, with recommended Gartner research on productivity-monitoring technologies. Accops is not mentioned.",
+      "use_for": "Background for positioning Accops' user-experience monitoring and productivity reports (logon duration, idle users, app usage) to a CIO who asks how to measure hybrid work. Not sales collateral.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "2022 content with 2021 survey data.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Gartner copyrighted symposium material; not for redistribution.",
+      "needs_human": "Reading material, not collateral.",
+      "third_party_copyright": "Gartner, Inc. 2022 symposium presentation; not for redistribution."
     }
   ]
 }
