@@ -2574,6 +2574,210 @@
    "visibility": "internal",
    "internal_reason": "Names customers per use case; no verified public URL.",
    "needs_human": "Archive in favour of the 2026 introduction deck?"
+  },
+  {
+   "source": "sharepoint/Accops - Single Slider Case Studies.pptx",
+   "title": "Accops Single-Slide Case Studies Library (2024-25): 55+ One-Slide Customer Stories by Sector - Government, Pharma, BFSI, Insurance, Healthcare, Manufacturing, Education - with Quick-Reference and Use-Case Sections",
+   "asset_type": "Case Study",
+   "industry": "",
+   "client": "One-slide stories for India's national government IT agency, oil and gas PSUs, an atomic research centre, defence R&D, India's largest insurer, nine pharma companies, a global bank, life and general insurers, a cancer hospital and other hospitals, a courier company, a small-finance bank, a manufacturer with 24,000+ employees, a chartered-accountancy firm and a Japanese university",
+   "client_actual": "Government: NIC (65,000 users in 24 hours at lockdown), HPCL, IGCAR Kalpakkam, LIC, DRDO; Pharma: JB Chemicals & Pharmaceuticals, Indoco Remedies, Bharat Biotech, Wockhardt, The Himalaya Drug Company, Advanced Enzymes, Serdia Pharmaceuticals (Servier) and others; BFSI/insurance: Deutsche Bank, Bajaj Allianz Life, IndiaFirst Life and others; Healthcare: RGCIRC, GKNM, Zulekha Hospitals; also Padmanabhan & Ramani Chartered Accountants",
+   "client_named": true,
+   "products": [
+    "HySecure",
+    "HyID",
+    "HyWorks",
+    "HyDesk",
+    "HyLabs",
+    "Virtual Browser",
+    "BioAuth",
+    "DaaS",
+    "ZTNA",
+    "VDI",
+    "MFA",
+    "SSO",
+    "Thin Clients"
+   ],
+   "competitors": [
+    "Cisco",
+    "Citrix"
+   ],
+   "personas": [
+    "Sales rep",
+    "Presales engineer",
+    "Marketing",
+    "CIO"
+   ],
+   "regulations": [
+    "HIPAA"
+   ],
+   "key_problem": "Reps need a quick, named proof point for a prospect's sector or use case without hunting through dozens of separate case-study PDFs.",
+   "key_outcomes": [
+    "Index (slide 2): government case studies (slides 3-10), pharmaceutical (11-19), industry detailed (20-39), industry quick reference (40-48), use-case based (49-58)",
+    "Government: national IT agency clientless remote access rolled out for 65,000 users within 24 hours at lockdown, replacing an installed VPN client (slide 3); oil PSU app/desktop delivery; atomic research centre internet isolation; insurer branch last-mile over RHEL 5 PCs; a 40-FIDO2-key MFA deployment; defence R&D endpoint and browsing security",
+    "Pharma section (slides 11-19): nine pharma/life-sciences stories - Covid BCP rolled out in 24 hours, branch access with vendor consolidation, desktop-to-VDI transition with thin clients, SAP access and patching, lab-research IP protection with auditor access",
+    "Quick-reference sector slides (40-48): banks (scaled 2,500 to 25,000 users in the pandemic; biometric for CBS; 'third largest bank of India'), insurance, BPO, PSUs/government, healthcare (HIPAA; cancer hospital, multi-speciality hospital, UAE hospital), pharma, manufacturing (Accops-Nutanix replacing a multi-vendor stack), education",
+    "Use-case slides (49-59): Orion ERP access where the previous VDI vendor failed, 'chose Accops VDI over XenApp', DaaS for an accounting firm, internet isolation at an atomic research centre, rugged thin clients for a 24,000-employee manufacturer's shop floors, courier-company private app access, small-finance-bank server MFA, bank biometric MFA without app changes"
+   ],
+   "brief": "A 60-slide library of one-slide customer case studies in problem / challenge / products / benefits form, organised by sector with an index (copyright 2024, last saved September 2025). Most slides name the customer; some pharma and industry slides show the name only as a logo. It collects many of the stories that also exist as separate (sometimes archived) case-study PDFs, including several Covid-era work-from-home rollouts.",
+   "use_for": "The fastest way to answer 'do we have a customer like X?' by sector - especially pharma (slides 11-19: nine named pharma companies, which partly answers content-gaps item 3), government (3-10) and healthcare (45). Lift single slides into a proposal after checking the customer is cleared for naming.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "Copyright 2024, last saved Sep 2025, but many stories are Covid-era (2020-21) work-from-home rollouts and some use old product wording (SSL VPN). Some customers may no longer be active.",
+   "superseded_by": "",
+   "confidence": 0.82,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Dozens of named customers; clearance for external use not recorded; no verified public URL.",
+   "needs_human": "Which of these customers are cleared to be named externally? A sendable (public) cut of the pharma and healthcare slides would close much of the pharma/healthcare proof gap. Check whether the Wockhardt and hospital stories duplicate the archived case studies."
+  },
+  {
+   "source": "sharepoint/Life Insurance Providers 21st Sep.pptx",
+   "title": "Accops Protects Businesses That Cover Life: Eight Life and General Insurer Case Slides (c. 2021) - VDI, ZTNA and MFA for WFH, Vendors, Legacy Apps and Citrix Migration",
+   "asset_type": "Case Study",
+   "industry": "BFSI",
+   "client": "Eight Indian insurers: seven life insurers and one general insurer, including a Citrix VDI migration, legacy apps on old OS, outsourced call-centre agents in lockdown, outsourced developers, and branch connectivity for India's largest insurer",
+   "client_actual": "ICICI Prudential Life (migrated users from Citrix VDI), IDBI Federal Life, Bajaj Allianz Life, Aditya Birla Sun Life, HDFC Life, IndiaFirst Life (WFH in 24 hours), Life Insurance Corporation of India, SBI General Insurance",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "HySecure",
+    "HyID",
+    "HyLite",
+    "VDI",
+    "ZTNA",
+    "MFA"
+   ],
+   "competitors": [
+    "Citrix"
+   ],
+   "personas": [
+    "Insurance CIO",
+    "CISO",
+    "IT head",
+    "Sales rep"
+   ],
+   "regulations": [],
+   "key_problem": "Insurers need security compliance with enterprise mobility: WFH for business continuity, legacy apps that need old OS, outsourced call-centre and developer teams on unmanaged devices, and branch connectivity when MPLS fails.",
+   "key_outcomes": [
+    "One slide per insurer in problem / products / benefits form (slides 2-9)",
+    "Citrix VDI users migrated to Accops with a single solution for virtualisation and VPN access, strong MFA and endpoint protection (a large private life insurer)",
+    "Outsourced call-centre agents given browser access during lockdown via HyLite, with lower TCO than the old solution (a life insurer); outsourced L3/L4 developers given DLP-protected access to product code (a life insurer)",
+    "WFH rolled out within 24 hours during Covid with no data on endpoints and voice+data access for BPO users (a life insurer)",
+    "India's largest insurer: HySecure for branch connectivity when MPLS is down, Linux endpoints, zero endpoint management; a general insurer: VDI + L7 gateway for WFH, branches and vendors"
+   ],
+   "brief": "A 9-slide insurance-sector reference deck (marked Accops Confidential) with one slide per customer for eight Indian life and general insurers. Written around Covid-era business continuity; created 2020 and last saved December 2023. The filename's '21st Sep' carries no year.",
+   "use_for": "Proof for an insurance prospect: 'which insurers use Accops and for what?'. The Citrix-migration and outsourced-developer stories are the most reusable. Check customer clearance before naming them externally.",
+   "publish_year": "2021",
+   "expired": false,
+   "stale_risk": "Content is Covid-era (2020-21) - lockdown BCP stories; year inferred from content (file last saved Dec 2023), confidence lowered. 'Zero-Trust Application Access Gateway' wording is current, but user counts and outcomes are not quantified.",
+   "superseded_by": "",
+   "confidence": 0.72,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Accops Confidential'; names eight insurers; no verified public URL.",
+   "needs_human": "Year is uncertain ('21st Sep' - 2020 or 2021?). The corporate decks cite '13 large life insurance businesses rely on Accops' - an updated insurance reference deck could list them."
+  },
+  {
+   "source": "sharepoint/Why DaaS-BattleCard.pptx",
+   "title": "Why DaaS - Accops DaaS Battlecard (2022): Accops on Azure vs AWS WorkSpaces and Other DaaS (Features and Per-User Pricing), DIY vs Managed DaaS, On-Prem vs Cloud 500-Desktop TCO, AVD/WVD Comparison",
+   "asset_type": "Battlecard",
+   "industry": "",
+   "client": "Success-stories slide for Accops with Microsoft (DIY DaaS customers and a semiconductor company); managed-DaaS topology built for that company",
+   "client_actual": "AMD (DIY DaaS success story and 'AMD: Topology' slide)",
+   "client_named": true,
+   "products": [
+    "DaaS",
+    "HyWorks",
+    "HySecure",
+    "HyID",
+    "BioAuth",
+    "HyLabs",
+    "Reporting Server",
+    "Nano",
+    "Digital Workspace",
+    "VDI",
+    "ZTNA",
+    "MFA"
+   ],
+   "competitors": [
+    "AWS WorkSpaces",
+    "Azure Virtual Desktop",
+    "Citrix",
+    "Microsoft",
+    "Zscaler",
+    "Cisco Duo"
+   ],
+   "personas": [
+    "Sales rep",
+    "Presales engineer",
+    "CIO",
+    "IT head"
+   ],
+   "regulations": [],
+   "key_problem": "Prospects weighing cloud desktops ask why Accops DaaS rather than AWS WorkSpaces, native AVD/WVD or Citrix on Azure, whether to run it themselves or have it managed, and whether cloud is cheaper than on-premise VDI.",
+   "key_outcomes": [
+    "Why DaaS now: WFH as strategy, securing data on local devices, cloud adoption; what you get - VDI broker with thin-client management, ZTNA gateway, MFA, on-demand endpoint control, powered by Microsoft Azure",
+    "Accops on Azure vs non-Azure DaaS vs other Azure DaaS providers (slide 21) and Accops vs AWS WorkSpaces feature table (slide 22): device binding, kiosk mode, snipping/screen-share/USB blocking, internet control, contextual access, biometric MFA, power management, UX reporting",
+    "Relative pricing (slide 23): add-ons AWS customers would buy separately - DLP about $2/user/month, web filtering about $2 (Zscaler-type proxy), MFA about $9 (Cisco Duo), posture checks about $3; absolute monthly VM cost comparison for a 2 vCPU / 8 GB Mumbai-region desktop (slide 24)",
+    "DIY DaaS vs Accops managed DaaS, user access flow and a semiconductor customer's topology (slides 25-28)",
+    "On-premise vs cloud VDI (slides 29-32): 5-year direct infrastructure TCO for 500 personal desktops shows about INR 7.29 crore difference in favour of on-premise, then the cloud counter-arguments (outsourced BAU, DR, agility, only Azure offers Windows 10 multi-session)",
+    "AVD vs Accops architecture and 'Accops features with AVD' (Teams optimisation, FSLogix/App-Attach, dynamic power management), and a WVD vs Citrix-with-Azure vs Accops-with-Azure vs Accops-with-bootable-USB feature grid (slides 34-39)"
+   ],
+   "brief": "A 40-slide DaaS battlecard (last saved March 2022). It explains why DaaS, what the Accops Digital Workspace on Azure includes and its differentiators, lists platform features, then gives competitive analysis against other Azure and non-Azure DaaS, a feature and pricing comparison with AWS WorkSpaces, DIY vs managed DaaS with a named semiconductor customer, an on-premise vs cloud TCO for 500 desktops, Microsoft licensing guidance and AVD/WVD/Citrix feature comparisons.",
+   "use_for": "Competitive answers for cloud-desktop deals: slides 22-24 for 'why not AWS WorkSpaces?' (with per-user add-on costs), slide 21 and 38-39 for 'why not native AVD or Citrix on Azure?', slide 31 for 'is cloud VDI cheaper than on-prem?'. Refresh prices before quoting.",
+   "publish_year": "2022",
+   "expired": false,
+   "stale_risk": "March 2022. Uses 'WVD' (now Azure Virtual Desktop) and Windows 10; AWS and add-on prices are 2022 list prices. The content-gaps report already flags the AWS WorkSpaces comparison as dated.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Competitive battlecard with pricing comparisons and a named customer; slide 31 marked 'Accops confidential'; no verified public URL.",
+   "needs_human": "Refresh the AWS WorkSpaces and AVD comparisons for 2026 (content-gaps item 7). Is AMD still a DaaS customer and cleared for naming?"
+  },
+  {
+   "source": "sharepoint/Accops - Technical Solution - BYOD.pptx",
+   "title": "Accops Technical Solution: Bring Your Own Device (2018) - BYOD Roadblocks, App/Desktop Virtualisation Approach, HySecure + HyWorks Deployment Diagram",
+   "asset_type": "Deck",
+   "industry": "",
+   "client": "",
+   "client_actual": "Japan and Europe customer-name slide (Kyoto University, Ibaraki Prefectural, Fresenius Kabi, Ravago, Kalle GmbH and others)",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "HySecure",
+    "HyID",
+    "HyLite",
+    "HyDesk",
+    "VDI",
+    "MFA"
+   ],
+   "competitors": [],
+   "personas": [
+    "IT head",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Letting employees use personal devices brings app-compatibility problems, locally installed apps, more support calls, decentralised data and no way to enforce data-protection policy or pass security audits.",
+   "key_outcomes": [
+    "Defines BYOD and lists roadblocks: app compatibility, local installs, support load, data not centralised, no enforceable data protection, compliance",
+    "Approach: deliver apps and desktops by application/desktop virtualisation to any device (laptops, Chromebooks, tablets, phones) with strict access control and audit",
+    "Challenges to solve: device entry identification and audit, multi-platform delivery, seamless remote access, strong authentication, granular audit",
+    "Deployment diagram (slide 13): HyWorks controller with virtual apps / shared desktops / Windows 8.1 VMs, HySecure gateway with HyID and HyLite over internet, mobile and Wi-Fi",
+    "Why Accops: single vendor for VDI, gateway, thin client and 2FA; '50% lower TCO'; product customisation welcome; 2018 company figures (350+ customers, 65+ team)"
+   ],
+   "brief": "An 18-slide BYOD technical-solution deck from 2018 (last saved May 2018). It explains BYOD, its roadblocks and challenges, the virtualisation-based approach and a HySecure + HyWorks deployment diagram, then 'Why Accops', BYOD use cases and customer slides. It predates zero-trust positioning and uses 'SSL VPN' and Windows 8.1.",
+   "use_for": "Background only. For a current BYOD answer use the Spectra HySecure BYOD solution brief (2026) or the HySecure use-case slides in the 2026 decks.",
+   "publish_year": "2018",
+   "expired": false,
+   "stale_risk": "2018 (last-saved date; 350+ customers, 65+ team). Windows 8.1 VMs, 'SSL VPN' naming and '50% lower TCO' claim are all dated.",
+   "superseded_by": "sharepoint/Accops_Spectra_HySecure_BYOD_Solution_Brief.pdf - the 2026 BYOD solution brief (batch 05).",
+   "confidence": 0.78,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Old internal technical deck with customer names; no verified public URL.",
+   "needs_human": "Archive candidate."
   }
  ]
 }
