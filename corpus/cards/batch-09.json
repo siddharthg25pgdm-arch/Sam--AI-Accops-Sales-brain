@@ -106,7 +106,7 @@
       "publish_year": "2025",
       "expired": false,
       "stale_risk": "August 2025. Some slides still carry '(c) 2024'. Figures differ from sibling decks: this one says 1,000+ customers, 350+ team and MFA for 60,000 at the private bank; the Feb 2025 event deck says 900+, 300+ and 90,000, and RBI for BYOD 350,000 vs 600,000. The 'geo-fencing' use-case slide repeats the NanoOS text by mistake. Edition matrices may differ from 'Accops Product Editions 2026' - use that for editions. Windows 10 EOL slide is past its date.",
-      "superseded_by": "",
+      "superseded_by": "sharepoint/Accops Corporate Deck - 25 Aug 2026.pptx - the newest corporate deck (25 Aug 2026, batch-10). Prefer it.",
       "confidence": 0.88,
       "public_url": "",
       "visibility": "internal",
