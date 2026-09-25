@@ -253,3 +253,47 @@ Reps quoting these to the same customer will contradict each other. Pick one fig
   and WireGuard. Dated, but the only material on Fortinet and Palo Alto.
 - Four Dataquest magazine stories were published in print and a Nutanix solution brief is
   Nutanix-branded. If they are online, send SAM the links and they become sendable.
+
+### Added after carding 50 more decks (26 September, later)
+
+**Most urgent: the CEO's personal details are on a slide in customer-facing decks.** A "many
+digital identities" slide shows his real internal usernames, a bank customer ID and a personal
+email address. It appears in the Global Event Deck (45-min, Sep 2025), *both* editions of the Oct
+2025 HDFC customer workshop, the June 2026 ZTNA webinar, the Japan "Sharable" bootcamp deck and
+both GTRE workshop decks. Replace the values with dummy ones in every copy.
+
+**The "Sharable" edition of the HDFC workshop deck is not safe to send.** Slide 1 still says
+"Confidential - Internal Use Only". It keeps product roadmaps with launch dates, device pricing,
+the bank's own Zscaler setup (slide 59) and the personal-details slide above. The Confidential
+edition adds about 30 named case studies, some marked Draft, and the Vision 2030 revenue target.
+
+**Other things to fix before a customer or partner sees them:**
+- The Vision 2030 revenue target is on slide 10 of the Savex **partner** deck.
+- The MFA commercial SoW pastes raw web-server logs with client IP addresses and internal
+  hostnames.
+- The Government Oct 2024 deck and several 2025-26 decks list HyDesk's country of origin as China,
+  Thailand, Taiwan or the UK, next to Make-in-India claims.
+- **HyMobile is built on Scalefusion.** The 2022 deck says so on slide 21, which explains
+  "Connect Scalefusion OneIdP" in the 2026 deck. Its customer stories (HAVI, AgVa, BYJU'S) may be
+  Scalefusion's customers, not Accops'. Confirm before reps cite them.
+- Several 2026 decks carry time-bound offers (FY27 50% discount, free VDI licences, a 100%
+  money-back guarantee) and new product names (GlassFence, Photon, Spectra). Get these signed off
+  before reps quote them.
+- Most 2026 decks say "2023 & 2024 Gartner MQ" on the About slide next to a 2025/2026 MQ slide.
+
+**More figures told differently:** government IT users 250,000 vs 350,000 vs 500,000; JioPC users
+1.6 million vs 18 million; private-bank VDI/ZTNA users 10,000 vs 30,000; DaaS price $21.1 vs
+Rs 1,333 per user per month; 2,000-PC TCO saving 13% vs 16%; HyLabs saving 34% vs about 60%; CRM
+speed-up 70x vs 100x.
+
+**Mislabelled or duplicated:** the Sri Lanka CIO deck is the Mumbai CIO Association deck, and its
+title slide says Ahmedabad. Goa v2 and "Into the Wild" are the same deck. Kotak Securities is
+described as a Middle East retailer. The Retail deck mentions "hospital networks". "Corporate Deck
+2026" is really a keynote; the actual current corporate deck is "Accops Corporate Deck - 25 Aug
+2026". The GovSec files say "April 206".
+
+**Stale but still the only material on its topic:** the RBI-compliant banking deck (2020) is the
+only RBI clause mapping. The Healthcare deck (2021) cites DISHA and the PDP Bill, both obsolete.
+
+**Helps close earlier gaps:** the "Single-Slider Case Studies" deck names 9 pharma customers (gap
+3). The Nigeria deck is the only Africa material. The GATES Bali deck has the ASEAN channel plan.
