@@ -1262,6 +1262,712 @@
    "visibility": "internal",
    "internal_reason": "Named 'Sharable' but not safe to send: CEO personal identifiers on slide 29 and customer names left in case-study text; no verified public URL.",
    "needs_human": "Before sharing: replace the slide-29 personal identifiers with dummy values; finish anonymising (TCS, Sharda Hospital, Kerzner headers; Flipkart, Kotak, NI in body text) or confirm those customers are cleared; decide whether the market-size and Proxmox-pricing slides after the 'Roadmap' divider belong in a partner deck."
+  },
+  {
+   "source": "sharepoint/Accops-NutanixDotNext-When VDI Is Not Enough-V6.pptx",
+   "title": "When Just VDI Is Not Enough: Need for a Unified Hybrid Work Platform - Nutanix .Next 2026 Chicago Session (V6, April 2026) - Drop-In Replacement on Nutanix AHV, L&D Lab and 350,000-User Private App Cases",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "India's largest e-commerce company (25,000 contractors), a global IT services firm's L&D labs (6,000+ concurrent users per lab), 350,000 employees on client-provided laptops needing private-app access",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "Enterprise Browser",
+    "HyDesk",
+    "UEM",
+    "HyLabs",
+    "DaaS",
+    "Nutanix AHV",
+    "Nutanix Prism",
+    "Nutanix Flow",
+    "Nutanix Files"
+   ],
+   "competitors": [
+    "VMware",
+    "Omnissa"
+   ],
+   "personas": [
+    "CIO",
+    "IT head",
+    "Head of Infrastructure",
+    "Nutanix sellers"
+   ],
+   "regulations": [],
+   "key_problem": "VDI secures apps and data by design but is overkill for web/SaaS-only users and corporate-device users, and a multi-vendor hybrid-work stack (VDI, ZTNA, SSE, browser, IAM, UEM) brings licensing, integration and support sprawl - just as VDI market consolidation forces customers to re-evaluate.",
+   "key_outcomes": [
+    "Opening (slide 2): India's largest e-commerce company - 7 million+ peak-season shipments, 500+ 3PLs, 21,000+ pin codes, 300+ dark stores, 25,000+ contractors for whom VDI was proposed",
+    "VDI benefits vs VDI challenges (slides 3-4) and the extra tools hybrid work needs (ZTNA, SSE, enterprise browser, IAM, RBI, UEM) - leading to vendor sprawl vs single vendor (slides 5-6, 15)",
+    "Company and platform (7-19): 1000+ customers, growing partner network in North America & EU, six product pillars, 2025 Gartner DaaS MQ, Jio CloudPC for 18 million home users (slide 17), largest-customers slide",
+    "Nutanix integration (slide 20): Files with FSLogix, Flow micro-segmentation, vGPU, shadow clones with gold master, Prism provisioning",
+    "Drop-in replacement architectures (slides 21-22): swap vCenter/ESXi-based VDI for Accops broker + gateway on Nutanix AHV via Prism Central, privately or through Accops' hybrid-cloud connector and SaaS control plane",
+    "Cases: L&D labs with 6,000+ concurrent users per lab migrated to Accops + Nutanix with delegated lab provisioning (slide 23); 350,000 employees on client laptops moved from a costly remote-browser-isolation product to a 100% Linux Accops VDI in a customer-assembled DaaS model, 'saving millions' (slide 24)",
+    "Booth offer (slide 26): 25 subscription licences free for a year and one month of free POC support"
+   ],
+   "brief": "A 26-slide session deck for Nutanix .Next 2026 in Chicago, presented by Accops' CEO & CTO (V6, last saved April 2026). It argues that VDI alone does not cover hybrid work, positions Accops' single-vendor platform on top of Nutanix, shows how Accops drops in to replace a VMware/Omnissa VDI on AHV, and closes with two large migration stories and a booth offer. It is the newest Nutanix-facing deck.",
+   "use_for": "Nutanix co-selling and VMware/Omnissa replacement on AHV: slides 21-22 show the drop-in replacement architecture, slides 23-24 are the two strongest large-scale migration stories, slide 4 is an honest 'when VDI is overkill' slide for a sceptical CIO.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "April 2026 (Nutanix .Next 2026). Uses 'Jio CloudPC for 18 million home users' while other 2026 decks say JioPC 1.6 million - the known contradiction. The booth offer applied to the event only.",
+   "superseded_by": "",
+   "confidence": 0.84,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck with unpublished customer outcomes and an event offer; no verified public URL.",
+   "needs_human": "Reconcile 18 million vs 1.6 million JioPC users. Content-gaps item 8 says Nutanix integration decks are from 2021 - this April 2026 deck (slides 20-22) is the current answer and could become a partner-shareable integration one-pager."
+  },
+  {
+   "source": "sharepoint/Accops Intro for Nutanix event_23rd Sept_V4.pptx",
+   "title": "Make PCs Invisible: Accops VDI + Nutanix Intro for a Nutanix Event (23 Sept 2025, V4) - VDI Benefits, Windows 10 Migration and Cloud Repatriation Plays, Accops + Nutanix Case Studies",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "A global IT services firm's L&D labs (6,000 concurrent users) and a list of anonymised Accops + Nutanix deployments (secure browsing, SWIFT users, defence, WebVPN, factories, branches)",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "MFA",
+    "HyDesk",
+    "HyLabs",
+    "Nutanix AHV"
+   ],
+   "competitors": [
+    "Broadcom VMware",
+    "Omnissa"
+   ],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head",
+    "Nutanix sellers"
+   ],
+   "regulations": [
+    "DPDP Act 2023"
+   ],
+   "key_problem": "CIOs and CISOs must meet evolving rules like DPDP, secure a dissolved perimeter and keep costs down while forced Windows 10 to 11 upgrades and siloed tools add cost.",
+   "key_outcomes": [
+    "Problems CIOs/CISOs are solving (slide 2) and 'typical PC computing' vs 'enter VDI' (slides 3-5)",
+    "Three VDI-benefit slides in security / cost / compliance form (6-8): data stays in the DC, patching in minutes, BYOD for short-term projects, lower power and e-waste",
+    "Accops + Nutanix 'from concerns to opportunities' stack (slide 14) and user-experience/TCO claim - slash TCO by up to 40% over 5+ years (15)",
+    "Three migration plays (slide 16): move Windows 10 PCs to VDI on existing Nutanix capacity, repatriate workspaces from public cloud, expand on demand",
+    "L&D lab case (17): first lab in Chennai live on Accops ICT lab virtualisation, 6,000 CCU, moving away from Broadcom/Omnissa and 'saving millions'",
+    "Accops + Nutanix case list (18): 1,250 secure-browsing users, 30,000/60,000-user Azure VDI + MFA, 300+ SWIFT users, 100 defence researchers, 300,000 WebVPN users, 1,000 factory users across 84 sites, 500+ branches"
+   ],
+   "brief": "A 20-slide intro presented by Accops' Director of Solution Consulting at a Nutanix event on 23 September 2025 (V4; last saved January 2026): 'Make PCs Invisible to Unlock Agility & Security in a Hybrid Multi-Cloud World'. A short, VDI-centred pitch to Nutanix customers: why VDI now, the joint Accops + Nutanix stack, three migration plays and joint customer results.",
+   "use_for": "A 15-20 minute joint Accops + Nutanix customer talk; slide 16 (Windows 10, repatriation and expansion plays) and slide 18 (joint deployments list) are the reusable parts.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "September 2025. The Windows 10 end-of-support play has passed (14 Oct 2025). The DSCI award is 'Security Product Company of the Year 2024' here.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck with unpublished deployment figures; no verified public URL.",
+   "needs_human": "The 'up to 40% lower TCO' claim has no source on the slide, while other decks use 13% or 16% for a 2,000-PC TCO - align the TCO messaging."
+  },
+  {
+   "source": "sharepoint/Accops Why VDI for Nutanix Partners.pptx",
+   "title": "Fuelling Success: The VDI Playbook for Market Growth - Why VDI for Nutanix Partners (Jan 2026 Edition) - India VDI Opportunity (~Rs 4,000 Crore SAM), 2,000-PC TCO and BOQ, Nutanix Replacement Architecture, Partner Offer",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "A global IT services firm's L&D labs (6,000 CCU), a manufacturer with 5 factories and 80+ distribution centres (Citrix + VMware replaced, 40% lower TCO), anonymised Accops + Nutanix deployments",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "HyDesk",
+    "DaaS",
+    "Nutanix AHV",
+    "Nutanix Prism",
+    "Nutanix Flow"
+   ],
+   "competitors": [
+    "Citrix",
+    "VMware",
+    "Omnissa"
+   ],
+   "personas": [
+    "Nutanix partner sales",
+    "Partner CXO",
+    "Nutanix sellers"
+   ],
+   "regulations": [
+    "DPDP Act 2023",
+    "RBI"
+   ],
+   "key_problem": "Nutanix partners are leaving money on the table by not selling VDI, which is India's fastest-growing, compliance-driven end-user computing market and a major driver of HCI consumption.",
+   "key_outcomes": [
+    "India VDI opportunity (slide 2): 3.14 crore seats; 5% share = 15.7 lakh seats, a partner SAM of about Rs 4,000 crore; 78% of Indian breaches linked to poor endpoint control; VDI cuts SME IT cost 35-40%; industry focus (BFSI, healthcare, government, education)",
+    "Two migration stories (3-4): L&D labs moved off Broadcom/Omnissa to Accops + Nutanix; a manufacturer's Citrix + VMware stack replaced with 40% lower TCO over 5 years",
+    "Why current tools fall short - DLP, SASE, endpoint security; 'what's wrong with ZTNA' (8-9); VDI benefits and pros/cons (10-20)",
+    "5-year TCO for 2,000 PCs moving to VDI and the matching bill of quantities (12 servers, 2,000 thin clients, RDS CALs, licences, 3 admins) (slides 7, 33-34)",
+    "Nutanix + Accops 'better together', DaaS in your datacentre, VMware-replacement architecture (Horizon/UAG to Accops broker + gateway on AHV) and the Nutanix/Accops trend play table (29-36)",
+    "Partner offer (slide 39): for every customer buying at least 6 Nutanix nodes, 25 free subscription licences for a year plus free VDI implementation help; appendix on cloud repatriation (69% considering, 35% already moved), edge use cases and 11 general use cases (41-47)"
+   ],
+   "brief": "A 47-slide partner enablement deck for Nutanix resellers titled 'Fuelling Success: The VDI Playbook for Market Growth' (last saved January 2026). It is the same deck as 'Nutanix Partner Event 2025 - Why VDI - 30 min' (July 2025) with a new title and a couple of use-case bullets changed. It sizes the Indian VDI market for partners, explains VDI economics with a rupee TCO and BOQ, shows the Accops + Nutanix replacement architecture and gives a node-linked licence offer.",
+   "use_for": "Recruiting and enabling Nutanix partners to sell VDI: slide 2 (market size for partners), slides 7 and 33-34 (2,000-PC TCO and BOQ they can reuse in a proposal), slide 31 (Horizon-to-Accops-on-AHV replacement), slide 39 (the 6-node offer).",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "Last saved January 2026, content from mid-2025: About slide says 900+ customers, 300+ team and '2023 & 2024 Gartner MQ'; the DSCI award is dated 2025 on slide 28. The market-size and breach figures have no source on the slide.",
+   "superseded_by": "",
+   "confidence": 0.82,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Partner enablement deck with pricing-relevant BOQ/TCO and an offer; no verified public URL.",
+   "needs_human": "Source the '3.14 crore seats', '78% of breaches' and '35-40% cost cut' figures before partners quote them. Is the 6-node / 25-licence offer still live?"
+  },
+  {
+   "source": "sharepoint/Nutanix Partner Event 2025 - Why VDI - 30 min.pptx",
+   "title": "Nutanix Partner Event 2025: Why VDI (30 Minutes, July 2025) - Earlier Copy of the 'VDI Playbook for Nutanix Partners' Deck",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Same anonymised stories as 'Accops Why VDI for Nutanix Partners' (L&D labs, manufacturer with 40% lower TCO)",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "HyDesk",
+    "DaaS",
+    "Nutanix AHV"
+   ],
+   "competitors": [
+    "Citrix",
+    "VMware",
+    "Omnissa"
+   ],
+   "personas": [
+    "Nutanix partner sales",
+    "Partner CXO"
+   ],
+   "regulations": [
+    "DPDP Act 2023",
+    "RBI"
+   ],
+   "key_problem": "Nutanix partners are missing India's growing VDI market and the HCI consumption it drives.",
+   "key_outcomes": [
+    "47 slides, text identical to 'Accops Why VDI for Nutanix Partners.pptx' except the title ('Beyond the Perimeter: Secure & Seamless Access') and two use-case bullets",
+    "Same India VDI market sizing (~Rs 4,000 crore partner SAM), 2,000-PC TCO and BOQ, Nutanix replacement architecture and 6-node / 25-licence partner offer"
+   ],
+   "brief": "The July 2025 version of the 30-minute 'Why VDI' deck used at the Nutanix Partner Event 2025. The January 2026 file 'Accops Why VDI for Nutanix Partners.pptx' is the same deck retitled 'Fuelling Success: The VDI Playbook for Market Growth'.",
+   "use_for": "Use the January 2026 copy instead; this one only matters for following up the July 2025 Nutanix partner event.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "July 2025; superseded by the retitled January 2026 copy.",
+   "superseded_by": "sharepoint/Accops Why VDI for Nutanix Partners.pptx - the same deck, retitled and re-saved in January 2026.",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Partner enablement deck with TCO/BOQ and an offer; no verified public URL.",
+   "needs_human": "Duplicate of the January 2026 'Why VDI for Nutanix Partners' deck - archive one."
+  },
+  {
+   "source": "sharepoint/Accops for Nutanix Internal Teams.pptx",
+   "title": "Accops for Nutanix Internal Teams (June 2023): Secure Workspace Anywhere - Portfolio, India Success Figures, Nutanix Integration, Six Business Cases for Nutanix Sellers, 2023 Team Contacts",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Anonymised install base and use-case figures (e-commerce contractors, insurers, private banks, central government, global conglomerate, nuclear power, university)",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "MFA",
+    "HyDesk",
+    "NanoOS",
+    "Virtual Browser",
+    "HyLabs",
+    "DaaS",
+    "Reporting Server",
+    "HyMobile",
+    "Nutanix AHV",
+    "Nutanix Flow"
+   ],
+   "competitors": [
+    "Citrix",
+    "VMware",
+    "Microsoft AVD",
+    "Zscaler",
+    "Okta",
+    "OneLogin",
+    "RSA"
+   ],
+   "personas": [
+    "Nutanix sellers",
+    "Nutanix SEs",
+    "Alliance managers"
+   ],
+   "regulations": [],
+   "key_problem": "Nutanix's own sales and SE teams need to know what Accops sells, where it wins and which Nutanix customers to bring it to.",
+   "key_outcomes": [
+    "Company and India success slide (2-7): 'only work-from-home solution provider in India per DSCI, NASSCOM, GeM, RBI'; the largest e-commerce company, '80% of all insurance companies in India', '3 of top 5 private banks for vendor access', '90% of central government employees' use Accops",
+    "Portfolio and Digital Workspace bundle (11-16); gateway, VDI and HyID use-case slides with anonymised sizes (25k+ contractors, 2.5 lakh+ government users, 100,000+ VDI users at a conglomerate, 30,000+ VDI on Azure at a private bank)",
+    "Nutanix integration (20-22): provisioning automation, power management, dynamic capacity, Prism Central, vGPU, Flow micro-segmentation for VDI users; joint case list",
+    "Feature slides for VDI, DLP, analytics, protocols, MFA, Reporting Server, HyDesk and JioBook, NanoOS, Virtual Browser, HyLabs, HySecure, HyID (23-57)",
+    "Competitor table (40) vs Citrix, VMware, AVD, Zscaler/SASE and Okta/OneLogin/RSA",
+    "Six business cases for Nutanix sellers (59-66): Citrix exit from India/APAC, managed DaaS vs on-prem VDI, ESG/thin clients, internet isolation, ICT labs, ZTNA for BYOD/vendors, MFA; sustainability section (67-69); Jio Platforms investment (70); 2023 team slide (71)"
+   ],
+   "brief": "A 72-slide enablement deck for Nutanix's internal sales and SE teams (last saved June 2023). It introduces Accops, gives headline India adoption claims, explains the Nutanix integration and product features, and ends with six ready-made business cases, a sustainability section, the Jio investment announcement and a 2023 team slide. A 49-slide 'mini' edition was made in February 2024.",
+   "use_for": "Background only: the original Nutanix alliance enablement story. For current Nutanix conversations use the April 2026 '.Next - When VDI Is Not Enough' deck or the January 2026 'VDI Playbook for Nutanix Partners'.",
+   "publish_year": "2023",
+   "expired": false,
+   "stale_risk": "June 2023. Slide 60 says 'Citrix exited India & APAC market' - the unverified claim flagged in the gap report. The team slide (71) names 2023 leadership and roles that have since changed. Adoption claims (80% of insurers, 90% of central government employees) have no source.",
+   "superseded_by": "sharepoint/Accops for Nutanix Internal Teams - mini.pptx - the February 2024 condensed edition of the same enablement deck.",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Partner-internal enablement deck with a team slide and unverified market claims; no verified public URL.",
+   "needs_human": "Retire or refresh: the Citrix-exit claim and the 2023 team slide should not reach Nutanix sellers today. Can the '80% of insurers / 90% of central government employees' claims be substantiated?"
+  },
+  {
+   "source": "sharepoint/Accops for Nutanix Internal Teams - mini.pptx",
+   "title": "Accops for Nutanix Internal Teams - Mini (February 2024): Condensed Nutanix Seller Enablement - Portfolio, Nutanix Integration, Business Cases, Alliance Team Contacts",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Anonymised install base and India success figures, as in the full edition",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "BioAuth",
+    "HyDesk",
+    "HyLabs",
+    "Virtual Browser",
+    "HyMobile",
+    "Nutanix AHV",
+    "Nutanix Flow"
+   ],
+   "competitors": [
+    "Citrix",
+    "VMware",
+    "Microsoft AVD",
+    "Zscaler",
+    "Okta",
+    "OneLogin",
+    "RSA"
+   ],
+   "personas": [
+    "Nutanix sellers",
+    "Nutanix SEs",
+    "Alliance managers"
+   ],
+   "regulations": [],
+   "key_problem": "Nutanix sellers need a shorter briefing on what Accops sells and which Nutanix customers to bring it to.",
+   "key_outcomes": [
+    "49 slides; 32 carried from the June 2023 full edition, with 2024 copyright and regrouped 'more products based on VDI' and 'more products for cybersecurity' sections (Virtual Browser RBI, HyLabs, HySecure, BioAuth, HyMobile)",
+    "Business cases retained, now saying 'Citrix & VMware exited India & APAC market, leaving its partners and customers high & dry' (slide 42), plus internet isolation and ESG cases",
+    "Alliances contact slide (48) naming the strategic-alliances manager, alliances SE manager and marketing contacts"
+   ],
+   "brief": "The February 2024 condensed (49-slide) edition of the Nutanix internal-teams enablement deck: same portfolio, integration and business-case material in fewer slides, with an updated alliance contact slide.",
+   "use_for": "Background only, as for the full edition. Use the 2026 Nutanix decks for live conversations.",
+   "publish_year": "2024",
+   "expired": false,
+   "stale_risk": "February 2024. Slide 42 now claims both Citrix and VMware 'exited India & APAC' - stronger than the full edition and unverified. Contacts may have changed.",
+   "superseded_by": "",
+   "confidence": 0.78,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Partner-internal enablement deck with a contacts slide and unverified competitor claims; no verified public URL.",
+   "needs_human": "The 'Citrix & VMware exited India & APAC' claim on slide 42 should be removed before any reuse. Is there a current Nutanix-seller enablement deck?"
+  },
+  {
+   "source": "sharepoint/Accops-Nutanix-DotNext-Event.pptx",
+   "title": "Uncomplicate Your VDI & Remote Access - Nutanix .NEXT 2024 Session Deck with Backup Slides (June 2024): Customer Case Tables, Incumbent-Replacement Wins, Citrix/VMware Component Comparison",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Named case studies on use-case tables (logistics, government, DTH, e-commerce, banks, electronics, IT services, insurers, AMCs, airline, publisher)",
+   "client_actual": "DTDC, NIC, Dish TV, Flipkart, RailTel, Canara Bank, Samsung, Zensar, Raychem, HDFC Bank, Axis Bank, Karnataka Bank, LIC MF, Motilal Oswal, Axis Bank AMC, Jazeera Airlines, Malayala Manorama, Bharti AXA, Future Generali, Jio, Myntra",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "MFA",
+    "SSO",
+    "HyDesk",
+    "NanoOS",
+    "Huddle",
+    "AirBridge",
+    "HyMobile",
+    "Nutanix AHV",
+    "Nutanix Flow"
+   ],
+   "competitors": [
+    "Citrix",
+    "VMware",
+    "Microsoft AVD",
+    "OneLogin",
+    "Azure AD",
+    "Cisco",
+    "F5",
+    "Fortinet",
+    "Zscaler"
+   ],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head",
+    "Nutanix sellers"
+   ],
+   "regulations": [],
+   "key_problem": "VDI and remote access have become complicated and costly - multi-vendor stacks, incumbent price rises, SaaS-only licensing and uncertain regional focus - just as hybrid work and gig workers grow.",
+   "key_outcomes": [
+    "Slides 1-29 are the submitted .NEXT session (see the SUBMITTED FILE card): new work models, CFO/CIO and CISO challenges, digital-workspace consolidation, customers, VDI features, Nutanix integration, VUCA and the 'future-ready VDI' close",
+    "Backup: 'Why Accops' (cost, simplicity, infrastructure-agnostic, flexible licensing, Reliance Jio stability) (31)",
+    "Use-case tables with named customers (32, 34): ZTNA as VPN replacement (DTDC, NIC, Dish TV), BYOD vendor access (Flipkart, DTDC), agent-less web access (NIC, RailTel), endpoint controls (Canara Bank), office-PC access (Samsung); MFA/biometric/face-auth cases for banks, AMCs and an airline",
+    "'Replacing the incumbent' (50): VDI replacing Citrix/VMware/AVD (Axis Bank, Malayala Manorama, Bharti AXA), MFA replacing OneLogin/Azure AD/Samsung MFA (Zensar, Future Generali), ZTNA replacing Cisco VPN/F5/Fortinet/Zscaler (NIC, Jio, Myntra, Flipkart)",
+    "Component-by-component comparison (51) of Citrix, VMware and Accops: broker, gateway, provisioning, profiles, protocols, app layering, MDM, SSO, HCI, micro-segmentation, cloud control plane",
+    "India success claims (48): largest e-commerce company, 80% of insurers, 3 of top 5 private banks, 90% of central government employees; Accops + Nutanix case list (54); Gartner Voice of the Customer DaaS 2024 (55)"
+   ],
+   "brief": "The full 63-slide working deck for Accops' Nutanix .NEXT 2024 session 'Uncomplicate Your VDI & Remote Access', presented by the co-founder, MD & CTO (last saved June 2024; booth S6). The first 29 slides are the submitted session; the rest are backup slides with named-customer use-case tables, the incumbent-replacement slide and a Citrix/VMware component comparison.",
+   "use_for": "Slide 50 is a compact answer to 'who have we displaced - Citrix, VMware, AVD, OneLogin, Cisco VPN, F5, Fortinet, Zscaler?', with named accounts; slide 51 maps each Citrix/VMware component to its Accops equivalent. Check figures and names are still valid before reuse.",
+   "publish_year": "2024",
+   "expired": false,
+   "stale_risk": "June 2024. Install-base figures (30,000 VDI / 60,000 MFA, 250,000 government) differ from 2026 decks. Adoption percentages have no source.",
+   "superseded_by": "",
+   "confidence": 0.82,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Names about 20 customers, including displaced-competitor wins; no verified public URL.",
+   "needs_human": "The replaced-competitor slide (50) is valuable for competitive questions (content-gaps item 7 lists no Fortinet material) - confirm those wins are still accurate and reference-able."
+  },
+  {
+   "source": "sharepoint/Accops-Nutanix-DotNext-Event_May 2024 _SUBMITTED FILE-v2.pptx",
+   "title": "Uncomplicate Your VDI & Remote Access - Nutanix .NEXT 2024 Session Deck as Submitted (29 Slides, May 2024, v2)",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Anonymised largest-customers slide; Middle East, Japan and USA/UK/Europe customer logo slides",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "MFA",
+    "HyDesk",
+    "Nutanix AHV",
+    "Nutanix Flow"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head"
+   ],
+   "regulations": [],
+   "key_problem": "Hybrid work (83% prefer remote/hybrid, 66% more gig work) has made VDI and remote access complex, costly and hard to secure with multiple vendors.",
+   "key_outcomes": [
+    "New work models (slide 4) and challenges for CFOs/CIOs (simplify, TCO, scale, fewer vendors) and CISOs (unauthorised access, legacy apps, BYOD/vendor access, segmentation, device compliance) (5-6)",
+    "Digital workspace transformation - collapsing desktop OS, endpoint security, DLP, backup, support and hardware into one virtual workspace (7)",
+    "Customers: largest customers (30,000 VDI / 60,000 MFA private bank, 250,000 government users, 10,000-user MFA for South Africa's largest GSI), Middle East, Japan and Europe logos, recognition, Gartner Peer Insights (8-14)",
+    "VDI: Digital Workspace suite, platform support (VMware, Nutanix, Hyper-V, Azure, AWS, OCI/GCP, upcoming OpenStack and Proxmox), Nutanix integration and Flow micro-segmentation, shared-desktop add-ons, self-service VDI, protocols (15-22)",
+    "Zero-trust contextual access, on-demand DLP, behavioural analytics, built-in MFA (23-26); VUCA in EUC and 'future-ready unified VDI' (27-28)"
+   ],
+   "brief": "The 29-slide session deck submitted for Nutanix .NEXT 2024 ('Uncomplicate Your VDI & Remote Access', co-founder, MD & CTO; last saved 19 May 2024). Its text is identical to the earlier 'SUBMITTED FILE' copy; the 63-slide 'Accops-Nutanix-DotNext-Event' deck adds backup slides.",
+   "use_for": "Following up Nutanix .NEXT 2024 contacts. For reuse, the 63-slide version has the same slides plus the named-customer backups; for current Nutanix events use the 2026 '.Next - When VDI Is Not Enough' deck.",
+   "publish_year": "2024",
+   "expired": false,
+   "stale_risk": "May 2024; install-base figures and platform 'upcoming' items (Proxmox, OpenStack) are out of date.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck with install-base figures; no verified public URL.",
+   "needs_human": "Identical text to 'Accops-Nutanix-DotNext-Event_May 2024 _SUBMITTED FILE.pptx' - keep one."
+  },
+  {
+   "source": "sharepoint/Accops-Nutanix-DotNext-Event_May 2024 _SUBMITTED FILE.pptx",
+   "title": "Uncomplicate Your VDI & Remote Access - Nutanix .NEXT 2024 Session Deck as Submitted (29 Slides, May 2024, First Copy)",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Anonymised largest-customers slide; regional customer logo slides",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "MFA",
+    "HyDesk",
+    "Nutanix AHV",
+    "Nutanix Flow"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head"
+   ],
+   "regulations": [],
+   "key_problem": "Hybrid work has made VDI and remote access complex, costly and hard to secure with multiple vendors.",
+   "key_outcomes": [
+    "Text identical, slide for slide, to the v2 'SUBMITTED FILE-v2' copy (29 slides)"
+   ],
+   "brief": "The first saved copy (15 May 2024) of the 29-slide Nutanix .NEXT 2024 submission. The v2 copy saved four days later has the same text.",
+   "use_for": "None beyond the v2 copy - prefer that card.",
+   "publish_year": "2024",
+   "expired": false,
+   "stale_risk": "May 2024; duplicate of v2.",
+   "superseded_by": "sharepoint/Accops-Nutanix-DotNext-Event_May 2024 _SUBMITTED FILE-v2.pptx - same text, saved later.",
+   "confidence": 0.78,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck with install-base figures; no verified public URL.",
+   "needs_human": "Duplicate - archive."
+  },
+  {
+   "source": "sharepoint/VMWare Alternative stack-Accops and Nutanix.pptx",
+   "title": "Nutanix + Accops as the VMware Alternative Stack (April 2024) - Earlier Copy of the '0424-' Deck",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "A telecom equipment major (the same customer pitch as the 0424 copy)",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "HyID",
+    "Nutanix AHV"
+   ],
+   "competitors": [
+    "VMware",
+    "Broadcom"
+   ],
+   "personas": [
+    "CIO",
+    "IT head",
+    "Head of Infrastructure"
+   ],
+   "regulations": [],
+   "key_problem": "Customers facing the Broadcom VMware changes need a full-stack alternative for virtualisation and VDI.",
+   "key_outcomes": [
+    "15 slides; the extracted text is identical to '0424-VMWare Alternative stack-Accops and Nutanix.pptx' (carded in batch 09)"
+   ],
+   "brief": "An earlier save (28 April 2024) of the Nutanix + Accops VMware-alternative pitch; the '0424-' copy saved on 10 May 2024 has the same text.",
+   "use_for": "Use the '0424-' copy's card.",
+   "publish_year": "2024",
+   "expired": false,
+   "stale_risk": "April 2024; duplicate.",
+   "superseded_by": "sharepoint/0424-VMWare Alternative stack-Accops and Nutanix.pptx - identical text, saved later.",
+   "confidence": 0.75,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Customer-specific pitch; no verified public URL.",
+   "needs_human": "Duplicate of the 0424 file - archive one."
+  },
+  {
+   "source": "sharepoint/Accops - Technical Solution - Nutanix.pptx",
+   "title": "Accops Solution for Nutanix (2018): Company Profile, Desktop Virtualization Market and Use Cases, Accops + Nutanix Architecture and Competitive Table vs VMware VDI + vSAN + Dell",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "2018 case list (a large pharma company with 700 VDI users, a conglomerate's factories, an MNC with 10,000 remote users, India's largest co-operative bank serving 100 co-op banks, the 3rd largest private bank)",
+   "client_actual": "Japanese, European and government customer names (Kyoto University, Ibaraki Prefecture, Fresenius Kabi, Ravago, NTPC, SAIL, BHEL, HPCL, Department of Atomic Energy, IIT Bombay, Dubai Courts and others); Indian partner/SI list",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "HyID",
+    "HyDesk",
+    "HyLabs",
+    "Nutanix AHV"
+   ],
+   "competitors": [
+    "VMware",
+    "Dell"
+   ],
+   "personas": [
+    "CIO",
+    "IT head",
+    "Nutanix sellers"
+   ],
+   "regulations": [],
+   "key_problem": "Earlier VDI projects failed on infrastructure bottlenecks, bandwidth, high TCO and multi-vendor complexity; HCI and cloud now make desktop virtualisation viable.",
+   "key_outcomes": [
+    "2018 company profile: 500+ customers, 85+ partners, 80+ team, '100% YoY growth'",
+    "Desktop virtualization market USD 6.2 bn to 28.34 bn at 28.57% CAGR (Research and Markets, 2016-2021) and why DV projects failed vs why VDI now",
+    "Accops + Nutanix solution scope (shared desktops, app virtualisation, virtual desktops on AHV, hosting gateway and infra servers) and a three-plane architecture",
+    "Competitive table: Accops + Nutanix vs VMware VDI + vSAN + Dell on thin clients, secure gateway, 2FA, HCI and TCO ('50% lower TCO')"
+   ],
+   "brief": "A 24-slide 'Accops Solution for Nutanix' deck from the _older folder (last saved December 2018): the 2018 company, market and use-case story, then the Accops + Nutanix joint solution, architecture and a competitive table. A 7-slide cut ('-m') was saved in 2020.",
+   "use_for": "History only. For Nutanix conversations use the 2026 .Next deck; for AHV integration detail the 2020 AHV integration guide (batch 08).",
+   "publish_year": "2018",
+   "expired": false,
+   "stale_risk": "2018: company figures, product names (SSL VPN), market data and competitive framing are all obsolete.",
+   "superseded_by": "sharepoint/Accops-NutanixDotNext-When VDI Is Not Enough-V6.pptx - the April 2026 Nutanix deck covers the joint solution with current products.",
+   "confidence": 0.72,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Old internal deck with customer and partner lists; no verified public URL.",
+   "needs_human": "In _older already - confirm it can be excluded from rep answers."
+  },
+  {
+   "source": "sharepoint/Accops - Technical Solution - Nutanix-m.pptx",
+   "title": "Accops Solution for Nutanix - 7-Slide Cut (2020): Joint Solution Scope, Competitive Table vs VMware + vSAN + Dell, Architecture, Case List",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Same 2018 case list as the full deck (pharma, conglomerate, MNC, co-operative bank, private bank)",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "HyDesk",
+    "Nutanix AHV"
+   ],
+   "competitors": [
+    "VMware",
+    "Dell"
+   ],
+   "personas": [
+    "IT head",
+    "Nutanix sellers"
+   ],
+   "regulations": [],
+   "key_problem": "Customers want desktop virtualisation on Nutanix HCI without a multi-vendor VMware stack.",
+   "key_outcomes": [
+    "Seven slides lifted from the 2018 'Accops Solution for Nutanix' deck: solution scope, competitive table, architecture, case studies and feature set"
+   ],
+   "brief": "A 7-slide extract of the 2018 Nutanix solution deck, last saved August 2020, in the _older folder.",
+   "use_for": "History only.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "Content is from 2018.",
+   "superseded_by": "sharepoint/Accops - Technical Solution - Nutanix.pptx - the full deck these slides were cut from.",
+   "confidence": 0.7,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Old internal extract; no verified public URL.",
+   "needs_human": "Archive candidate."
+  },
+  {
+   "source": "sharepoint/Nutanix Customers.pptx",
+   "title": "Accops - Nutanix Joint Customers (June 2023): Joint Case-Study List and Joint Customer Logo Slide",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Anonymised Accops + Nutanix deployments (1,250 secure-browsing users, 30,000/60,000-user Azure VDI + MFA, 300+ SWIFT users, 400+ WFH staff, 100 defence researchers, 300,000 WebVPN users, 1,000 factory users across 84 sites, 500+ branches) and a logo slide",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "Virtual Browser",
+    "Nutanix AHV"
+   ],
+   "competitors": [],
+   "personas": [
+    "Nutanix sellers",
+    "Alliance managers"
+   ],
+   "regulations": [],
+   "key_problem": "Nutanix and Accops sellers need proof of joint deployments.",
+   "key_outcomes": [
+    "Slide 2: the joint Accops + Nutanix case list reused in later Nutanix decks",
+    "Slide 3: joint customer logos (image only)"
+   ],
+   "brief": "A 4-slide deck (last saved June 2023) in the Nutanix _older folder with the joint case list and a joint-customer logo slide; the logos are images, so only the case list is readable.",
+   "use_for": "Answering 'which customers run Accops on Nutanix?' at a headline level; the same list appears in the 2025-26 Nutanix decks.",
+   "publish_year": "2023",
+   "expired": false,
+   "stale_risk": "June 2023; the case list has been reused unchanged since.",
+   "superseded_by": "",
+   "confidence": 0.6,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Joint customer list with logos; no verified public URL.",
+   "needs_human": "Joint customer names are only in the logo image - a text list would make it searchable."
+  },
+  {
+   "source": "sharepoint/Accops-May24-DigitalWorkspace-Intro.pptx",
+   "title": "Secure Access to Business Apps: Accops Digital Workspace Intro Deck (May-Sep 2024) - Portfolio, India Success Figures, VDI Security Features incl. Virtual IP, VDI Firewall, Biometric SDK in VDI, Licensing Editions, Incumbent Replacement",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Named customers on use-case tables (as in the Nutanix .NEXT 2024 backup slides) and anonymised install base",
+   "client_actual": "DTDC, NIC, Dish TV, Flipkart, RailTel, Canara Bank, Samsung, Zensar, Raychem, HDFC Bank, Axis Bank, Karnataka Bank, Jazeera Airlines, Malayala Manorama, Bharti AXA, Future Generali, Jio, Myntra (use-case and replacement slides)",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "MFA",
+    "HyDesk",
+    "NanoOS",
+    "Huddle",
+    "AirBridge",
+    "Reporting Server",
+    "DaaS",
+    "Digital Workspace"
+   ],
+   "competitors": [
+    "Citrix",
+    "VMware",
+    "Microsoft AVD",
+    "Zscaler",
+    "Okta",
+    "OneLogin",
+    "RSA",
+    "Cisco",
+    "F5",
+    "Fortinet"
+   ],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Hybrid work and BYOD make it hard to give secure, compliant access to business apps; multi-vendor VDI, VPN and MFA stacks are costly and incumbents are raising prices and narrowing licensing.",
+   "key_outcomes": [
+    "Company, portfolio, work-model and CIO/CISO challenge slides; India success claims and largest customers (1-16)",
+    "VDI security features (25-51): virtual IP per user in shared sessions (34), DLP, session recording, watermark, copy and USB control, behavioural analytics and a user-level 'VDI firewall' built on app/network analytics (40-45), Reporting Server, audited file transfer, an SDK that makes biometric scanners work inside VDI/RDS sessions (49-51), facial auth with continuous monitoring",
+    "Licensing (slide 54): Virtual Apps & Desktops Standard/Advanced, ZTNA Basic, Digital Workspace editions; DaaS on Azure India (55)",
+    "HySecure and HyID use-case tables with named customers (56-59), 'Replacing the incumbent' (60), Citrix/VMware component comparison (61) and competitor table (62)"
+   ],
+   "brief": "A 64-slide general intro deck titled 'Secure Access to Business Apps' (filename May 2024; last saved September 2024) in General Presentations. It shares its customer and replacement slides with the Nutanix .NEXT 2024 deck, and is strongest on VDI security features - virtual IP, VDI firewall, biometric SDK in VDI - and the 2024 licensing editions.",
+   "use_for": "Presales detail on VDI security: slide 34 (unique IP per user in shared desktops), slides 41-45 (user-level firewall/analytics inside VDI), slides 49-51 (fingerprint scanners inside VDI sessions), slide 54 (2024 edition structure). Check editions against the 2026 Product Editions document.",
+   "publish_year": "2024",
+   "expired": false,
+   "stale_risk": "2024: company figures, editions and install-base numbers have changed; some slides still carry 2023 copyright.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Names many customers and displaced-competitor wins; licensing structure; no verified public URL.",
+   "needs_human": "Is this still used as an intro deck, or should it move to _archieved now that the Aug 2026 corporate deck exists? The biometric-in-VDI and VDI-firewall slides deserve a place in a current technical deck."
   }
  ]
 }
