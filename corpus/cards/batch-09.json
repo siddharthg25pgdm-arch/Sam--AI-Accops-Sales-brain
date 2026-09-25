@@ -579,10 +579,10 @@
    "stale_risk": "December 2019 regulation. RBI has since issued further directions for UCBs and banks (including IT governance and outsourcing directions); check whether any clause has been superseded before relying on it.",
    "superseded_by": "",
    "confidence": 0.92,
-   "public_url": "",
-   "visibility": "internal",
-   "internal_reason": "Third-party regulator document; public on rbi.org.in, but no verified URL recorded here.",
-   "needs_human": "Public on the RBI website - record the rbi.org.in URL so SAM can link the source instead of the SharePoint copy. Note for marketing: this is the ONLY RBI document in the library and it covers co-operative banks, not commercial/private banks.",
+   "public_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=11772",
+   "visibility": "both",
+   "internal_reason": "",
+   "needs_human": "Regulator's public document - SAM should link the rbi.org.in notification (verified 25 Sep 2026) rather than the SharePoint copy. Note for marketing: this is the ONLY RBI document in the library and it covers co-operative banks, not commercial/private banks.",
    "third_party_copyright": "Reserve Bank of India. Public regulatory circular."
   },
   {
@@ -1092,6 +1092,553 @@
    "visibility": "internal",
    "internal_reason": "Marked 'Accops Confidential'; no verified public URL.",
    "needs_human": "A .pptx twin is in the same folder (clears by stem). Is HyMobile still actively sold? The only current MDM material is two slides in the corporate deck."
+  },
+  {
+   "source": "sharepoint/Accops - Turbo Architecture-v2.pdf",
+   "title": "HySecure Turbo Architecture v2 (2020): WireGuard-Based UDP Tunnel - Cryptography, Key Exchange, Packet Flow in NAT and Route Modes, Benchmarks",
+   "asset_type": "Deck",
+   "industry": "",
+   "client": "An Indian bank's contact centre (about 500 agents on an Android VoIP app) as the worked example",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HySecure",
+    "Turbo",
+    "ZTNA",
+    "HyWorks"
+   ],
+   "competitors": [
+    "WireGuard",
+    "IPsec",
+    "OpenVPN",
+    "IKEv2",
+    "DTLS",
+    "Ameyo"
+   ],
+   "personas": [
+    "Network architect",
+    "Presales engineer",
+    "CISO",
+    "IT head"
+   ],
+   "regulations": [
+    "DoT OSP"
+   ],
+   "key_problem": "TCP-based SSL tunnels give poor, jittery VoIP, video and heavy-graphics performance over the internet and cannot give each user a fixed IP, which VoIP systems, NAC, web proxies and DoT rules need.",
+   "key_outcomes": [
+    "Two endpoints: TLS 1.2 on TCP 443 for authentication, device checks and key distribution; Noise protocol on UDP 443 for the data tunnel",
+    "Cryptography: ChaCha20-Poly1305, Curve25519 ECDH, BLAKE2s, SipHash24, HKDF; NoiseIK one-round-trip handshake; rekey every 120 s; perfect forward secrecy, identity hiding, replay and KCI resistance; IP-binding cookies against DoS; ~4,000 lines of kernel code; references the WireGuard paper",
+    "Optional 256-bit pre-shared symmetric key (e.g. delivered via MDM) for post-quantum resistance; encryption workflow in six steps",
+    "Benchmarks: 1,011 Mbps vs 825-881 Mbps IPsec and 258 Mbps OpenVPN; 0.403 ms latency vs 0.51-0.52 ms and 1.54 ms",
+    "Unique static virtual IP per user every login, NAT'ed on the gateway or routed internally; DNS proxy with redirect list; step-by-step packet flows (addresses and MACs) for NAT, masquerade and route modes",
+    "Use cases: VoIP from PC or phone, mobile apps, VoIP/Teams/WebEx over VDI, backups, SCCM, always-on domain traffic, per-user IP for NAC/proxies, UDP multicast trading apps; ships in HySecure 5.4"
+   ],
+   "brief": "The deepest document in the library on how HySecure's Turbo tunnel works. It explains the two-channel design (TLS for login and key exchange, a WireGuard/Noise-based UDP tunnel for traffic), lists the cryptographic primitives and security properties, shows the key-exchange workflow including an optional pre-shared key, benchmarks Turbo against IPsec and OpenVPN, lists device, DLP and endpoint controls, use cases, the 'Duplex Secure Private Application Network' concept, OSI-layer data flow, DNS resolution, and numbered packet-flow diagrams for NAT, masquerade and route modes behind a load-balanced HySecure cluster. It ends with the bank contact-centre example and deployment note (HySecure 5.4). Version 2 adds the full primitive list, rekey interval, post-quantum PSK and masquerade/route-mode detail missing from v1.",
+   "use_for": "Presales and network-architect conversations that ask for 'HySecure architecture', how the L3 tunnel is secured, firewall ports (TCP/UDP 443), NAT vs route mode, VoIP/softphone support or why Turbo beats IPsec/OpenVPN. Pair with the four WireGuard third-party papers for cryptographic assurance.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "Copyright 2020, HySecure 5.4 era; slide text still says 'DPAN' in places (older name). Benchmarks are Accops' own 2020 figures. Newer material adds Kyber/QRNG quantum-safe options not covered here.",
+   "superseded_by": "",
+   "confidence": 0.9,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Accops Confidential'; contains internal architecture detail.",
+   "needs_human": "A .pptx twin is in the same folder (clears by stem). This is the closest thing to the 'HySecure architecture / deployment guide' reps ask for, but it covers Turbo only - a current full HySecure architecture document is still missing."
+  },
+  {
+   "source": "sharepoint/Accops - Turbo Architecture-v1.pdf",
+   "title": "HySecure Turbo Architecture v1 (2020): Earlier Edition of the Turbo UDP Tunnel Deck",
+   "asset_type": "Deck",
+   "industry": "",
+   "client": "An Indian bank contact centre (Android VoIP app) as the example",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HySecure",
+    "Turbo",
+    "ZTNA"
+   ],
+   "competitors": [
+    "WireGuard",
+    "IPsec",
+    "OpenVPN"
+   ],
+   "personas": [
+    "Network architect",
+    "Presales engineer"
+   ],
+   "regulations": [
+    "DoT OSP"
+   ],
+   "key_problem": "Earlier draft of the Turbo architecture explanation.",
+   "key_outcomes": [
+    "Same structure as v2: Turbo concept, protocol security, benchmarks (1,011 Mbps vs IPsec/OpenVPN), features, use cases, packet flows, bank case, deployment",
+    "Lacks v2's full primitive list, 120-second rekey, post-quantum pre-shared key and encryption workflow, and the masquerade/route-mode detail; still uses the older 'DPAN' name"
+   ],
+   "brief": "Version 1 of the Turbo architecture deck. Its text is a subset of v2: v2 renames 'DPAN' to 'Turbo', expands the protocol-security slide and adds the encryption workflow and two further packet-flow slides.",
+   "use_for": "Nothing v2 does not cover - use v2.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "Superseded by v2.",
+   "superseded_by": "sharepoint/Accops - Turbo Architecture-v2.pdf - expanded edition of the same deck.",
+   "confidence": 0.9,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Accops Confidential'.",
+   "needs_human": "Superseded by v2; the v1 PDF and .pptx can be archived."
+  },
+  {
+   "source": "sharepoint/Wireguard Whitepaper.pdf",
+   "title": "WireGuard: Next Generation Kernel Network Tunnel - Jason A. Donenfeld (Third-Party Protocol Paper, NDSS 2017; Draft Revision June 2020)",
+   "asset_type": "Third-Party Research",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "Turbo",
+    "HySecure"
+   ],
+   "competitors": [
+    "WireGuard",
+    "IPsec",
+    "OpenVPN"
+   ],
+   "personas": [
+    "Network architect",
+    "CISO",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "IPsec and OpenVPN are complex, large and hard to audit; WireGuard proposes a small, fast, secure layer-3 tunnel.",
+   "key_outcomes": [
+    "Design: layer-3 kernel virtual interface; 'cryptokey routing' binding peer public keys to allowed IPs; roaming endpoints",
+    "Protocol: 1-RTT NoiseIK handshake, Curve25519 static keys (OpenSSH style), ChaCha20-Poly1305 transport over UDP, optional pre-shared symmetric key, encrypted and authenticated cookie MACs against DoS, timer state machine, 'silence is a virtue' (no response to unauthenticated packets)",
+    "Implementation in under 4,000 lines of Linux code; performance comparisons with IPsec and OpenVPN",
+    "Static link wireguard.com/papers/wireguard.pdf; draft revision dated 1 June 2020; version in NDSS 2017 proceedings"
+   ],
+   "brief": "The original WireGuard protocol paper by its author, covering cryptokey routing, send/receive flow, the Noise-based handshake and cryptography, cookie DoS mitigation, the timer state machine, Linux kernel implementation and performance. Accops keeps it in the HySecure/Turbo folder because HySecure Turbo is built on WireGuard's design; the Accops Turbo deck cites it as its reference.",
+   "use_for": "Technical assurance for a network architect or CISO asking whether the Turbo tunnel's cryptography is sound - send the public link alongside the Accops Turbo Architecture v2 deck. Not Accops collateral.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "Draft revision of June 2020 of a 2017 paper; the protocol is stable, but the published version on wireguard.com may be newer.",
+   "superseded_by": "",
+   "confidence": 0.93,
+   "public_url": "https://www.wireguard.com/papers/wireguard.pdf",
+   "visibility": "both",
+   "internal_reason": "",
+   "needs_human": "Third-party paper - share the public link rather than the SharePoint copy. Reps should say 'Turbo is based on the WireGuard design', not that Accops wrote or certified it.",
+   "third_party_copyright": "Copyright 2015-2020 Jason A. Donenfeld. Publicly available paper."
+  },
+  {
+   "source": "sharepoint/Wireguard formal verification.pdf",
+   "title": "Formal Verification of the WireGuard Protocol - Donenfeld and Milner (Oxford), Tamarin Prover Proofs (Third-Party Paper, June 2018)",
+   "asset_type": "Third-Party Research",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "Turbo",
+    "HySecure"
+   ],
+   "competitors": [
+    "WireGuard"
+   ],
+   "personas": [
+    "CISO",
+    "Network architect",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Security claims for a VPN handshake need independent, machine-checked proof.",
+   "key_outcomes": [
+    "Enumerates the security properties of WireGuard's NoiseIK-based key exchange and verifies them in the Tamarin prover",
+    "Properties covered include key secrecy, forward secrecy, mutual authentication, key-compromise impersonation resistance, replay resistance and a limited form of identity hiding",
+    "Draft revision dated 7 June 2018; static link wireguard.com/papers/wireguard-formal-verification.pdf"
+   ],
+   "brief": "An academic paper by WireGuard's author and an Oxford University researcher that models the WireGuard key exchange and proves its security properties with the Tamarin symbolic verification tool, including the caveats on identity hiding. Filed with the Accops HySecure Turbo material as third-party evidence for the protocol Turbo is based on.",
+   "use_for": "Answering 'has the tunnel protocol been formally verified?' in a security review or RFP - cite with the public link, alongside the Turbo Architecture v2 deck.",
+   "publish_year": "2018",
+   "expired": false,
+   "stale_risk": "2018 draft; later mechanised proofs (e.g. the 2019 Inria CryptoVerif report, also in this folder) extend it.",
+   "superseded_by": "",
+   "confidence": 0.93,
+   "public_url": "https://www.wireguard.com/papers/wireguard-formal-verification.pdf",
+   "visibility": "both",
+   "internal_reason": "",
+   "needs_human": "Third-party paper - share the public link. It verifies WireGuard, not Accops' Turbo implementation.",
+   "third_party_copyright": "Copyright 2017 Jason A. Donenfeld & Kevin Milner. Publicly available paper."
+  },
+  {
+   "source": "sharepoint/Wireguard security review 3rd party-He-Xu-Xu.pdf",
+   "title": "Security Analysis of WireGuard - MIT 6.857 Final Project (He, Xu, Wu, Spring 2018): Fuzzing Audit, No Critical Bugs, Two Timer Fixes Recommended",
+   "asset_type": "Third-Party Research",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "Turbo",
+    "HySecure"
+   ],
+   "competitors": [
+    "WireGuard",
+    "OpenVPN",
+    "strongSwan"
+   ],
+   "personas": [
+    "CISO",
+    "Network architect"
+   ],
+   "regulations": [],
+   "key_problem": "Independent review of the parts of WireGuard not covered by formal proofs - reconnection, session management and timers.",
+   "key_outcomes": [
+    "Partial security audit by three MIT students, focused on unverified reconnection and session-management code, using network fuzzing with artificial latency and packet loss",
+    "Found WireGuard 'generally functions as it should'; no critical bugs; robust under 80% packet loss",
+    "Found a timer-system implementation bug and a double-handshake scenario; recommended rounding the handshake-retransmission timer up and simplifying the send-keepalive timer"
+   ],
+   "brief": "A 2018 MIT 6.857 (Computer and Network Security) final project that audits WireGuard's session and timer logic by fuzzing across cloud nodes, reports good behaviour under adverse networks and two implementation issues, and recommends fixes. Filed with the HySecure Turbo material as third-party review evidence.",
+   "use_for": "Supporting evidence in a security questionnaire about the tunnel protocol behind Turbo. Lower weight than the formal proofs - it is a student project.",
+   "publish_year": "2018",
+   "expired": false,
+   "stale_risk": "Spring 2018 student project against an early WireGuard version; issues found were minor and likely fixed upstream.",
+   "superseded_by": "",
+   "confidence": 0.9,
+   "public_url": "https://courses.csail.mit.edu/6.857/2018/project/He-Xu-Xu-WireGuard.pdf",
+   "visibility": "both",
+   "internal_reason": "",
+   "needs_human": "Filename says 'He-Xu-Xu' but the third author on the paper is Jerry Wu. Student project, not an audit firm - don't call it a 'third-party security audit' to customers.",
+   "third_party_copyright": "Authors' MIT course project; publicly available."
+  },
+  {
+   "source": "sharepoint/Wireguard security testing.pdf",
+   "title": "A Mechanised Cryptographic Proof of the WireGuard VPN Protocol - Lipp, Blanchet, Bhargavan (Inria Research Report RR-9269, 2019, CryptoVerif)",
+   "asset_type": "Third-Party Research",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "Turbo",
+    "HySecure"
+   ],
+   "competitors": [
+    "WireGuard",
+    "IPsec",
+    "OpenVPN"
+   ],
+   "personas": [
+    "CISO",
+    "Network architect"
+   ],
+   "regulations": [],
+   "key_problem": "Symbolic proofs alone do not give computational cryptographic guarantees for the full protocol including transport data.",
+   "key_outcomes": [
+    "First mechanised computational proof of the whole WireGuard protocol, including transport data messages, using the CryptoVerif proof assistant in an ACCE-style model",
+    "Proves correctness, message secrecy, forward secrecy, mutual authentication, session uniqueness and resistance to key-compromise impersonation, identity mis-binding and replay",
+    "Discusses the strength of WireGuard's identity hiding; 49-page Inria report (April 2019, revised June 2019), HAL id hal-02100345v2"
+   ],
+   "brief": "An Inria Paris (Prosecco team) research report giving a machine-checked computational proof of WireGuard's security. Despite the SharePoint filename 'security testing', it is a formal cryptographic proof, not a penetration test. Filed with HySecure Turbo material as evidence for the protocol Turbo is built on.",
+   "use_for": "The strongest third-party assurance for the Turbo tunnel's cryptography in a security review; cite with the public HAL link and the Turbo Architecture v2 deck.",
+   "publish_year": "2019",
+   "expired": false,
+   "stale_risk": "2019 report; proofs apply to the WireGuard protocol, not to Accops' implementation.",
+   "superseded_by": "",
+   "confidence": 0.92,
+   "public_url": "https://hal.inria.fr/hal-02100345v2",
+   "visibility": "both",
+   "internal_reason": "",
+   "needs_human": "Filename 'Wireguard security testing' is misleading - it is a cryptographic proof. Consider renaming.",
+   "third_party_copyright": "Inria research report; open-access on HAL."
+  },
+  {
+   "source": "sharepoint/Accops - NanoOS - Tech Doc-v3.pdf",
+   "title": "Accops NanoOS Technical Document v3 (2020): Hardened Ubuntu Secure OS on USB or Disk - Features, Versions and Step-by-Step Setup",
+   "asset_type": "Technical Guide",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "Nano",
+    "NanoOS",
+    "HySecure",
+    "HyWorks",
+    "Thin Clients"
+   ],
+   "competitors": [],
+   "personas": [
+    "IT head",
+    "Presales engineer",
+    "Support engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Staff working from home on personal or old PCs expose corporate apps to keyloggers and malware on the local OS; IT needs a locked-down, disposable work OS without shipping laptops.",
+   "key_outcomes": [
+    "NanoOS: customised, hardened Ubuntu that turns any x86 PC into a locked-down thin client, either as a RAM-only live OS from a USB 3.0 drive (local disk untouched) or installed permanently on the hard drive",
+    "Pre-installed HySecure and HyWorks clients, Chrome, Firefox and SSH; works as VPN or VDI terminal",
+    "Controls: internet blocked after logon and logout, no local HDD or USB storage access, encrypted read-only file system wiped on reboot, will not boot in a VM, boot integrity check, password-protected GRUB, HySecure copy-paste policy, PKI device identity (HySecure 5.2 patch 605X) shown as 'Accops Nano'",
+    "Versions: Nano 1.0/1.2 on Xubuntu 16.04 (kernel 4.15), 1.2a (kernel 5.4.28), v1.4.1 64-bit",
+    "Step-by-step: burn the ISO with balenaEtcher (8 GB+ USB 3.0, tested on SanDisk Ultra), BIOS boot order, disable Secure Boot, HyWorks pre-requisites"
+   ],
+   "brief": "A 2020 confidential technical and how-to document for Accops NanoOS. It explains the two ways to use it (live USB or permanent install), lists 15 security features, gives OS and kernel versions, walks through live-USB and permanent-install flows, creating a bootable USB with balenaEtcher on Windows, Linux or macOS with screenshots, booting a user PC, and HyWorks and PC pre-requisites.",
+   "use_for": "Presales or support explaining exactly how Nano works and is rolled out (e.g. 'can they use their own PC safely?', 'what does the user have to do?'). For a customer-facing overview send the Nano Brochure V5 2026 (public) instead.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "2020; based on Xubuntu 16.04, which is end-of-life - check the current NanoOS base and version. Version table has placeholders (vXXXX, YYYYY). Download links point to balenaEtcher 1.5.80. Requires disabling Secure Boot.",
+   "superseded_by": "",
+   "confidence": 0.88,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Confidential'; contains a default installer username and password.",
+   "needs_human": "The document prints the installer confirmation credentials (username 'os', password 'password') - remove before sharing, and confirm they are not still valid on shipping images. An updated tech doc for the current NanoOS release is needed."
+  },
+  {
+   "source": "sharepoint/The+Economic+Times+-+Mumbai,+6_9_2021.pdf",
+   "title": "The Economic Times (Mumbai, 9 June 2021): Top Private Bank Enabled Remote Work for 78,000 Employees - Accops Named as Hybrid-Work Partner",
+   "asset_type": "Press Coverage",
+   "industry": "BFSI",
+   "client": "One of India's largest private banks (78,000 employees)",
+   "client_actual": "Axis Bank; quotes Avinash Raghavendra (EVP & Head IT) and Rajkamal Vempati (President & Head HR)",
+   "client_named": true,
+   "products": [],
+   "competitors": [
+    "Microsoft"
+   ],
+   "personas": [
+    "CIO",
+    "IT head",
+    "HR head"
+   ],
+   "regulations": [],
+   "key_problem": "The 2020 lockdown forced a large bank to put frontline and back-office staff on remote working almost overnight while keeping them productive and engaged.",
+   "key_outcomes": [
+    "Remote working enablement for 78,000 employees; 'what would have taken at least three months was done in 30 days' (EVP & Head IT)",
+    "Head of IT: 'our partners such as Accops, Microsoft among others have helped us in ramping up hybrid work'",
+    "Bank outcomes cited: in FY21, 74% of credit cards and 57% of personal loans issued digitally, 71% of fixed deposits opened virtually; 79% rise in technology spend over two years",
+    "HR measures: hybrid model with 2-3 office days, counselling, '7up' end of work by 7 pm, 'Weekend your Way', GIG-A-OPPORTUNITIES freelancers"
+   ],
+   "brief": "A one-page Economic Times (Mumbai edition) e-paper article of 9 June 2021, 'Transforming Digitally with Employees', by Suchetana Ray, about how a large private bank enabled remote work for 78,000 employees during the pandemic and kept them engaged. The text layer holds only the headline and URL; the article is an image. Accops is mentioned once, by name, as a partner that helped ramp up hybrid work.",
+   "use_for": "Third-party press proof that a top private bank credits Accops for its remote / hybrid-work rollout - useful for BFSI credibility, alongside the bank's own case study. Accops is a single mention, not the subject.",
+   "publish_year": "2021",
+   "expired": false,
+   "stale_risk": "June 2021, pandemic context; figures are the bank's FY21 numbers.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Newspaper clipping; Times Group copyright; no verified public URL for the article.",
+   "needs_human": "Carded from the article image (text layer has only the headline and e-paper URL). Times Group copyright - share the ET link rather than the PDF if used externally. Filed in 'Paid Media_Case Studies' - was this paid placement?",
+   "third_party_copyright": "Bennett, Coleman & Co. (The Economic Times). Newspaper article."
+  },
+  {
+   "source": "sharepoint/BOTS Slot - 1-pages-1-compressed.pdf",
+   "title": "BOTS 8.0 'Book of Titans' - World CIO 200 Roadshow 2025, Part 1 of 5 (Scanned): Cover, Founder's Note and CIO Project Profiles",
+   "asset_type": "Event Publication",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [],
+   "competitors": [],
+   "personas": [
+    "SDR",
+    "Account executive",
+    "Regional sales head",
+    "Marketing"
+   ],
+   "regulations": [],
+   "key_problem": "Event collateral from the Global CIO Forum's CIO200 programme, useful for prospecting CIOs met at the MEA roadshow.",
+   "key_outcomes": [
+    "Scanned book (50 pages in this part): cover 'BOTS 8.0 - Celebrating the success of Top 200 CIOs & pioneering digital projects - Book of Titans, World CIO 200 Roadshow 2025'",
+    "Founder's note from the Global CIO Forum (10th edition of CIO200; top 200 projects from 6,000+ nominations)",
+    "One-page CIO profiles: name, title, organisation, country, sector, project, technologies, challenges, success metrics, 2026 investment priorities, certifications (e.g. a UAE events/hospitality group's Head of Telecoms & Technology)"
+   ],
+   "brief": "The first of five scanned sections of the Global CIO Forum's 'Book of Titans' (BOTS 8.0) for the World CIO 200 Roadshow 2025, filed under Roadshows/MEA/Egypt. Image-only PDF - no text layer; carded from sampled pages. Each page profiles a CIO or CISO and their flagship digital project, including stated 2026 investment priorities.",
+   "use_for": "SDR and regional prospecting after the CIO200 roadshow: find CIOs by country and sector, and use their stated projects and 2026 priorities (AI, cybersecurity, zero trust, cloud) as outreach hooks. Not Accops collateral; never send.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "2025 edition; job titles and employers change quickly.",
+   "superseded_by": "",
+   "confidence": 0.5,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Third-party event book containing personal profiles of named CIOs; image-only scan.",
+   "needs_human": "Image-only scan with no text - carded from 3 sampled pages; SAM cannot search the CIO names inside. If the book is useful for prospecting, OCR it or get the digital edition from Global CIO Forum. Contains personal data of third parties - keep internal.",
+   "third_party_copyright": "Global CIO Forum (CIO200 / BOTS 8.0)."
+  },
+  {
+   "source": "sharepoint/BOTS Slot - 2-compressed.pdf",
+   "title": "BOTS 8.0 'Book of Titans' - World CIO 200 Roadshow 2025, Part 2 of 5 (Scanned CIO/CISO Project Profiles)",
+   "asset_type": "Event Publication",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [],
+   "competitors": [],
+   "personas": [
+    "SDR",
+    "Account executive",
+    "Regional sales head"
+   ],
+   "regulations": [],
+   "key_problem": "Continuation of the CIO200 Book of Titans profiles.",
+   "key_outcomes": [
+    "49 scanned pages of one-page CIO/CISO profiles with project, metrics and 2026 priorities",
+    "Sampled page: a Nigerian bank CISO's SOC modernisation (SOAR, ML detection; MTTD down 76%, MTTR down 82%)"
+   ],
+   "brief": "Second scanned section of the Global CIO Forum BOTS 8.0 book (World CIO 200 Roadshow 2025), filed under Roadshows/MEA/Egypt. Image-only; carded from a sampled page.",
+   "use_for": "Prospecting research on CIOs/CISOs profiled in the book (MEA, Africa, Asia). Internal only.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "2025 edition; roles change.",
+   "superseded_by": "",
+   "confidence": 0.45,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Third-party event book with personal profiles; image-only scan.",
+   "needs_human": "Image-only; carded from one sampled page. See Part 1.",
+   "third_party_copyright": "Global CIO Forum (CIO200 / BOTS 8.0)."
+  },
+  {
+   "source": "sharepoint/BOTS Slot - 3.pdf",
+   "title": "BOTS 8.0 'Book of Titans' - World CIO 200 Roadshow 2025, Part 3 of 5 (Scanned CIO Project Profiles)",
+   "asset_type": "Event Publication",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [],
+   "competitors": [],
+   "personas": [
+    "SDR",
+    "Account executive",
+    "Regional sales head"
+   ],
+   "regulations": [],
+   "key_problem": "Continuation of the CIO200 Book of Titans profiles.",
+   "key_outcomes": [
+    "49 scanned pages of one-page CIO profiles",
+    "Sampled page: a Qatari manufacturer's ERP digital transformation (30% faster order processing, 20% higher production efficiency)"
+   ],
+   "brief": "Third scanned section of the Global CIO Forum BOTS 8.0 book, filed under Roadshows/MEA/Egypt. Image-only; carded from a sampled page.",
+   "use_for": "Prospecting research on profiled CIOs (Gulf, MEA). Internal only.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "2025 edition; roles change.",
+   "superseded_by": "",
+   "confidence": 0.45,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Third-party event book with personal profiles; image-only scan.",
+   "needs_human": "Image-only; carded from one sampled page. See Part 1.",
+   "third_party_copyright": "Global CIO Forum (CIO200 / BOTS 8.0)."
+  },
+  {
+   "source": "sharepoint/BOTS Slot - 4.pdf",
+   "title": "BOTS 8.0 'Book of Titans' - World CIO 200 Roadshow 2025, Part 4 of 5 (Scanned CIO Project Profiles)",
+   "asset_type": "Event Publication",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [],
+   "competitors": [],
+   "personas": [
+    "SDR",
+    "Account executive",
+    "Regional sales head"
+   ],
+   "regulations": [],
+   "key_problem": "Continuation of the CIO200 Book of Titans profiles.",
+   "key_outcomes": [
+    "50 scanned pages of one-page CIO profiles",
+    "Sampled page: a Malaysian education group CIO's AI-driven education management system"
+   ],
+   "brief": "Fourth scanned section of the Global CIO Forum BOTS 8.0 book, filed under Roadshows/MEA/Egypt. Image-only; carded from a sampled page. Includes South-East Asian CIOs as well as MEA.",
+   "use_for": "Prospecting research on profiled CIOs, including Malaysia / SEA. Internal only.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "2025 edition; roles change.",
+   "superseded_by": "",
+   "confidence": 0.45,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Third-party event book with personal profiles; image-only scan.",
+   "needs_human": "Image-only; carded from one sampled page. See Part 1.",
+   "third_party_copyright": "Global CIO Forum (CIO200 / BOTS 8.0)."
+  },
+  {
+   "source": "sharepoint/BOTS Slot - 5.pdf",
+   "title": "BOTS 8.0 'Book of Titans' - World CIO 200 Roadshow 2025, Part 5 of 5 (Scanned CIO Project Profiles)",
+   "asset_type": "Event Publication",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [],
+   "competitors": [],
+   "personas": [
+    "SDR",
+    "Account executive",
+    "Regional sales head"
+   ],
+   "regulations": [],
+   "key_problem": "Final section of the CIO200 Book of Titans profiles.",
+   "key_outcomes": [
+    "30 scanned pages of one-page CIO profiles",
+    "Sampled page: a Dubai entertainment group's IT & Digital executive director's multi-year transformation (NPS +20, CRM database 4x)"
+   ],
+   "brief": "Fifth and last scanned section of the Global CIO Forum BOTS 8.0 book, filed under Roadshows/MEA/Egypt. Image-only; carded from a sampled page.",
+   "use_for": "Prospecting research on profiled CIOs (UAE, MEA). Internal only.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "2025 edition; roles change.",
+   "superseded_by": "",
+   "confidence": 0.45,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Third-party event book with personal profiles; image-only scan.",
+   "needs_human": "Image-only; carded from one sampled page. See Part 1.",
+   "third_party_copyright": "Global CIO Forum (CIO200 / BOTS 8.0)."
+  },
+  {
+   "source": "sharepoint/Accops Brandbook 2025.pdf",
+   "title": "Accops Brand Guidelines (Brandbook 2025): Logo, Product Logos, Colour Palette with Hex/RGB/CMYK, Typography, Iconography and Imagery Rules",
+   "asset_type": "Brand Guidelines",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [],
+   "competitors": [],
+   "personas": [
+    "Marketing",
+    "Designer",
+    "Partner",
+    "Agency"
+   ],
+   "regulations": [],
+   "key_problem": "Everyone producing Accops material - marketing, partners, agencies - needs one reference for how the brand looks so collateral stays consistent.",
+   "key_outcomes": [
+    "Developed by an external design agency; covers core values, primary and secondary logos, clear space and minimum size, do's and don'ts, favicon (48 px), product logos",
+    "Primary colours: Portland Orange #f05a30, Cantaloupe #ffaf2a, Davy Grey #555555, white, black (with RGB and CMYK); full secondary, tertiary and gradient palettes (e.g. navy #0b246e, blue #4661ad, purple #6533b6)",
+    "Typography: Barlow and Segoe UI for brand; Roboto Flex and Spline Sans for products, with weights for heading, body and emphasis",
+    "Iconography, image selection, wrong image usage, and logo use on images"
+   ],
+   "brief": "The 2025 Accops brand book (about 28 pages), created by an external agency. It defines the logo system and product logos, the colour system with exact hex, RGB and CMYK values, brand and product typefaces and their usage, iconography, image selection rules and examples of wrong usage.",
+   "use_for": "Designers, agencies, partners and anyone building co-branded material, event booths, slides or web pages who asks for 'brand guidelines', 'our colours / hex codes', 'which font' or 'the logo rules'. Not customer collateral.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "2025 edition; check whether a 2026 refresh exists.",
+   "superseded_by": "",
+   "confidence": 0.88,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal brand reference; no verified public URL.",
+   "needs_human": "Can this be shared with partners and agencies as-is? If so, mark it as partner-shareable."
   }
  ]
 }
