@@ -38,6 +38,8 @@ const REG = [
   row("R4", "Presentations", "Accops Solutions for Govt V1 2026.pptx", "Presentation"),
   row("R5", "eBooks", "Accops Browser Isolation eBook.pdf", "eBook"),
   row("R6", "Social Media", "Social-Media-Banners Browser Isolation.png", "Brand"),
+  row("R7", "Videos/Demo Videos/Revised", "Device posture check and related data on management console.mp4", "Video"),
+  row("R8", "Brochures & Datasheets/New", "Accops HyID Datasheet.V5 2026.pdf", "Brochure"),
 ];
 
 // ---- stubbed network: Supabase fixtures, and a scripted model
@@ -61,7 +63,7 @@ const call = (args) => () => ({ role: "assistant", content: null, tool_calls: [{
 const say = (text) => () => ({ role: "assistant", content: text });
 const run = (steps) => { script = [...steps]; bodies = []; };
 
-const { ask, heuristicFilters, assetTypeOf, namedTitles } = await jiti.import("./agent.ts");
+const { ask, heuristicFilters, assetTypeOf, namedTitles, PRICE_ASK, searchText, SYSTEM } = await jiti.import("./agent.ts");
 const { refresh } = await jiti.import("./registry-cache.ts");
 const { apiSearch, apiAsk } = await jiti.import("./api.ts");
 await refresh();
@@ -109,10 +111,17 @@ r = await ask("pricing for hydesk");
 ok(/^Pricing is not in the collateral library/.test(r.text) && r.assets.length === 0 && r.zero, `pricing is a gap: ${r.text}`);
 ok(!/^Pricing/.test((run([call({ query: "hydesk" }), say("- **Accops HyDesk Brochure V6 2026** - fits")]), await ask("hydesk brochure for cost savings")).text), "'cost savings' is not a pricing ask");
 
-// 1d''. The model turns everything down and names nothing: a gap, no contradicting cards.
+// 1d''. The model turns everything down and names nothing. Still missing (a gap), but the rep gets
+// the closest real results that clear the relevance floor, labelled as substitutes - the model
+// over-rejects ("No pharma case study" over four pharma whitepapers).
 run([say("No media-industry ZTNA whitepaper is available.")]);
 r = await ask("do we have a media industry ZTNA whitepaper?");
-ok(r.zero && r.intent === "gap" && r.assets.length === 0 && /^No media/.test(r.text), `a denial with no named substitute is a gap: ${r.assets.map(a => a.title)}`);
+ok(r.missing && !r.zero && r.intent === "gap" && r.assets.length >= 1 && r.assets.length <= 2 && /^No media.*\nClosest in the library:$/.test(r.text),
+  `a denial naming nothing still shows up to 2 real substitutes: ${r.text} | ${r.assets.map(a => a.title)}`);
+// ...unless nothing clears the floor: then a plain gap, no cards contradicting the sentence.
+run([say("No Arabic collateral exists.")]);
+r = await ask("arabic collateral");
+ok(r.zero && r.missing && r.assets.length === 0 && r.text === "No Arabic collateral exists.", `junk-only -> plain gap: ${r.text} | ${r.assets.map(a => a.title)}`);
 run([say("No exact match. Closest:\n- **Accops HyDesk Brochure V6 2026** - nearest fit")]);
 r = await ask("hydesk brochure for a new branch office");
 ok(!r.zero && r.missing && r.assets.some(a => /HyDesk/.test(a.title)), `a denial that names a real substitute keeps its cards, and is still missing: ${r.assets.map(a => a.title)}`);
@@ -200,11 +209,12 @@ ok(r.missing && !r.zero && r.intent === "gap", `substitutes shown, exact thing s
 ok(r.assets.length === 1 && r.assets[0].title === "Accops Browser Isolation eBook", `only the real substitute is a card: ${r.assets.map(a => a.title)}`);
 ok(!/Banners/.test(r.text) && /^No Browser Isolation brochure/.test(r.text) && /eBook/.test(r.text), `the banner line is dropped from the prose: ${r.text}`);
 ok(r.assets.length <= 2, "at most 2 substitutes");
-// 7b. Only junk named: a gap with no cards, verdict sentence only.
+// 7b. Only junk named: the junk is dropped and the closest real results that clear the floor stand in.
 run([say(`No Browser Isolation brochure exists yet.
 - **Social-Media-Banners Browser Isolation** - substitute: visuals`)]);
 r = await ask("remote browser isolation brochure");
-ok(r.zero && r.missing && r.assets.length === 0 && r.text === "No Browser Isolation brochure exists yet.", `junk substitutes -> plain gap: ${r.text} ${r.assets.map(a => a.title)}`);
+ok(!r.zero && r.missing && r.assets.length <= 2 && r.assets.some(a => /Browser Isolation eBook/.test(a.title)) && !r.assets.some(a => /Banners/.test(a.title))
+  && !/Banners/.test(r.text) && r.text.startsWith("No Browser Isolation brochure exists yet.\nClosest in the library:"), `junk named -> real substitutes instead: ${r.text} ${r.assets.map(a => a.title)}`);
 // 7c. The model says an eBook "fits" a brochure ask: not a denial, but the brochure is still missing.
 run([say(`One asset fits.
 - **Accops Browser Isolation eBook** - covers isolation`)]);
@@ -225,6 +235,42 @@ run([say(`No Browser Isolation brochure exists yet.
 const a7 = await apiAsk("remote browser isolation brochure", "check", "api");
 ok(a7.missing === true && a7.gap === false && a7.assets.length === 1, `apiAsk exposes missing distinct from gap: ${JSON.stringify({ m: a7.missing, g: a7.gap })}`);
 ok(logged.some(e => e.kind === "gap" && e.query === "remote browser isolation brochure"), "a gap event is logged for a missing-with-substitutes answer");
+
+// 8. Repros from the 25 Sep production salesperson test.
+const seedSaw = (t) => bodies[0].messages.some(m => m.role === "tool" && m.tool_call_id === "seed" && m.content.includes(t));
+// 8a. A mis-tagged asset: City Pharmacy is filed under retail, so the Pharma-filtered seed missed it.
+run([say("- **Accops City Pharmacy Case Study** - a pharmacy chain, public")]);
+r = await ask("pharma case study I can send a customer");
+ok(seedSaw("City Pharmacy"), "the seed also searches the words without the industry filter");
+ok(r.assets[0]?.title === "Accops City Pharmacy Case Study" && !r.missing, `mis-tagged asset found and grounded: ${r.assets.map(a => a.title)}`);
+// 8b. Over-rejection: the model says no, the real results still show as substitutes.
+run([say("No pharma case study matches.")]);
+r = await ask("pharma customer proof");
+ok(r.missing && !r.zero && r.assets.length > 0 && r.assets.length <= 2 && r.assets.every(a => /pharma/i.test(`${a.title} ${a.industry}`)), `over-rejection still shows pharma substitutes: ${r.assets.map(a => a.title)}`);
+run([say("No HyID one-pager exists.")]);
+r = await ask("one pager on HyID i can email");
+ok(r.assets.some(a => /HyID Datasheet/.test(a.title)), `a one-pager ask surfaces the HyID datasheet: ${r.assets.map(a => a.title)}`);
+// 8c. Videos carry no product tag; a named type Video still finds them.
+run([say("- **Device posture check and related data on management console** - HySecure device posture demo")]);
+r = await ask("hysecure demo video");
+ok(seedSaw("Device posture check") && r.assets[0]?.title.startsWith("Device posture check") && !r.missing, `video found: ${r.assets.map(a => a.title)}`);
+// 8d. Pricing means Accops pricing, not "price" anywhere in the deal story.
+for (const q of ["pricing for hydesk", "what does hyworks cost", "HyWorks price list", "quote for 500 users", "how much does hysecure cost per user", "licence cost for HyID", "hyid pricing"])
+  ok(PRICE_ASK.test(q), `pricing ask: ${q}`);
+for (const q of ["customer on vmware horizon wants to move after broadcom price hike, omnissa migration pitch?", "hydesk brochure for cost savings", "vdi cost savings case study", "citrix price increase battlecard", "cost of downtime whitepaper"])
+  ok(!PRICE_ASK.test(q), `not a pricing ask: ${q}`);
+run([say("- **Accops Powered VDI vs Citrix VDI** - migration angle")]);
+r = await ask("customer on vmware horizon wants to move after broadcom price hike, omnissa migration pitch?");
+ok(!/^Pricing is not/.test(r.text), `deal context is not a pricing ask: ${r.text}`);
+// 8e. Short follow-ups are searched with the previous question.
+const hist = [{ role: "user", content: "hydesk brochure" }, { role: "assistant", content: "- **Accops HyDesk Brochure V6 2026** - current" }];
+ok(searchText("anything newer?", hist) === "hydesk brochure anything newer?" && searchText("shorter one? something 1-2 pages", hist).startsWith("hydesk brochure"), "follow-ups carry the topic");
+ok(searchText("citrix battlecard", hist) === "citrix battlecard" && searchText("anything newer?") === "anything newer?", "a new ask, or no history, is searched as typed");
+run([say("- **Accops HyDesk Brochure V6 2026** - the current edition")]);
+r = await ask("anything newer?", hist);
+ok(!r.zero && r.assets[0]?.title === "Accops HyDesk Brochure V6 2026" && seedSaw("HyDesk"), `follow-up answered: ${r.text} | ${r.assets.map(a => a.title)}`);
+// 8f. "public" only when sending outside.
+ok(/"public" or "published" in the verdict only if the rep is sending/.test(SYSTEM), "the prompt keeps visibility talk out of internal verdicts");
 
 // 6. Cold start: apiSearch waits for the registry instead of ranking the frozen cards alone.
 globalThis.__samReg = undefined; globalThis.__samRegAt = undefined; regDelay = 50;

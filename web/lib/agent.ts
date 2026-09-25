@@ -31,15 +31,17 @@ export const SYSTEM = `You are SAM. You help Accops sales reps find collateral. 
 workspace vendor: HySecure (ZTNA), HyID (MFA/SSO), HyWorks (VDI/DaaS), HyLabs, HyDesk (thin clients), Browser Isolation.
 
 - Name ONLY documents search_assets returned, by exact title. Never invent a document, client, number or price.
-  If nothing returned is what was asked for, say so in one sentence starting "No", then list up to 2 closest
-  substitutes that share its product or topic, each "- **exact title** - substitute: why it helps". None close: name none.
+  A result that meets the need in substance (right industry or product, other type) fits. If none is exactly what was
+  asked, start "No exact ..." and still list the 2 closest as "- **exact title** - substitute: why it helps".
+  Name none only if every result is unrelated.
 - A search in the rep's own words has already run; its results are above. Search again only if none of them fit.
   Set asset_type only when the rep names a type. The server widens a filter that finds nothing and decides internal
   vs external from the rep's wording, so never repeat a search reworded. At most 2 more searches.
 - The library has case studies, whitepapers, decks, brochures and datasheets, certificates, and competitive battlecards
   (vs Citrix, VMware Horizon, Omnissa, Zscaler, Cisco AnyConnect and others). A battlecard IS a deck: when a rep asks
   for a deck and a battlecard fits, recommend it as the deck.
-- visibility "public" may be sent outside Accops; "internal" must not leave Accops. Say which.
+- visibility "public" may be sent outside Accops; "internal" must not leave Accops. Say which in each asset's line.
+  Say "public" or "published" in the verdict only if the rep is sending something outside Accops.
 - trust is a warning to pass on: EXPIRED means do not send it; a newer edition means recommend that one; an age note
   goes in that asset's line.
 - Case-study clients are anonymised: use the descriptor unless the result names the client.
@@ -52,7 +54,7 @@ export const MAX_SEARCHES = 3;
 /** Results per search handed to the model. Three become cards; one spare lets it pick the newer
  *  edition. Was 5 at 300-char briefs, which made the tool payload most of every question's tokens. */
 const SEARCH_LIMIT = 4;
-export const ASSET_TYPES = ["Case Study", "Whitepaper", "Battlecard", "Deck", "Brochure"];
+export const ASSET_TYPES = ["Case Study", "Whitepaper", "Battlecard", "Deck", "Brochure", "Video"];
 
 const tools: Anthropic.Tool[] = [{
   name: "search_assets",
@@ -125,6 +127,8 @@ export function assetTypeOf(value: unknown): string | undefined {
   const v = String(value ?? "").toLowerCase().replace(/[\s-]+/g, "");
   if (!v) return undefined;
   if (/compar|versus|^vs/.test(v)) return "Battlecard";
+  // Not a catalogue group, but a real registry type (26 files): searchAssets matches it on asset_type.
+  if (/video|recording/.test(v)) return "Video";
   const g = typeGroup({ asset_type: v } as Asset);
   return g === "Other" ? undefined : g;
 }
@@ -135,7 +139,8 @@ const TYPE_WORDS: [string, RegExp][] = [
   ["Whitepaper", /white ?paper|e-?book|thought leadership|\bpov\b/],
   ["Battlecard", /battle ?card|competitive|comparison|compare|\bvs\.?\b|versus/],
   ["Deck", /\bdecks?\b|presentation|\bslides?\b|\bppt/],
-  ["Brochure", /brochure|data ?sheet|leaflet|flyer|one-pager/],
+  ["Brochure", /brochure|data ?sheet|leaflet|flyer|one[- ]?pager/],
+  ["Video", /\bvideos?\b|\brecordings?\b/],
 ];
 export function typesNamedIn(q: string): string[] {
   const p = q.toLowerCase();
@@ -240,13 +245,25 @@ export function namesAsset(name: string, a: Asset): boolean {
 const DENIAL = /^\W*(no\b|none\b|nothing\b|there (is|are) no\b|we (do not|don['’]t) have\b|sam (does not|doesn['’]t) have\b|the library (does not|doesn['’]t) have\b|i (could not|couldn['’]t) find\b|unfortunately\b)/i;
 const GAP_TEXT = "Nothing in the library matches that, and it has been logged as a content gap. Try a broader industry or product, or browse the catalogue.";
 // "what does hyworks cost", "pricing for HyWorks" - not "cost savings case study".
-const PRICE_ASK = /\b(price|prices|pricing|priced|quote|quotation|how much)\b|\bwhat (does|do|would) .{1,40}\bcost\b|\bcost of (a |an |the )?(licen|subscription|hy|accops)/i;
+// Only a request for ACCOPS pricing: "a customer moving after Broadcom's price hike" is deal context,
+// and the old bare-word match answered it with the canned pricing line and no cards.
+export const PRICE_ASK = new RegExp([
+  String.raw`\bprice ?lists?\b`, String.raw`\bquotations?\b`,
+  String.raw`\b(pricing|quotes?)\s+(for|of|on)\b`,
+  String.raw`\b(prices?|cost)\s+(for|of)\s+(a |an |the )?(accops|hy|ztna|mfa|vdi|daas|licen|subscription|\d)`,
+  String.raw`\bhow much (does|do|is|are|would|will|for)\b`,
+  String.raw`\bwhat (does|do|would|will) .{1,40}\bcost\b`,
+  String.raw`\b(licen[cs]e|licen[cs]ing|subscription|per[- ]?(user|seat|device))\s+(price|pricing|cost)s?\b`,
+  String.raw`\b(accops|our|hy(secure|id|works|labs|desk)|ztna|mfa|vdi|daas)\s+(price|pricing|quote)s?\b`,
+  String.raw`^\W*(price|pricing|quote)\b`,
+].join("|"), "i");
 const NO_PRICING = "Pricing is not in the collateral library, so SAM cannot quote it. Check current pricing with your sales manager. This has been logged as a content gap.";
 
 // ---- Missing, and what may stand in for it ----------------------------------------------------
 
 /** A type the rep named, satisfied by this asset. A battlecard IS a deck (see searchAssets). */
 function isType(a: Asset, t: string): boolean {
+  if (t === "Video") return /video|demo/i.test(a.asset_type) || /\.(mp4|mov|webm)$/i.test(a.file?.path ?? "");
   const g = typeGroup(a);
   return g === t || (t === "Deck" && g === "Battlecard");
 }
@@ -271,7 +288,10 @@ export function substituteFits(question: string, a: Asset): boolean {
   if (f.product && productsOf(a).includes(f.product)) return true;
   if (f.vertical && verticalOf(a) === f.vertical) return true;
   const words = queryTokens(question).filter(w => !typesNamedIn(w).length && !GENERIC.has(w) && !/^(report|webinar|ebook|slides?)$/.test(w));
-  const hay = `${a.title} ${productsOf(a).join(" ")} ${a.use_for}`.toLowerCase();
+  // With a product or industry named, a topic word must be in the TITLE ("City Pharmacy" for a pharma
+  // ask filed under retail); "remote" somewhere in a BFSI case study's use_for is not a substitute
+  // for a Browser Isolation brochure.
+  const hay = `${a.title} ${productsOf(a).join(" ")} ${f.product || f.vertical ? "" : a.use_for}`.toLowerCase();
   return words.some(w => tokenMatcher(w).test(hay));
 }
 
@@ -310,8 +330,36 @@ export function seedSearch(question: string): SearchRun | null {
   // would come back with three random assets under it.
   if (!queryTokens(question).length) return null;
   const f = heuristicFilters(question);
-  return runSearch({ query: question, asset_type: f.asset_type, vertical: f.vertical, product: f.product }, question);
+  // A type the rep named is a filter too (runSearch drops it again if it finds nothing).
+  const asset_type = f.asset_type || typesNamedIn(question)[0] || "";
+  const a = runSearch({ query: question, asset_type, vertical: f.vertical, product: f.product }, question);
+  if (!f.vertical && !f.product) return a;
+  // Industry and product tags are keyword guesses, and a mis-tagged asset is invisible to a filtered
+  // search: City Pharmacy is filed under E-commerce / Retail, so "pharma customer proof" never saw it;
+  // HySecure demo videos carry no product tag. So the words alone run too, and fill the list.
+  const b = runSearch({ query: question, asset_type }, question);
+  const seen = new Set<string>(), hits: SearchHit[] = [];
+  for (const h of [...a.hits.slice(0, 3), ...b.hits, ...a.hits.slice(3)]) {
+    const k = assetKey(h.asset);
+    if (!seen.has(k) && hits.length < SEARCH_LIMIT + 1) { seen.add(k); hits.push(h); }
+  }
+  const note = [a.note, b.hits.some(h => !a.hits.some(x => assetKey(x.asset) === assetKey(h.asset))) ? "some results matched the words without the industry/product filter" : null].filter(Boolean).join("; ") || null;
+  return { hits, considered: a.considered, input: a.input, note, payload: toolPayload(hits, note) };
 }
+
+/** What to search for. A short follow-up ("anything newer?", "shorter one? 1-2 pages") means nothing
+ *  on its own and came back a gap; it is about the previous question, so it is searched with it.
+ *  ponytail: "no topic words of its own, or opens like a follow-up, and names no type" is the whole
+ *  test; "citrix battlecard" after a pharma question is searched on its own, which is right. */
+export function searchText(question: string, history: { role: string; content: string }[] = []): string {
+  const prev = [...history].reverse().find(h => h.role === "user")?.content?.trim();
+  if (!prev) return question;
+  if (typesNamedIn(question).length) return question; // "citrix battlecard" is a new ask
+  const content = queryTokens(question).filter(t => !FOLLOW_WORDS.test(t));
+  const opener = /^\W*(and|also|what about|how about|anything|any|something|shorter|longer|newer|older|another|other|more|same|that|this|it|one|ok|okay)\b/i.test(question);
+  return content.length === 0 || opener ? `${prev} ${question}` : question;
+}
+const FOLLOW_WORDS = /^(newer|older|shorter|longer|smaller|bigger|pages?|another|else|more|one|version|edition|similar|instead|also)$/;
 export const SEED_STEP = "tool call: search_assets (the rep's own words)";
 
 export function finish(p: {
@@ -342,18 +390,29 @@ export function finish(p: {
     p.trace.push({ step: "verdict: nothing fits", detail: why });
     return { text: t, assets: [], trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error, intent: "gap", zero: true, missing: true };
   };
-  // The model looked at everything found and turned it all down ("No media-industry ZTNA whitepaper
-  // is available.") without naming a substitute. Believe it: the retrieval floor always finds
-  // SOMETHING, and showing social-media banner images under that sentence contradicts it.
-  if (searched && text && !names.length && DENIAL.test(text)) return gap(text, "the model rejected every result and named none");
-  // "No Browser Isolation brochure exists yet" and then substitutes. The exact thing is still missing
-  // (a gap, and the rep may ask marketing for it), but the rep gets the closest real documents - only
-  // the ones the model named that clear the relevance floor, at most 2, never padded with the rest.
-  if (searched && text && !bad.length && named.length && DENIAL.test(text)) {
-    const subs = [...new Set(named)].filter(h => substituteFits(p.question, h.asset)).slice(0, 2);
-    if (!subs.length) return gap(text.split("\n")[0], "the model's substitutes share nothing with the ask");
-    if (subs.length < named.length) p.trace.push({ step: "substitutes: floor", detail: `kept ${subs.length} of ${named.length} named substitutes` });
-    return { text: keepLines(text, subs), assets: subs.map(toCard), trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error,
+  // The verdict is "we don't have it". The exact thing is missing (a gap, and the rep may ask marketing
+  // for it), but the rep still gets the closest real documents, clearly as substitutes:
+  //   - the ones the model named, if they clear the relevance floor (at most 2);
+  //   - otherwise the best results that clear it. The model over-rejects: production said "No pharma
+  //     case study" over four pharma whitepapers and a public pharmacy case study, and zero cards hid
+  //     all of them. Only when nothing clears the floor (banner PNGs for a whitepaper ask) is it a
+  //     plain gap with no cards.
+  if (searched && text && !bad.length && DENIAL.test(text)) {
+    const verdict = text.split("\n")[0].trim();
+    let subs = [...new Set(named)].filter(h => substituteFits(p.question, h.asset)).slice(0, 2);
+    let out: string;
+    if (subs.length) {
+      if (subs.length < named.length) p.trace.push({ step: "substitutes: floor", detail: `kept ${subs.length} of ${named.length} named substitutes` });
+      out = keepLines(text, subs);
+    } else {
+      subs = hits.filter(h => substituteFits(p.question, h.asset)).slice(0, 2);
+      if (!subs.length) return gap(verdict, named.length ? "the model's substitutes share nothing with the ask" : "the model rejected every result and nothing clears the relevance floor");
+      p.trace.push({ step: "substitutes: from the results", detail: `the model named ${named.length ? "only unrelated documents" : "none"}; showing the ${subs.length} closest that share the ask's product, industry or topic` });
+      out = `${verdict}\nClosest in the library:`;
+    }
+    if (heuristicFilters(p.question).audience === "external" && !subs.some(h => h.asset.public_url))
+      out += "\nNone of these is published, so ask marketing before sending anything outside Accops.";
+    return { text: out, assets: subs.map(toCard), trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error,
       intent: "gap", zero: false, missing: true };
   }
   const shown = [...new Set([...named, ...hits])].slice(0, 3);
@@ -407,7 +466,7 @@ export async function ask(question: string, history: { role: "user" | "assistant
     try { return withFailures(await askClaude(question, history, t0, deadline)); }
     catch (err) { failed(process.env.CLAUDE_MODEL ?? "claude-sonnet-5", err); }
   }
-  const local = askLocal(question, t0);
+  const local = askLocal(searchText(question, history), t0);
   // Surface provider failures in the trace so a silent fallback is visible in the UI, API and dashboard.
   for (const f of failures) local.trace.unshift({ step: "model provider failed, fell back to retrieval", detail: `${f.model}: ${f.message}`.slice(0, 300) });
   return { ...local, error: providerFailure(failures, false) };
@@ -421,11 +480,12 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
   const messages: Anthropic.MessageParam[] = [...history.slice(-4), { role: "user", content: question }];
   const trace: AskResult["trace"] = [];
   const pool: SearchHit[] = [];
-  const seed = seedSearch(question);
+  const sq = searchText(question, history); // what to search for: a short follow-up carries the previous question
+  const seed = seedSearch(sq);
   if (seed) {
     pool.push(...seed.hits);
     trace.push({ step: SEED_STEP, detail: JSON.stringify(seed.input) }, { step: "tool result", detail: `${seed.hits.length} of ${seed.considered} assets${seed.note ? ` - ${seed.note}` : ""}` });
-    messages.push({ role: "assistant", content: [{ type: "tool_use", id: "seed", name: "search_assets", input: { query: question } }] },
+    messages.push({ role: "assistant", content: [{ type: "tool_use", id: "seed", name: "search_assets", input: { query: sq } }] },
       { role: "user", content: [{ type: "tool_result", tool_use_id: "seed", content: seed.payload }] });
   }
   let filters: Record<string, unknown> = seed ? { ...seed.input } : {}, calls = seed ? 1 : 0;
@@ -438,13 +498,13 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
     if (final || res.stop_reason !== "tool_use" || toolUses.length === 0) {
       const text = res.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map(b => b.text).join("\n").trim();
       trace.push({ step: "model", detail: `${model} · ${((Date.now() - t0) / 1000).toFixed(1)}s · ${res.usage.input_tokens} in / ${res.usage.output_tokens} out` });
-      return finish({ question, text, pool, calls, runtime: "claude", model, trace, filters,
+      return finish({ question: sq, text, pool, calls, runtime: "claude", model, trace, filters,
         error: text ? null : { kind: final ? "step_exhausted" : "empty_answer", detail: `${model} finished with no text after ${calls} searches` } });
     }
     messages.push({ role: "assistant", content: res.content });
     const results: (Anthropic.ToolResultBlockParam | Anthropic.TextBlockParam)[] = [];
     for (const tu of toolUses) {
-      const s = runSearch(tu.input as Record<string, unknown>, question);
+      const s = runSearch(tu.input as Record<string, unknown>, sq);
       calls++; filters = { ...s.input };
       pool.push(...s.hits);
       trace.push({ step: "tool call: search_assets", detail: JSON.stringify(s.input) }, { step: "tool result", detail: `${s.hits.length} of ${s.considered} assets${s.note ? ` - ${s.note}` : ""}` });
