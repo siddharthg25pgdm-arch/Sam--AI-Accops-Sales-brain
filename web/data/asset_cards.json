@@ -817,7 +817,7 @@
       "inventory_filename": "Defence_RD_AccopsNutanix_V3.pdf",
       "title": "Defence RD Accops Nutanix V3",
       "asset_type": "Case Study",
-      "industry": "Defence / R&D",
+      "industry": "Government / Defence R&D",
       "client": "A defence research and development organisation (anonymised; government-aligned)",
       "products": [
         "HyWorks (VDI with GPU)",
@@ -835,7 +835,7 @@
       ],
       "brief": "",
       "use_for": "Defence/research/government pitch; GPU VDI use case; internet isolation in sensitive environments; post-VMware migration",
-      "section": "SECTION 3: CASE STUDIES — MANUFACTURING / INDUSTRY 4.0",
+      "section": "SECTION 5: CASE STUDIES — GOVERNMENT / DEFENCE / RESEARCH",
       "file": {
         "path": "case studys/case study nutanix/Defence R&D_Accops-Nutanix.V3.pdf",
         "modified": "2026-03-31",
@@ -1014,7 +1014,7 @@
       "inventory_filename": "Accops__Govt_Web_ZTNA__Case_Study.pdf",
       "title": "Accops Govt Web ZTNA Case Study",
       "asset_type": "Case Study",
-      "industry": "Government (IT Services)",
+      "industry": "Government",
       "client": "A government-owned, not-for-profit IT service provider (anonymised; manages IT infrastructure for multiple government departments, operates data centers, manages nationwide government network)",
       "products": [
         "Accops ZTNA"
@@ -1175,7 +1175,7 @@
       "inventory_filename": "Accops__City_Pharmacy__Case_Study_.pdf",
       "title": "Accops City Pharmacy Case Study",
       "asset_type": "Case Study",
-      "industry": "Healthcare / Retail Pharmacy",
+      "industry": "Pharma / Healthcare",
       "client": "City Pharmacy (named)",
       "products": [],
       "key_problem": "",

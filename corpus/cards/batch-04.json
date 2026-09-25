@@ -226,7 +226,7 @@
       "client": "",
       "client_actual": "",
       "client_named": false,
-      "products": ["Browser Isolation", "VDI", "HyWorks", "HySecure"],
+      "products": ["Browser Isolation", "AirBridge", "Thin Clients"],
       "competitors": [],
       "personas": ["CISO", "CIO", "IT head", "Head of Infrastructure"],
       "regulations": ["CERT-In", "NCIIPC", "MoD guidelines"],
