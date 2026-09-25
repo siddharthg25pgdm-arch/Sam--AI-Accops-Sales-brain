@@ -12,7 +12,7 @@
 const DOC_EXT = new Set(["pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "txt", "md", "rtf"]);
 /** This tenant z-prefixes dead folders so they sort to the bottom: zArchive, zzzArchive,
  *  "zCase Studies (Archive_DONOTUSE)". Treat that convention as the exclusion rule. */
-const DEAD = /(z*archive|do ?not ?use|donotuse|obsolete|deprecated|backup|to[ _-]?(be[ _-]?)?delet(e|ed)|for[ _-]?deletion|(^|[ _/(-])(old|wip|draft|drafts|temp|tmp|raw)([ _/)-]|$))/i;
+const DEAD = /(z*archie?ve|do ?not ?use|donotuse|obsolete|deprecated|backup|to[ _-]?(be[ _-]?)?delet(e|ed)|for[ _-]?deletion|(^|[ _/(-])(old|wip|draft|drafts|temp|tmp|raw)([ _/)-]|$))/i;
 
 export type IncomingFile = {
   event?: "created" | "modified" | "deleted";

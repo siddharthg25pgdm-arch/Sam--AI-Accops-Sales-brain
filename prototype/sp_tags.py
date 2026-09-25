@@ -60,7 +60,7 @@ COMPETITOR = [
     (r"array networks", "Array Networks"), (r"\bthinprint\b", "ThinPrint"),
 ]
 # z-prefixed folders are this tenant's "sorted to the bottom, do not use" convention
-DEAD = re.compile(r"(z*archive|do ?not ?use|donotuse|obsolete|deprecated|backup|to[ _-]?(be[ _-]?)?delet(e|ed)|for[ _-]?deletion"
+DEAD = re.compile(r"(z*archie?ve|do ?not ?use|donotuse|obsolete|deprecated|backup|to[ _-]?(be[ _-]?)?delet(e|ed)|for[ _-]?deletion"
                   r"|(^|[ _/(-])(old|wip|draft|drafts|temp|tmp|raw)([ _/)-]|$))", re.I)
 
 
