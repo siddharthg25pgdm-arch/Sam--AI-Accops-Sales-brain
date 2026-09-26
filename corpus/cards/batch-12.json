@@ -158,6 +158,158 @@
    "visibility": "internal",
    "internal_reason": "Internal competitive table about a Nutanix product; Nutanix is now a partner, so it should not be shared.",
    "needs_human": "Probably retire: Frame's status has changed and Accops now sells alongside Nutanix. If kept, check the 'Frame discontinued' claim and replace 'Accops Virtual Office' with the current DaaS name."
+  },
+  {
+   "source": "sharepoint/Event Request Template & SOP.xlsx",
+   "title": "Event Request Template and Event SOP (Internal Marketing Form): Proposal Fields, Success Metrics, CEO Approval, Partner-Event Responsibilities and KPIs",
+   "asset_type": "Template",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [],
+   "competitors": [],
+   "personas": [
+    "Sales rep",
+    "Partner manager",
+    "Regional business head",
+    "Marketing"
+   ],
+   "regulations": [],
+   "key_problem": "Sales and partner managers proposing an event need a standard way to request it, get it approved and agree who owns what, so marketing can plan and audit it.",
+   "key_outcomes": [
+    "Request sheet rules: the proposer must get the CEO's approval first; the request's ageing starts only once it reaches marketing with that approval; brand audit is marketing's job, post-event tracking the proposer's",
+    "Request fields: event type, proposer, city, mode, date, focus verticals, objective, two short-term and two long-term success metrics, budget, success owner, CEO approval, and for partner events the partner name, category, minimum promised audience, partner FY target and last-FY revenue",
+    "Drop-down lists: event types (with / through / to partner, existing customers, sponsored, Accops-own, partner connect, partner acquisition), approval states, Indian cities plus UAE, Qatar, Saudi Arabia, Kuwait and North Africa, objectives (reconnect, reinforce, empower, new customer acquisition, thought leadership, brand visibility)",
+    "Metric options: attendees, decision-makers attended, 5/5 feedback ratings, booth visitors, net new opportunities, opportunity conversion %, partner orders in the FY, net new conversion, upsell, cross-sell",
+    "SOP tab (images): per-event-type planning and execution tables, e.g. 'With Partner Events': budget approval by the executive leadership team, date and venue by partner + partner manager, venue and collateral by the partner to Accops brand guidelines, partner must deliver the minimum committed audience, speaker is the regional business head or presales head, leadership attends only for high-value partners, post-event follow-up by the partner manager measured in MQLs, auditing by marketing"
+   ],
+   "brief": "An internal Excel workbook (created August 2022, last saved September 2025) with an 'Event Request' form sheet, an 'SOP' sheet whose content is pasted slide images (an 'Event Request CHECKLIST' and per-event-type responsibility/KPI tables) and a lookup sheet feeding the drop-downs. The partner-target field is labelled for FY 22-23.",
+   "use_for": "Answering 'how do I propose an event / a partner event?' and 'who does what for a partner event?': fill the Event Request sheet, get CEO approval, send to marketing; the SOP tab lists responsibilities and KPIs. Internal process document, not collateral.",
+   "publish_year": "2022",
+   "expired": false,
+   "stale_risk": "Created August 2022; the partner-target column still says FY 22-23 although the file was re-saved in September 2025. The SOP is only in images, so SAM can quote it only from this card.",
+   "superseded_by": "",
+   "confidence": 0.75,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal approval process and partner-event rules.",
+   "needs_human": "Is this still the live event-request process? Update the 'Partner Target for 22-23FY' column label, and consider typing the SOP tables as text so they are searchable. The request sheet holds one stray partial entry ('28 augt')."
+  },
+  {
+   "source": "sharepoint/Accops-CIOKlub-Event-Deck-1Hour-July2025.pptx",
+   "title": "'Beyond the Perimeter: Secure & Seamless Access' - CIOKlub 1-Hour Event Deck (July 2025): Zero Trust (Human, Device, Intent), HyID, HySecure with Quantum-Safe Encryption, VDI Benefits, 2,000-PC TCO, Proxmox/DaaS Offers",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Anonymised install-base slide (3rd largest private bank, largest e-commerce company, largest insurer, Indian government IT team, a Japanese university, a nuclear power company, a global service provider, India's largest company); Chennai, North India, Japan and MEA customer logo slides",
+   "client_actual": "Japan reference slide names Kyoto University, Ibaraki Prefectural, Okayama University, DHC Corporation, Fukuoka City, Kansai University, Aomori Prefecture, NTT Data Hokkaido, Marubeni Information Systems, University of Fukui and other Japanese cities and companies",
+   "client_named": true,
+   "products": [
+    "HyID",
+    "BioAuth",
+    "HySecure",
+    "ZTNA",
+    "Enterprise Browser",
+    "HyWorks",
+    "Digital Workspace",
+    "VDI",
+    "HyDesk",
+    "JioBook",
+    "NanoOS",
+    "HyMobile",
+    "UEM",
+    "Reporting Server",
+    "DaaS",
+    "Proxmox"
+   ],
+   "competitors": [
+    "Citrix",
+    "Omnissa",
+    "VMware",
+    "Azure Virtual Desktop",
+    "Zscaler",
+    "Okta",
+    "OneLogin",
+    "RSA"
+   ],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head"
+   ],
+   "regulations": [
+    "DPDP Act 2023"
+   ],
+   "key_problem": "Hybrid work, smart endpoints, Windows 10 end-of-life and DPDP push CIOs to secure access without adding more point products, while the VMware/Citrix ownership changes raise licensing costs.",
+   "key_outcomes": [
+    "Opening (slides 3-6): new work models, CIO/CISO problems, challenges by offering (VDI, VPN, MFA, thin clients), 'what has changed since 2021' - Broadcom/VMware sale to Omnissa (KKR), Citrix PE buyout, bigger bundles and minimum licence purchases",
+    "Credentials (7-24): 1000+ customers, 200+ partners, 350+ team, 2M+ users; slide 7 says '2023 & 2024 Gartner MQ' while slide 8 says recognised in the 2025 DaaS MQ; DSCI Security Product Company of the Year 2024; HyDesk spec table and JioBook at INR 15,000; largest-customers slide; Chennai, North India, Japan and MEA reference slides",
+    "Zero trust (25-40): authenticate, validate human, device and intent, monitor (impossible travel, geo-location); HyID contextual/biometric/password-less MFA and SSO; vendor non-AD directory and desktop/server logon MFA case studies",
+    "ZTNA (41-50): VPN vs ZTNA, HySecure use cases, on-demand DLP, quantum threat (cites a CSO Online story on Chinese researchers and D-Wave), Kyber768/1024 and QRNG appliance support, Vajra secure enterprise browser",
+    "VDI (52-80): Windows 10 EOL, PC carbon footprint (Gartner 50% of IT GHG), VDI benefits and pros/cons, Digital Workspace on any hypervisor, shared desktops 50% cheaper than personal, 2,000-PC 5-year TCO (VDI Rs 27.21 crore vs desktops Rs 31.20 crore, 13% saving) with a full bill of quantities",
+    "Offers (82-90): Accops-supported Proxmox editions (Education Silver/Gold, Enterprise Gold/Platinum), 'DaaS in your datacenter' on Proxmox claimed 30% cheaper than Microsoft AVD, managed DaaS on Azure, NanoOS USB, HyMobile UEM, Reporting Server",
+    "Competitor grid (slide 91): Accops Digital Workspace vs Citrix, Omnissa, AVD, Zscaler/SASE and Okta/OneLogin/RSA; 'Why Accops' seven reasons"
+   ],
+   "brief": "A 98-slide deck for a CIOKlub (Chennai CIO forum) session in July 2025, presented by Accops' co-founder, MD & CEO. Despite the '1Hour' name it is a full library: company credentials and reference customers, a zero-trust framework with HyID and HySecure, quantum-safe encryption, the VDI business case with a 2,000-PC TCO and BOQ, Proxmox and DaaS offers, other products, a competitor grid and a sustainability close. Several slides are image-only (demo video, reporting server screenshots, logo slides).",
+   "use_for": "A South India CIO audience in 2025: slide 18 is the Chennai customer logo slide, slide 79-80 the 2,000-PC TCO with BOQ, slides 48-49 the quantum-safe ZTNA story, slide 84 the Proxmox support editions, slide 91 the multi-vendor comparison grid. For 2026 events use the Sovereign CIO Conclave city decks instead.",
+   "publish_year": "2025",
+   "expired": false,
+   "stale_risk": "July 2025 (filename; last saved September 2025). Windows 10 EOL slide is now past. Gartner years conflict (slides 7 vs 8). The private bank's MFA users are 90,000 on slide 20 and 60,000 on slide 37. HyDesk country-of-origin row (UK, China, Thailand/Taiwan) sits beside 'Made in India'.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck with the CEO's personal digital identifiers on slide 29, install-base descriptors, internal pricing points and an unlicensed third-party image (Squarex).",
+   "needs_human": "Slide 29 ('Many Digital Identities') shows the CEO's real internal usernames, a bank customer ID and a personal email - replace with dummy values before this deck is shared. Reconcile 90,000 vs 60,000 MFA users and the Gartner years. Verify the D-Wave RSA-break slide and the 'Proxmox DaaS 30% cheaper than AVD' claim before reuse."
+  },
+  {
+   "source": "sharepoint/Savex_Accops Partner 20 Mins 3rd June.pptx",
+   "title": "Accops Partner Deck for a National Distributor's Event (20 Minutes, 3 June 2026): Credentials, Make-in-India Sovereignty, Six-Pillar Platform with Forcepoint SSE, Single-Vendor Case, June Offers, ACAP Certifications",
+   "asset_type": "Deck",
+   "industry": "",
+   "client": "Prepared for a national IT distributor's partner session (named only in the filename); anonymised largest-customers slide",
+   "client_actual": "Savex Technologies (filename only)",
+   "client_named": true,
+   "products": [
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "HyWorks",
+    "VDI",
+    "Enterprise Browser",
+    "HyDesk",
+    "UEM",
+    "DaaS",
+    "Forcepoint SSE"
+   ],
+   "competitors": [],
+   "personas": [
+    "Partner",
+    "Reseller sales",
+    "Distributor"
+   ],
+   "regulations": [],
+   "key_problem": "Channel partners need a short pitch of what Accops sells, why a Make-in-India single vendor, and what offers they can take to customers this month.",
+   "key_outcomes": [
+    "Credentials (slides 2-4): 1000+ customers, 200+ partners, 350+ team, 2M+ users, part of Reliance since Sep 2023; About slide says '2023 & 2024 Gartner MQ' while slide 3 says recognised in the 2025 DaaS MQ; awards 2023-2025",
+    "Sovereignty (slides 5-7): 'Aligned with our PM's vision for Bharat' - Made-in-India ZTNA, data sovereignty, a slide listing a 7-point national call (WFH, buy Made-in-India and unrelated items such as gold buying, fuel, cooking oil, fertiliser, foreign travel); 'Time for preference bias for Make-in-India'",
+    "Largest-customers slide (8): same install-base descriptors as the 2026 decks (3rd largest private bank 10,000 VDI/ZTNA + 90,000 MFA, federal government IT 500,000 ZTNA, RBI for BYOD 350,000, largest company of India VDI 100,000, largest TPA in UK, 7th largest life insurer)",
+    "Platform (slides 9-16): six pillars - ZTNA gateway (quantum-safe encryption, on-demand DLP), Accops + Forcepoint SSE (SWG, CASB, DLP, DSPM), IAM, virtual apps and desktops, enterprise browser (600+ controls, AI phishing control), thin client/OS incl. NComputing LeafOS, SaaS UEM",
+    "Single-vendor case (17-18): reduced licensing, no integration gaps, one support point; 'isolate your crown jewels, authorize each entry, restrict lateral movement'",
+    "Offers (20-22): DaaS with free device at Rs 1,333/user/month; free VDI licences until the incumbent contract expires; free legacy-app SSO for 6 months and 50% discount for FY27 orders, labelled 'June Month Offer Only'",
+    "Close: Why Accops (7 reasons) and ACAP partner certifications (IAM, VDI, ZTNA solution expert; certified sales professional)"
+   ],
+   "brief": "A 25-slide, 20-minute cut of the 2026 partner deck presented by Accops' co-founder, CEO & CTO for a national distributor's partner session on 3 June 2026 (last saved 9 June 2026). It drops the 30-minute edition's roadmap, use-case and VDI-objection sections and keeps credentials, the sovereignty argument, the platform pillars with Forcepoint SSE, the single-vendor pitch and the June offers.",
+   "use_for": "A short partner or distributor slot where the goal is a quick overview plus this month's offers. For a fuller partner session use the 30-minute Savex deck (May 2026) or the 2026 partner bootcamp deck.",
+   "publish_year": "2026",
+   "expired": true,
+   "stale_risk": "3 June 2026; the offers are explicitly 'June Month Offer Only', so they have lapsed. Gartner years conflict between slides 2 and 3.",
+   "superseded_by": "",
+   "confidence": 0.82,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Distributor-specific deck with time-bound commercial offers and install-base descriptors; no verified public URL.",
+   "needs_human": "A 20-minute cut of 'Savex_Accops Partner 30 mins 2026.pptx'. Slide 5 reproduces a political '7-point call' (gold buying, cooking oil, fertiliser, foreign travel) that has nothing to do with Accops - consider dropping it from partner decks. June offers have expired: refresh before reuse. Fix the Gartner years on slide 2."
   }
  ]
 }
