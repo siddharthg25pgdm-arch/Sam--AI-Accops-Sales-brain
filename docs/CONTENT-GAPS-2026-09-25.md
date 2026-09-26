@@ -357,3 +357,53 @@ details. SAM no longer offers it; consider moving it out of Sales Collateral.
 - The Hyderabad CIO deck (slide 32) maps each product to DPDP principles; with the 2019 Data
   Compliance deck it could seed a DPDP pitch (gaps 4 and 9).
 - *.Next 2026 "When VDI Is Not Enough"* is the current answer to the Nutanix integration gap (gap 8).
+
+### Added after carding the last 38 files (all 876 SharePoint files are now accounted for)
+
+**Customer production data is sitting in Sales Collateral. Move it out.**
+- `HySecure Logs Mapping & Device ID Details.xlsx` contains a bank's live logs: hostnames, MAC
+  and IP addresses, usernames and AD groups.
+- `Impossible Travel Events.xlsx` contains about 6,400 rows of real user IDs, public IP addresses
+  and locations.
+- `Customers' detals for MFA webinar` (sic) contains customer details.
+SAM no longer offers any of these three, but anyone with access to the folder can still open them.
+- The Cisco joint deck ends with Cisco and Accops staff contact tables, including a mobile-number
+  column. The DaaS scoping questionnaire still has one prospect's answers in it; keep a blank master
+  instead.
+
+**Another company's slides in an Accops deck.** Both MEA partner bootcamp editions, including the
+"Public Version", end with four Haltdos slides (its awards, leadership and products).
+
+**More in the "public" bootcamp decks:** the 16 May PUBLIC-SHARABLE edition has the India partner
+tier revenue targets, the discount and rebate structure (with letters in place of percentages)
+and the distributor list. Its slide 3 identifies Flipkart ("subsidiary of the world's largest
+retailer"). The CIOKlub July 2025 deck (slide 29) also has the CEO identifiers slide. The 2026
+Japan bootcamp decks have dropped it.
+
+**Garbled or wrong case slides:** MEA Confidential describes NIC as an HIV/AIDS drug maker and
+Kotak Securities as a Middle East retailer. Japanese V4.0 puts the Diligenta case under a "Network
+International" heading and gives 3,500 users where the English edition says 5,000. The Japanese
+decks are machine-translated in places (the About slide's USD 110B figure is garbled) and need a
+native reviewer. Japan English slide 129 still has working notes ("Make videos", "IKEA ???").
+
+**Slides to review for tone:** Savex 20-minute deck slide 5 reproduces a political "7-point call"
+(gold buying, cooking oil, fertiliser, foreign travel). The Defence deck slide 50 has geopolitical
+remarks.
+
+**Still more figures told differently:** Kyoto University is also "Japan's 3rd largest national
+university" and "Japan's second-largest university". The IRIS launch is "2026 Q2" and "15 Dec
+2026" in the same Japan deck. Shared desktops are "75% cheaper" in the 2023 webinar and "50%" in
+CIOKlub. DaaS is USD 17.99 (MEA), on top of Rs 1,333 and USD 21.1 elsewhere.
+
+**Misleading or empty files:** "Nutanix .Next Tokyo 2026 - English v4" is a single blank slide, so
+there is no English Tokyo deck. "VDI Deck 08-19" is August 2026, not 2019. "VDI-Benefits-DRAFT" is
+really a 104-slide product catalogue. "Calculatore in sales tools.txt" is empty.
+
+**Good news for earlier gaps:**
+- The 2026 Japan bootcamp decks have four new named VDI displacement cases: Graviton (HFT), Airtel
+  (Horizon replacement), Dr. Reddy's (SAP on GCP) and Diligenta (Citrix, licence cost up 4x).
+- The VDI Deck (Aug 2026) has Indovance, the only GPU DaaS / CAD case.
+- Nutanix .Next Tokyo v4 has Japanese municipal cases, naming Haebaru Town.
+- The Gartner Japan summit deck is the only sustainability / ESG material.
+- The VDI-Benefits-2 draft has a five-lens VDI business-case framework worth finishing.
+- A 24]7.ai hybrid-cloud BPO proposal could become a case study.
