@@ -288,8 +288,19 @@ export function describe(a: Asset): string {
   const folder = a.section || (a.file?.path ?? "").split("/").slice(0, -1).join("/");
   const text = isDescribed(a) ? [a.brief, a.use_for.startsWith("Filed under ") ? "" : a.use_for, a.key_problem, a.key_outcomes[0] ?? ""].find(s => s && s.trim()) ?? "" : "";
   if (!text) return folder ? `Filed under ${folder}; SAM has not read this one, so check what it covers before using it.` : "SAM has not read this one, so check what it covers before using it.";
-  const first = text.trim().match(/^.{40,}?[.!?](?=\s|$)/)?.[0] ?? text.trim();
-  return first.length <= 180 ? first : `${first.slice(0, 177).replace(/\s+\S*$/, "")}…`;
+  return firstSentence(text, 180);
+}
+
+/** The first sentence of `text`, at most `max` characters. "Accops Systems Pvt. Ltd" is not a sentence end. */
+export function firstSentence(text: string, max: number): string {
+  const t = text.trim();
+  let end = t.length;
+  for (const m of t.matchAll(/[.!?](?=\s|$)/g)) {
+    if (m.index < 30 || /\b(pvt|ltd|inc|co|no|nos|vs|v|e\.g|i\.e|incl|approx|dr|mr|ms|st|u\.s)$/i.test(t.slice(0, m.index))) continue;
+    end = m.index + 1; break;
+  }
+  const s = t.slice(0, end);
+  return s.length <= max ? s : `${s.slice(0, max - 3).replace(/\s+\S*$/, "")}…`;
 }
 
 export function trustNote(a: Asset): string | null {

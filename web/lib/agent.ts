@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, cover, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
+import { searchAssets, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured, compatModels } from "./agent-openai";
 import { providerFailure, type AskError } from "./events";
 
@@ -177,7 +177,10 @@ export function runSearch(raw: Record<string, unknown>, question: string): Searc
     args = { ...args, audience: "internal" }; ({ results, considered } = searchAssets(args));
     notes.push("nothing published matches, so these are internal only");
   }
-  for (const k of ["asset_type", "product"] as const) {
+  // The product goes first: it is a keyword guess, while asset_type is kept only when the rep named
+  // it. "hysecure demo video" found no Video tagged HySecure (demo videos carry no product tag), and
+  // dropping the type first answered a video ask with three decks.
+  for (const k of ["product", "asset_type"] as const) {
     if (results.length || !args[k]) continue;
     notes.push(`nothing matched ${k} ${args[k]}, so that filter was dropped`);
     args = { ...args, [k]: undefined }; ({ results, considered } = searchAssets(args));
@@ -361,7 +364,8 @@ export function verdictProblem(verdict: string, shown: SearchHit[], question: st
 function assetLine(h: SearchHit, external: boolean): string {
   const a = h.asset, y = yearOf(a), t = trustNote(a);
   const vis = a.public_url ? "public" : external ? "internal only: do not send outside Accops" : "internal only";
-  return `- **${a.title}** (${[y, vis].filter(Boolean).join(", ")}) - ${describe(a)}${t ? ` ${/^EXPIRED/.test(t) ? "" : "Check first: "}${t}` : ""}`;
+  // The full trust note is on the card; the line keeps its first sentence so three lines stay scannable.
+  return `- **${a.title}** (${[y, vis].filter(Boolean).join(", ")}) - ${describe(a)}${t ? ` ${/^EXPIRED/.test(t) ? "" : "Check first: "}${firstSentence(t, 140)}` : ""}`;
 }
 
 /** Each shown asset that has a newer edition in the catalogue brings it in, newer first. The trust
@@ -441,7 +445,7 @@ export function seedSearch(question: string): SearchRun | null {
   // A type the rep named is a filter too (runSearch drops it again if it finds nothing).
   const asset_type = f.asset_type || typesNamedIn(question)[0] || "";
   const a = runSearch({ query: question, asset_type, vertical: f.vertical, product: f.product }, question);
-  if (!f.vertical && !f.product && !asset_type && f.audience === "internal" && !pagesWanted(question)) return a;
+  if (!f.vertical && !f.product && !asset_type && f.audience === "internal" && !pagesWanted(question) && !EXTERNAL.test(question.toLowerCase())) return a;
   // Every filter here is a preference, not a wall. Industry and product tags are keyword guesses, and
   // a mis-tagged asset is invisible to a filtered search: City Pharmacy is filed under E-commerce /
   // Retail, so "pharma customer proof" never saw it; HySecure demo videos carry no product tag. A
@@ -456,8 +460,21 @@ export function seedSearch(question: string): SearchRun | null {
   const max = pagesWanted(question);
   const short = max ? searchAssets({ query: question, asset_type: asset_type || undefined, vertical: f.vertical || undefined, limit: 40 }).results
     .filter(h => (h.asset.file?.pages ?? 99) <= max).slice(0, 2) : [];
+  // Filtered results lead only when they are ABOUT the product the filter named: the product tag
+  // matches any mention, and "send the customer a hyworks brochure" led with a HySecure datasheet
+  // that names HyWorks once.
+  const front = a.hits.slice(0, 3).filter(h => !a.input.product || isAbout(h.asset, a.input.product));
+  // Something to send, even when the ask is mixed ("something I can send the CIO today plus
+  // something for my own prep" reads internal): the best published match gets a slot.
+  // Ranked by words in the TITLE first: in a long paragraph the case study titled "Hospital" is the
+  // one a hospital CIO wants, over one that happens to share "users" and "desktop" with the ask.
+  const inTitle = (h: SearchHit) => queryTokens(question).filter(t => tokenMatcher(t).test(h.asset.title.toLowerCase())).length;
+  const pub = EXTERNAL.test(question.toLowerCase())
+    ? searchAssets({ query: question, asset_type: asset_type || undefined, vertical: f.vertical || undefined, audience: "external", limit: 10 }).results
+      .filter(h => !front.some(x => assetKey(x.asset) === assetKey(h.asset))).sort((x, y) => inTitle(y) - inTitle(x) || y.score - x.score).slice(0, 1)
+    : [];
   const seen = new Set<string>(), all: SearchHit[] = [];
-  for (const h of [...short, ...a.hits.slice(0, 3), ...[...b, ...c, ...a.hits.slice(3)].sort((x, y) => y.score - x.score)]) {
+  for (const h of [...short, ...front, ...pub, ...[...b, ...c, ...a.hits].sort((x, y) => y.score - x.score)]) {
     const k = assetKey(h.asset);
     if (!seen.has(k)) { seen.add(k); all.push(h); }
   }
