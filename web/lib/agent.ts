@@ -375,38 +375,80 @@ export function readReply(text: string): { verdict: string; nums: number[]; none
 const COVERAGE = /\b(cover(s|ed|ing)?|includ(e|es|ed|ing)|contain(s|ed|ing)?|show(s|ed|ing|cases?)?|detail(s|ed|ing)?|describ(e|es|ed|ing)|explain(s|ed|ing)?|demonstrat(e|es|ed|ing)|walks? through|outlin(e|es|ed|ing)|highlight(s|ed|ing)?|compar(e|es|ed|ing)|address(es|ed|ing)?|provid(e|es|ed|ing)|spells? out|mapp(ed|ing)|has (a|an|the)|with (a|an|the) (section|slide|chapter|table|figure))\b|\bcan be (framed|adapted|tailored|positioned|used|repurposed|reused)\b|\b(replaced|migrated|moved off|switched from)\b/i;
 
 /** Why a verdict may not be shown, or null when it may. A denial ("No exact APRA material") may name
- *  what is missing in the rep's words; anything else may only name what the shown cards have. */
-export function verdictProblem(verdict: string, shown: SearchHit[], question: string, denial: boolean): string | null {
+ *  what is missing in the rep's words; anything else may only name what the shown cards have.
+ *  `seen` is every result this turn: a verdict may mention one the relevance floor then dropped ("a
+ *  corporate brochure", 27 Sep #2 #14) in its plain words and numbers, but not its entities. */
+export function verdictProblem(verdict: string, shown: SearchHit[], question: string, denial: boolean, seen: SearchHit[] = []): string | null {
   // "The library has / includes / contains" is the verdict the prompt asks for: the LIBRARY holds
   // documents. Only a document covering, including or showing something is a claim about content.
   // On 27 Sep this rule threw away 18 of 35 verdicts because it could not tell the two apart.
   const v = verdict.replace(LIBRARY_HAS, "library");
-  const c = v.match(COVERAGE);
+  const c = [...v.matchAll(COVERAGE_ALL)].find(m => !titleBacks(v, m, shown));
   if (c) return `says what a document covers ("${c[0]}")`;
-  const cards = shown.map(h => `${cardText(h.asset)} ${yearOf(h.asset) ?? ""}`).join(" ");
+  const text = (hs: SearchHit[]) => hs.map(h => `${cardText(h.asset)} ${yearOf(h.asset) ?? ""}`).join(" ");
+  const cards = text(shown), more = text(seen.filter(h => !shown.some(s => assetKey(s.asset) === assetKey(h.asset))));
   // The rep's acronym read one way ("assuming GCC means a global capability centre") is what the prompt
   // asks for, and says nothing about a document; it may use the ask's words and plain English.
   const assumed = v.match(ASSUMED)?.[0] ?? "";
   if (assumed && namedEntities(assumed).some(e => !mentions(question, e))) return "assumes something the rep did not ask about";
+  const q = question.toLowerCase(), asked = new Set((q.match(/[a-z][a-z']+/g) ?? []).map(stem));
   // A clause saying what is NOT there ("but no SOC 2 Type 2 report") names the missing thing in the
   // rep's words, like a denial does; the rest may only name what the shown cards have.
   for (const clause of v.replace(assumed, " ").split(/[;:]|,(?!\d)|\s(?=but\b|though\b|however\b)/i)) {
     const neg = denial || /^\W*(?:(?:but|though|however|and|although)\s+)?(?:there (?:is|are)\s+)?(?:no|not|none|nothing|without)\b/i.test(clause);
-    const on = `${cards} ${neg ? question.toLowerCase() : ""}`;
-    const foreign = namedEntities(clause).filter(e => !OWN_PRODUCTS.has(e) && !mentions(on, e));
+    // Entities only from the SHOWN cards (a region only from their title, client or industry): "GCC"
+    // in a card's use_for is not a GCC pitch (#10), "for SEA prospects" not a Malaysia reference (#25).
+    const foreign = namedEntities(clause).filter(e => !OWN_PRODUCTS.has(e) && !(neg && mentions(q, e)) && !shown.some(h => entityOn(h.asset, e)));
     if (foreign.length) return `names ${foreign.join(", ")}, which no shown card mentions`;
+    const on = `${cards} ${more} ${neg ? q : ""}`;
     const nums = (clause.match(/\b\d[\d,]{2,}\b/g) ?? []).filter(n => !on.includes(n) && !on.includes(n.replace(/,/g, "")));
     if (nums.length) return `states ${nums.join(", ")}, which no shown card has`;
-    // Every other word must be plain answer vocabulary or be on a shown card (for a denial, also in
-    // the ask). A claim about a document therefore needs the card's own words: "banks leaving legacy
-    // VDI" passes only if the card says so. ponytail: lexical, not semantic - a card's words recombined
-    // into a false claim would pass; the entity, number and coverage-verb checks above catch the kinds
-    // production actually produced.
-    const words = (clause.toLowerCase().match(/[a-z][a-z']+/g) ?? []).filter(w => w.length > 2);
-    const unknown = words.filter(w => !ANSWER_WORDS.has(w) && !ANSWER_WORDS.has(w.replace(/(es|s)$/, "")) && !ANSWER_WORDS.has(w.replace(/s$/, "")) && !tokenMatcher(w).test(on));
-    if (unknown.length) return `uses words no shown card has (${unknown.slice(0, 4).join(", ")})`;
+    // Every other word must be plain answer vocabulary, on a result this turn, or the rep's own ("for a
+    // bank moving off Citrix", "after the Broadcom price hike" - #1, #16). Not the rep's words as what
+    // a document is OF or ABOUT: "case studies of banks leaving legacy desktops" puts the rep's
+    // situation on a card. ponytail: lexical, not semantic - a card's words recombined into a false
+    // claim would pass; the entity, number, count and coverage-verb checks catch the kinds production
+    // actually produced.
+    const subject = clause.match(/\b(?:of|about|where|whose|showing)\b.*$/i)?.[0] ?? "";
+    const unknown = (part: string, own: boolean) => (part.toLowerCase().match(/[a-z][a-z']+/g) ?? []).filter(w => w.length > 2)
+      .filter(w => !ANSWER_WORDS.has(w) && !ANSWER_WORDS.has(w.replace(/(es|s)$/, "")) && !ANSWER_WORDS.has(w.replace(/s$/, "")) && !tokenMatcher(w).test(on) && !(own && asked.has(stem(w))));
+    const bad = [...unknown(clause.slice(0, clause.length - subject.length), true), ...unknown(subject, neg)];
+    if (bad.length) return `uses words no shown card has (${bad.slice(0, 4).join(", ")})`;
+  }
+  // "two ZTNA decks" over one deck and two notes (27 Sep #10, #35): a count of a type is checked.
+  if (shown.length) for (const m of v.matchAll(COUNTED)) {
+    const n = COUNT_WORDS[m[1].toLowerCase()], t = assetTypeOf(m[2].replace(/ies$/i, "y").replace(/s$/i, ""));
+    const have = shown.filter(h => !t || isType(h.asset, t)).length;
+    if (t && n > have) return `says ${m[1].toLowerCase()} ${m[2].toLowerCase()}, but ${have} shown`;
   }
   return null;
+}
+const COVERAGE_ALL = new RegExp(COVERAGE.source, "gi");
+/** "moving" and "move", "hike" and "hikes": one word to the rep. */
+const stem = (w: string) => w.replace(/(?:ing|ed|es|e|s)$/, "");
+/** "a deck covering Proxmox support", "two battlecards comparing AWS WorkSpaces and HyWorks": true when
+ *  one shown card's TITLE has the verb's object (and, for a comparison, is one: "vs", or a battlecard).
+ *  Then the claim is the title's, not the model's (27 Sep #21, #29). */
+function titleBacks(v: string, m: RegExpMatchArray, shown: SearchHit[]): boolean {
+  if (!/^(cover|compar)/i.test(m[0])) return false;
+  const object = v.slice((m.index ?? 0) + m[0].length).split(/[;:,.()]|\s(?:and|but|or|while|for|to|as|so)\s/i)[0];
+  const words = (object.toLowerCase().match(/[a-z][a-z0-9']+/g) ?? []).filter(w => w.length > 2 && !ANSWER_WORDS.has(w));
+  return words.length > 0 && shown.some(h => {
+    const t = h.asset.title.toLowerCase();
+    return words.every(w => tokenMatcher(w).test(t)) && (!/^compar/i.test(m[0]) || /\bvs\.?\b|versus|compar/.test(t) || typeGroup(h.asset) === "Battlecard");
+  });
+}
+const COUNT_WORDS: Record<string, number> = { two: 2, both: 2, three: 3, four: 4, five: 5 };
+/** A count of two or more, a few words, then a document type: "two relevant ZTNA pitch decks". */
+const COUNTED = /\b(two|both|three|four|five)\s+(?:[^\s,;.]+\s+){0,5}?(case stud(?:y|ies)|decks?|battle ?cards?|brochures?|data ?sheets?|white ?papers?|videos?)\b/gi;
+/** Places and languages: a document is FOR them only when its title, file name, client or industry
+ *  says so. Its use_for names the audience ("for SEA prospects: Indonesia, Malaysia"), and the SEA
+ *  Compressed deck, whose card says it has no SEA customer story, passed as a Malaysia reference
+ *  (27 Sep #25). GCC is either a Gulf customer or a global capability centre; both are audiences. */
+const PLACES = new Set([...REGIONS, "GCC"]);
+function entityOn(a: Asset, e: string): boolean {
+  if (!PLACES.has(e)) return mentions(cardText(a), e);
+  return mentions(`${a.title} ${(a.file?.path ?? "").split("/").pop()} ${a.client} ${a.industry}`, e);
 }
 /** The library (not a document) as the subject: "The library has / includes / contains ...". */
 const LIBRARY_HAS = /\b(?:the (?:collateral )?library|sam|we)\s+(?:also\s+|only\s+|still\s+)?(?:has|have|holds?|includes?|contains?|offers?)\b/gi;
@@ -414,6 +456,7 @@ const LIBRARY_HAS = /\b(?:the (?:collateral )?library|sam|we)\s+(?:also\s+|only\
 const ASSUMED = /\b(?:i\s+)?(?:assum(?:ed|ing|e)|taking)\b[^;,.()]*/i;
 /** Words a verdict may use whatever the cards say: whether it fits, how many, what kind, who may see it. */
 const ANSWER_WORDS = new Set(`yes not none nothing exact exactly closest close best better strong stronger strongest good great match matching fit fits
+focused oriented themed actual real proper cover covers covered covering compare compares compared comparing
 fitting suit suitable useful relevant option alternative substitute stand here these those this that both either each one two three four five
 several some any only also still but and for with from about into the are was were can may might could should would will please use using
 send sending share shared shareable sendable forward email outside externally external internal internally public published publicly unpublished
@@ -469,13 +512,15 @@ const SPECS = new Set(["Sizing", "Concurrent users"]);
 function asksAbout(question: string): string[] { return namedEntities(question); }
 function hasEntity(h: SearchHit, e: string, question: string): boolean {
   if (OWN_PRODUCTS.has(e)) return isAbout(h.asset, e) || !isDescribed(h.asset);
-  if (!SPECS.has(e)) return mentions(cardText(h.asset), e);
+  if (!SPECS.has(e)) return entityOn(h.asset, e);
   const product = heuristicFilters(question).product;
   return mentions(h.asset.title, e) && typeGroup(h.asset) !== "Case Study" && (!product || isAbout(h.asset, product));
 }
 /** How a missing entity is named in the answer: "HyWorks sizing", not "Sizing". */
 function entityLabel(e: string, question: string): string {
   const product = heuristicFilters(question).product;
+  // The acronym's two readings, since SAM cannot know which the rep meant (27 Sep #10).
+  if (e === "GCC") return "GCC (a Gulf customer or a global capability centre)";
   return SPECS.has(e) ? `${product ? `${product} ` : ""}${e.toLowerCase()}` : e;
 }
 
@@ -518,18 +563,19 @@ export function sending(question: string): boolean { return EXTERNAL.test(questi
 
 /** Which of the shown documents can go to a customer, written by SAM from each card's visibility.
  *  The model is never asked: on 27 Sep it said "two can be shared" about three internal documents. */
-export function sendLine(shown: SearchHit[], external: boolean): string {
+export function sendLine(shown: SearchHit[], external: boolean, question = ""): string {
   const n = shown.length, pub = shown.filter(h => h.asset.public_url).length;
   if (!n) return "";
-  if (pub === n) return n === 1 ? "It is public, so it can be sent to a customer." : `All ${n} are public, so they can be sent to a customer.`;
-  if (pub) return `${pub} of ${n} can be sent to a customer; the rest are internal only.`;
+  const to = /\bpartners?\b/i.test(question) ? "a partner" : "a customer";
+  if (pub === n) return n === 1 ? `It is public, so it can be sent to ${to}.` : `${n === 2 ? "Both" : `All ${n}`} are public, so they can be sent to ${to}.`;
+  if (pub) return `${pub} of ${n} can be sent to ${to}; the rest are internal only.`;
   return external ? "None of these is published, so none can be sent outside Accops; ask marketing first." : "All internal: don't send outside Accops.";
 }
 
 /** The answer text: verdict, SAM's sendability line, notes, then one card-written line per asset. */
 function answerText(verdict: string, notes: string[], shown: SearchHit[], question: string): string {
   const external = sending(question);
-  return [verdict, sendLine(shown, external), ...notes, ...shown.map(h => assetLine(h, external))].filter(Boolean).join("\n");
+  return [verdict, sendLine(shown, external, question), ...notes, ...shown.map(h => assetLine(h, external))].filter(Boolean).join("\n");
 }
 
 /** The retrieval floor. Plain search on the rep's own words scored 93% hit@3 while the model, left to
@@ -563,7 +609,13 @@ export function seedSearch(question: string): SearchRun | null {
   // Filtered results lead only when they are ABOUT the product the filter named: the product tag
   // matches any mention, and "send the customer a hyworks brochure" led with a HySecure datasheet
   // that names HyWorks once.
-  const front = a.hits.slice(0, 3).filter(h => !a.input.product || isAbout(h.asset, a.input.product));
+  let front = a.hits.slice(0, 3).filter(h => !a.input.product || isAbout(h.asset, a.input.product));
+  // A sending ask searches public-only, and public corporate brochures that list HyID kept that search
+  // from ever widening: "one pager on HyID i can email" never saw the (internal) HyID datasheet (27 Sep
+  // #7). With nothing public about the product, its own documents of the type join, internal too;
+  // sendLine then says none can be sent, and the ask is a gap.
+  if (f.product && f.audience === "external" && !front.length)
+    front = searchAssets({ query: question, asset_type: asset_type || undefined, product: f.product, limit: SEARCH_LIMIT }).results.filter(h => isAbout(h.asset, f.product)).slice(0, 2);
   // Something to send, even when the ask is mixed ("something I can send the CIO today plus
   // something for my own prep" reads internal): the best published match gets a slot.
   // Ranked by words in the TITLE first: in a long paragraph the case study titled "Hospital" is the
@@ -629,7 +681,8 @@ export const SEED_STEP = "tool call: search_assets (the rep's own words)";
  *    4. The verdict loses any sending or visibility talk (dropSending) and is shown only if
  *       verdictProblem() passes it; otherwise SAM writes a plain one. What can be sent is SAM's own
  *       line (sendLine), from the cards. Every card shown clears the relevance floor (relevant).
- *    5. missing (the exact thing is not in the library): the verdict is a denial (or "but no X"), the
+ *    5. missing (the exact thing is not in the library): the verdict is a denial (or "but no X" - read
+ *       from the model's verdict, so it holds when the guard replaces the rest), the
  *       model picked nothing, a named type is absent, a named product / competitor / regulation /
  *       region / spec is on no shown card, or the rep is sending and nothing shown is public.
  *       Substitutes still show; the request button follows from missing. */
@@ -696,6 +749,7 @@ export function finish(p: {
       p.trace.push({ step: "substitutes: from the results", detail: `the model picked ${chosen.length ? "only unrelated documents" : "none"}; showing the ${subs.length} closest that share the ask's product, industry or topic` });
     }
     const fits = hits.filter(h => relevant(p.question, h.asset));
+    subs = namedFirst(subs, fits, own, p.trace);
     subs = shortFirst(ensurePublished(withSuccessors(subs, p.trace).filter(h => relevant(p.question, h.asset)), fits, p.question, p.trace), fits, own, p.trace).slice(0, 2);
     return done(denial ? denialClause(reply.verdict, p.question) : "No exact match in the library.", ["Closest in the library:"], subs, true);
   }
@@ -717,6 +771,7 @@ export function finish(p: {
   if (uncovered.length) {
     p.trace.push({ step: "verdict: named entity missing", detail: `no shown card has ${uncovered.join(", ")}` });
     const about = uncovered.some(e => OWN_PRODUCTS.has(e) || SPECS.has(e));
+    shown = namedFirst(shown, fill, own, p.trace).slice(0, 3);
     return done(`No exact match for ${uncovered.map(e => entityLabel(e, own)).join(" or ")}: none of the closest documents ${about ? "is about" : "mentions"} ${uncovered.length > 1 ? "them" : "it"}.`, ["Closest in the library:"], shown, true);
   }
   // The named type must be met by a document about the named product: a corporate brochure is a
@@ -736,19 +791,21 @@ export function finish(p: {
   // verdict first - "two can be shared" about three internal documents reached a rep on 27 Sep.
   const g = dropSending(verdict);
   if (g !== verdict) p.trace.push({ step: "guard: sending language dropped from the verdict", detail: `"${verdict}" -> "${g}"`.slice(0, 300) });
-  const problem = bad.length ? "names a document no search returned" : !verdict ? "no verdict sentence" : g ? verdictProblem(g, shown, p.question, false) : null;
+  const problem = bad.length ? "names a document no search returned" : !verdict ? "no verdict sentence" : g ? verdictProblem(g, shown, p.question, false, hits) : null;
   if (problem && verdict) p.trace.push({ step: "verdict guard: replaced", detail: `${problem}: ${verdict}`.slice(0, 300) });
+  // "a related auditor letter, but no SOC 2 Type 2 report": the model says the exact thing is not
+  // there, so it is a gap with the request button, like a denial (27 Sep #14). Read from the MODEL's
+  // verdict: a replaced one still said so, and its denial clause is kept when that passes on its own.
+  const partial = !bad.length && PARTIAL_DENIAL.test(g);
+  const tail = partial ? g.slice(g.search(PARTIAL_DENIAL)).replace(/^[\s;,]*(?:(?:but|though|however|although)\s+)?(?:there (?:is|are)\s+)?/i, "") : "";
   // Only sending talk, now dropped: SAM's sendability line leads the answer on its own.
-  const final = problem ? "Best matches in the library." : g;
+  const final = partial && problem ? tidy(denialClause(tail, p.question)) : problem ? "Best matches in the library." : g;
   const notes = PRICE_ASK.test(p.question) ? ["Confirm current pricing with your sales manager before quoting it."] : [];
   // Asked for something to send and nothing shown can be: the sendable thing is what is missing, so
   // it is a gap with the request button (27 Sep #7, "one pager on HyID i can email").
   const unsendable = sending(p.question) && !shown.some(h => h.asset.public_url);
   if (unsendable) p.trace.push({ step: "verdict: nothing sendable", detail: "the rep is sending outside Accops and every shown document is internal" });
-  // "a related auditor letter, but no SOC 2 Type 2 report": the model says the exact thing is not
-  // there, so it is a gap with the request button, like a denial (27 Sep #14).
-  const partial = !problem && PARTIAL_DENIAL.test(final);
-  if (partial) p.trace.push({ step: "verdict: partial denial", detail: final });
+  if (partial) p.trace.push({ step: "verdict: partial denial", detail: g });
   return done(final, notes, shown, unsendable || partial);
 }
 
@@ -785,6 +842,27 @@ function shortFirst(shown: SearchHit[], pool: SearchHit[], turn: string, trace: 
   if (!add) return shown;
   trace.push({ step: "length: short match added", detail: `"${add.asset.title}" is ${add.asset.file?.pages} page(s)` });
   return [add, ...shown].slice(0, 3);
+}
+
+/** A "no exact X" answer leads with the best result of the product (and type) the rep named, when the
+ *  substitutes have none: "No exact datasheet with max concurrent users per appliance" over a logistics
+ *  case study and an editions matrix, with the public HySecure datasheet in the results, read as "we
+ *  have no HySecure datasheet" (27 Sep #23, #7, #19). The product is an Accops one or the product word
+ *  the ask names ("DaaS"); a document of the named type about it beats one only about it. */
+function namedFirst(subs: SearchHit[], pool: SearchHit[], turn: string, trace: AskResult["trace"]): SearchHit[] {
+  const prods = [...new Set([...asksAbout(turn).filter(e => OWN_PRODUCTS.has(e)), heuristicFilters(turn).product].filter(Boolean))];
+  if (!prods.length) return subs;
+  const types = typesNamedIn(turn);
+  // ABOUT means the primary product tag here: the 2026 Editions matrix names HySecure and HyID in its
+  // title, and passed for both products' datasheet. An untagged file falls back to its title.
+  const about = (h: SearchHit) => prods.some(e => h.asset.products.length ? (ALIAS[e] ?? [e.toLowerCase()]).some(w => h.asset.products[0].toLowerCase().includes(w)) : isAbout(h.asset, e));
+  const rank = (h: SearchHit) => (about(h) ? 1 : 0) + (types.some(t => isType(h.asset, t)) ? 2 : 0);
+  const best = Math.max(0, ...subs.map(rank));
+  if (best === 3) return subs;
+  const add = primaryFirst(pool.filter(h => rank(h) > best && rank(h) % 2 === 1), prods[0]).sort((x, y) => rank(y) - rank(x))[0];
+  if (!add) return subs;
+  trace.push({ step: "substitutes: named product first", detail: `${add.asset.title} is about ${prods.join(" or ")}` });
+  return [add, ...subs.filter(h => assetKey(h.asset) !== assetKey(add.asset))];
 }
 
 /** A denial verdict cut to its denial: "No exact Proxmox integration doc, but the Nutanix guide covers
@@ -869,7 +947,9 @@ export async function ask(question: string, history: { role: "user" | "assistant
   };
   // A model that answers after an earlier provider failed keeps its own error if it has one (an
   // empty answer outranks a recovered outage); otherwise the recovered failure is what gets recorded.
-  const withFailures = (r: AskResult): AskResult => ({ ...r, error: r.error ?? providerFailure(failures, true) });
+  // The trace says so too: on 26 Sep 20 of 35 answers came from the fallback and nothing said why.
+  const withFailures = (r: AskResult): AskResult => ({ ...r, error: r.error ?? providerFailure(failures, true),
+    trace: [...failures.map(f => ({ step: "model provider failed, answered by fallback", detail: `${f.model}: ${f.message}; answered by ${r.model}`.slice(0, 300) })), ...r.trace] });
   if (openAICompatConfigured()) {
     // Primary, then a second model on the same provider. Groq's free-tier limits are per model, so
     // when gpt-oss-120b is out of tokens for the minute (429) gpt-oss-20b usually is not - better a

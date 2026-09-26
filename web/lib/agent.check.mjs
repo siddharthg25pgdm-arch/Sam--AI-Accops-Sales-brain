@@ -55,7 +55,13 @@ const CARDS = [{ source: "sharepoint/Accops vs Citrix Feature Table 2018.pdf", f
   title: "Accops vs Citrix Feature Table 2018", asset_type: "Competitive", industry: "", client: "", products: ["HyWorks"], competitors: ["Citrix"],
   personas: [], regulations: [], key_problem: "", key_outcomes: [], brief: "A 2018 feature table comparing Accops with Citrix.", use_for: "",
   publish_year: "2018", expired: false, expiry_date: null, stale_risk: "", superseded_by: "sharepoint/Accops Powered VDI vs Citrix VDI.pdf - the 2024 battlecard",
-  visibility: "internal", internal_reason: "", public_url: "", confidence: 0.9, needs_human: "", batch: "t", item_id: "R9" }];
+  visibility: "internal", internal_reason: "", public_url: "", confidence: 0.9, needs_human: "", batch: "t", item_id: "R9" },
+  // A public brochure that lists HyID among other products: it kept "one pager on HyID i can email" from
+  // ever seeing the internal HyID datasheet (27 Sep #7).
+  { source: "public/Accops Corporate Brochure 2026.pdf", filename: "Accops Corporate Brochure 2026.pdf", title: "Accops Corporate Brochure 2026", asset_type: "Brochure", industry: "", client: "",
+  products: ["HyWorks", "HySecure", "HyID"], competitors: [], personas: [], regulations: [], key_problem: "", key_outcomes: [], brief: "Company overview: HyWorks, HySecure and HyID in one brochure.", use_for: "",
+  publish_year: "2026", expired: false, expiry_date: null, stale_risk: "", superseded_by: "", visibility: "public", internal_reason: "", public_url: "https://downloads.accops.com/corporate-brochure-2026.pdf",
+  confidence: 0.9, needs_human: "", batch: "t", item_id: null }];
 
 // ---- stubbed network: Supabase fixtures, and a scripted model
 let script = [], bodies = [], regDelay = 0, logged = [];
@@ -323,7 +329,7 @@ const pickSay = (verdict, ...titles) => (body) => ({ role: "assistant", content:
   const { verdictProblem } = await jiti.import("./agent.ts");
   const card = { asset: { title: "Two Leading Indian Private Banks", asset_type: "Case Study", industry: "BFSI", client: "", products: [], key_problem: "", key_outcomes: ["MFA for 60,000 users"],
     brief: "Two private banks secured remote access with MFA.", use_for: "", section: "", file: { path: "x.pdf", year: "2026" }, public_url: "u" }, score: 1, why: "" };
-  ok(verdictProblem("Two public BFSI case studies you can send.", [card], "pvt bank moving off citrix", false) === null, "a plain verdict passes");
+  ok(verdictProblem("Two public BFSI case studies you can send.", [card, card], "pvt bank moving off citrix", false) === null, "a plain verdict passes");
   ok(/Citrix/.test(verdictProblem("Two public case studies of banks leaving Citrix.", [card], "pvt bank moving off citrix", false)), "the rep's competitor attributed to a card is caught");
   ok(/includ/.test(verdictProblem("The datasheet includes max concurrent users.", [card], "q", false)), "coverage verbs are caught");
   ok(/2,000/.test(verdictProblem("Good for a 2,000-user quote.", [card], "pricing for 2,000 users", false)), "a number no card has is caught");
@@ -419,8 +425,48 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   ok(dropSending("The library includes relevant manufacturing VDI case studies and they can be sent.") === "The library includes relevant manufacturing VDI case studies.", "'sent' clause dropped");
   ok(dropSending("Send the RBI-focused solution document to the CISO.") === "" && dropSending("The library has two decks.") === "The library has two decks.", "all-sending -> empty; no sending -> unchanged");
   ok(dropSending("Two can be emailed: the library has two HyID datasheets.") === "The library has two HyID datasheets.", "a leading sending clause goes with its separator");
-  ok(sendLine([bank1, bank2], false) === "All 2 are public, so they can be sent to a customer." && sendLine([bank1, cx1, cx2], true) === "1 of 3 can be sent to a customer; the rest are internal only."
+  ok(sendLine([bank1, bank2], false) === "Both are public, so they can be sent to a customer." && sendLine([bank1, bank2, pharmacy], false) === "All 3 are public, so they can be sent to a customer."
+    && sendLine([bank1, cx1], true, "any malaysia customer reference i can share with a partner?") === "1 of 2 can be sent to a partner; the rest are internal only." && sendLine([bank1, cx1, cx2], true) === "1 of 3 can be sent to a customer; the rest are internal only."
     && sendLine([cx1], false) === "All internal: don't send outside Accops." && /^None of these is published/.test(sendLine([cx1], true)), "sendability is computed from visibility");
+  // 27 Sep re-run #2: six real production verdicts the guard threw away (#2, 8, 14, 16, 21, 29), over
+  // the cards production showed. They must pass now.
+  const cc = (title, o = {}) => { const h = c(title, o); h.asset.use_for = o.use_for ?? ""; h.asset.brief = o.brief ?? title; return h; };
+  const deck2021 = cc("Accops BFSI Proposal Deck, Part 1 (2021): Cutting a Bank's Citrix VDI Dependency", { type: "Deck", industry: "BFSI", year: "2021" });
+  const pharmaWp = cc("ZTNA for Pharma and Healthcare (Life Sciences)", { type: "Whitepaper", industry: "Pharma / Healthcare" });
+  const corp = cc("Accops Corporate Brochure: Anywhere Access, Secure and Simplified", { type: "Brochure", pub: 1 });
+  const euc = cc("Migration Strategy from VMware EUC: Three Full-Stack Replacement Options", { type: "Deck" });
+  const vvf = cc("Omnissa Horizon with VMware vSphere Foundation for VDI: Analysis of the Bundled Offering", { type: "Whitepaper" });
+  const broadcom = cc("Vanquishing VMware: Broadcom Acquisition Battlecard and VDI Attack Scenarios (Jul 2022)", { type: "Battlecard", year: "2022" });
+  const ahv = cc("Accops HyWorks and Nutanix AHV: Solution Support Document and Deployment Best-Practice Guide (v2, Nov 2020)", { type: "Solution Document", year: "2020" });
+  const proxmox = cc("Accops Digital Workspace on Proxmox V2.0 (Dec 2024): Replacing VMware Horizon + vSphere, with Accops-Supported Proxmox Editions", { type: "Deck", year: "2024" });
+  const whyDaas = cc("Why DaaS - Accops DaaS Battlecard (2022): Accops on Azure vs AWS WorkSpaces and Other DaaS", { type: "Battlecard", year: "2022" });
+  const field = cc("Accops Powered VDI vs the Field (29 Nov 2022): Tier 1 (Citrix, VMware), Public Cloud (AVD, AWS WorkSpaces)", { type: "Battlecard", year: "2022" });
+  const bankQ = "pvt bank in mumbai moving off citrix, need a bfsi case study i can send them";
+  const prod = [
+    ["The library has two 2026 BFSI case studies, newer than the 2021 deck.", [bank1, bank2], `${bankQ} anything newer?`, [deck2021, bank1, bank2]],
+    ["The library has a pharma case study and a pharma‑focused whitepaper as the closest proofs.", [pharmacy, pharmaWp], "pharma customer proof", []],
+    ["The library has a SOC‑1/2 auditor letter (not a full SOC 2 report) and a corporate brochure; no actual SOC 2 Type 2 report.", [mirox], "do we have SOC 2 type 2 report", [mirox, corp]],
+    ["The library has a suitable migration deck and a battlecard for moving from VMware Horizon after the Broadcom price hike.", [euc, vvf, broadcom], "customer on vmware horizon wants to move after broadcom price hike, omnissa migration pitch?", []],
+    ["The library has an integration document for Nutanix AHV and a deck covering Proxmox support.", [ahv, proxmox], "does hyworks support nutanix AHV and proxmox? need integration doc", []],
+    ["The library has two battlecards comparing AWS WorkSpaces and HyWorks.", [whyDaas, field], "aws workspaces vs hyworks comparison", []],
+    ["The library has two relevant BFSI case studies for a private bank moving off Citrix.", [deck2021, bank1, bank2], bankQ, []],
+  ];
+  for (const [v, shown, q, seen] of prod) ok(verdictProblem(dropSending(v), shown, q, false, seen) === null, `production verdict rejected: "${v}" -> ${verdictProblem(dropSending(v), shown, q, false, seen)}`);
+  // ...and the ones it was right to replace, or that passed and were wrong (#5, #10, #25, #34, #35).
+  const seaDeck = cc("Accops Customer Deck for South-East Asia, Compressed V2.0 (Sep 2026)", { type: "Deck", use_for: "For SEA prospects (Indonesia, Malaysia, Thailand); this compressed edition has no SEA customer story." });
+  const gccNote = cc("Accops Digital Workspace for Outsourced Service Providers and Consulting Firms (2020)", { type: "Solution Document", use_for: "GCC and BPO prospects" });
+  const pqc = cc("Deep Research Note: Post-Quantum Cryptography Gaps in Zscaler and a Multi-Vendor ZTNA Pitch for Banks", { type: "Research Note" });
+  const conclave = cc("Sovereign CIO Conclave, Bangalore (Aug-Sep 2026) - ZTNA and Isolation", { type: "Deck" });
+  const anyconnect = cc("Accops HySecure vs Cisco AnyConnect and Other VPNs (PDF, 2021)", { type: "Battlecard" }), ztnaDeck = cc("Secure Access with Zero Trust: Accops HySecure ZTNA Gateway Deck - VPN vs ZTNA", { type: "Deck" });
+  for (const [v, shown, q] of [
+    ["The library has a solution document mapping RBI cyber-security framework and a case study on RBI-mandated MFA for banks.", [bank1], "RBI guidelines, what can i send him"],
+    ["The library has two relevant ZTNA pitch decks for GCC contexts.", [gccNote, pqc, conclave], "whats our ZTNA pitch for a GCC"],
+    ["The library has a Malaysia customer deck.", [seaDeck], "any malaysia or indonesia customer reference i can share with a partner?"],
+    ["The library has no HySecure demo video, but it contains two relevant demo videos.", [v1, v2], "hysecure demo video"],
+    ["The library has two battlecards on Cisco AnyConnect replacement.", [anyconnect, ztnaDeck], "cisco anyconnect replacement"],
+    ["The library has a deck comparing Citrix and HyWorks.", [bank1], "citrix comparison"],
+    ["The library has a case study covering a Citrix migration.", [bank1, deck2021], "bank moving off citrix"],
+  ]) ok(verdictProblem(dropSending(v), shown, q, false, shown) !== null, `risky verdict passed: "${v}"`);
   // Rendered: the model's "two can be shared" about internal documents never reaches the rep.
   run([pickSay("The library has internal product videos for HySecure; two can be shared.", "Geofencing control", "Device posture check and related data on management console")]);
   r = await ask("product video hysecure");
@@ -476,6 +522,47 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   r = await ask("citrix battlecard");
   ok(r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && r.assets[1]?.title === "Accops vs Citrix Feature Table 2018" && traceHas(r, "newer edition first"), `newer edition first when both were picked: ${r.assets.map(a => a.title)}`);
 }
+
+// 14. 27 Sep re-run #2, through finish() on hand-made results (the fixture corpus has none of these).
+{
+  const { finish } = await jiti.import("./agent.ts");
+  const h = (title, o = {}) => ({ asset: { title, asset_type: o.type ?? "Case Study", industry: o.industry ?? "", client: "", products: o.products ?? [], key_problem: "", key_outcomes: [],
+    brief: o.brief ?? title, use_for: o.use_for ?? "", section: "", file: { path: `${title}.pdf`, year: o.year ?? null }, public_url: o.pub ? `https://downloads.accops.com/${encodeURIComponent(title)}.pdf` : null }, score: 1, why: "" });
+  const fin = (question, text, pool) => finish({ question, text, pool, calls: 1, runtime: "openai-compatible", model: "m", trace: [], filters: {}, error: null });
+  // #14: a partial denial whose verdict fails the guard keeps missing (the request button) and its denial.
+  const mirox = h("Auditor Letter on SOC 1 / SOC 2 Applicability to Accops Products (Mirox, 2022) - Not a SOC 2 Report", { type: "Certification", year: "2022" });
+  r = fin("do we have SOC 2 type 2 report", "The library has a SOC 2 letter from a zzqvendor; no actual SOC 2 Type 2 report.\nPICKS: 1", [mirox]);
+  ok(r.missing && /^No actual SOC 2 Type 2 report\.\n/.test(r.text) && traceHas(r, "verdict guard: replaced") && traceHas(r, "partial denial"), `replaced partial denial keeps its clause and the button: ${r.text} | ${r.missing}`);
+  // #25: a region named only as the audience (use_for) is not covered: gap + button; "partner" in the line.
+  const sea = h("Accops Customer Deck for South-East Asia, Compressed V2.0 (Sep 2026)", { type: "Deck", use_for: "For SEA prospects in Indonesia and Malaysia; this compressed edition has no SEA customer story." });
+  const dth = h("Major Indian DTH and OTT Platform: Secure Remote Access for 300+ Vendors", { industry: "Media", pub: 1, use_for: "A customer reference for partner and vendor access asks in Malaysia or Indonesia" });
+  r = fin("any malaysia or indonesia customer reference i can share with a partner?", "The library has the closest matches.\nPICKS: 1, 2", [sea, dth]);
+  ok(r.missing && /^No exact match for Malaysia or Indonesia: none of the closest documents mentions them\./.test(r.text) && /sent to a partner/.test(r.text), `audience-only region is a gap: ${r.text}`);
+  // #10: GCC on no shown title is a gap, and the answer states both readings.
+  const gcc = h("Accops Digital Workspace for Outsourced Service Providers (2020)", { type: "Solution Document", products: ["HySecure"], use_for: "GCC and BPO prospects needing ZTNA" });
+  const conclave = h("Sovereign CIO Conclave (2026) - ZTNA and Isolation", { type: "Deck", products: ["HySecure"] });
+  r = fin("whats our ZTNA pitch for a GCC", "The library has two relevant ZTNA pitch decks for GCC contexts.\nPICKS: 1, 2", [gcc, conclave]);
+  ok(r.missing && /^No exact match for GCC \(a Gulf customer or a global capability centre\)/.test(r.text), `GCC pitch is a gap with its readings: ${r.text}`);
+  // #23: "No exact datasheet with ..." leads with the product's datasheet, not the model's case study.
+  const ecom = h("Leading Indian E-commerce Logistics Company: Software ZTNA for 2,300 Concurrent Users", { products: ["HySecure"] });
+  const editions = h("Accops Product Editions 2026: Feature Matrix for Digital Workspace, HySecure, HyID and HyLabs", { type: "Datasheet", products: ["HyWorks", "HySecure", "HyID"] });
+  const ds = h("Accops HySecure Gateway: Zero Trust Remote Access Datasheet", { type: "Datasheet", products: ["HySecure", "ZTNA"], pub: 1 });
+  r = fin("hysecure datasheet specs - max concurrent users per appliance", "No exact datasheet with max concurrent users per appliance.\nPICKS: 1, 2", [ecom, editions, ds]);
+  ok(r.missing && r.assets[0]?.title === ds.asset.title && r.assets.length === 2 && traceHas(r, "named product first"), `the product's datasheet leads the substitutes: ${r.assets.map(a => a.title)}`);
+  // An exact-type-and-product substitute already picked is left alone.
+  r = fin("hysecure datasheet specs - max concurrent users per appliance", "No exact datasheet with max concurrent users per appliance.\nPICKS: 3, 1", [ecom, editions, ds]);
+  ok(r.assets[0]?.title === ds.asset.title && !traceHas(r, "named product first"), `picked datasheet stays first: ${r.assets.map(a => a.title)}`);
+}
+// 14a. A sending ask whose public results only LIST the product still sees the product's own document (#7).
+{
+  const { seedSearch } = await jiti.import("./agent.ts");
+  const s = seedSearch("one pager on HyID i can email");
+  ok(/HyID Datasheet/.test(s.hits[0]?.asset.title ?? ""), `the HyID datasheet leads the seed: ${s.hits.map(h => h.asset.title)}`);
+}
+// 14b. The fallback model's answer says in the trace why the primary did not answer.
+run([() => ({ status: 429, text: "Rate limit reached for model openai/gpt-oss-120b" }), call({ query: "citrix" }), say("- **Accops Powered VDI vs Citrix VDI** - comparison")]);
+r = await ask("citrix comparison");
+ok(r.trace[0]?.step === "model provider failed, answered by fallback" && /gpt-oss-120b.*429.*answered by openai\/gpt-oss-20b/.test(r.trace[0].detail), `fallback reason in the trace: ${JSON.stringify(r.trace[0])}`);
 
 // 6. Cold start: apiSearch waits for the registry instead of ranking the frozen cards alone.
 globalThis.__samReg = undefined; globalThis.__samRegAt = undefined; regDelay = 50;
