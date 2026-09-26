@@ -393,4 +393,22 @@ regDelay = 0;
   ok(g.fixed === 0, "an internal asset described without sending language is left alone");
 }
 
+// Sending ask: when the picks are all internal but a relevant public document was found, it goes first.
+{
+  const { ensurePublished } = await jiti.import("./agent.ts");
+  const a = (title, public_url = null, industry = "Pharma / Healthcare") => ({ asset: { title, asset_type: "Case Study", industry, client: "", products: [],
+    key_problem: "", key_outcomes: [], brief: `${title} hospital healthcare case study`, use_for: "", section: "", file: { path: `${title}.pdf` }, public_url }, score: 1, why: "" });
+  const internal1 = a("UAE Multi-Hospital Group Remote Access"), internal2 = a("Accops for Healthcare Whitepaper");
+  const zulekha = a("Accops Zulekha Hospital Case Study", "https://www.accops.com/case-studies/zulekha-hospital");
+  const tr = [];
+  let out = ensurePublished([internal1, internal2], [internal1, internal2, zulekha], "healthcare case study for a customer", tr);
+  ok(out[0] === zulekha && out.length === 2 && tr.some(t => /published match added/.test(t.step)), `sending ask puts the public case study first: ${out.map(h => h.asset.title)}`);
+  out = ensurePublished([internal1, internal2], [internal1, internal2, zulekha], "healthcare case study for my own prep", []);
+  ok(out[0] === internal1, "an internal ask keeps the model's picks");
+  const unrelated = a("Accops Corporate Brochure", "https://downloads.accops.com/b.pdf", "Cross-industry");
+  unrelated.asset.asset_type = "Brochure"; unrelated.asset.brief = "company overview";
+  out = ensurePublished([internal1], [internal1, unrelated], "telecom case study to send a customer", []);
+  ok(out[0] === internal1, "an unrelated public document does not jump in");
+}
+
 console.log(`agent.check: ${n} assertions passed`);

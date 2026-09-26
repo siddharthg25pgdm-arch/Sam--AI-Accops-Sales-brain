@@ -604,10 +604,11 @@ export function finish(p: {
       }
       p.trace.push({ step: "substitutes: from the results", detail: `the model picked ${chosen.length ? "only unrelated documents" : "none"}; showing the ${subs.length} closest that share the ask's product, industry or topic` });
     }
+    subs = ensurePublished(subs, hits.filter(h => substituteFits(p.question, h.asset)), p.question, p.trace).slice(0, 2);
     return done(denial ? denialClause(reply.verdict, p.question) : "No exact match in the library.", ["Closest in the library:"], subs, true);
   }
 
-  let shown = withSuccessors(chosen.length ? chosen.slice(0, 3) : hits.slice(0, 3), p.trace);
+  let shown = ensurePublished(withSuccessors(chosen.length ? chosen.slice(0, 3) : hits.slice(0, 3), p.trace), hits, p.question, p.trace);
   const uncovered = coverEntities(shown, hits, p.question, p.trace);
   shown = shown.slice(0, 3);
   const types = typesNamedIn(p.question);
@@ -630,6 +631,19 @@ export function finish(p: {
   const final = problem ? "Best matches in the library:" : g;
   const notes = PRICE_ASK.test(p.question) ? ["Confirm current pricing with your sales manager before quoting it."] : [];
   return done(final, notes, shown, false);
+}
+
+/** A rep asking for something to SEND gets a sendable document when one was found. Production: for
+ *  "healthcare case study for a customer" the model picked three internal documents while the public
+ *  Zulekha Hospital and City Pharmacy case studies were in its results, and the answer became "none
+ *  of these can be sent". The best relevant public result (same relevance floor as substitutes, so an
+ *  unrelated public brochure cannot jump in) goes first, replacing the last pick. */
+export function ensurePublished(shown: SearchHit[], pool: SearchHit[], question: string, trace: AskResult["trace"]): SearchHit[] {
+  if (heuristicFilters(question).audience !== "external" || shown.some(h => h.asset.public_url)) return shown;
+  const pub = pool.find(h => h.asset.public_url && substituteFits(question, h.asset) && !shown.includes(h));
+  if (!pub) return shown;
+  trace.push({ step: "sendable: published match added", detail: `"${pub.asset.title}" is public; the picks were all internal` });
+  return [pub, ...shown].slice(0, Math.max(shown.length, 1));
 }
 
 /** A denial verdict cut to its denial: "No exact Proxmox integration doc, but the Nutanix guide covers
