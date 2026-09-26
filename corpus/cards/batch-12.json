@@ -1426,6 +1426,130 @@
    "visibility": "internal",
    "internal_reason": "Lists dozens of named customers against use cases without recorded reference permission; install-base figures; no verified public URL.",
    "needs_human": "Source the '13 large life insurers' and '93.05% Accops reachability' claim before reuse. Reconcile RBI users (600,000 vs 350,000). The named-customer-per-use-case slides (24, 34, 44) would make a good internal 'reference finder' if kept current."
+  },
+  {
+   "source": "sharepoint/Applying Virtualization to Training Lab.pptx",
+   "title": "Applying Virtualization to Training/ICT Labs - Short Solution Proposal Deck (Jan 2023): Current Lab Pain Points, Proposed Nested-VM Lab Architecture on VDI, Access Model, Benefits, HyLabs",
+   "asset_type": "Deck",
+   "industry": "Education",
+   "client": "An unnamed organisation running a hands-on training lab where each student uses a large desktop PC with several VMware Workstation VMs (including a Kali Linux VM), reset every two weeks",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyLabs",
+    "HyWorks",
+    "VDI",
+    "MFA"
+   ],
+   "competitors": [],
+   "personas": [
+    "Training / L&D head",
+    "Lab administrator",
+    "IT head",
+    "Education IT"
+   ],
+   "regulations": [],
+   "key_problem": "Physical lab PCs running multiple local VMs are hard to manage, slow to reset and update, and only usable offline in the lab.",
+   "key_outcomes": [
+    "Current state (slide 2): one large desktop per student with multiple VMware Workstation VMs; challenges are physical PC management, reset time, app updates every 2 weeks, offline-only access",
+    "Proposed architecture (slide 3): lab VMs and a nested-virtualisation 'master VM' delivered as VDI, with separate lab, user and production networks",
+    "Access model (slide 4): a student can use several VMs at once on different virtual switches/VLANs, or a master VM that runs more VMs inside it (Hyper-V/VMware Workstation); campus-wide access with MFA, device lock-in and role/location/device-based zero-trust policies",
+    "Benefits (slide 5): no physical PCs, fully automated provisioning and de-provisioning, dynamic sizing, access from anywhere per policy, production network isolated from the lab network",
+    "HyLabs summary (slide 6): self-service, timetable-based allocation, non-persistent linked clones, web access for BYOD, role-based security and audit logs"
+   ],
+   "brief": "A 6-7 slide 'Accops Confidential' solution sketch from January 2023 for virtualising a hands-on training lab (e.g. security training with Kali Linux VMs) using VDI and nested virtualisation, closing with the HyLabs feature summary. The same filename exists in two SharePoint folders: the Technical Solutions/Virtual Labs copy (7 slides, January 2023) adds a 2023 company slide (700+ customers, 240+ team, leadership names); the Industry Solutions/Education copy (6 slides, re-saved March 2025) is identical without that slide.",
+   "use_for": "A starting point for a corporate training-lab or cyber-range proposal where students need several networked VMs at once (slides 3-4 explain nested VMs and VLAN separation). For university ICT labs use the HyLabs material and the Kyoto University case instead.",
+   "publish_year": "2023",
+   "expired": false,
+   "stale_risk": "January 2023. The company slide in the Virtual Labs copy has 2023 figures and leadership titles (CEO, co-founder & CTO) that have since changed.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked 'Accops Confidential'; a customer-specific solution sketch.",
+   "needs_human": "Two copies share this filename (Technical Solutions/Virtual Labs, Jan 2023, 7 slides; Industry Solutions/Education, Mar 2025 re-save, 6 slides without the company slide) - keep one. Which customer was this proposal for?"
+  },
+  {
+   "source": "sharepoint/BOM with prices and sizing-v3.xlsx",
+   "title": "HyID + BioAuth Biometric MFA Bill of Materials and Sizing Template, v3 (2022-23): Fingerprint and Face-Auth BOMs for 15,000 Users across DC/DR/UAT, Year-4-6 AMC Lines, VM Sizing per Component",
+   "asset_type": "Sales Tool",
+   "industry": "BFSI",
+   "client": "Built for a 15,000-user biometric MFA proposal (DC, DR and UAT sites; onsite engineer location in North India); no customer named in the workbook",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyID",
+    "BioAuth",
+    "MFA",
+    "Reporting Server"
+   ],
+   "competitors": [],
+   "personas": [
+    "Presales engineer",
+    "Sales rep",
+    "Solution architect"
+   ],
+   "regulations": [],
+   "key_problem": "A presales team answering a large biometric-MFA RFP needs a complete bill of materials and infrastructure sizing - Accops licences, customer-provided hardware and OS, support, services and multi-year AMC - in the buyer's format.",
+   "key_outcomes": [
+    "Two BOM sheets - fingerprint and face authentication - each with sections: hardware sizing (DC, DR, UAT), OS and database licensing (Windows Server 2019, Oracle/RHEL, MS SQL), Accops licences, fingerprint scanner devices, enterprise support, optional onsite L2 engineer, design and implementation, customer-provided items (SSL certificate)",
+    "Accops licence lines for 15,000 named users: HyID Gold subscription, BioAuth fingerprint or face-auth add-on (face BOM adds a liveness-check add-on), fingerprint server site licences and hardware tokens; Accops part codes are listed against each line",
+    "Separate 'AMC for 4th, 5th and 6th year' and 'from 2nd year onwards' blocks for renewals",
+    "Price, tax and total columns exist but are zero/blank in this copy - it is a template, not a quote",
+    "Sizing sheets for DC, DR and UAT: per-component VMs (BioAuth web portal, face-auth services and MariaDB, Redis session cache, config/audit/fingerprint DB, authorizer, HyID config and access nodes, reporting server, device messenger and classification services) with vCPU, RAM, disk and OS; DC total 33 VMs / 216 vCPU / 540 GB RAM, plus physical servers for the BioAuth core engine and the fingerprint matching engine and its licence server"
+   ],
+   "brief": "An Excel bill-of-materials and sizing workbook (created April 2022, last saved January 2023) in the ABS (Accops BioAuth) proposal folder, for a 15,000-user HyID + BioAuth biometric MFA deployment across DC, DR and UAT. It has fingerprint and face-auth BOM variants with AMC years 4-6, and three sizing sheets listing every server component. Unit prices are blank.",
+   "use_for": "Sizing or pricing a large on-premise biometric MFA deal (typically a bank): copy the BOM structure and the per-component VM sizing (DC/DR/UAT) instead of rebuilding them, then fill in current prices. Pairs with the HyID biometric techno-commercial proposal and the BioAuth deployment-details deck in the same folder.",
+   "publish_year": "2022",
+   "expired": false,
+   "stale_risk": "2022-23. Windows Server 2019 and the listed component architecture may have changed; check current BioAuth sizing and part codes before reuse.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal presales template with part codes and deployment sizing from a customer proposal.",
+   "needs_human": "Which proposal was this built for, and is v3 the latest? Confirm the part codes and component list still match the current BioAuth release."
+  },
+  {
+   "source": "sharepoint/HySecure Logs Mapping & Device ID Details.xlsx",
+   "title": "HySecure Syslog Event Mapping and Device-ID Fields Reference (Apr 2020): 12 Log Events with Mapping Templates and Reported Fields, 17+ Device Identity Attributes - Contains Real Customer Log Samples",
+   "asset_type": "Technical Guide",
+   "industry": "BFSI",
+   "client": "Sample log lines taken from a bank's production HySecure deployment",
+   "client_actual": "The sample logs show a large Indian private bank's UK operation (domain, AD group names and hostnames visible in the raw lines)",
+   "client_named": true,
+   "products": [
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "MFA",
+    "Reporting Server"
+   ],
+   "competitors": [],
+   "personas": [
+    "Presales engineer",
+    "SOC / SIEM engineer",
+    "Customer IT security team"
+   ],
+   "regulations": [],
+   "key_problem": "Customers integrating HySecure with a SIEM or building ARS reports need to know which events HySecure logs, the field order in each log line, and which device attributes identify an endpoint.",
+   "key_outcomes": [
+    "'Logs Mapping' sheet: 12 events - application request, HyID server auth request, failed application/service access, AD user login, logout and login failure, email authentication request, invalid OTP, native admin login, login failure and logout, failed to send OTP",
+    "For each event: a sample log line, a mapping template (<DATESTAMP>,<LOGIN_STATUS_CODE>,<LOGIN_SUBSTATUS_CODE>,... placeholders) and the numbered list of fields reported (status codes, hostname, domain, AD groups, MAC, client and WAN IP, 2FA token type, client type, application server and port, username, application name, EPS profile)",
+    "'Device ID' sheet: 17+ attributes HySecure can collect to identify a device (HDD, CPU and motherboard serials, IMEI, MAC list, received and detected WAN IP, device/browser type, browser ID, region, time zone, locale, hostname, domain, default gateway, NIC manufacturer) marked mandatory or optional",
+    "The sample lines are unredacted production data: real hostnames, MAC and IP addresses, usernames and the bank's AD group names"
+   ],
+   "brief": "A two-sheet Excel reference created in April 2020 (ARS 'Report Examples' folder) that documents HySecure's syslog events with sample lines, parsing templates and field lists, and the device-identity attributes used for device binding. Useful technical content, but the samples were copied from a bank's live logs without masking.",
+   "use_for": "Answering 'what does HySecure send to our SIEM and in what format?' or 'which device attributes can HySecure bind to?' during an RFP or SIEM integration - describe the event list and field lists; do not share the file itself.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "April 2020; log formats and device attributes may have changed in later HySecure releases (e.g. new events for posture re-evaluation or enterprise browser).",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Contains a customer's raw production log lines: hostnames, MAC and IP addresses, usernames and AD group names.",
+   "needs_human": "Replace the sample log lines with dummy values (hostnames, MACs, IPs, usernames, the bank's domain and AD groups) - as it stands the file exposes a customer's production data. Then check the event list against the current HySecure release; a cleaned copy would be a useful SIEM-integration datasheet."
   }
  ]
 }
