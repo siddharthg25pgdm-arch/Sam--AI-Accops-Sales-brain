@@ -1550,6 +1550,133 @@
    "visibility": "internal",
    "internal_reason": "Contains a customer's raw production log lines: hostnames, MAC and IP addresses, usernames and AD group names.",
    "needs_human": "Replace the sample log lines with dummy values (hostnames, MACs, IPs, usernames, the bank's domain and AD groups) - as it stands the file exposes a customer's production data. Then check the event list against the current HySecure release; a cleaned copy would be a useful SIEM-integration datasheet."
+  },
+  {
+   "source": "sharepoint/Impossible Travel Events.xlsx",
+   "title": "Impossible Travel Events - Sample ARS Report Export (June 2020): Daily Sheets of Consecutive-Login Pairs with Location, Distance and Time - Raw Production Data",
+   "asset_type": "Sample Report",
+   "industry": "",
+   "client": "Exported from a customer's HySecure/ARS deployment (not identified in the file)",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "Reporting Server",
+    "HySecure",
+    "ZTNA"
+   ],
+   "competitors": [],
+   "personas": [
+    "Presales engineer",
+    "CISO",
+    "SOC analyst"
+   ],
+   "regulations": [],
+   "key_problem": "Security teams want to see what Accops' reporting shows for 'impossible travel' - a user logging in from two places too far apart for the time between logins.",
+   "key_outcomes": [
+    "Eight daily sheets (1-8 June 2020) with roughly 6,400 event rows in total (a handful on 1 June, 1,000-1,500 a day at peak)",
+    "Columns: timestamp, user ID, current login time, WAN IP, country, region and city; previous login time, WAN IP, country, region and city; distance from last login (km); duration since last login",
+    "No summary, chart or explanation - it is a raw export",
+    "Every row is real production data: user IDs, public IP addresses and locations"
+   ],
+   "brief": "An Excel export of 'impossible travel' detections from Accops' reporting (ARS) for eight days in June 2020, kept in the ARS 'Report Examples' folder. Each row pairs a user's current and previous login with IPs, geo-locations, distance and elapsed time. It demonstrates the report's fields but consists entirely of unmasked customer data.",
+   "use_for": "Only to describe what the impossible-travel report contains (the column list above) when a prospect asks about ARS anomaly detection. Do not send the file; ask for a masked sample or a screenshot from a demo environment.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "June 2020 data from an early ARS version; ARS 3.0 (2026) has a new interface.",
+   "superseded_by": "",
+   "confidence": 0.85,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Thousands of rows of real user IDs, public IP addresses and login locations from a customer deployment.",
+   "needs_human": "This is personal data (user IDs + IPs + locations) sitting in Sales Collateral. Move it out or replace it with a masked or synthetic sample; consider whether the customer's consent covered keeping it."
+  },
+  {
+   "source": "sharepoint/Accops DaaS Calculator v-2.3.xlsx",
+   "title": "Accops DaaS (AVO) Pricing Calculator v2.3 (May 2021): Azure-Hosted DaaS Quote Builder - Customer VDI Configs In, Per-User Monthly Price, One-Time Charges and Revenue Split Out",
+   "asset_type": "Sales Tool",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "DaaS",
+    "HyWorks",
+    "HySecure",
+    "Reporting Server",
+    "Digital Workspace"
+   ],
+   "competitors": [
+    "Azure Virtual Desktop"
+   ],
+   "personas": [
+    "Presales engineer",
+    "Sales rep",
+    "Partner"
+   ],
+   "regulations": [],
+   "key_problem": "Pricing a managed DaaS deal on Azure means combining VM sizes, hours of use, storage, egress, shared infrastructure, Microsoft and Accops licences and partner margin - too many variables to do by hand for each quote.",
+   "key_outcomes": [
+    "Input sheet: up to four VDI configurations (personal or pooled, Windows Server/Windows 10/Linux, user count, logged-in hours, concurrency, Azure VM type, users per VM, disk type, user storage), tenant type (shared/dedicated), commitment (PAYG or yearly), user location (India, UAE, USA), common infrastructure choices (ARS server, AD extension, site-to-site VPN, gold masters, file server vs Azure Files), per-user bandwidth, Windows licence inclusion, Accops Digital Workspace edition, partner and distributor margin",
+    "Output sheet: one-time charges (consulting, design, provisioning, onboarding), monthly fixed charges, per-user monthly price for each configuration and the year-1 revenue split between Accops services, Accops products, Azure, partner and distributor",
+    "Supporting sheets: fixed-cost builder for account-level VMs (HySecure gateway, HyWorks controller, file server, AD, ARS, VPN gateway), calculation sheet, per-user licence cost table, an Azure price catalogue (India and UAE regions), drop-down lists, and a working sheet for egress, storage and ARS licence costs",
+    "Prices are in INR and the Azure catalogue reflects 2021 rates; the sample inputs show a mixed 350-user scenario"
+   ],
+   "brief": "An Excel calculator (last saved May 2021) for quoting Accops Virtual Office/DaaS hosted on Azure. The rep enters the customer's desktop configurations and options on the 'AVO Input Sheet' and reads per-user monthly prices, one-time charges and the revenue split on the 'AVO Output Sheet'; the remaining sheets hold the cost model, internal licence prices and an Azure price catalogue.",
+   "use_for": "Building a DaaS quote or sanity-checking a DaaS price: it shows which cost elements go into a per-user price (compute hours, concurrency, storage, egress, shared infra, Microsoft and Accops licences, partner margin). Internal only - it holds internal licence costs and margins. Azure rates and Accops prices are from 2021; the 2026 offers (Rs 1,333, USD 17.99) come from newer pricing.",
+   "publish_year": "2021",
+   "expired": false,
+   "stale_risk": "May 2021. Azure prices, VM families and Accops licence prices have changed; 'AVO' (Accops Virtual Office) is the old DaaS name. Recalculate before quoting.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Contains internal licence costs, partner/distributor margins and the revenue-split model.",
+   "needs_human": "Is there a newer DaaS calculator behind the 2026 Rs 1,333 / USD 17.99 offers? If so, retire this one; if not, update the Azure catalogue and licence prices. The 'Calculatore in sales tools.txt' file in the DaaS folder is empty, so it gives no pointer."
+  },
+  {
+   "source": "sharepoint/Accops DaaS questionnaire v-06.xlsx",
+   "title": "Accops DaaS Scoping Questionnaire v06 (Oct 2021): 12 Discovery Question Groups - Users and Workloads, Applications, Support Model, AD, Microsoft Licensing, Azure Tenant, Access/MFA, Geo Constraints, Peripherals (Copy Partly Filled In for a Prospect)",
+   "asset_type": "Template",
+   "industry": "",
+   "client": "This copy carries partial answers from one prospect (a services firm with users in the Philippines, India, the US and the UK, a small POC growing to a few hundred users over two shifts)",
+   "client_actual": "The prospect is referred to only by an abbreviation in the answers",
+   "client_named": false,
+   "products": [
+    "DaaS",
+    "HyWorks",
+    "HySecure",
+    "HyID",
+    "Digital Workspace"
+   ],
+   "competitors": [],
+   "personas": [
+    "Presales engineer",
+    "Sales rep",
+    "Partner"
+   ],
+   "regulations": [
+    "GDPR"
+   ],
+   "key_problem": "Before sizing and pricing DaaS, presales needs a consistent set of discovery questions so nothing (licensing, AD, network access, GPU, compliance) is missed.",
+   "key_outcomes": [
+    "Q1 business drivers for DaaS; Q2 user numbers, concurrency, geography and working hours; Q3 workload split (light, medium, heavy, power) with OS, storage and vCPU/RAM per category",
+    "Q4 applications: list, internet vs internal-network access (site-to-site or personal VPN), where apps are hosted, GPU needs",
+    "Q5 support model: who patches OS, distributes software, manages users, and whether the customer needs admin access to HyWorks/HySecure/HyID",
+    "Q7 Active Directory (use customer AD credentials or Accops-provided identity, access to file shares and print); Q8 Microsoft licensing (EA, Windows and Office editions, CSP); Q9 Azure tenant (AAD, sync, region, provision in existing tenant)",
+    "Q10 existing gateway/VPN/MFA; Q11 geo-location/compliance hosting constraints; Q12 peripheral devices",
+    "This copy has a prospect's notes filled in (user split by country, Accops to provide identity and OS licences, URL whitelisting, GDPR, antivirus, DLP, storage and backup expectations, 12-hour shifts)"
+   ],
+   "brief": "A one-sheet Excel discovery questionnaire (v06, last saved October 2021) for scoping an Accops DaaS deployment. The questions are generic and still useful; the copy in SharePoint has been partly filled in for one offshore-services prospect, so reps should clear the Responses column before sending it.",
+   "use_for": "Running a DaaS or cloud-VDI discovery call, or sending a prospect a scoping questionnaire; the answers feed the DaaS calculator. Clear the prospect's answers first.",
+   "publish_year": "2021",
+   "expired": false,
+   "stale_risk": "October 2021: refers to Windows 10 and Azure AD (now Entra ID); does not ask about DPDP or other newer compliance needs.",
+   "superseded_by": "",
+   "confidence": 0.82,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "The stored copy contains one prospect's requirement answers.",
+   "needs_human": "Save a blank master copy (Responses column empty) so reps don't send another prospect's answers; consider adding DPDP/data-residency and GPU-workload questions."
   }
  ]
 }
