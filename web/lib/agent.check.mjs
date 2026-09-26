@@ -325,6 +325,8 @@ const pickSay = (verdict, ...titles) => (body) => ({ role: "assistant", content:
   ok(/Citrix/.test(verdictProblem("Two public case studies of banks leaving Citrix.", [card], "pvt bank moving off citrix", false)), "the rep's competitor attributed to a card is caught");
   ok(/includ/.test(verdictProblem("The datasheet includes max concurrent users.", [card], "q", false)), "coverage verbs are caught");
   ok(/2,000/.test(verdictProblem("Good for a 2,000-user quote.", [card], "pricing for 2,000 users", false)), "a number no card has is caught");
+  ok(/leaving/.test(verdictProblem("Two case studies of banks leaving legacy desktops.", [card], "bank leaving legacy desktops", false)), "a paraphrased claim in words no card has is caught");
+  ok(verdictProblem("No exact Proxmox integration document", [], "does hyworks support proxmox? need integration doc", true) === null, "a denial may name what is missing in the rep's words");
   // An uncarded asset says so instead of being described from its title.
   run([pickSay("A HySecure demo video fits.", "Geofencing control")]);
   r = await ask("hysecure demo video");

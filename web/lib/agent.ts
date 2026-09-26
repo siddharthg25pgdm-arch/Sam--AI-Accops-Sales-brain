@@ -39,8 +39,8 @@ workspace vendor: HySecure (ZTNA), HyID (MFA/SSO), HyWorks (VDI/DaaS), HyLabs, H
   if it is in the results. A result marked "contents unknown" is a title only: pick it only if the title clearly fits.
 - If none is exactly what was asked, the verdict starts "No exact" and names the missing thing in the rep's words,
   and you still pick the 2 closest as substitutes. PICKS: none only if every result is unrelated.
-- Reply with exactly two lines and nothing else. Line 1: one verdict sentence under 25 words: does the library have
-  what was asked for. Line 2: "PICKS: " and the n of up to 3 results, best first ("PICKS: 4, 1"), or "PICKS: none".
+- Reply with exactly two lines and nothing else. Line 1: one plain verdict sentence under 25 words: does the library
+  have what was asked for, how many picks, and can they be sent. Line 2: "PICKS: " and the n of up to 3 results, best first ("PICKS: 4, 1"), or "PICKS: none".
   SAM prints each pick's title, description, visibility and warnings from the library itself.
 - The verdict never names a document, never says what a document covers, includes or shows, and never attributes the
   rep's situation, competitor, regulation or numbers to a document. Never quote a price.
@@ -357,8 +357,28 @@ export function verdictProblem(verdict: string, shown: SearchHit[], question: st
   if (foreign.length) return `names ${foreign.join(", ")}, which no shown card mentions`;
   const nums = (verdict.match(/\b\d[\d,]{2,}\b/g) ?? []).filter(n => !on.includes(n) && !on.includes(n.replace(/,/g, "")));
   if (nums.length) return `states ${nums.join(", ")}, which no shown card has`;
+  // Every other word must be plain answer vocabulary or be on a shown card (for a denial, also in
+  // the ask). A claim about a document therefore needs the card's own words: "banks leaving legacy
+  // VDI" passes only if the card says so. ponytail: lexical, not semantic - a card's words recombined
+  // into a false claim would pass; the entity, number and coverage-verb checks above catch the kinds
+  // production actually produced.
+  const words = (verdict.toLowerCase().match(/[a-z][a-z']+/g) ?? []).filter(w => w.length > 2);
+  const unknown = words.filter(w => !ANSWER_WORDS.has(w) && !ANSWER_WORDS.has(w.replace(/(es|s)$/, "")) && !tokenMatcher(w).test(on));
+  if (unknown.length) return `uses words no shown card has (${unknown.slice(0, 4).join(", ")})`;
   return null;
 }
+/** Words a verdict may use whatever the cards say: whether it fits, how many, what kind, who may see it. */
+const ANSWER_WORDS = new Set(`yes not none nothing exact exactly closest close best better strong stronger strongest good great match matching fit fits
+fitting suit suitable useful relevant option alternative substitute stand here these those this that both either each one two three four five
+several some any only also still but and for with from about into the are was were can may might could should would will please use using
+send sending share shared shareable sendable forward email outside externally external internal internally public published publicly unpublished
+confidential ask asking marketing request library collateral document doc material asset item file version edition newer newest older latest
+current recent updated dated old new available exist exists there have has had found find accops sam rep prep preparation call meeting pitch
+outreach customer client prospect buyer cio ciso cto team deck slide presentation battlecard comparison brochure datasheet whitepaper ebook
+case study studies video demo certificate certification report guide pager page short shorter long longer brief overview story reference proof
+own you your our its their them they ready right direct directly general generic specific similar same other another more most less least
+nearest instead yet though however which what why how where when who whom whose than then such very just assumed assuming meaning means`.split(/\s+/)
+  .concat(PRODUCTS.map(p => p.toLowerCase()), [...OWN_PRODUCTS].map(p => p.toLowerCase())));
 
 /** One document's line, written from its card. Nothing in it comes from the model. */
 function assetLine(h: SearchHit, external: boolean): string {
@@ -601,15 +621,15 @@ export function finish(p: {
     p.trace.push({ step: "verdict: type missing", detail: `asked for ${types.join(" or ")}; none of the results is one` });
     return done(`No exact ${types.join(" or ").toLowerCase()} for this in the library.`, ["Closest in the library:"], shown, true);
   }
-  const problem = bad.length ? "names a document no search returned" : !verdict ? "no verdict sentence" : verdictProblem(verdict, shown, p.question, false);
-  if (problem) {
-    if (verdict) p.trace.push({ step: "verdict guard: replaced", detail: `${problem}: ${verdict}`.slice(0, 300) });
-    verdict = "Best matches in the library:";
-  }
+  // Sending first: a verdict telling the rep to send an internal document is replaced by code text,
+  // which needs no further check.
   const g = guardVerdict(verdict, shown);
   if (g !== verdict) p.trace.push({ step: "guard: internal asset in sending language", detail: `verdict "${verdict}" replaced` });
+  const problem = g !== verdict ? null : bad.length ? "names a document no search returned" : !verdict ? "no verdict sentence" : verdictProblem(verdict, shown, p.question, false);
+  if (problem && verdict) p.trace.push({ step: "verdict guard: replaced", detail: `${problem}: ${verdict}`.slice(0, 300) });
+  const final = problem ? "Best matches in the library:" : g;
   const notes = PRICE_ASK.test(p.question) ? ["Confirm current pricing with your sales manager before quoting it."] : [];
-  return done(g, notes, shown, false);
+  return done(final, notes, shown, false);
 }
 
 /** A denial verdict cut to its denial: "No exact Proxmox integration doc, but the Nutanix guide covers
