@@ -409,8 +409,8 @@ export const ENTITIES: Record<string, string[]> = {
   Australia: ["australia", "australian"], "New Zealand": ["new zealand"], Saudi: ["saudi", "ksa"], UAE: ["uae", "dubai", "abu dhabi", "emirates"],
   Qatar: ["qatar"], Oman: ["oman"], Kuwait: ["kuwait"], Bahrain: ["bahrain"], "Middle East": ["middle east", "mea", "gulf"], GITEX: ["gitex"], GCC: ["gcc"],
   Malaysia: ["malaysia", "malaysian"], Indonesia: ["indonesia", "indonesian"], Thailand: ["thailand"], Philippines: ["philippines"], Singapore: ["singapore"],
-  Vietnam: ["vietnam"], "Sri Lanka": ["sri lanka", "colombo"], Japan: ["japan", "japanese"], Africa: ["africa", "kenya", "nigeria"],
-  Arabic: ["arabic"], Bahasa: ["bahasa"], Sizing: ["sizing", "capacity planning"], "Concurrent users": ["concurrent", "concurrency"],
+  Vietnam: ["vietnam"], "Sri Lanka": ["sri lanka", "colombo"], Japan: ["japan", "japanese", "tokyo"], Africa: ["africa", "kenya", "nigeria"],
+  Arabic: ["arabic"], Bahasa: ["bahasa"], Sizing: ["sizing", "capacity planning"], "Concurrent users": ["concurrent user", "concurrency"],
   HySecure: ["hysecure"], HyID: ["hyid"], HyWorks: ["hyworks"], HyLabs: ["hylabs"], HyDesk: ["hydesk"], BioAuth: ["bioauth"],
   "Browser Isolation": ["browser isolation", "virtual browser", "vajra"],
 };

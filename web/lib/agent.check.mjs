@@ -111,7 +111,7 @@ ok(r.assets.length === 0 && r.zero === true && r.missing === true && r.intent ==
 // 1c. A grounded answer is left alone, and the card it names comes first.
 run([call({ query: "citrix comparison" }), say("One internal battlecard fits.\n- **Accops Powered VDI vs Citrix VDI** - direct comparison. Internal only.")]);
 r = await ask("citrix comparison");
-ok(r.text.startsWith("One internal battlecard fits."), `grounded prose kept: ${r.text}`);
+ok(r.text.startsWith("One battlecard fits.\nAll internal: don't send outside Accops."), `grounded prose kept (visibility is SAM's line, not the verdict's): ${r.text}`);
 ok(r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI", "named asset is the first card");
 
 // 1d. Cards are the union of every search, not just the last.
@@ -234,7 +234,7 @@ ok(!r.zero && r.missing && r.assets.length <= 2 && r.assets.some(a => /Browser I
 run([say(`One asset fits.
 - **Accops Browser Isolation eBook** - covers isolation`)]);
 r = await ask("browser isolation brochure");
-ok(r.missing && !r.zero && r.assets[0]?.title === "Accops Browser Isolation eBook", `named type absent -> missing, cards kept: ${JSON.stringify({ m: r.missing, z: r.zero })}`);
+ok(r.missing && !r.zero && r.assets[0]?.title === "Accops Browser Isolation eBook", `named type absent -> missing, cards kept: ${JSON.stringify({ m: r.missing, z: r.zero })} ${r.text}`);
 run([say("- **Accops HyDesk Brochure V6 2026** - current")]);
 r = await ask("hydesk brochure");
 ok(!r.missing && !r.zero, "a brochure answering a brochure ask is not missing");
@@ -307,7 +307,7 @@ const pickSay = (verdict, ...titles) => (body) => ({ role: "assistant", content:
 {
   run([pickSay("One internal Citrix battlecard fits.", "Accops Powered VDI vs Citrix VDI")]);
   r = await ask("citrix comparison");
-  ok(r.text.startsWith("One internal Citrix battlecard fits.\nAll internal: don't send outside Accops.\n- **Accops Powered VDI vs Citrix VDI** (") && r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && !r.missing,
+  ok(r.text.startsWith("One Citrix battlecard fits.\nAll internal: don't send outside Accops.\n- **Accops Powered VDI vs Citrix VDI** (") && r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && !r.missing,
     `a picked result is rendered by SAM: ${r.text}`);
   ok(JSON.parse(bodies[0].messages.find(m => m.tool_call_id === "seed").content).results.every(x => Number.isInteger(x.n)), "every result the model sees carries its number");
   // Prose about a document never reaches the rep, even for a real, grounded title.
@@ -335,7 +335,8 @@ const pickSay = (verdict, ...titles) => (body) => ({ role: "assistant", content:
 // 9b. A named entity no shown card mentions -> missing, honestly worded, with the request button (#26).
 run([pickSay("The HySecure datasheet can be framed to meet APRA CPS 234.", "Accops HyID Datasheet 2026")]);
 r = await ask("australian gov / APRA CPS 234 angle for hysecure - anything?");
-ok(r.missing && !r.zero && r.intent === "gap" && /^No exact match for APRA or Australia: none of the closest documents mentions them\.\nAll internal[^\n]*\nClosest in the library:/.test(r.text) && !/framed/.test(r.text),
+ok(r.missing && !r.zero && r.intent === "gap" && /^No exact match for APRA or Australia: none of the closest documents mentions them\.\n[^\n]*\nClosest in the library:/.test(r.text) && !/framed/.test(r.text)
+  && !r.assets.some(a => /HyID/.test(a.title)), // a HyID datasheet is off-product for a HySecure ask (relevance floor)
   `APRA on no card -> missing: ${r.text} | ${r.missing}`);
 // 9c. Two entities: the model picks only the Nutanix guide, SAM adds the Proxmox brochure (#21).
 run([pickSay("HyWorks has integration material for both.", "Accops HyWorks and Nutanix AHV Integration Guide")]);
@@ -401,14 +402,16 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
     ["Two close matches, both BFSI case studies from 2026.", [bank1, bank2], "bfsi case study", false],
     ["No exact Browser Isolation brochure; the closest are two ZTNA decks.", [z1, z2], "remote browser isolation brochure", true],
   ];
-  const passed = good.filter(([v, shown, q, d]) => verdictProblem(v, shown, q, d) === null);
+  const passed = good.filter(([v, shown, q, d]) => verdictProblem(dropSending(v), shown, q, d) === null);
   console.log(`agent.check: ${passed.length} of ${good.length} typical good verdicts pass the verdict guard`);
-  for (const [v, shown, q, d] of good) ok(verdictProblem(v, shown, q, d) === null, `good verdict rejected: "${v}" -> ${verdictProblem(v, shown, q, d)}`);
+  for (const [v, shown, q, d] of good) ok(verdictProblem(dropSending(v), shown, q, d) === null, `good verdict rejected: "${v}" -> ${verdictProblem(dropSending(v), shown, q, d)}`);
   // ...while the risky kinds are still caught.
   for (const [v, shown, q] of [["The deck covers a Citrix migration.", [bank1], "q"], ["The HyID datasheet includes max concurrent users.", [hyid], "q"],
-    ["The library has a case study of a bank that replaced Citrix.", [bank1], "bank moving off citrix"], ["Assuming it means Okta, the library has two decks.", [z1], "zscaler pitch"],
-    ["The library has two public Citrix battlecards.", [cx1, cx2], "citrix battlecard"]])
+    ["The library has a case study of a bank that replaced Citrix.", [bank1], "bank moving off citrix"], ["Assuming it means Okta, the library has two decks.", [z1], "zscaler pitch"]])
     ok(verdictProblem(v, shown, q, false) !== null, `risky verdict passed: "${v}"`);
+  // Visibility words are SAM's too: stripped from the verdict, since sendLine says which is which.
+  ok(dropSending("The library has two public Citrix battlecards.") === "The library has two Citrix battlecards." && dropSending("Two decks; both are internal.") === "Two decks."
+    && dropSending("A public sector bank case study fits.") === "A public sector bank case study fits.", "visibility adjectives and predicates dropped, 'public sector' kept");
   // 11. Sending talk is SAM's, not the model's: every word form is dropped from the verdict (27 Sep #12 "shared").
   ok(dropSending("The library has internal product videos for HySecure; two can be shared.") === "The library has internal product videos for HySecure.", "'shared' clause dropped");
   ok(dropSending("The library includes relevant manufacturing VDI case studies and they can be sent.") === "The library includes relevant manufacturing VDI case studies.", "'sent' clause dropped");
@@ -420,6 +423,21 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   run([pickSay("The library has internal product videos for HySecure; two can be shared.", "Geofencing control", "Device posture check and related data on management console")]);
   r = await ask("product video hysecure");
   ok(/^The library has internal product videos for HySecure\.\nAll internal: don't send outside Accops\.\n- \*\*/.test(r.text) && !/shared/.test(r.text), `verdict kept, sending line is SAM's: ${r.text}`);
+}
+
+// 12. A named Accops product with no document of the asked type about it (27 Sep #15, #7).
+{
+  run([pickSay("The library has a brochure.", "Accops HyDesk Brochure V6 2026")]);
+  r = await ask("remote browser isolation brochure");
+  ok(r.missing && /^No exact Browser Isolation brochure in the library\./.test(r.text) && r.assets.some(a => /Browser Isolation|Virtual Browser/.test(a.title)) && !r.assets.some(a => /HyDesk/.test(a.title)),
+    `a brochure about another product is not a browser isolation brochure; the product's own documents stand in: ${r.text}`);
+  run([pickSay("The library has the 2026 HyID datasheet.", "Accops HyID Datasheet 2026")]);
+  r = await ask("one pager on HyID i can email");
+  ok(r.missing && r.assets[0]?.title === "Accops HyID Datasheet 2026" && /^The library has the 2026 HyID datasheet\.\nNone of these is published/.test(r.text) && traceHas(r, "nothing sendable"),
+    `a sending ask with nothing public is missing (request button): ${r.text} | ${r.missing}`);
+  run([pickSay("The library has the HyDesk brochure.", "Accops HyDesk Brochure V6 2026")]);
+  r = await ask("hydesk brochure");
+  ok(!r.missing && /^The library has the HyDesk brochure\./.test(r.text), `the product's own brochure is exact: ${r.text}`);
 }
 
 // 6. Cold start: apiSearch waits for the registry instead of ranking the frozen cards alone.

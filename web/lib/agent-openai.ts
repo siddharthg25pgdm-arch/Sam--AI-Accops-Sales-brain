@@ -75,7 +75,7 @@ export async function askOpenAICompat(question: string, history: { role: "user" 
   let filters: Record<string, unknown> = seed ? { ...seed.input } : {}, calls = seed ? 1 : 0, tokens = 0;
   const done = (text: string, error: AskError | null) => {
     trace.push({ step: "model", detail: `${model} (openai-compatible) · ${((Date.now() - t0) / 1000).toFixed(1)}s · ${tokens} tokens` });
-    return finish({ question: sq, text, pool, calls, runtime: "openai-compatible", model, trace, filters, error });
+    return finish({ question: sq, turn: question, text, pool, calls, runtime: "openai-compatible", model, trace, filters, error });
   };
   for (let round = 0; ; round++) {
     // The last round runs with tools off, so the model must answer from what it found. Before, it
