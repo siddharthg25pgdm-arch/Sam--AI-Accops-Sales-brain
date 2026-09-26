@@ -1677,6 +1677,121 @@
    "visibility": "internal",
    "internal_reason": "The stored copy contains one prospect's requirement answers.",
    "needs_human": "Save a blank master copy (Responses column empty) so reps don't send another prospect's answers; consider adding DPDP/data-residency and GPU-workload questions."
+  },
+  {
+   "source": "sharepoint/VDI-DaaS-Licensing-Breakup and Comparison.xlsx",
+   "title": "VDI/DaaS Microsoft Licensing Breakup: Azure Virtual Desktop vs Accops on Azure vs Accops On-Premise (Mar 2023) - Control Plane, Shared (Windows Server / Win 10-11 Multi-Session) and Personal Desktops, RDS CAL and VDA Rules",
+   "asset_type": "Battlecard",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "HySecure",
+    "Digital Workspace",
+    "VDI",
+    "DaaS"
+   ],
+   "competitors": [
+    "Azure Virtual Desktop",
+    "Citrix",
+    "VMware",
+    "Microsoft"
+   ],
+   "personas": [
+    "Presales engineer",
+    "Sales rep",
+    "Procurement",
+    "IT head"
+   ],
+   "regulations": [],
+   "key_problem": "Customers comparing AVD with Accops on Azure or on-premise get lost in Microsoft licensing - who pays for the control plane, the Windows OS, RDS CALs and VDA rights in each model.",
+   "key_outcomes": [
+    "Three-column comparison (AVD | Accops on Azure | Accops on-premise), each with component, 'delivered as' and licensing",
+    "Control plane: AVD's is free with qualifying M365/Windows E3 subscriptions (external users pay per user per month; Citrix/VMware on Azure charge per user); Accops on Azure runs HyWorks and HySecure as IaaS VMs with Accops Digital Workspace licences (BYOL); on-premise the same on customer hardware",
+    "Shared desktops on Windows Server: AVD and Accops-on-Azure VMs billed at Linux rates with no Windows Server OS charge (or hybrid/BYOL); on-premise the customer buys Windows Server Datacenter/Standard by cores; RDS CALs needed in all three (SPLA, existing CALs with Software Assurance, or CSP)",
+    "Windows 10/11 multi-session and personal desktops: OS included via M365 on Azure; user access through M365 E3-type subscriptions (Windows Pro endpoint) or a Windows VDA licence for non-Windows endpoints; on-premise needs VDA subscription or Windows Enterprise, with eligible endpoint OS listed",
+    "Notes tell the reader to check Microsoft's site for the latest licensing status"
+   ],
+   "brief": "A single-sheet Excel reference (created and saved 3 March 2023) that breaks down Microsoft and Accops licensing for three ways of delivering virtual desktops: Azure Virtual Desktop, Accops on Azure and Accops on-premise. It is a licensing explainer, not a price sheet.",
+   "use_for": "Answering 'what Microsoft licences do we need with Accops vs AVD?' - RDS CALs for shared Windows Server desktops, M365/E3 or VDA for Windows 10/11 desktops, and why the Accops control plane needs its own VMs and licences on Azure. Check Microsoft's current terms before quoting.",
+   "publish_year": "2023",
+   "expired": false,
+   "stale_risk": "March 2023. Microsoft licensing changes often (AVD per-user access pricing, Windows 11 multi-session, VDA terms); the sheet itself says to verify on Microsoft's site.",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal presales licensing reference; no verified public URL.",
+   "needs_human": "Review against current Microsoft licensing (2026) and add Windows 11/Entra naming; worth turning into a one-page customer-facing explainer since licensing questions come up in every AVD comparison."
+  },
+  {
+   "source": "sharepoint/Calculatore in sales tools.txt",
+   "title": "'Calculatore in sales tools' - Empty Text File in the DaaS Technical Solutions Folder (0 bytes, Oct 2021)",
+   "asset_type": "Other",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "DaaS"
+   ],
+   "competitors": [],
+   "personas": [],
+   "regulations": [],
+   "key_problem": "None - the file is empty.",
+   "key_outcomes": [
+    "Zero-byte text file dated 30 October 2021, the same day the DaaS questionnaire v06 was last saved",
+    "Its name suggests it was meant to point reps to the DaaS calculator kept elsewhere in 'sales tools'"
+   ],
+   "brief": "An empty placeholder file ('Calculatore' [sic] in sales tools) in Presentations/Technical Solutions Presentations/DaaS. It has no content; the DaaS calculator itself is 'Accops DaaS Calculator v-2.3.xlsx' in Presentations/Product Presentations/DaaS.",
+   "use_for": "Nothing directly. If someone is looking for the DaaS calculator, point them to 'Accops DaaS Calculator v-2.3.xlsx'.",
+   "publish_year": "2021",
+   "expired": false,
+   "stale_risk": "Empty file.",
+   "superseded_by": "",
+   "confidence": 0.9,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Empty placeholder.",
+   "needs_human": "Delete it, or replace it with a real pointer to the current DaaS calculator."
+  },
+  {
+   "source": "sharepoint/Webinar recording-23March2022.txt",
+   "title": "Secure Browser / Internet Isolation Webinar Recording, 23 March 2022 - Pointer File (One SharePoint Video Link)",
+   "asset_type": "Other",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "Remote Browser Isolation",
+    "Virtual Browser"
+   ],
+   "competitors": [],
+   "personas": [
+    "Sales rep",
+    "Presales engineer"
+   ],
+   "regulations": [],
+   "key_problem": "Reps looking for the internet-isolation webinar recording need to know where it lives.",
+   "key_outcomes": [
+    "The file holds a single line: a sharing link to a video on the Accops MarketingTeam SharePoint site",
+    "Filed in 'Internet Isolation (or) Secure Browser' next to the Secure Browser solution deck, the virtual-browser POC report and the Secure Internet Browsing whitepaper, so the recording is presumably the March 2022 internet-isolation / secure-browser webinar",
+    "No title, speaker or description is recorded"
+   ],
+   "brief": "A 105-byte text file saved on 25 March 2022 that contains only a SharePoint video link to a webinar recorded on 23 March 2022. Its folder places it with the Accops internet isolation / virtual browser material.",
+   "use_for": "When someone asks for a recorded internet-isolation or secure-browser webinar: the link is inside this file (internal SharePoint, sign-in required). It is not a customer-shareable URL.",
+   "publish_year": "2022",
+   "expired": false,
+   "stale_risk": "March 2022 recording; the product has since been repositioned as remote browser isolation, GlassFence and the enterprise browser. The link may no longer resolve.",
+   "superseded_by": "",
+   "confidence": 0.65,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal SharePoint sharing link; the video's content and audience rights are not recorded.",
+   "needs_human": "Check the link still works, confirm the webinar's topic and speakers, and decide whether the recording can be published (e.g. on YouTube) so SAM can offer a shareable URL."
   }
  ]
 }
