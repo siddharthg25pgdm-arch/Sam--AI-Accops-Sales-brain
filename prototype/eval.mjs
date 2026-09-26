@@ -104,9 +104,12 @@ function judge(qn, res) {
   const titles = assets.map(a => `${a.title ?? ""} ${a.path ?? ""}`).join(" | ").toLowerCase();
 
   if (qn.type === "gap") {
-    // Admitting a hole is the correct answer. Returning assets anyway is the failure - a tool that
-    // answers everything confidently is worse than one that says no.
-    return { hit: res.gap === true || assets.length === 0, why: res.gap ? "declared a gap" : `returned ${assets.length}` };
+    // Admitting a hole is the correct answer. Returning assets AS IF they were the answer is the
+    // failure - a tool that answers everything confidently is worse than one that says no. Since
+    // 26 Sep, `missing: true` with labelled substitutes (and the request button) is also an
+    // admission: the rep is told it doesn't exist and offered the closest real documents.
+    const admitted = res.gap === true || res.missing === true || assets.length === 0;
+    return { hit: admitted, why: res.gap ? "declared a gap" : res.missing ? `declared missing, ${assets.length} substitutes` : `returned ${assets.length} as the answer` };
   }
   if (qn.type === "external") {
     if (assets.length === 0) return { hit: res.gap === true, why: "nothing returned" };
