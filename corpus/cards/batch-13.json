@@ -1,0 +1,76 @@
+{
+  "generated_by": "Claude, in-session, 27 September 2026",
+  "note": "Batch 13: six PUBLIC documents from the downloads.accops.com bucket (originals in corpus/public/, text in corpus/text/), every one read in full. Each public_url was checked with an HTTP HEAD (browser User-Agent) on 27 September 2026 and returned 200 with a Content-Length matching the local copy, so visibility is 'both'. Three version questions were settled by word-level diffs of the extracted text, not by filename: (1) 'Accops for Government 2026' and '... 2026 V2' differ in one phrase - the older one still says 'the IT infrastructure of Customer Name', an unfilled template placeholder, which V2 fixes; (2) 'Hysecure Datasheet.V4 Aug 25' and the carded V5 2026 are word-for-word identical apart from hyphenation and the 2026 copyright line; (3) the carded SharePoint 'Digital Workspace Brochure 2025' and the public V2 2026 differ only in the cover strap-line and one word in the closing. The two corporate brochures ('Brochure 4' and 'Brochure with logos') share most pages but are not strictly editions of one another - see their cards. superseded_by is set only on an older document whose newer edition was verified.",
+  "schema_notes": {
+    "needs_human": "A question only Siddharth or marketing can answer.",
+    "client_actual": "Real customer names printed in the document. Supabase only, never in a model prompt."
+  },
+  "model_visible": ["title", "asset_type", "industry", "client", "products", "competitors", "personas", "use_for", "publish_year", "visibility", "superseded_by"],
+  "cards": [
+    {
+      "source": "public/Accops for Government 2026 V2.pdf",
+      "title": "Accops for Government: Zero Trust Reference Architecture, Seven Integrated Components (2026 V2)",
+      "asset_type": "Solution Document",
+      "industry": "Government",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": ["HySecure", "ZTNA", "HyID", "MFA", "SSO", "HyWorks", "VDI", "Remote Browser Isolation", "AirBridge", "Huddle", "HyDesk", "Thin Clients"],
+      "competitors": [],
+      "personas": ["CISO", "CIO", "IT head", "Head of Infrastructure", "Government IT officer", "procurement"],
+      "regulations": ["OWASP Top 10", "SANS Top 25"],
+      "key_problem": "A government organisation hardening its IT needs one Zero Trust design covering private application access, identity, isolated desktops, internet browsing, cross-network file transfer, remote IT support and endpoints - replacing VPNs, NAC, WAF and separate access portals rather than bolting on seven point products.",
+      "key_outcomes": [
+        "Seven 'off the shelf' components in one reference architecture: ZTNA, HyID (MFA/SSO/IAM), VDI Suite, Remote Browser Isolation, AirBridge, Huddle and HyDesk thin clients - each with capabilities, a reference architecture diagram and use cases",
+        "ZTNA replaces VPN with identity- and application-level access: Layer 7 reverse proxy, Layer 4 tunnelling, device posture, context policies, clientless or agent access, DLP (copy-paste, screenshot, screen-recording blocks) and support for external QRNG for post-quantum cryptography",
+        "Web application protection against OWASP Top 10, OWASP Top 20 automated threats and SANS Top 25",
+        "Four ZTNA deployment options - on-premises or cloud, each direct-connect or reverse-connect via Edge and App Connectors with no inbound firewall ports - and two models: self-hosted or ZTNA-as-a-service",
+        "HyID: OTP, push, biometrics, hardware tokens, QR passwordless login, FIDO and Windows Hello, SAML 2.0/OAuth SSO, RADIUS connectors, impossible-travel detection, device binding, SIEM integration",
+        "VDI for developers, auditors, external vendors (time-bound sandboxes with auto-reset) and privileged admins, with session recording, USB/screen-capture blocking and non-persistent desktops",
+        "Remote Browser Isolation streams only pixels; AirBridge moves files between isolated networks with multi-engine AV scanning and Content Disarm and Reconstruction; Huddle gives on-premise remote support that works in air-gapped networks"
+      ],
+      "brief": "A nine-page, component-by-component solution document written as a proposal for 'Government Organisations'. Each of the seven components gets a product overview, key capabilities, a reference architecture diagram and a use-case list. ZTNA is the most detailed section (deployment topologies, flexible model, seven use cases including VPN replacement and consolidating VPN/NAC/WAF/portals). The VDI section is the one to point at for privileged access, auditor and third-party developer scenarios; Browser Isolation plus AirBridge covers internet-to-internal separation; Huddle and HyDesk cover remote support and endpoint replacement. No customers, prices or statistics are cited. Its content is the same as the SharePoint 'Accops Solutions for Govt. V1 '26' (differences are typesetting and a few words).",
+      "use_for": "Send to a government, PSU or public-sector prospect - or attach to a tender/RFP response - when they need the full architecture in one document: VPN replacement with ZTNA, air-gapped or isolated networks, secure file transfer between networks, internet isolation, or thin-client rollouts. This is the public, sendable edition.",
+      "publish_year": "2026",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.94,
+      "public_url": "https://downloads.accops.com/Accops%20for%20Government%202026%20V2.pdf",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": "Same content as the SharePoint 'Accops Solutions for Govt. V1 '26.pdf' (carded internal in batch-05, re-typeset May 2026, after this March 2026 PDF). Confirm which is canonical; if the SharePoint file is the same document, its card can point reps at this public URL."
+    },
+    {
+      "source": "public/Accops for Government 2026.pdf",
+      "title": "Accops for Government: Zero Trust Reference Architecture (2026, first edition - contains a 'Customer Name' placeholder)",
+      "asset_type": "Solution Document",
+      "industry": "Government",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": ["HySecure", "ZTNA", "HyID", "MFA", "SSO", "HyWorks", "VDI", "Remote Browser Isolation", "AirBridge", "Huddle", "HyDesk", "Thin Clients"],
+      "competitors": [],
+      "personas": ["CISO", "CIO", "IT head", "Head of Infrastructure", "Government IT officer", "procurement"],
+      "regulations": ["OWASP Top 10", "SANS Top 25"],
+      "key_problem": "A government organisation needs one Zero Trust architecture for private application access, identity, desktops, internet isolation, file transfer, remote support and endpoints.",
+      "key_outcomes": [
+        "Same seven components, capabilities, reference architectures and use cases as the 2026 V2 edition (ZTNA, HyID, VDI Suite, Remote Browser Isolation, AirBridge, Huddle, HyDesk)",
+        "Four ZTNA deployment options including reverse-connect with no inbound ports; self-hosted or ZTNA-as-a-service",
+        "External QRNG support for post-quantum cryptography; OWASP Top 10 / Top 20 automated threats / SANS Top 25 web application protection",
+        "Opening paragraph reads 'strengthen the IT infrastructure of Customer Name' - an unfilled proposal-template placeholder"
+      ],
+      "brief": "The first published edition of the Accops for Government solution document. A word-level diff against the V2 file shows exactly one difference: the introduction here says 'the IT infrastructure of Customer Name', where V2 says 'Government Organisations'. Everything else - all nine pages, seven components and their use cases - is identical, and both PDFs were produced on 20 March 2026 two hours apart. It is still downloadable from the public bucket.",
+      "use_for": "Do not send - use the 2026 V2 edition, which is the same document with the placeholder fixed. Only relevant if a customer quotes this URL back.",
+      "publish_year": "2026",
+      "expired": false,
+      "stale_risk": "The first line of the introduction contains the literal template text 'Customer Name'. Sending it tells a government buyer they received an unedited proposal template.",
+      "superseded_by": "public/Accops for Government 2026 V2.pdf - identical text except that V2 replaces the 'Customer Name' placeholder with 'Government Organisations'. Send V2.",
+      "confidence": 0.95,
+      "public_url": "https://downloads.accops.com/Accops%20for%20Government%202026.pdf",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": "This placeholder edition is still live on downloads.accops.com. Ask marketing whether to remove it or redirect it to the V2 file."
+    }
+  ]
+}
