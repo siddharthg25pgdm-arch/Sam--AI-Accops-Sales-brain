@@ -11,7 +11,7 @@
  *  "openai-compatible" with the model name - it used to say "claude", which made every dashboard
  *  number about "Claude" actually about Groq. */
 import { VERTICALS, PRODUCTS, type SearchHit } from "./cards";
-import { SYSTEM, ASSET_TYPES, MAX_SEARCHES, BUDGET_USED, SEED_STEP, runSearch, seedSearch, searchText, finish, type AskResult } from "./agent";
+import { SYSTEM, ASSET_TYPES, MAX_SEARCHES, BUDGET_USED, SEED_STEP, runSearch, seedSearch, searchText, finish, toolPayload, numbering, type AskResult } from "./agent";
 import type { AskError } from "./events";
 
 type Msg = { role: "system" | "user" | "assistant" | "tool"; content: string | null; tool_calls?: ToolCall[]; tool_call_id?: string; name?: string };
@@ -70,7 +70,7 @@ export async function askOpenAICompat(question: string, history: { role: "user" 
     pool.push(...seed.hits);
     trace.push({ step: SEED_STEP, detail: JSON.stringify(seed.input) }, { step: "tool result", detail: `${seed.hits.length} of ${seed.considered} assets${seed.note ? ` - ${seed.note}` : ""}` });
     messages.push({ role: "assistant", content: null, tool_calls: [{ id: "seed", type: "function", function: { name: "search_assets", arguments: JSON.stringify({ query: sq }) } }] },
-      { role: "tool", tool_call_id: "seed", name: "search_assets", content: seed.payload });
+      { role: "tool", tool_call_id: "seed", name: "search_assets", content: toolPayload(seed.hits, seed.note, numbering(pool)) });
   }
   let filters: Record<string, unknown> = seed ? { ...seed.input } : {}, calls = seed ? 1 : 0, tokens = 0;
   const done = (text: string, error: AskError | null) => {
@@ -114,7 +114,8 @@ export async function askOpenAICompat(question: string, history: { role: "user" 
       calls++; filters = { ...s.input };
       pool.push(...s.hits);
       trace.push({ step: "tool call: search_assets", detail: JSON.stringify(s.input) }, { step: "tool result", detail: `${s.hits.length} of ${s.considered} assets${s.note ? ` - ${s.note}` : ""}` });
-      messages.push({ role: "tool", tool_call_id: tc.id, name: "search_assets", content: s.payload });
+      // Numbered across the whole turn, so a pick means the same result whichever search returned it.
+      messages.push({ role: "tool", tool_call_id: tc.id, name: "search_assets", content: toolPayload(s.hits, s.note, numbering(pool)) });
     }
     if (calls >= MAX_SEARCHES) messages.push({ role: "system", content: BUDGET_USED });
   }

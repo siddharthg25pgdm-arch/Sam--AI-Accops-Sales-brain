@@ -107,7 +107,8 @@ export async function markRead(messageId: string) {
  *  relevance order stands: for "iso certificate" a weakly matching public datasheet used to outrank
  *  the certificate itself, just because it happened to be public. */
 export function renderForWhatsApp(answer: string, assets: { title: string; link: string | null; location: string | null; visibility: string; why: string; year: string | null; trust?: string | null }[], gap: boolean, publicFirst = false): string {
-  const lines = [answer.trim()];
+  // The answer's "- " document lines are the numbered assets below, written from the same card fields.
+  const lines = [assets.length ? answer.split("\n").filter(l => !l.startsWith("- ")).join("\n").trim() : answer.trim()];
   const ordered = (publicFirst ? [...assets].sort((a, b) => Number(b.visibility === "public") - Number(a.visibility === "public")) : [...assets]).slice(0, 3);
   ordered.forEach((a, i) => {
     // A link only when we have a real one - see assetLink() in lib/cards.ts, which returns the public URL

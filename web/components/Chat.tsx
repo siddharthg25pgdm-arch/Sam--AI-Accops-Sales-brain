@@ -66,7 +66,8 @@ function Answer({ turn, onBrowse }: { turn: ChatTurn; onBrowse: (f: { vertical?:
   const f = turn.filters;
   return (
     <div className="msg sam">
-      <p className="verdict">{turn.content}</p>
+      {/* The document lines in the text are the cards below, written from the same fields; show them once. */}
+      <p className="verdict">{turn.assets?.length ? turn.content.split("\n").filter(l => !l.startsWith("- ")).join(" ") : turn.content}</p>
       {turn.assets?.map(a => <ResultCard key={a.path ?? a.title} a={a} eventId={turn.eventId} />)}
       {turn.eventId !== undefined && <RequestBox turn={turn} open={asking} onOpen={() => setAsking(true)} onClose={() => setAsking(false)}
         onBrowse={() => onBrowse({ vertical: f?.vertical })} />}

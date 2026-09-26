@@ -251,10 +251,49 @@ export function supersedingFile(s: string): string | null {
   return m ? m[1].split("/").pop()!.replace(/\.(pdf|pptx|docx|ppt|doc|xlsx)$/i, "") : null;
 }
 
-export function trustNote(a: Asset): string | null {
+/** The card row behind an asset, for the fields an Asset does not carry. */
+function metaOf(a: Asset) {
   const meta = cardMeta();
-  const m = (a.item_id ? meta.get(`id:${a.item_id}`) : undefined)
-    ?? meta.get((a.file?.path ?? "").split("/").pop()?.toLowerCase() ?? "");
+  return (a.item_id ? meta.get(`id:${a.item_id}`) : undefined) ?? meta.get((a.file?.path ?? "").split("/").pop()?.toLowerCase() ?? "");
+}
+
+/** Everything SAM has on file about what a document says: its text fields plus the card's
+ *  competitors, regulations and personas. What an answer may claim about a document is checked
+ *  against this and nothing else. */
+export function cardText(a: Asset): string {
+  const m = metaOf(a);
+  return `${blob(a)} ${[...(m?.competitors ?? []), ...(m?.regulations ?? []), ...(m?.personas ?? [])].join(" ")}`.toLowerCase();
+}
+
+/** The catalogue asset a card's superseded_by points at, following up to three hops, or null when
+ *  the newer edition is not in the catalogue (the note then names it and the rep asks marketing). */
+export function successorOf(a: Asset): Asset | null {
+  const norm = (s: string) => s.toLowerCase().replace(/\.(pdf|docx|pptx|doc|ppt|xlsx)$/, "").replace(/[^a-z0-9]/g, "");
+  let cur = a, found: Asset | null = null;
+  for (let hop = 0; hop < 3; hop++) {
+    const f = supersedingFile(metaOf(cur)?.superseded_by ?? "");
+    const next = f ? allAssets().find(x => norm((x.file?.path ?? "").split("/").pop() ?? "") === norm(f) && dedupeKey(x) !== dedupeKey(cur)) : undefined;
+    if (!next) break;
+    found = cur = next;
+  }
+  return found;
+}
+
+/** One line on what the document is, from its card only - never from model prose. An asset SAM has
+ *  not read (registry-only: a filename and a folder) says so rather than guessing from the title. */
+export function isDescribed(a: Asset): boolean {
+  return Boolean(a.brief?.trim() || a.key_problem?.trim() || a.key_outcomes.length || (a.use_for?.trim() && !a.use_for.startsWith("Filed under ")));
+}
+export function describe(a: Asset): string {
+  const folder = a.section || (a.file?.path ?? "").split("/").slice(0, -1).join("/");
+  const text = isDescribed(a) ? [a.brief, a.use_for.startsWith("Filed under ") ? "" : a.use_for, a.key_problem, a.key_outcomes[0] ?? ""].find(s => s && s.trim()) ?? "" : "";
+  if (!text) return folder ? `Filed under ${folder}; SAM has not read this one, so check what it covers before using it.` : "SAM has not read this one, so check what it covers before using it.";
+  const first = text.trim().match(/^.{40,}?[.!?](?=\s|$)/)?.[0] ?? text.trim();
+  return first.length <= 180 ? first : `${first.slice(0, 177).replace(/\s+\S*$/, "")}…`;
+}
+
+export function trustNote(a: Asset): string | null {
+  const m = metaOf(a);
   if (m?.expired) {
     return `EXPIRED${m.expiry_date ? ` on ${m.expiry_date}` : ""} - do not send. ${m.needs_human || ""}`.trim();
   }
@@ -423,7 +462,7 @@ export function searchAssets(args: SearchArgs): { results: SearchHit[]; consider
  *  or filename) when any result is. "does hyworks support nutanix AHV and proxmox?" ranked five
  *  Nutanix guides first, and the answer said no Proxmox document exists while the Proxmox brochure
  *  sat at #6. The missing one replaces the lowest result that no other entity depends on. */
-function cover(ranked: SearchHit[], limit: number, named: string[]): SearchHit[] {
+export function cover(ranked: SearchHit[], limit: number, named: string[]): SearchHit[] {
   const top = ranked.slice(0, limit);
   if (named.length < 2) return top;
   const about = (h: SearchHit, e: string) => mentions(`${h.asset.title} ${h.asset.file?.path.split("/").pop() ?? ""}`, e);

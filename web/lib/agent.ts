@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, BROCHURE_MISSPELT, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
+import { searchAssets, cover, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured, compatModels } from "./agent-openai";
 import { providerFailure, type AskError } from "./events";
 
@@ -30,23 +30,22 @@ export type AskResult = {
 export const SYSTEM = `You are SAM. You help Accops sales reps find collateral. Accops is an Indian cybersecurity and digital
 workspace vendor: HySecure (ZTNA), HyID (MFA/SSO), HyWorks (VDI/DaaS), HyLabs, HyDesk (thin clients), Browser Isolation.
 
-- Name ONLY documents search_assets returned, by exact title. Never invent a document, client, number or price.
-  A result that meets the need in substance (right industry or product, other type) fits. If none is exactly what was
-  asked, start "No exact ..." and still list the 2 closest as "- **exact title** - substitute: why it helps".
-  Name none only if every result is unrelated.
-- A search in the rep's own words has already run; its results are above. Search again only if none of them fit.
-  Set asset_type only when the rep names a type. The server widens a filter that finds nothing and decides internal
-  vs external from the rep's wording, so never repeat a search reworded. At most 2 more searches.
-- The library has case studies, whitepapers, decks, brochures and datasheets, certificates, and competitive battlecards
-  (vs Citrix, VMware Horizon, Omnissa, Zscaler, Cisco AnyConnect and others). A battlecard IS a deck: when a rep asks
-  for a deck and a battlecard fits, recommend it as the deck.
-- visibility "public" may be sent outside Accops; "internal" must not leave Accops. Say which in each asset's line.
+- search_assets results are numbered n. A search in the rep's own words has already run; its results are above.
+  Search again only if none fit. Set asset_type only when the rep names a type. The server widens a filter that finds
+  nothing and decides internal vs external from the rep's wording, so never repeat a search reworded. At most 2 more.
+- Pick results that meet the need in substance (right product, competitor, industry or topic; another type is fine).
+  The library has case studies, whitepapers, decks, brochures, datasheets, certificates and battlecards (vs Citrix,
+  VMware, Omnissa, Zscaler, Cisco and others); a battlecard IS a deck. When trust names a newer edition, pick that one
+  if it is in the results. A result marked "contents unknown" is a title only: pick it only if the title clearly fits.
+- If none is exactly what was asked, the verdict starts "No exact" and names the missing thing in the rep's words,
+  and you still pick the 2 closest as substitutes. PICKS: none only if every result is unrelated.
+- Reply with exactly two lines and nothing else. Line 1: one verdict sentence under 25 words: does the library have
+  what was asked for. Line 2: "PICKS: " and the n of up to 3 results, best first ("PICKS: 4, 1"), or "PICKS: none".
+  SAM prints each pick's title, description, visibility and warnings from the library itself.
+- The verdict never names a document, never says what a document covers, includes or shows, and never attributes the
+  rep's situation, competitor, regulation or numbers to a document. Never quote a price.
   Say "public" or "published" in the verdict only if the rep is sending something outside Accops.
-- trust is a warning to pass on: EXPIRED means do not send it; a newer edition means recommend that one; an age note
-  goes in that asset's line.
-- Case-study clients are anonymised: use the descriptor unless the result names the client.
-- Reply: one verdict sentence, then up to 3 lines "- **exact title** - why it fits this ask". No links. Under 100 words.
-  No greeting.`;
+- If an acronym in the ask could mean two things (GCC: Gulf, or global capability centre), say which you assumed.`;
 
 /** Searches one question may make. The round after the last one runs with tools switched off, so the
  *  model has to answer from what it found - "The model ran out of steps" was ~1 in 6 production answers. */
@@ -75,7 +74,9 @@ const tools: Anthropic.Tool[] = [{
 
 export function toCard(h: SearchHit) {
   const a = h.asset;
-  return { title: a.title, asset_type: a.asset_type, industry: a.industry, why: h.why, link: assetLink(a), location: assetLocation(a),
+  // `why` is what the CARD says the document is (describe()), never model prose and never the
+  // search's "matched x, y": every channel prints it under the title.
+  return { title: a.title, asset_type: a.asset_type, industry: a.industry, why: describe(a), link: assetLink(a), location: assetLocation(a),
     visibility: a.public_url ? "public" : "internal", year: yearOf(a), stale: isStale(a),
     // Why a rep should hesitate, in words. Null for most assets; an expiry or a newer edition for
     // the ones where sending the wrong copy actually costs something.
@@ -83,10 +84,10 @@ export function toCard(h: SearchHit) {
 }
 /** What the model sees of each result. Every field here is re-sent on every later round of the
  *  question, so it is the biggest token cost SAM has: short brief, two outcomes, empty fields dropped. */
-export function toolPayload(hits: SearchHit[], note: string | null = null) {
+export function toolPayload(hits: SearchHit[], note: string | null = null, ids: Map<string, number> = numbering(hits)) {
   const keep = (o: Record<string, unknown>) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== null && v !== "" && !(Array.isArray(v) && !v.length)));
   return JSON.stringify({ ...(note ? { note } : {}), results: hits.map(({ asset: a, why }) => keep({
-    title: a.title, type: a.asset_type, industry: a.industry, client: a.client, products: a.products.join(", "),
+    n: ids.get(assetKey(a)), title: a.title, type: a.asset_type, contents: isDescribed(a) ? null : "unknown, title only", industry: a.industry, client: a.client, products: a.products.join(", "),
     use_for: a.use_for.slice(0, 100), brief: (a.brief || a.key_problem || "").slice(0, 160),
     outcomes: a.key_outcomes.slice(0, 2).map(o => o.slice(0, 80)), year: yearOf(a),
     // The model needs the REASON, not just a boolean. "stale: true" cannot distinguish an old but
@@ -306,31 +307,127 @@ export function substituteFits(question: string, a: Asset): boolean {
   return words.some(w => tokenMatcher(w).test(hay));
 }
 
-/** Drop the list lines of `text` that name a document not in `keep`. The verdict sentence stays. */
-function keepLines(text: string, keep: SearchHit[]): string {
-  return text.split("\n").filter(line => {
-    if (!/^\s*(?:[-*•]|\d+[.)])\s+/.test(line)) return true;
-    const n = namedTitles(line);
-    return !n.length || n.some(x => keep.some(h => namesAsset(x, h.asset)));
-  }).join("\n").trim();
+// ---- The answer contract: the model picks, SAM writes ------------------------------------------
+//
+// On 26 Sep the model's prose said what documents cover in the rep's own words: "Two Leading Indian
+// Private Banks ... replaced legacy access (including Citrix)" about a card with no Citrix on it,
+// "includes max concurrent users per appliance" about a datasheet without that figure, and
+// descriptions of videos SAM has never read (6 of 35 answers). A title guard cannot see a claim. So
+// the model now returns one verdict sentence and the numbers of the results it picks, and SAM prints
+// every document line itself, from the card: describe(), visibility and trustNote(). The only model
+// prose a rep sees is the verdict, and verdictProblem() rejects one that says what a document
+// covers, or names a competitor, regulation, region or number that no shown card has.
+
+/** Result numbers for the whole turn, in first-seen order over the pool. The payload and finish()
+ *  both derive them from the pool, so no extra state has to cross between them. */
+export function numbering(pool: SearchHit[]): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const h of pool) { const k = assetKey(h.asset); if (!m.has(k)) m.set(k, m.size + 1); }
+  return m;
 }
 
-/** The answer SAM gives when it will not use the model's prose: plain, and built only from real cards. */
-function plainAnswer(cards: AskResult["assets"], question: string): string {
-  if (!cards.length) return GAP_TEXT;
-  const lines = ["No exact match I can vouch for. Closest in the library:"];
-  if (heuristicFilters(question).audience === "external" && !cards.some(c => c.visibility === "public"))
-    lines.push("None of these is published, so ask marketing before sending anything outside Accops.");
-  for (const c of cards) if (c.trust) lines.push(`- ${c.title}: ${c.trust}`);
-  return lines.join("\n");
+const PICKS = /^\W*picks?\W*[:=-]\s*(.*)$/i;
+const LIST_LINE = /^\s*(?:[-*•]|\d+[.)])\s+/;
+/** The model's reply, read: its verdict sentence, the result numbers it picked, and whether it said
+ *  "none". Titles written the old way ("- **title** - why") are read by the caller via namedTitles. */
+export function readReply(text: string): { verdict: string; nums: number[]; none: boolean } {
+  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const pickLine = lines.find(l => PICKS.test(l));
+  const nums = [...(pickLine?.match(PICKS)?.[1] ?? "").matchAll(/\d+/g)].map(m => Number(m[0]))
+    .concat([...text.matchAll(/\[(\d+)\]/g)].map(m => Number(m[1])));
+  const first = lines.find(l => !PICKS.test(l) && !LIST_LINE.test(l)) ?? "";
+  const bare = first.replace(/\*\*|__/g, "").replace(/\s*\[\d+\](?:\s*(?:,|and)\s*\[\d+\])*/g, "").replace(/^verdict\W*/i, "").trim();
+  return { verdict: bare.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? bare, nums: [...new Set(nums)], none: Boolean(pickLine && /\bnone\b/i.test(pickLine) && !nums.length) };
 }
 
-/** Close out a model answer. Both model paths end here, so the guarantees hold for either:
- *    1. No search returned anything -> a plain gap, whatever the model wrote. An empty search is
- *       exactly when the prose invented documents ("internal brochures contain the cost details").
- *    2. The prose names a document no search returned -> the prose is replaced by plainAnswer().
- *    3. Cards come from EVERY search this turn, not just the last (the prose draws on all of them):
- *       the documents the prose names, in its order, then the best of the rest. Max 3. */
+/** Words that say what a document covers, or that fit it to the rep's situation. None may appear in a
+ *  verdict: what a document covers is printed from its card, below the verdict. */
+const COVERAGE = /\b(cover(s|ed|ing)?|includ(e|es|ed|ing)|contain(s|ed|ing)?|show(s|ed|ing|cases?)?|detail(s|ed|ing)?|describ(e|es|ed|ing)|explain(s|ed|ing)?|demonstrat(e|es|ed|ing)|walks? through|outlin(e|es|ed|ing)|highlight(s|ed|ing)?|compar(e|es|ed|ing)|address(es|ed|ing)?|provid(e|es|ed|ing)|spells? out|mapp(ed|ing)|has (a|an|the)|with (a|an|the) (section|slide|chapter|table|figure))\b|\bcan be (framed|adapted|tailored|positioned|used|repurposed|reused)\b|\b(replaced|migrated|moved off|switched from)\b/i;
+
+/** Why a verdict may not be shown, or null when it may. A denial ("No exact APRA material") may name
+ *  what is missing in the rep's words; anything else may only name what the shown cards have. */
+export function verdictProblem(verdict: string, shown: SearchHit[], question: string, denial: boolean): string | null {
+  const c = verdict.match(COVERAGE);
+  if (c) return `says what a document covers ("${c[0]}")`;
+  const on = `${shown.map(h => `${cardText(h.asset)} ${yearOf(h.asset) ?? ""}`).join(" ")} ${denial ? question.toLowerCase() : ""}`;
+  const foreign = namedEntities(verdict).filter(e => !OWN_PRODUCTS.has(e) && !mentions(on, e));
+  if (foreign.length) return `names ${foreign.join(", ")}, which no shown card mentions`;
+  const nums = (verdict.match(/\b\d[\d,]{2,}\b/g) ?? []).filter(n => !on.includes(n) && !on.includes(n.replace(/,/g, "")));
+  if (nums.length) return `states ${nums.join(", ")}, which no shown card has`;
+  return null;
+}
+
+/** One document's line, written from its card. Nothing in it comes from the model. */
+function assetLine(h: SearchHit, external: boolean): string {
+  const a = h.asset, y = yearOf(a), t = trustNote(a);
+  const vis = a.public_url ? "public" : external ? "internal only: do not send outside Accops" : "internal only";
+  return `- **${a.title}** (${[y, vis].filter(Boolean).join(", ")}) - ${describe(a)}${t ? ` ${/^EXPIRED/.test(t) ? "" : "Check first: "}${t}` : ""}`;
+}
+
+/** Each shown asset that has a newer edition in the catalogue brings it in, newer first. The trust
+ *  note said "a newer edition exists - prefer that one" and the newer one was never shown (#4, #16).
+ *  At most 3: superseded ones go first when there is no room. */
+function withSuccessors(shown: SearchHit[], trace: AskResult["trace"]): SearchHit[] {
+  const out: SearchHit[] = [], old = new Set<SearchHit>();
+  const has = (a: Asset) => out.some(x => assetKey(x.asset) === assetKey(a)) || shown.some(x => assetKey(x.asset) === assetKey(a));
+  for (const h of shown) {
+    const s = successorOf(h.asset);
+    if (s && !has(s)) { out.push({ asset: s, score: h.score, why: "newer edition" }); old.add(h); trace.push({ step: "newer edition shown", detail: `${s.title} supersedes ${h.asset.title}` }); }
+    if (!out.includes(h)) out.push(h);
+  }
+  for (let i = out.length - 1; out.length > 3 && i >= 0; i--) if (old.has(out[i])) out.splice(i, 1);
+  return out.slice(0, 3);
+}
+
+/** Named things the rep asked about (competitor, regulation, region, spec) and whether a card has
+ *  one. A spec ("sizing", "concurrent users") counts only on a card about the product named with it:
+ *  a BioAuth sizing guide is not HyWorks sizing. Accops' own product names are not checked here -
+ *  uncarded demo videos never name their product, and the type and product rules already cover them. */
+const SPECS = new Set(["Sizing", "Concurrent users"]);
+function asksAbout(question: string): string[] { return namedEntities(question).filter(e => !OWN_PRODUCTS.has(e)); }
+function hasEntity(h: SearchHit, e: string, question: string): boolean {
+  if (!mentions(cardText(h.asset), e)) return false;
+  const product = heuristicFilters(question).product;
+  return !SPECS.has(e) || !product || isAbout(h.asset, product);
+}
+
+/** A named entity that no shown card has, when a result about it (in its title) exists, replaces the
+ *  last shown result that no other entity depends on. What is still uncovered afterwards is returned:
+ *  the exact thing is missing. */
+function coverEntities(shown: SearchHit[], hits: SearchHit[], question: string, trace: AskResult["trace"]): string[] {
+  const need = asksAbout(question), types = typesNamedIn(question);
+  for (const e of need) {
+    if (shown.some(h => hasEntity(h, e, question))) continue;
+    const add = hits.find(h => !shown.includes(h) && mentions(`${h.asset.title} ${(h.asset.file?.path ?? "").split("/").pop()}`, e)
+      && hasEntity(h, e, question) && (!types.length || types.some(t => isType(h.asset, t))));
+    if (!add) continue;
+    const i = shown.length < 3 ? -1 : [2, 1, 0].find(j => need.every(x => x === e || !hasEntity(shown[j], x, question) || shown.some((h, k) => k !== j && hasEntity(h, x, question))));
+    if (i === undefined) continue;
+    if (i < 0) shown.push(add); else shown[i] = add;
+    trace.push({ step: "coverage: named entity", detail: `added ${add.asset.title} for ${e}` });
+  }
+  return need.filter(e => !shown.some(h => hasEntity(h, e, question)));
+}
+
+/** A pricing ask may only be answered by a CURRENT Accops price list. A May 2021 DaaS pricing
+ *  calculator "can be adapted for a 2,000-user quote" was the answer to "pricing for 2000 users". */
+export function isPriceList(a: Asset): boolean {
+  return /\b(price ?lists?|price ?books?|pricing)\b/i.test(a.title) && !/calculat|estimat|\btco\b|model/i.test(a.title) && !isStale(a);
+}
+/** Pricing-adjacent documents a rep may use internally for a price conversation - never as a quote. */
+function priceReferences(hits: SearchHit[], question: string): SearchHit[] {
+  const product = heuristicFilters(question).product;
+  return hits.filter(h => /\b(pric\w*|calculators?|licen[cs]\w*|editions?)\b/i.test(h.asset.title) && (!product || isAbout(h.asset, product))).slice(0, 2);
+}
+
+/** The answer text: verdict, notes, then one card-written line per asset. */
+function answerText(verdict: string, notes: string[], shown: SearchHit[], question: string): string {
+  const external = heuristicFilters(question).audience === "external";
+  if (external && shown.length && !shown.some(h => h.asset.public_url) && !notes.some(n => /published/.test(n)) && !/published/.test(verdict))
+    notes = [...notes, "None of these is published, so ask marketing before sending anything outside Accops."];
+  return [verdict, ...notes, ...shown.map(h => assetLine(h, external))].filter(Boolean).join("\n");
+}
+
 /** The retrieval floor. Plain search on the rep's own words scored 93% hit@3 while the model, left to
  *  write its own queries and filters, scored 64-71%: it rewrote "public sector bank case study" and
  *  "proxmox" into searches that missed what the words alone found. So this search always runs first,
@@ -359,11 +456,13 @@ export function seedSearch(question: string): SearchRun | null {
   const max = pagesWanted(question);
   const short = max ? searchAssets({ query: question, asset_type: asset_type || undefined, vertical: f.vertical || undefined, limit: 40 }).results
     .filter(h => (h.asset.file?.pages ?? 99) <= max).slice(0, 2) : [];
-  const seen = new Set<string>(), hits: SearchHit[] = [];
+  const seen = new Set<string>(), all: SearchHit[] = [];
   for (const h of [...short, ...a.hits.slice(0, 3), ...[...b, ...c, ...a.hits.slice(3)].sort((x, y) => y.score - x.score)]) {
     const k = assetKey(h.asset);
-    if (!seen.has(k) && hits.length < SEARCH_LIMIT + 1) { seen.add(k); hits.push(h); }
+    if (!seen.has(k)) { seen.add(k); all.push(h); }
   }
+  // The merge must not undo searchAssets' coverage: every named entity keeps a result about it.
+  const hits = cover(all, SEARCH_LIMIT + 1, namedEntities(question));
   const extra = hits.some(h => !a.hits.some(x => assetKey(x.asset) === assetKey(h.asset)));
   const note = [a.note, short.length ? `the first ${short.length} result(s) are ${max} pages or fewer` : null,
     extra ? "results after the first three are not filtered by type, industry, product or audience" : null].filter(Boolean).join("; ") || null;
@@ -401,11 +500,23 @@ function isFollowUp(q: string): boolean {
 const FOLLOW_WORDS = /^(newer|older|shorter|longer|smaller|bigger|pages?|another|else|more|one|version|edition|similar|instead|also)$/;
 export const SEED_STEP = "tool call: search_assets (the rep's own words)";
 
+/** Close out a model answer. Both model paths end here, so the guarantees hold for either:
+ *    1. No search returned anything -> a plain gap, whatever the model wrote.
+ *    2. The reply names a document no search returned -> its verdict is not used (grounding guard).
+ *    3. The model only CHOOSES: result numbers (or, in the old shape, exact titles) from any search
+ *       this turn. Every document line is written here from the card (see answerText).
+ *    4. The verdict is shown only if verdictProblem() passes it, and never tells the rep to send an
+ *       internal document; otherwise SAM writes a plain one.
+ *    5. missing (the exact thing is not in the library): the verdict is a denial, the model picked
+ *       nothing, a named type is absent, or a named competitor / regulation / region / spec is on no
+ *       shown card. Substitutes still show; the request button follows from missing. */
 export function finish(p: {
   question: string; text: string; pool: SearchHit[]; calls: number; runtime: AskResult["runtime"]; model: string | null;
   trace: AskResult["trace"]; filters: Record<string, unknown>; error: AskError | null;
 }): AskResult {
-  let hits = best(p.pool), text = p.text.trim();
+  let hits = best(p.pool);
+  const text = p.text.trim();
+  const ids = numbering(p.pool);
   const names = namedTitles(text);
   const bad = names.filter(n => !hits.some(h => namesAsset(n, h.asset)));
   if (bad.length) p.trace.push({ step: "grounding guard: answer replaced", detail: `named ${bad.length} document(s) no search returned: ${bad.join("; ")}`.slice(0, 300) });
@@ -416,72 +527,100 @@ export function finish(p: {
     p.trace.push({ step: "tool call: search_assets (grounding)", detail: JSON.stringify(s.input) }, { step: "tool result", detail: `${s.hits.length} of ${s.considered} assets` });
   }
   const searched = p.calls > 0 || bad.length > 0;
-  // A pricing ask finds real product brochures, and the prose then said "internal brochures contain
-  // the cost details" - a claim about content, which the title guard cannot see. So unless a returned
-  // document is ABOUT price (by title; battlecards mention competitors' price rises in passing), a
-  // pricing ask is a gap. A price list added later passes.
-  if (PRICE_ASK.test(p.question) && !hits.some(h => /\b(price|pricing)\b/i.test(h.asset.title))) {
-    p.trace.push({ step: "grounding guard: pricing", detail: "no returned document is a price list" });
-    return { text: NO_PRICING, assets: [], trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error, intent: "gap", zero: true, missing: true };
-  }
-  const named = names.map(n => hits.find(h => namesAsset(n, h.asset))).filter((h): h is SearchHit => Boolean(h));
-  const gap = (t: string, why: string): AskResult => {
-    p.trace.push({ step: "verdict: nothing fits", detail: why });
-    return { text: t, assets: [], trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error, intent: "gap", zero: true, missing: true };
+  const done = (verdict: string, notes: string[], shown: SearchHit[], missing: boolean): AskResult => {
+    const zero = searched && !shown.length && missing;
+    return { text: shown.length || !searched ? answerText(verdict, notes, shown, p.question) : verdict, assets: shown.map(toCard), trace: p.trace,
+      runtime: p.runtime, model: p.model, filters: p.filters, error: p.error, intent: searched ? (missing ? "gap" : "find_asset") : "other", zero, missing };
   };
-  // The verdict is "we don't have it". The exact thing is missing (a gap, and the rep may ask marketing
-  // for it), but the rep still gets the closest real documents, clearly as substitutes:
-  //   - the ones the model named, if they clear the relevance floor (at most 2);
-  //   - otherwise the best results that clear it. The model over-rejects: production said "No pharma
-  //     case study" over four pharma whitepapers and a public pharmacy case study, and zero cards hid
-  //     all of them. Only when nothing clears the floor (banner PNGs for a whitepaper ask) is it a
-  //     plain gap with no cards.
-  if (searched && text && !bad.length && DENIAL.test(text)) {
-    const verdict = text.split("\n")[0].trim();
-    let subs = [...new Set(named)].filter(h => substituteFits(p.question, h.asset)).slice(0, 2);
-    let out: string;
-    if (subs.length) {
-      if (subs.length < named.length) p.trace.push({ step: "substitutes: floor", detail: `kept ${subs.length} of ${named.length} named substitutes` });
-      out = keepLines(text, subs);
-    } else {
-      subs = hits.filter(h => substituteFits(p.question, h.asset)).slice(0, 2);
-      if (!subs.length) return gap(verdict, named.length ? "the model's substitutes share nothing with the ask" : "the model rejected every result and nothing clears the relevance floor");
-      p.trace.push({ step: "substitutes: from the results", detail: `the model named ${named.length ? "only unrelated documents" : "none"}; showing the ${subs.length} closest that share the ask's product, industry or topic` });
-      out = `${verdict}\nClosest in the library:`;
-    }
-    if (heuristicFilters(p.question).audience === "external" && !subs.some(h => h.asset.public_url))
-      out += "\nNone of these is published, so ask marketing before sending anything outside Accops.";
-    const g = guardSending(out, subs);
-    if (g.fixed) p.trace.push({ step: "guard: internal asset in sending language", detail: `${g.fixed} line(s) marked internal only` });
-    out = g.text;
-    return { text: out, assets: subs.map(toCard), trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error,
-      intent: "gap", zero: false, missing: true };
+  if (!searched) return done(text || GAP_TEXT, [], [], false); // a greeting: no search, no documents
+  // Nothing returned at all: a plain gap, whatever the prose claims - an empty search is exactly
+  // when prose invented documents. A denial may keep its own words ("No Arabic collateral exists.").
+  if (!hits.length) return done(!bad.length && DENIAL.test(readReply(text).verdict) ? denialClause(readReply(text).verdict, p.question) : GAP_TEXT, [], [], true);
+
+  // Pricing: only a current Accops price list answers it. Anything else is a gap, with pricing-related
+  // documents offered as internal references, labelled as not a quote.
+  if (PRICE_ASK.test(p.question) && !hits.some(h => isPriceList(h.asset))) {
+    p.trace.push({ step: "grounding guard: pricing", detail: "no returned document is a current price list" });
+    const refs = priceReferences(hits, p.question);
+    return done(NO_PRICING, refs.length ? ["For your own reference only, not a quote:"] : [], refs, true);
   }
-  const shown = [...new Set([...named, ...hits])].slice(0, 3);
-  const cards = shown.map(toCard);
-  if (searched && !hits.length) text = GAP_TEXT;
-  else if (bad.length || !text) text = plainAnswer(cards, p.question);
-  // A gap is "we ended up with nothing", not "the first search missed": the first search is often
-  // over-filtered and widened later. No search at all (a greeting) is not a gap either.
-  const zero = searched && !hits.length;
-  const missing = zero || (searched && typeMissing(p.question, shown));
-  if (missing && !zero) p.trace.push({ step: "verdict: type missing", detail: `asked for ${typesNamedIn(p.question).join(" or ")}; none of the results is one` });
-  const g = guardSending(text, shown);
-  if (g.fixed) p.trace.push({ step: "guard: internal asset in sending language", detail: `${g.fixed} line(s) marked internal only` });
-  text = g.text;
-  return { text, assets: cards, trace: p.trace, runtime: p.runtime, model: p.model, filters: p.filters, error: p.error,
-    intent: searched ? (missing ? "gap" : "find_asset") : "other", zero, missing };
+
+  const reply = readReply(text);
+  const byN = new Map([...ids].map(([k, n]) => [n, hits.find(h => assetKey(h.asset) === k)]));
+  const picked = reply.nums.map(n => byN.get(n)).filter((h): h is SearchHit => Boolean(h));
+  const named = names.map(n => hits.find(h => namesAsset(n, h.asset))).filter((h): h is SearchHit => Boolean(h));
+  const chosen = [...new Set([...picked, ...named])];
+  if (reply.nums.length > picked.length) p.trace.push({ step: "picks: unknown result number", detail: `picked ${reply.nums.join(", ")}; ${reply.nums.length - picked.length} not returned this turn` });
+  const denial = !bad.length && DENIAL.test(reply.verdict);
+
+  // "We don't have it": substitutes are the model's picks that clear the relevance floor (max 2), else
+  // the best results that do. The model over-rejects - "No pharma case study" over a public pharmacy
+  // case study - so only when nothing clears the floor is it a plain gap with no cards.
+  if (denial || reply.none) {
+    let subs = chosen.filter(h => substituteFits(p.question, h.asset)).slice(0, 2);
+    if (subs.length < chosen.length) p.trace.push({ step: "substitutes: floor", detail: `kept ${subs.length} of ${chosen.length} picked substitutes` });
+    if (!subs.length) {
+      subs = hits.filter(h => substituteFits(p.question, h.asset)).slice(0, 2);
+      if (!subs.length) {
+        p.trace.push({ step: "verdict: nothing fits", detail: chosen.length ? "the model's substitutes share nothing with the ask" : "the model rejected every result and nothing clears the relevance floor" });
+        return done(denial ? denialClause(reply.verdict, p.question) : GAP_TEXT, [], [], true);
+      }
+      p.trace.push({ step: "substitutes: from the results", detail: `the model picked ${chosen.length ? "only unrelated documents" : "none"}; showing the ${subs.length} closest that share the ask's product, industry or topic` });
+    }
+    return done(denial ? denialClause(reply.verdict, p.question) : "No exact match in the library.", ["Closest in the library:"], subs, true);
+  }
+
+  let shown = withSuccessors(chosen.length ? chosen.slice(0, 3) : hits.slice(0, 3), p.trace);
+  const uncovered = coverEntities(shown, hits, p.question, p.trace);
+  shown = shown.slice(0, 3);
+  const types = typesNamedIn(p.question);
+  const typeGone = typeMissing(p.question, shown);
+  let verdict = reply.verdict;
+  if (uncovered.length) {
+    p.trace.push({ step: "verdict: named entity missing", detail: `no shown card mentions ${uncovered.join(", ")}` });
+    return done(`No exact match for ${uncovered.join(" or ")}: none of the closest documents mentions ${uncovered.length > 1 ? "them" : "it"}.`, ["Closest in the library:"], shown, true);
+  }
+  if (typeGone) {
+    p.trace.push({ step: "verdict: type missing", detail: `asked for ${types.join(" or ")}; none of the results is one` });
+    return done(`No exact ${types.join(" or ").toLowerCase()} for this in the library.`, ["Closest in the library:"], shown, true);
+  }
+  const problem = bad.length ? "names a document no search returned" : !verdict ? "no verdict sentence" : verdictProblem(verdict, shown, p.question, false);
+  if (problem) {
+    if (verdict) p.trace.push({ step: "verdict guard: replaced", detail: `${problem}: ${verdict}`.slice(0, 300) });
+    verdict = "Best matches in the library:";
+  }
+  const g = guardVerdict(verdict, shown);
+  if (g !== verdict) p.trace.push({ step: "guard: internal asset in sending language", detail: `verdict "${verdict}" replaced` });
+  const notes = PRICE_ASK.test(p.question) ? ["Confirm current pricing with your sales manager before quoting it."] : [];
+  return done(g, notes, shown, false);
+}
+
+/** A denial verdict cut to its denial: "No exact Proxmox integration doc, but the Nutanix guide covers
+ *  AHV" keeps only what is missing. Then checked like any verdict; a failing one becomes plain. */
+function denialClause(verdict: string, question: string): string {
+  const head = verdict.split(/\s*(?:[;:–—(]|\s-\s|,\s*(?:but|however|though|so|instead)\b|\bbut\b|\bhowever\b)/i)[0].replace(/[.\s]+$/, "");
+  return head && !verdictProblem(head, [], question, true) ? `${head}.` : "No exact match in the library.";
 }
 
 const SEND_WORDS = /\b(e-?mail(ing)?|send(ing)?|shar(e|ing)|forward(ing)?|prospects?|customer-facing|client-facing)\b/i;
-const NEGATED_SEND = /\b(do not|don['’]t|not|never|must not|cannot|can['’]t|before)\b[^.]{0,40}\b(send|share|forward|e-?mail)/i;
+const NEGATED_SEND = /\b(no|do not|don['’]t|not|never|must not|cannot|can['’]t|before)\b[^.]{0,40}\b(send|share|forward|e-?mail)/i;
+
+/** The verdict tells the rep to send something and a shown document is internal: "**Send** the
+ *  RBI-focused solution document (internal)". The document lines are SAM's and already say "internal
+ *  only", so only the verdict can do this - and it is replaced, not appended to, so it cannot say
+ *  both "suitable to share" and "do not send". */
+function guardVerdict(verdict: string, shown: SearchHit[]): string {
+  if (!SEND_WORDS.test(verdict) || NEGATED_SEND.test(verdict) || shown.every(h => h.asset.public_url)) return verdict;
+  return shown.some(h => h.asset.public_url)
+    ? "Only the public documents below can be sent outside Accops; the internal ones must not leave Accops."
+    : "None of these is published, so none can be sent outside Accops; ask marketing first.";
+}
 
 /** Production wrote "internal one-pager ... suitable for emailing prospects" about an internal-only
- *  datasheet: a line that tells a rep to send a document that must not leave Accops. The card says
- *  "Internal only", but the prose is what gets read. So any line that names an INTERNAL asset in
- *  sending language, without already saying not to, gets the warning appended - in code, because the
- *  model's wording cannot be relied on for this. Over-warning an internal document is harmless;
- *  under-warning is how a confidential deck reaches a customer. */
+ *  datasheet. Document lines are now written by SAM (answerText) and carry the visibility, so finish()
+ *  checks only the verdict (guardVerdict); this line-level guard stays for any caller that still has
+ *  free prose naming documents. Over-warning an internal document is harmless; under-warning is how
+ *  a confidential deck reaches a customer. */
 export function guardSending(text: string, shown: SearchHit[]): { text: string; fixed: number } {
   let fixed = 0;
   const lines = text.split("\n").map(line => {
@@ -551,7 +690,7 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
     pool.push(...seed.hits);
     trace.push({ step: SEED_STEP, detail: JSON.stringify(seed.input) }, { step: "tool result", detail: `${seed.hits.length} of ${seed.considered} assets${seed.note ? ` - ${seed.note}` : ""}` });
     messages.push({ role: "assistant", content: [{ type: "tool_use", id: "seed", name: "search_assets", input: { query: sq } }] },
-      { role: "user", content: [{ type: "tool_result", tool_use_id: "seed", content: seed.payload }] });
+      { role: "user", content: [{ type: "tool_result", tool_use_id: "seed", content: toolPayload(seed.hits, seed.note, numbering(pool)) }] });
   }
   let filters: Record<string, unknown> = seed ? { ...seed.input } : {}, calls = seed ? 1 : 0;
   // Same shape as askOpenAICompat: up to MAX_SEARCHES searching rounds, then one with tools off.
@@ -573,7 +712,7 @@ async function askClaude(question: string, history: { role: "user" | "assistant"
       calls++; filters = { ...s.input };
       pool.push(...s.hits);
       trace.push({ step: "tool call: search_assets", detail: JSON.stringify(s.input) }, { step: "tool result", detail: `${s.hits.length} of ${s.considered} assets${s.note ? ` - ${s.note}` : ""}` });
-      results.push({ type: "tool_result", tool_use_id: tu.id, content: s.payload });
+      results.push({ type: "tool_result", tool_use_id: tu.id, content: toolPayload(s.hits, s.note, numbering(pool)) });
     }
     if (calls >= MAX_SEARCHES) results.push({ type: "text", text: BUDGET_USED });
     messages.push({ role: "user", content: results });
@@ -615,8 +754,11 @@ function askLocal(question: string, t0: number): AskResult {
   trace.push({ step: "tool result", detail: `${results.length} of ${considered} assets` });
   trace.push({ step: "model", detail: `none, retrieval only · ${Date.now() - t0}ms` });
   // Same rule as finish(): a pricing ask with no price list is a gap on every path.
-  if (PRICE_ASK.test(question) && !results.some(h => /\b(price|pricing)\b/i.test(h.asset.title)))
-    return { text: NO_PRICING, assets: [], trace, runtime: "local", model: null, intent: "gap", filters: f, zero: true, missing: true, error: null };
+  if (PRICE_ASK.test(question) && !results.some(h => isPriceList(h.asset))) {
+    const refs = priceReferences(results, question);
+    return { text: answerText(NO_PRICING, refs.length ? ["For your own reference only, not a quote:"] : [], refs, question), assets: refs.map(toCard), trace, runtime: "local", model: null,
+      intent: "gap", filters: f, zero: !refs.length, missing: true, error: null };
+  }
   const label = f.vertical ? ` for ${f.vertical}` : "";
   // With no model to read the results, "exact" is mechanical: of the type the rep named, and ABOUT
   // the product they named (in its title or product tags), not merely mentioning it. The product
@@ -645,7 +787,7 @@ function askLocal(question: string, t0: number): AskResult {
   // Only say "internal only" when it is true of what was actually returned. Saying it unconditionally
   // told reps a public case study could not be sent, which is the false-gap defect in reverse.
   if (externalEmpty && shown.length) text += " None of these is published yet, so ask marketing before sending anything outside Accops.";
-  return { text, assets: shown.map(toCard), trace, runtime: "local", model: null, intent: missing ? "gap" : "find_asset", filters: f,
+  return { text: answerText(text, [], shown, question), assets: shown.map(toCard), trace, runtime: "local", model: null, intent: missing ? "gap" : "find_asset", filters: f,
     zero: !shown.length, missing, error: null };
 }
 
