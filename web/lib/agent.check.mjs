@@ -323,7 +323,7 @@ const pickSay = (verdict, ...titles) => (body) => ({ role: "assistant", content:
   const { verdictProblem } = await jiti.import("./agent.ts");
   const card = { asset: { title: "Two Leading Indian Private Banks", asset_type: "Case Study", industry: "BFSI", client: "", products: [], key_problem: "", key_outcomes: ["MFA for 60,000 users"],
     brief: "Two private banks secured remote access with MFA.", use_for: "", section: "", file: { path: "x.pdf", year: "2026" }, public_url: "u" }, score: 1, why: "" };
-  ok(verdictProblem("Two public BFSI case studies you can send.", [card], "pvt bank moving off citrix", false) === null, "a plain verdict passes");
+  ok(verdictProblem("Two public BFSI case studies you can send.", [card, card], "pvt bank moving off citrix", false) === null, "a plain verdict passes");
   ok(/Citrix/.test(verdictProblem("Two public case studies of banks leaving Citrix.", [card], "pvt bank moving off citrix", false)), "the rep's competitor attributed to a card is caught");
   ok(/includ/.test(verdictProblem("The datasheet includes max concurrent users.", [card], "q", false)), "coverage verbs are caught");
   ok(/2,000/.test(verdictProblem("Good for a 2,000-user quote.", [card], "pricing for 2,000 users", false)), "a number no card has is caught");
@@ -419,7 +419,8 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   ok(dropSending("The library includes relevant manufacturing VDI case studies and they can be sent.") === "The library includes relevant manufacturing VDI case studies.", "'sent' clause dropped");
   ok(dropSending("Send the RBI-focused solution document to the CISO.") === "" && dropSending("The library has two decks.") === "The library has two decks.", "all-sending -> empty; no sending -> unchanged");
   ok(dropSending("Two can be emailed: the library has two HyID datasheets.") === "The library has two HyID datasheets.", "a leading sending clause goes with its separator");
-  ok(sendLine([bank1, bank2], false) === "All 2 are public, so they can be sent to a customer." && sendLine([bank1, cx1, cx2], true) === "1 of 3 can be sent to a customer; the rest are internal only."
+  ok(sendLine([bank1, bank2], false) === "Both are public, so they can be sent to a customer." && sendLine([bank1, bank2, pharmacy], false) === "All 3 are public, so they can be sent to a customer."
+    && sendLine([bank1, cx1], true, "any malaysia customer reference i can share with a partner?") === "1 of 2 can be sent to a partner; the rest are internal only." && sendLine([bank1, cx1, cx2], true) === "1 of 3 can be sent to a customer; the rest are internal only."
     && sendLine([cx1], false) === "All internal: don't send outside Accops." && /^None of these is published/.test(sendLine([cx1], true)), "sendability is computed from visibility");
   // Rendered: the model's "two can be shared" about internal documents never reaches the rep.
   run([pickSay("The library has internal product videos for HySecure; two can be shared.", "Geofencing control", "Device posture check and related data on management console")]);
