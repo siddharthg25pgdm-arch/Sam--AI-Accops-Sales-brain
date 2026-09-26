@@ -626,11 +626,13 @@ export const SEED_STEP = "tool call: search_assets (the rep's own words)";
  *    2. The reply names a document no search returned -> its verdict is not used (grounding guard).
  *    3. The model only CHOOSES: result numbers (or, in the old shape, exact titles) from any search
  *       this turn. Every document line is written here from the card (see answerText).
- *    4. The verdict is shown only if verdictProblem() passes it, and never tells the rep to send an
- *       internal document; otherwise SAM writes a plain one.
- *    5. missing (the exact thing is not in the library): the verdict is a denial, the model picked
- *       nothing, a named type is absent, or a named competitor / regulation / region / spec is on no
- *       shown card. Substitutes still show; the request button follows from missing. */
+ *    4. The verdict loses any sending or visibility talk (dropSending) and is shown only if
+ *       verdictProblem() passes it; otherwise SAM writes a plain one. What can be sent is SAM's own
+ *       line (sendLine), from the cards. Every card shown clears the relevance floor (relevant).
+ *    5. missing (the exact thing is not in the library): the verdict is a denial (or "but no X"), the
+ *       model picked nothing, a named type is absent, a named product / competitor / regulation /
+ *       region / spec is on no shown card, or the rep is sending and nothing shown is public.
+ *       Substitutes still show; the request button follows from missing. */
 export function finish(p: {
   question: string; text: string; pool: SearchHit[]; calls: number; runtime: AskResult["runtime"]; model: string | null;
   trace: AskResult["trace"]; filters: Record<string, unknown>; error: AskError | null;
