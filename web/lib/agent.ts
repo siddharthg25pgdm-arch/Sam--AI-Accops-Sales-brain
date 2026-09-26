@@ -445,7 +445,7 @@ const COUNTED = /\b(two|both|three|four|five)\s+(?:[^\s,;.]+\s+){0,5}?(case stud
  *  says so. Its use_for names the audience ("for SEA prospects: Indonesia, Malaysia"), and the SEA
  *  Compressed deck, whose card says it has no SEA customer story, passed as a Malaysia reference
  *  (27 Sep #25). GCC is either a Gulf customer or a global capability centre; both are audiences. */
-const PLACES = new Set([...REGIONS, "GCC", "Middle East"]);
+const PLACES = new Set([...REGIONS, "GCC"]);
 function entityOn(a: Asset, e: string): boolean {
   if (!PLACES.has(e)) return mentions(cardText(a), e);
   return mentions(`${a.title} ${(a.file?.path ?? "").split("/").pop()} ${a.client} ${a.industry}`, e);
@@ -681,7 +681,8 @@ export const SEED_STEP = "tool call: search_assets (the rep's own words)";
  *    4. The verdict loses any sending or visibility talk (dropSending) and is shown only if
  *       verdictProblem() passes it; otherwise SAM writes a plain one. What can be sent is SAM's own
  *       line (sendLine), from the cards. Every card shown clears the relevance floor (relevant).
- *    5. missing (the exact thing is not in the library): the verdict is a denial (or "but no X"), the
+ *    5. missing (the exact thing is not in the library): the verdict is a denial (or "but no X" - read
+ *       from the model's verdict, so it holds when the guard replaces the rest), the
  *       model picked nothing, a named type is absent, a named product / competitor / regulation /
  *       region / spec is on no shown card, or the rep is sending and nothing shown is public.
  *       Substitutes still show; the request button follows from missing. */
