@@ -327,6 +327,9 @@ export function relevant(question: string, a: Asset): boolean {
   if (/\bjapanese\b|(?:^|[-_ ])jp(?:[-_ ]|$)/i.test(title) && !named.includes("Japan")) return false;
   const regions = namedEntities(title).filter(e => REGIONS.includes(e));
   if (regions.length && typeGroup(a) !== "Case Study" && !regions.some(e => named.includes(e))) return false;
+  // A file SAM has not read is judged by its type: the model picked "Geofencing control.mp4" by its
+  // title for "hysecure demo video", and nothing on it says HySecure.
+  if (!isDescribed(a) && typesNamedIn(question).some(t => isType(a, t))) return !isJunk(a);
   const prods = named.filter(e => OWN_PRODUCTS.has(e));
   if (prods.length && !prods.some(e => isAbout(a, e)) && isDescribed(a) && !named.some(e => !OWN_PRODUCTS.has(e) && !SPECS.has(e) && mentions(cardText(a), e))) return false;
   const f = heuristicFilters(question);
@@ -705,7 +708,7 @@ export function finish(p: {
   const successors = withSuccessors(base, p.trace), onTopic = successors.filter(fit);
   let shown = ensurePublished(onTopic.length ? onTopic : successors, hits, p.question, p.trace);
   shown = shortFirst(shown, fill, own, p.trace);
-  const uncovered = coverEntities(shown, hits, own, p.trace);
+  const uncovered = coverEntities(shown, fill, own, p.trace);
   shown = shown.slice(0, 3);
   const types = typesNamedIn(own);
   const verdict = reply.verdict;
@@ -722,8 +725,8 @@ export function finish(p: {
     p.trace.push({ step: "verdict: type missing", detail: `asked for ${[...prods, types.join(" or ")].join(" ")}; none of the results is one` });
     if (prods.length) {
       // Two of the product's own documents beat a corporate brochure that lists it among twenty.
-      const own = [...new Set([...primaryFirst(shown.filter(ofProduct), prods[0]), ...primaryFirst(hits.filter(h => prods.some(e => isAbout(h.asset, e))), prods[0])])];
-      shown = own.length >= 2 ? own.slice(0, 2) : [...own, ...shown.filter(h => !ofProduct(h))].slice(0, 3);
+      const mine = [...new Set([...primaryFirst(shown.filter(ofProduct), prods[0]), ...primaryFirst(fill.filter(h => prods.some(e => isAbout(h.asset, e))), prods[0])])];
+      shown = mine.length >= 2 ? mine.slice(0, 2) : [...mine, ...shown.filter(h => !ofProduct(h))].slice(0, 3);
     }
     return done(prods.length ? `No exact ${prods.join(" or ")} ${types.join(" or ").toLowerCase()} in the library.` : `No exact ${types.join(" or ").toLowerCase()} for this in the library.`, ["Closest in the library:"], shown, true);
   }

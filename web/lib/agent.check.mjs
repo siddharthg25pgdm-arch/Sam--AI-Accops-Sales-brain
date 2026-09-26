@@ -47,6 +47,8 @@ const REG = [
   row("R12", "Nutanix", "Accops HyWorks and Nutanix AHV Integration Guide.pdf", "Solution Document"),
   row("R13", "Brochures", "Accops Digital Workspace on Proxmox V2.pdf", "Brochure"),
   row("R14", "Videos/Demo Videos/Revised", "Geofencing control.mp4", "Video"),
+  // 27 Sep repros
+  row("R15", "Presentations/Japan", "Accops Nutanix .Next Tokyo 2026 - Japanese v4 with Videos.pptx", "Presentation"),
 ];
 // One card: the 2018 table is superseded by the Citrix battlecard (the newer edition must be shown).
 const CARDS = [{ source: "sharepoint/Accops vs Citrix Feature Table 2018.pdf", filename: "Accops vs Citrix Feature Table 2018.pdf",
@@ -438,6 +440,41 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   run([pickSay("The library has the HyDesk brochure.", "Accops HyDesk Brochure V6 2026")]);
   r = await ask("hydesk brochure");
   ok(!r.missing && /^The library has the HyDesk brochure\./.test(r.text), `the product's own brochure is exact: ${r.text}`);
+}
+
+// 13. 27 Sep fixes 4-7.
+{
+  // 4. A mixed ask (send + my own prep) gets the public hospital case study added, prep picks kept (#31).
+  run([pickSay("The library has a healthcare whitepaper.", "ZTNA for Pharma and Healthcare (Life Sciences)")]);
+  r = await ask("Hospital chain in Kerala, 800 users, currently on Citrix, evaluating Azure Virtual Desktop. Need something I can send the CIO today plus something for my own prep against AVD");
+  ok(r.assets[0]?.title === "Accops Zulekha Hospital Case Study" && r.assets.some(a => a.title === "ZTNA for Pharma and Healthcare (Life Sciences)") && /can be sent to a customer/.test(r.text) && !/None of these is published/.test(r.text),
+    `mixed ask: public hospital case study first, prep pick kept: ${r.assets.map(a => a.title)} | ${r.text}`);
+  ok(heuristicFilters("CISO asked about RBI, what can i send him").audience === "external" && heuristicFilters("one pager on HyID i can email").audience === "external", "send him / i can email are sending asks");
+  // 5. Follow-ups check the rep's own turn, not the carried question's competitor (#2), and a
+  //    1-2 page ask promotes a known 2-page document (#3).
+  const bank = "pvt bank in mumbai moving off citrix, need a bfsi case study i can send them";
+  const h2 = [{ role: "user", content: bank }, { role: "assistant", content: "..." }];
+  run([pickSay("These are the newest BFSI case studies in the library.", "Accops BFSI Integrated Case Study")]);
+  r = await ask("anything newer?", h2);
+  ok(!r.missing && !/Citrix/.test(r.text) && /^These are the newest BFSI case studies in the library\./.test(r.text), `a follow-up is not re-checked for Citrix: ${r.text} | ${r.missing}`);
+  run([pickSay("The library has two BFSI case studies.", "Accops BFSI Integrated Case Study", "Accops Leading Pvt Sector Bank Case Study")]);
+  r = await ask("shorter one? something 1-2 pages", [...h2, { role: "user", content: "anything newer?" }, { role: "assistant", content: "..." }]);
+  ok(!/No exact match for Citrix/.test(r.text) && /Private Bank MFAZTNA|South India Bank/.test(r.assets[0]?.title ?? "") && traceHas(r, "short match added"), `the 2-page case study goes first: ${r.assets.map(a => a.title)} | ${r.text}`);
+  // 6. The relevance floor: an off-topic pick is dropped, not shown in slot 2 (#8), and a Japanese
+  //    deck needs Japan in the ask (#22).
+  run([call({ query: "deutsche bank case study" }), pickSay("The library has a pharma case study.", "Accops City Pharmacy Case Study", "Accops Deutsche Bank Case Study")]);
+  r = await ask("pharma customer proof");
+  ok(r.assets.length === 1 && r.assets[0].title === "Accops City Pharmacy Case Study" && traceHas(r, "relevance: picks dropped"), `a bank case study is dropped from a pharma answer: ${r.assets.map(a => a.title)}`);
+  const { relevant } = await jiti.import("./agent.ts");
+  const tokyo = { title: "Accops Nutanix .Next Tokyo 2026 - Japanese v4 with Videos", asset_type: "Presentation", industry: "", client: "", products: ["HyWorks"], key_problem: "", key_outcomes: [],
+    brief: "HyWorks VDI sizing on Nutanix AHV", use_for: "", section: "", file: { path: "Presentations/Japan/Accops Nutanix .Next Tokyo 2026 - Japanese v4 with Videos.pptx" }, public_url: null };
+  ok(!relevant("hyworks sizing for 500 concurrent users", tokyo) && relevant("hyworks deck for a japanese customer", tokyo), "a Japanese-language deck only when Japan is asked about");
+  const mea = { ...tokyo, title: "Partner Bootcamp 2026 - MEA Edition for the Dubai Partner Summit: Middle East Sovereignty", products: ["HySecure"], brief: "Middle East partner programme", file: { path: "x/MEA Bootcamp.pptx" } };
+  ok(relevant("middle east event deck, gitex", mea) && !relevant("hysecure event deck for a kerala partner meet", mea), "a regional event deck only for its own region");
+  // 7. Both editions picked, old one first: the newer edition moves ahead (#17).
+  run([pickSay("The library has two Citrix comparisons.", "Accops vs Citrix Feature Table 2018", "Accops Powered VDI vs Citrix VDI")]);
+  r = await ask("citrix battlecard");
+  ok(r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && r.assets[1]?.title === "Accops vs Citrix Feature Table 2018" && traceHas(r, "newer edition first"), `newer edition first when both were picked: ${r.assets.map(a => a.title)}`);
 }
 
 // 6. Cold start: apiSearch waits for the registry instead of ranking the frozen cards alone.
