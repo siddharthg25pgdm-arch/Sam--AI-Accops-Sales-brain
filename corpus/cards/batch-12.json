@@ -1,0 +1,163 @@
+{
+ "generated_by": "Claude, in-session, 26 September 2026",
+ "note": "Batch 12: the final uncarded queue - 2026 partner bootcamp 4-hour decks (PUBLIC-SHARABLE, Confidential, MEA, Japan editions incl. Japanese-language), Savex partner decks, Gartner DW Summit Japan v7, Nutanix .NEXT Tokyo 2026 set, CIOKlub Jul 2025, Defence Dec 2025, older general and technical decks (VDI Deck 08-19, Webinar Use Cases, Deck 1-Hour Feb 2025, Cisco joint and hybrid-cloud VDI, Graphics Workstation v3 internal training, two VDI-Benefits drafts, training-lab virtualisation), and spreadsheet/text tools (Duo/AWS/Frame comparisons, DaaS calculator and questionnaire, VDI-DaaS licensing breakup, ABS BOM, ARS report examples, event request SOP). Written from corpus/text/*.txt (xlsx extracted from sharedStrings/sheet XML, cached values). Japanese-language decks are carded in English. Near-copies are compared against their base deck and named in needs_human. Sensitive values (usernames, IPs, device IDs, phone numbers, personal identifiers, prices tied to a customer) are never copied; the card says the document contains them.",
+ "schema_notes": {
+  "needs_human": "A question only Siddharth or marketing can answer.",
+  "client_actual": "Real customer names printed in the document. Supabase only, never in a model prompt."
+ },
+ "model_visible": [
+  "title",
+  "asset_type",
+  "industry",
+  "client",
+  "products",
+  "competitors",
+  "personas",
+  "use_for",
+  "publish_year",
+  "visibility",
+  "superseded_by"
+ ],
+ "cards": [
+  {
+   "source": "sharepoint/2021-01-01-Accops-HyID-vs-Cisco-Duo.xlsx",
+   "title": "Accops HyID (Silver/Gold/Platinum) vs Cisco Duo Editions (Free, MFA, Access, Beyond): Feature Checklist Spreadsheet (2021)",
+   "asset_type": "Battlecard",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyID",
+    "MFA",
+    "BioAuth",
+    "HySecure",
+    "ZTNA"
+   ],
+   "competitors": [
+    "Cisco Duo"
+   ],
+   "personas": [
+    "Sales rep",
+    "Presales engineer",
+    "CISO",
+    "IT head"
+   ],
+   "regulations": [],
+   "key_problem": "A prospect pricing Cisco Duo per edition needs to see which Duo tier a given HyID edition matches, and where Duo needs an extra gateway or cloud sync that HyID does on-premise.",
+   "key_outcomes": [
+    "One-sheet x/no checklist: four Duo editions with their list prices of the time (Free up to 10 users, MFA, Access, Beyond - USD 3/6/9 per user per month) against HyID Silver, Gold and Platinum",
+    "Sections: user trust (push, security keys/U2F, OTP, SMS, hardware tokens, self-enrolment), device trust (device dashboard, health, BYOD vs corporate), adaptive policies (network, location, user group, Tor blocking, anomalous access, MDM/endpoint-management gating), secure app access and SSO",
+    "HyID-only rows: connector for third-party fingerprint/face authentication and Accops' own fingerprint/face authentication",
+    "Where Duo Network Gateway gives internal web/SSH/cloud app access, HyID needs an additional HySecure gateway (Silver/Gold) or has HySecure included (Platinum)",
+    "HyID rows for RADIUS/LDAP proxy, local database/LDAP without Active Directory, and on-premise deployment with no user sync to a third-party cloud",
+    "Some mobile device-trust rows are marked 'MDM needed' on the HyID side"
+   ],
+   "brief": "A small single-sheet Excel checklist (created March 2021, last saved March 2023) comparing Cisco Duo's four editions with HyID's three editions row by row. Cells are 'x' or 'no' (a few 'MDM needed', 'Custom checks' or 'Additional HySecure Gateway'). There is no narrative, scoring or pricing for HyID. In the extracted text empty cells collapse, so read the column position in the original sheet before quoting a specific row.",
+   "use_for": "A Duo displacement or head-to-head MFA deal: 'which HyID edition matches Duo Access/Beyond?', 'does HyID need a gateway for internal apps?', 'can HyID run fully on-premise without cloud user sync?'. Internal checklist to build a customer-facing table from, not a document to send.",
+   "publish_year": "2021",
+   "expired": false,
+   "stale_risk": "Created March 2021, last saved March 2023 (the '2021-01-01' prefix is the bulk-rename date). Duo's editions and prices have since changed (Duo now sells Essentials/Advantage/Premier), so the Duo columns are out of date. HyID edition contents may also have changed.",
+   "superseded_by": "",
+   "confidence": 0.7,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal competitive checklist with a competitor's historical price points; no verified public URL.",
+   "needs_human": "Refresh the Duo side against Duo's current editions (Essentials/Advantage/Premier) and prices before anyone quotes it, and confirm HyID Silver/Gold/Platinum is still the edition naming."
+  },
+  {
+   "source": "sharepoint/2021-01-01-Accops-vs-AWS-Workspace.xlsx",
+   "title": "Accops (on Azure) vs AWS WorkSpaces: Feature Comparison Spreadsheet (2017)",
+   "asset_type": "Battlecard",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "HySecure",
+    "HyID",
+    "DaaS",
+    "VDI",
+    "Thin Clients",
+    "MFA",
+    "BioAuth"
+   ],
+   "competitors": [
+    "AWS WorkSpaces"
+   ],
+   "personas": [
+    "Sales rep",
+    "Presales engineer",
+    "IT head",
+    "Head of Infrastructure"
+   ],
+   "regulations": [],
+   "key_problem": "A customer choosing a cloud desktop service asks what Accops running on Azure does that AWS WorkSpaces does not.",
+   "key_outcomes": [
+    "About 60 Yes/No rows: Accops in Azure vs AWS WorkSpaces",
+    "Desktop types: Accops offers flexible machine sizes, shared hosted desktops, published apps and Linux desktops; WorkSpaces had four fixed configurations and dedicated desktops only",
+    "Authentication: Accops built-in 2FA, OTP and biometrics; WorkSpaces relied on on-premise RADIUS",
+    "Endpoint data controls (copy-paste, print-screen, internet control, one-way file transfer, stealth mode) marked Yes for Accops, No for WorkSpaces",
+    "Protocol row: RemoteFX (Accops) vs PCoIP (WorkSpaces), with 'up to 128 Kbps' bandwidth",
+    "Endpoints and peripherals: Windows XP, Linux and mobile browsers, printers, scanners, dot-matrix printers, USB tokens and biometric devices supported by Accops, mostly No for WorkSpaces"
+   ],
+   "brief": "A one-sheet Excel comparison of Accops VDI hosted on Azure against AWS WorkSpaces, created and last saved in December 2017 and marked 'CONFIDENTIAL, Copyright 2017'. It covers machine configuration and desktop types, gateway and authentication, endpoint security controls, display protocol, endpoint hardware and operating systems, browsers and peripheral support.",
+   "use_for": "Background for an AWS WorkSpaces objection, mainly the endpoint-control and peripheral rows (dot-matrix printers, USB tokens, biometric devices, copy/print blocking) that still differentiate. For current pricing against WorkSpaces use the DaaS DIY/AMD deck or the 2022 Why DaaS battlecard instead.",
+   "publish_year": "2017",
+   "expired": false,
+   "stale_risk": "December 2017. Many AWS columns are no longer true (WorkSpaces now has more bundles, Linux, built-in MFA options, and WSP/DCV instead of only PCoIP); Windows XP and RemoteFX are obsolete. Do not send as-is.",
+   "superseded_by": "",
+   "confidence": 0.72,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked CONFIDENTIAL; a 2017 competitor comparison that is largely out of date.",
+   "needs_human": "Nine-year-old AWS WorkSpaces claims: retire or rebuild. The 2022 'Why DaaS' battlecard (slide 22) is a newer Accops-vs-WorkSpaces feature table and should be the one reps use."
+  },
+  {
+   "source": "sharepoint/2021-01-01-Accops-vs-NutanixFrame.xlsx",
+   "title": "Nutanix Frame vs Accops: VDI Feature Comparison Spreadsheet (Nov 2020)",
+   "asset_type": "Battlecard",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "HySecure",
+    "VDI",
+    "DaaS",
+    "MFA"
+   ],
+   "competitors": [
+    "Nutanix Frame"
+   ],
+   "personas": [
+    "Sales rep",
+    "Presales engineer",
+    "Partner",
+    "IT head"
+   ],
+   "regulations": [],
+   "key_problem": "Nutanix customers and partners comparing Frame with Accops need a quick list of what each supports.",
+   "key_outcomes": [
+    "About 25 Yes/No rows in three sections: VDI management, platform support, security",
+    "Accops-only rows: shared hosted (multi-session) desktops, USB redirection, Linux endpoints, client-based access, session and process performance logs, user self-service, access to physical PCs",
+    "Platforms: both run on Nutanix AHV and on Azure/AWS/GCP; Frame on Nutanix Cloud, Accops on VMware ESX and Hyper-V; Frame control plane SaaS, Accops on-prem",
+    "Security: Accops built-in gateway, MFA, contextual access, copy protection, session recording and watermark; Frame relies on the customer's VPN and third-party MFA",
+    "DaaS row names Nutanix XiFrame vs 'Accops Virtual Office'"
+   ],
+   "brief": "A one-sheet Excel comparison created and saved on 3 November 2020 (the '2021-01-01' prefix is a bulk rename), listing features of Nutanix Frame against Accops with Yes/No cells. Nothing beyond the table - no pricing, sources or narrative.",
+   "use_for": "Internal background when a Nutanix-led deal also has Frame on the table. Treat it as history: Accops now positions as Nutanix's VDI partner, and the 'Customer Deck SEA 1.0' says Frame has been discontinued - check that before using either claim.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "November 2020. Frame has changed hands and product names since (the 2026 SEA customer deck calls it discontinued); 'Accops Virtual Office' is an old DaaS name; the 'on-prem only' control plane line predates Accops' SaaS offers.",
+   "superseded_by": "",
+   "confidence": 0.7,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Internal competitive table about a Nutanix product; Nutanix is now a partner, so it should not be shared.",
+   "needs_human": "Probably retire: Frame's status has changed and Accops now sells alongside Nutanix. If kept, check the 'Frame discontinued' claim and replace 'Accops Virtual Office' with the current DaaS name."
+  }
+ ]
+}
