@@ -1,3 +1,219 @@
+## 28 September re-run #3
+
+**For Siddharth.** This is the fourth run of the same 35 questions, with the same follow-up history
+and the same strict rubric. It went to production after commit `a61cef7`. That commit made these
+changes:
+- The verdict guard allows the rep's own words, and "comparing" or "covering" when a shown title
+  backs them. It checks words against every result this turn.
+- A partial denial keeps `missing` true.
+- A "no exact" answer puts the named product and type first (`namedFirst`).
+- A region, language or GCC counts only when it is in the title, file name, client or industry.
+- A verdict cannot count more cards of a type than are shown.
+- The trace says when a fallback model answered.
+- The sendability line says "Both are public", and says "partner" when the rep did.
+
+- **Tested:** 26 Sep 2026, 21:00:48 to 21:25:41 UTC (27 Sep, 02:30 to 02:55 IST). That is 1 build
+  probe, 35 `/ask` calls about 30 s apart, and 7 more for the demo script (below). Every call had
+  `x-sam-test: 1`. Follow-ups carried the earlier turns as `history`, as before. SAM event ids 1419
+  to 1496.
+- **Build check:** the first probe, "any malaysia or indonesia customer reference i can share with a
+  partner?" (21:00:48, event 1419), came back with `missing` true and "1 of 2 can be sent to a
+  partner". So `a61cef7` was live.
+- **Models: most answers came from the smaller model.** Groq's tokens-per-day limit for
+  `openai/gpt-oss-120b` (200,000) was spent by question 3. The new trace step shows it on every
+  answer: `model provider failed, answered by fallback :: openai/gpt-oss-120b returned 429 ... tokens
+  per day (TPD): Limit 200000, Used 199518`.
+  - `openai/gpt-oss-120b` answered 3 questions: #1, #2 and #33.
+  - `openai/gpt-oss-20b` answered 31.
+  - #32 got no model at all. 120b returned 429, 20b timed out at 40 s, and SAM answered from
+    retrieval alone. That answer was still right.
+
+  So this run tests the 20b model far more than run #2 did (20 of 35 on 20b). Treat the changes in
+  model voice below with that in mind.
+- **Checked:** every gap, "nothing to send" answer and denial, against free `/search` calls (21:20
+  to 21:21 UTC).
+
+### Headline
+
+| | 26 Sep | 27 Sep | 27 Sep #2 | 28 Sep #3 |
+|---|---|---|---|---|
+| **Happy** | 11 | 16 | 21 | **19** |
+| Acceptable gap (honest, request button) | 7 | 7 | 9 | **12** |
+| Unsatisfying | 17 | 12 | 5 | **4** |
+| False or hidden gaps (the content existed) | 5 | 3 | 1 | **0** (1 more in the demo dry run) |
+| Verdict guard replaced the model's verdict | n/a | 18 of 35 | 10 of 35 | **3 of 35** (1 wrongly) |
+| Sending guard replaced, or stripped sending words from, the verdict | n/a | 7 | 1 | **3 strips** (#3, #12, #34) |
+| Sendability line matches the cards' visibility | n/a | n/a | 35 of 35 | **35 of 35** |
+| Request button (`missing`) shown when the exact thing is absent | n/a | n/a | not counted | **12 of 15** (missed #12, #14, #34) |
+| Invented claims in document lines | 6 answers | 0 | 0 | **0** |
+| Wrong or contradictory claims in a verdict that was shown | (in the 6) | 1 | 1 | **3** (#12, #14, #34) |
+| Answered by the primary model (120b) | 35 | 35 | 15 | **3** |
+
+**Unsatisfying went from 5 to 4 and acceptable gaps from 9 to 12. Happy fell from 21 to 19.**
+- **Up (3):** the three risky answers of run #2 are now honest gaps with the button. #10 names the
+  GCC ambiguity, #23 shows the public HySecure datasheet first, and #25 no longer counts an audience
+  line as a Malaysia reference.
+- **Down (2):** #12 and #34, the HySecure videos. The 20b model now writes "The library has no exact
+  HySecure demo video; closest are two demo videos." SAM neither catches this as a contradiction nor
+  treats it as a denial, so the rep reads a "no" with no request button. The same shape breaks #14
+  (SOC 2). This is the top failure below.
+
+The verdict guard now replaces 3 verdicts, down from 10. The model's own verdict reaches the rep in
+most answers again: all six of run #2's wrong replacements (#2, 8, 14, 16, 21, 29) now pass. The
+sendability line is right in 35 of 35, and "Both are public" and "partner" both appear where they
+should.
+
+### Every question
+
+H = happy, A = acceptable gap, U = unsatisfying. "VG" = the verdict guard replaced the verdict.
+"120b" marks the three answers from the primary model; all the others came from `gpt-oss-20b`,
+except #32 (retrieval only).
+
+| # | Question | Run #2 | Now | Why (now) |
+|---|---|---|---|---|
+| 1 | AE: pvt bank moving off citrix, bfsi case study i can send | H | H | The internal 2021 BFSI Citrix proposal deck ("do not send outside Accops"), then both public 2026 private-bank case studies. "2 of 3 can be sent" is right. The model's verdict is shown now ("moving" is the rep's own word). 120b. **On 20b this question gave a false gap:** see failure 2. |
+| 2 | AE: anything newer? | H | H | "The library has two 2026 BFSI case studies that are newer than the 2021 deck." "Both are public, so they can be sent to a customer." The history-word fix works. 120b. |
+| 3 | AE: shorter one? 1-2 pages | H | H | The 2-page *Private Bank MFA-ZTNA* case study comes first again ("length: short match added"). Weaker verdict: the model wrote "two 2026 BFSI case studies that are short enough for a quick send". `dropSending` cut the whole "that ..." clause, so the verdict no longer says which card is short. The claim that the 2026 ones are short was unsupported anyway. |
+| 4 | AE: citrix battlecard for my own prep | H | H | Both 2024 Citrix battlecards, "All internal". The model's verdict is shown. |
+| 5 | AE: RBI framework, what can i send the CISO | H | H | The public *Two Leading Indian Private Banks* case study (RBI-mandated MFA for vendors) and the internal IBA CISO keynote. "1 of 2 can be sent" is right. The regulator's co-op bank circular dropped out, which is no loss. **VG wrongly** replaced a fair verdict because of "supporting". |
+| 6 | AE: pricing for 2000 users hyworks vs citrix quote | A | A | Unchanged: NO_PRICING, "for your own reference only, not a quote", the 2021 calculator and the 2022 DaaS battlecard. `missing` is true. |
+| 7 | SDR: one pager on HyID i can email | A | A | **Better substitute:** the *HyID Datasheet V5 2026* now comes first, then the Editions matrix. "None of these is published ... ask marketing first." `missing` is true ("verdict: nothing sendable"). |
+| 8 | SDR: pharma customer proof | H | H | City Pharmacy (public) and the single-slide library. The model's verdict is shown. |
+| 9 | SDR: manufacturing plant VDI case study | H | H | Textile manufacturer (public), then Polycab. The model's verdict is shown. |
+| 10 | SDR: ZTNA pitch for a GCC | U | **A** | "No exact match for GCC (a Gulf customer or a global capability centre): none of the closest documents mentions it." `missing` is true and the button shows. The substitutes are two 2026 CIO event decks, which are weak but labelled. The false "two ZTNA pitch decks for GCC contexts" is gone. |
+| 11 | SDR: customer logo pack | H | H | The Delighted Customers' Catalogue (Jul 2025). It still says "All internal" over a single card. |
+| 12 | SDR: product video hysecure | H | **U** | The same two demo videos (Geofencing, Device posture). But the verdict is "The library has no exact HySecure product video; closest are two demo videos", with `missing` false and no button. The videos are filed as HySecure demos and are the top `/search` hits for "hysecure video". The answer denies what it shows. See failure 1. |
+| 13 | SE: ISO 27001 certificate for an RFP | U | U | Only the 2013-edition certificate is shown now; the off-topic slots 2 and 3 are gone. There is still no expiry warning (your decision). VG replaced "the ISO 27001 certificate needed for the RFP", which was harmless and arguably right. |
+| 14 | SE: SOC 2 type 2 report | U | U | "The library has no SOC 2 Type 2 report; closest are an auditor letter and a corporate brochure." It shows one card (the Mirox letter), because the relevance floor dropped the brochure. `missing` is false, so there is still no button. The verdict also names the brochure that was dropped. See failure 1. |
+| 15 | SE: remote browser isolation brochure | A | A | "No exact Browser Isolation brochure in the library." The substitutes are the Virtual Browser whitepaper (2025) and the June 2026 ZTNA and Isolation webinar. The button shows. |
+| 16 | SE: vmware horizon, broadcom price hike, omnissa pitch | H | H | Migration Strategy, the Omnissa VVF Analysis, then the 2022 Broadcom battlecard with "A newer edition exists: Omnissa Horizon VVF Analysis - prefer that one". The model's verdict is shown now; the rep's own words pass. |
+| 17 | REG: bahasa indonesia daas brochure | A | A | Honest gap and button. The public 2026 DaaS brochure is above the internal 2025 one, which is marked "A newer edition exists". |
+| 18 | SE: omnissa migration deck | H | H | Proxmox V2.0, then Migration Strategy. **VG rightly** replaced a backwards verdict ("migrating from Omnissa to Horizon"). Migration Strategy would be the better lead. |
+| 19 | SE: data residency, DaaS hosted in india, RFP | A | A | "No exact match for Data residency", with the button. The substitutes are still weak: the 2021 Nutanix joint brief and a distributor partner talk. The public 2026 India/Sovereign brochure (the 27 Sep substitute) is not shown. Do not demo this one. |
+| 20 | SE: hysecure architecture / deployment guide | H | H | The HySecure for ZTNA Reference Architectures deck, alone. The floor dropped the HyID architecture deck. |
+| 21 | SE: hyworks on nutanix AHV and proxmox | H | H | The Nutanix AHV guide (2020) and Proxmox V2.0. "No single document covering both ...; closest are ..." is shown; "covering" passes now. |
+| 22 | SE: hyworks sizing for 500 users | A | A | "No exact HyWorks sizing deck for 500 concurrent users." with the button. The Graphics Workstation deck and DaaS v2 2023 are the substitutes. |
+| 23 | SE: hysecure datasheet max concurrent users per appliance | U | **A** | **The hidden result is fixed.** The public *HySecure Gateway: Zero Trust Remote Access Datasheet* (2026) comes first, then the V3 datasheet ("newer edition exists"), then Ecom Express. `missing` is true. The wording is awkward: "No exact match for HySecure concurrent users: none of the closest documents is about it." |
+| 24 | REG: arabic brochure for a saudi bank | A | A | "No exact match for Saudi or Arabic", with the button. The substitutes are the two public Indian private-bank case studies and BFSI 2026. |
+| 25 | REG: malaysia / indonesia customer reference | U | **A** | "No exact match for Malaysia or Indonesia", `missing` true, and "It is public, so it can be sent to a partner." The SEA deck with no SEA story is gone. The one substitute is an Indian DTH case study (public), which is weak. |
+| 26 | REG: APRA CPS 234 / Australian gov | A | A | "No exact match for APRA or Australia", with the button. **Better substitute:** the public HySecure datasheet comes first ("named product first"), then the partner bootcamp. |
+| 27 | REG: middle east event deck, gitex | A | A | "No exact match for GITEX", with the button. The MEA Dubai bootcamp and keynote are shown internal. `/search "gitex"` returns nothing. |
+| 28 | REG: fortinet vpn replacement pitch | H | H | The ZTNA Gateway deck naming Fortinet (2022, age noted), then the Nutanix .NEXT 2024 deck. The model's verdict is shown. |
+| 29 | SE: aws workspaces vs hyworks | H | H | Why DaaS 2022 and "vs the Field" 2022. "Two battlecards comparing AWS WorkSpaces and HyWorks" is shown now; the title backs "comparing". |
+| 30 | AE: bhai urgent hyworks brocher bhejo customer ko | H | H | The public Digital Workspace Brochure V2 2026 and the public India/Sovereign brochure. "Both are public, so they can be sent to a customer." |
+| 31 | AE: Kerala hospital, Citrix vs AVD, send CIO + my prep | H | H | The public Zulekha Hospital case study first, then the VDI deck (Aug 2026) and "vs the Field" (with AVD), both "do not send outside Accops". "1 of 3 can be sent" is right. |
+| 32 | SDR: pharma case study I can send | H | H | **Retrieval only** (120b 429, 20b timed out at 40 s): City Pharmacy and Zulekha, both public, "Both are public". The canned verdict is plain but correct. |
+| 33 | SDR: what about hospitals? | H | H | Zulekha (public) first, then City Pharmacy. The follow-up kept its context. 120b. |
+| 34 | SE: hysecure demo video | H | **U** | Same as #12: "The library has no exact HySecure demo video; closest are two demo videos", over the two HySecure demo videos, with no button. In run #2 the guard caught this contradiction. |
+| 35 | SE: cisco anyconnect replacement | H | H | The HySecure vs Cisco AnyConnect PDF first, then the ZTNA Gateway deck. The verdict says "battlecards", but both are decks (a minor slip). |
+
+**Moved up (3):** #10, 23 and 25 went from U to A. **Moved down (2):** #12 and #34 went from H to U.
+Every other answer kept its grade. #7 and #26 got better substitutes, and #2, 16, 21 and 29 now show
+the model's verdict.
+
+**Demo dry run (7 more calls, 21:21 to 21:25 UTC, all 20b).** These were the demo questions in demo
+order, with the web chat's history (the last 6 turns).
+- The Citrix battlecard, the Kerala mixed ask, the Broadcom/Omnissa pitch and browser isolation all
+  came back as above.
+- The Citrix battlecard verdict was replaced (VG, on "can be used").
+- The Kerala verdict read "an VDI battlecard" (failure 5).
+- "anything newer?" after browser isolation put the June 2026 webinar first. VG rightly replaced a
+  false "India edition brochure that includes Remote Browser Isolation".
+- The bank question (#1) gave a **false gap**: "No exact match for Citrix", `missing` true (failure
+  2). "BFSI case study I can send to a private bank customer" (event 1496) was clean: two public
+  2026 case studies, "Both are public".
+
+### What still fails, ranked by how often a rep would hit it
+
+**1. "The library has no X" is neither a denial nor a partial denial, so the rep reads a "no" with
+no request button (#12, #14, #34; about 1 in 12, and more often on 20b).**
+- **Repro:** "hysecure demo video".
+  - **What came back:** "The library has no exact HySecure demo video; closest are two demo videos."
+    It showed the Geofencing and Device posture demo videos, with `missing` false.
+  - The same shape appeared on "do we have SOC 2 type 2 report": "The library has no SOC 2 Type 2
+    report; closest are an auditor letter and a corporate brochure."
+- **Cause 1, in `finish()` in `web/lib/agent.ts`:**
+  - `DENIAL` only matches a verdict that opens with "no", "none", "there is no" or "the library
+    does not have". It misses "The library has no".
+  - `PARTIAL_DENIAL` needs a `;`, `,` or "but" before the "no".
+  - So neither the denial branch nor `partial` fires, and `missing` stays false.
+- **Cause 2, in `verdictProblem()`:** the guard now checks words across all results this turn
+  (`seen = hits`). So "a corporate brochure" passes on #14 even though the relevance floor dropped
+  that card. In run #2 the contradiction in #34 was caught; it no longer is.
+- **Fix:**
+  - Treat `^the library (has|holds|contains) no\b` (and "sam has no" / "we have no") as `DENIAL`.
+    The denial branch then keeps the substitutes and sets `missing`.
+  - Check document nouns in the verdict against the shown cards only; keep `seen` for plain words.
+  - For #12 and #34 the right answer is arguably "yes, two HySecure demo videos". A denial whose
+    named product matches the shown cards' `path` or folder could go to the guard instead.
+
+**2. A competitor named as context becomes a required entity, so a good answer gets a false gap
+(demo dry run: #1 on 20b).**
+- **Repro:** "pvt bank in mumbai moving off citrix, need a bfsi case study i can send them".
+  - On 20b (event 1488), the model picked only the two public case studies. The answer became "No
+    exact match for Citrix: none of the closest documents mentions it.", with `missing` true and the
+    button.
+  - On 120b (event 1421), the model also picked the Citrix-titled BFSI deck and the answer was clean.
+  - The rep asked for a BFSI case study. Citrix is the situation, not the ask.
+- **Suspect:** `coverEntities()` / `asksAbout()` in `agent.ts`. Every named competitor must appear on
+  a shown card, and no *case study* names Citrix.
+- **Fix direction:** a competitor after "moving off / replacing / leaving / evaluating" is context.
+  - It should reorder (put a card that names it first, if one clears the floor), not set `missing`.
+  - Or require the entity only when it is the object of the asked type ("citrix battlecard").
+
+**3. Groq's daily limit, not code: the primary model was gone by question 3.** This is operational.
+- Today's first two runs used up `gpt-oss-120b`'s 200,000 tokens per day. 31 of 35 answers came
+  from 20b, and one (#32) from retrieval alone after 20b timed out at 40 s.
+- 20b writes the "The library has no X; closest are Y" verdicts in failure 1 more often.
+- On a demo day, run nothing heavy beforehand. The new trace step makes this visible: "model
+  provider failed, answered by fallback ... tokens per day (TPD)".
+- On the retrieval-only path, `ask()` `unshift`s the failures, so the trace lists 20b before 120b
+  (cosmetic).
+
+**4. The verdict guard still throws away some fair verdicts (1 of 3 in the 35, plus 1 in the dry
+run).**
+- **Wrongly replaced:**
+  - #5, "supporting" ("a relevant case study and a supporting deck").
+  - The dry-run Citrix battlecard, "can be used": "two 2024 Citrix battlecards that can be used for
+    prep". `COVERAGE` includes `can be (framed|adapted|...|used)`.
+- **Rightly replaced:**
+  - #18 (backwards: "from Omnissa to Horizon").
+  - The dry-run "anything newer?" (a false "brochure that includes Remote Browser Isolation").
+- **Harmless:** #13 (the 2013 ISO certificate "needed for the RFP").
+- **Suspect:** `verdictProblem()`. Descriptive adjectives count as unknown words, and "can be used"
+  counts as coverage.
+- **Fix direction:**
+  - Allow "can be used for <the rep's word>" when that word is in the question.
+  - Allow a small set of role adjectives (supporting, related, relevant).
+
+**5. `dropSending()` over-strips (#3 and the dry-run Kerala answer).**
+- **#3:** the model wrote "... that are short enough for a quick send." The split on " that " drops
+  the whole clause, so the answer to "shorter one?" loses the word "short".
+- **The dry-run Kerala answer:** `VIS_ADJ` turns "an internal VDI battlecard" into "an VDI
+  battlecard".
+- **Fix:**
+  - Drop only the sending phrase ("for a quick send"), not the relative clause.
+  - Re-pick "a" or "an" after removing a visibility adjective.
+
+**6. Weak substitutes on some honest gaps (#19, #10, #25).**
+- **#19 data residency:** the 2021 Nutanix brief and a partner talk. On 27 Sep the substitutes were
+  the public 2026 India/Sovereign brochure and DaaS V4 2026, which was better. The entity-missing
+  return (`verdict: named entity missing`) shows the model's picks as they are. `namedFirst`
+  didn't help, because data residency is not a product.
+- **#10:** two CIO event decks.
+- **#25:** one Indian DTH case study.
+- These answers are honest, but a rep gets little from the substitutes.
+
+**7. The ISO 27001 certificate (#13): unchanged, your decision.**
+
+**8. Cosmetic.**
+- "All internal: don't send outside Accops." over a single card (#11, 13, 14, 20).
+- "1 of 2 can be sent ...; the rest are internal only" when the rest is one card.
+- #23's label "HySecure concurrent users ... none is about it".
+- #35's "battlecards" over two decks.
+
+---
+
 ## 27 September re-run #2
 
 **For Siddharth.** This is the third run of the same 35 questions, with the same follow-up history
