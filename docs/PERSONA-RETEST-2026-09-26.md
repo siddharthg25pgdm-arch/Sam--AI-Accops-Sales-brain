@@ -1,3 +1,218 @@
+## 27 September re-run
+
+**For Siddharth.** The same 35 questions, the same follow-up history and the same strict rubric as
+the 26 Sep run below, sent to production after the answer-contract merge (the model returns a
+verdict sentence + `PICKS`; SAM writes every document line from the card).
+
+- **Tested:** 26 Sep 2026, 19:15:09 to 19:31:24 UTC (27 Sep, 00:45 to 01:01 IST). 35 `/ask` calls,
+  about 28 s apart, all with `x-sam-test: 1`, plus one build probe at 19:14:20 UTC. Follow-ups carried
+  the earlier turns as `history`, as before. All 35 answered on `openai/gpt-oss-120b`, no fallbacks.
+  SAM event ids 1283 (probe) and 1284 to 1327.
+- **Build check:** the probe "healthcare case study for a customer" put the public Zulekha Hospital
+  case study first on the first try, so the newest build (local main `96bec72`, "a rep asking for
+  something to send gets a sendable document") was already live.
+- **Checked:** every gap and every "nothing to send" against free `/search` calls (19:33 to 19:36
+  UTC).
+
+### Headline
+
+| | 26 Sep | 27 Sep |
+|---|---|---|
+| **Happy** | 11 | **16** |
+| Acceptable gap (honest, request button) | 7 | **7** |
+| Unsatisfying | 17 | **12** |
+| False or hidden gaps (the content existed) | 5 | **3** (#3, #5, #31) |
+| Verdict guard replaced the model's verdict ("Best matches in the library:") | n/a | **18 of 35** |
+| Sending guard replaced the verdict with code text | n/a | 7 of 35 |
+| Invented claims in document lines | 6 answers | **0** |
+| Invented or contradictory claims in a verdict that was shown | (in the 6 above) | **1** (#12) |
+
+**Happy went from 11 to 16: seven questions moved up and two moved down.** The answer contract did
+what it was built for. No document line now says anything that isn't on the card, and the Citrix,
+"max concurrent users" and video-description inventions of 26 Sep are gone.
+
+**The new cost is a flat voice.** The model's verdict reached the rep in only 4 of 35 answers (#12,
+and the three denials #24, 25, 26). Of the rest, 18 opened with "Best matches in the library:", 7
+with the sending guard's text, and 6 with SAM's own gap or pricing text. So the verdict guard is
+catching almost every verdict the model writes, not just the bad ones, and it threw away two good
+ones: the SOC 2 denial (#14) and the GCC assumption the prompt asks for (#10). The reason is a
+mismatch between the prompt and the guard (failure 1 below). The model is not getting more creative.
+
+### Every question
+
+H = happy, A = acceptable gap, U = unsatisfying. "VG" = verdict guard replaced the verdict; "SG" =
+sending guard replaced it.
+
+| # | Question | 26 Sep | 27 Sep | Why (27 Sep) |
+|---|---|---|---|---|
+| 1 | AE: pvt bank moving off citrix, bfsi case study i can send | U | **H** | Both public 2026 private-bank case studies, no Citrix claim. SG: "Only the public documents below can be sent". The 2021 internal BFSI Citrix proposal deck is listed first, labelled "do not send", which is useful prep. |
+| 2 | AE: anything newer? | U | U | The topic is kept (walk-back works) and it re-lists the two 2026 case studies, which are already the newest. But the verdict is "No exact match for Citrix", with `missing` true and the request button, which answers a question the rep didn't ask. The turn before had shown a Citrix-titled deck. |
+| 3 | AE: shorter one? 1-2 pages | U | U | Same "No exact match for Citrix" verdict. The two cards have no known page count, so nothing says whether they are short. The seed search put two results of 2 pages or fewer first (trace), but neither was shown. The 2-page *Accops Private Bank MFAZTNA Case Study* exists (internal). |
+| 4 | AE: citrix battlecard for my own prep | U | **H** | The two 2024 *Accops Powered VDI vs Citrix* battlecards are 1 and 2 (filler stopwords fixed). VG. |
+| 5 | AE: RBI framework, what can i send the CISO | U | U | UCB RBI 2020 (co-op banks) and BFSI 2026, both internal, with no "do not send" warning, because "send him" doesn't read as external. The public *RBI Circular (31 Dec 2019)* exists and isn't shown. VG. |
+| 6 | AE: pricing for 2000 users hyworks vs citrix quote | U | **A** | "Pricing is not in the collateral library ... check with your sales manager". The 2021 calculator and the 2022 DaaS battlecard appear under "For your own reference only, not a quote", both with age warnings. `missing` is true. |
+| 7 | SDR: one pager on HyID i can email | A | **U** | SG: "None of these is published ... ask marketing first", which is honest. But `missing` is false, so there is no request button and no "no public HyID one-pager". Two filler decks sit under the datasheet, one carrying time-bound discount offers. |
+| 8 | SDR: pharma customer proof | H | H | City Pharmacy (public) and the single-slide library. The top slot is a private-bank bootcamp deck, which is off-topic. VG. |
+| 9 | SDR: manufacturing plant VDI case study | H | H | Textile manufacturer (public) first. VG. |
+| 10 | SDR: ZTNA pitch for a GCC | U | U | A 2020 outsourcing note, a Zscaler PQC note and a CIO conclave deck. The GCC ambiguity isn't named: the model's verdict was replaced (VG). The Dataquest "6,000 users in 7 countries" case study exists. |
+| 11 | SDR: customer logo pack | H | H | Delighted Customers' Catalogue (Jul 2025) with "logos may be former customers". SG. |
+| 12 | SDR: product video hysecure | U | U | **The only model verdict shown, and it is wrong:** "The library has internal product videos for HySecure; two can be shared". Two of the three cards are decks, all three are internal only, and the sending guard missed "shared". The Geofencing video is third; the Device posture video isn't shown. |
+| 13 | SE: ISO 27001 certificate for an RFP | U | U | Unchanged: the 2013-edition certificate, no expiry warning (your 8 Sep decision). VG. |
+| 14 | SE: SOC 2 type 2 report | A | **U** | The model's verdict was accurate ("a related internal auditor letter but not a full SOC 2 Type 2 report"), but VG replaced it because of the words "has a". `missing` is false, so there is no request button. The Mirox letter's title still says "Not a SOC 2 Report". An irrelevant corporate brochure is second. |
+| 15 | SE: remote browser isolation brochure | U | U | Worse framing: two corporate brochures (public) under "Best matches in the library:" (VG), with no note that neither is about browser isolation. The *Virtual Browser* whitepaper (2025), the RBI eBook and the Internet Isolation one-pager exist and aren't shown. |
+| 16 | SE: vmware horizon, broadcom price hike, omnissa pitch | H | H | Migration Strategy deck, then the Omnissa VVF Analysis pulled in as the newer edition, then the 2022 Broadcom battlecard. VG. |
+| 17 | REG: bahasa indonesia daas brochure | A | A | "No exact match for Indonesia or Bahasa", with the button. The internal 2025 DaaS brochure is listed *above* its public 2026 successor, and a VMware migration deck fills slot 3. |
+| 18 | SE: omnissa migration deck | H | H | Migration Strategy from VMware EUC first. VG. |
+| 19 | SE: data residency, DaaS hosted in india, RFP | A | A | "No exact match for Data residency", with the button. The substitutes are now the *public 2026* India/Sovereign corporate brochure and DaaS V4 2026 (the successor fix). |
+| 20 | SE: hysecure architecture / deployment guide | H | H | The *HySecure for ZTNA ... Reference Architectures* deck, but only third, behind two BioAuth deployment decks (wrong product). VG. |
+| 21 | SE: hyworks on nutanix AHV and proxmox | U | **H** | Both entities covered: the Nutanix AHV guide (2020, age noted) and the Proxmox V2.0 deck (trust note points to the newer Oct 2025 brochure). The false gap is fixed. VG. |
+| 22 | SE: hyworks sizing for 500 users | U | U | Graphics Workstation deck (2020), a Japanese Nutanix Tokyo deck and DaaS v2 2023. It never says there is no HyWorks sizing guide, and gives no button. VG. |
+| 23 | SE: hysecure datasheet max concurrent users per appliance | U | U | The invented spec claim is gone. But it shows the Editions matrix, an Ecom Express "2,300 concurrent users" case study and the public HySecure Gateway datasheet, and never says that no document states a per-appliance maximum. No button. VG. |
+| 24 | REG: arabic brochure for a saudi bank | A | A | "No exact Arabic brochure for a Saudi bank prospect." Substitutes are the two public Indian private-bank case studies. |
+| 25 | REG: malaysia / indonesia customer reference | A | A | Honest gap and button. The substitutes are the SEA Customer Deck V2.0 (Sep 2026, internal) and an Indian DTH case study. |
+| 26 | REG: APRA CPS 234 / Australian gov | U | **A** | "No exact APRA CPS 234 HySecure collateral.", `missing` true, button. The substitutes (two partner bootcamp decks) are weak but labelled. |
+| 27 | REG: middle east event deck, gitex | A | A | "No exact match for GITEX", with the button. The MEA Dubai Partner Summit bootcamp and keynote are shown internal, and trust notes flag the time-bound offers and discount table. A Japanese Nutanix Tokyo deck took slot 2. |
+| 28 | REG: fortinet vpn replacement pitch | H | H | The *Secure Access with Zero Trust ... Fortinet* deck first (2022, age noted). VG. |
+| 29 | SE: aws workspaces vs hyworks | H | H | Why DaaS battlecard 2022 and DaaS v2 2023 (AWS pricing), both dated. SG added "ask marketing first", which is harmless. |
+| 30 | AE: bhai urgent hyworks brocher bhejo customer ko | U | **H** | The public *Digital Workspace ... Brochure with Full Datasheet (V2, 2026)* first (newly carded), and the public DaaS 2026 second. SG. |
+| 31 | AE: Kerala hospital, Citrix vs AVD, send CIO + my prep | U | U | **Hidden gap:** "None of these is published, so none can be sent" (SG), yet the public *Zulekha Hospital* case study exists and was in the pool. The prep side is fine: Healthcare deck 2021, and VDI vs the Field 2022 with AVD. |
+| 32 | SDR: pharma case study I can send | H | H | City Pharmacy (public) first. Two Japan bootcamp decks fill slots 2 and 3. |
+| 33 | SDR: what about hospitals? | H | H | Zulekha Hospital (public) first; the follow-up kept its context. VG. |
+| 34 | SE: hysecure demo video | U | **H** | The Geofencing and Device posture demo videos, each "Filed under Videos/Demo Videos/Revised; SAM has not read this one". This is honest and they are the right files. A Japanese deck is third. VG. |
+| 35 | SE: cisco anyconnect replacement | H | H | The HySecure vs Cisco AnyConnect battlecard (2021) is third, behind the ZTNA Gateway deck (names Cisco) and the ZPA comparison. VG. |
+
+**Moved up (7):** #1, 4, 6, 21, 26, 30, 34. **Moved down (2):** #7 and #14. Both went from A to U
+because an honest "we don't have it" lost its request button. All eleven 26 Sep happy answers stayed
+happy. Two answers kept their grade but got better: #19 (the public 2026 substitutes) and #23 (no
+invented spec any more).
+
+### What improved, and why
+
+- **The answer contract** (`finish()` / `answerText()` / `assetLine()` in `web/lib/agent.ts`): no
+  invented coverage in any document line (#1, 2, 3, 12, 23, 31 were the 26 Sep cases). Uncarded
+  videos say "SAM has not read this one" (#34, #12).
+- **Filler and Hinglish stopwords** (`cards.ts`): "citrix battlecard for my own prep before the call
+  tmrw" returns the 2024 battlecards (#4).
+- **Entity coverage** (`coverEntities`): Proxmox gets its own result next to Nutanix (#21).
+- **`missing` for named entities:** APRA (#26), GITEX (#27), Bahasa (#17) and data residency (#19)
+  are honest gaps with the button.
+- **Pricing guard** (`isPriceList`, `priceReferences`, `NO_PRICING`): the calculator is "for your own
+  reference only, not a quote", with the sales-manager line (#6).
+- **Newly carded public documents:** the Digital Workspace Brochure V2 2026 answers the Hinglish ask
+  (#30), and the 2026 corporate brochures are the data-residency substitutes (#19).
+- **Newer editions pulled in** (`withSuccessors`): the Omnissa VVF Analysis (#16) and DaaS V4 2026
+  (#19, 30).
+- **Walk-back follow-ups** (`searchText`): the second follow-up (#3) now searches with the bank
+  question. The verdict still fails there (item 5 below).
+
+### What still fails, ranked by how often a rep would hit it
+
+**1. The prompt and the verdict guard contradict each other, so 25 of 35 verdicts are thrown away
+(every answer).**
+- **Repro:** any find ask, e.g. "manufacturing plant VDI case study".
+  - The model writes "The library includes relevant manufacturing VDI case studies and they can be
+    sent."
+  - Trace: `verdict guard: replaced :: says what a document covers ("includes")`.
+  - The rep sees "Best matches in the library:".
+- **Cause:** `SYSTEM` in `web/lib/agent.ts` (lines 42-43) asks for a verdict on "does the library
+  have what was asked for, how many picks, and can they be sent". The model answers with "The
+  library includes / contains / has a ...", and those words are in the `COVERAGE` regex
+  (`verdictProblem`, line 348). "sent" is not in `ANSWER_WORDS` (line 371), so "can be sent"
+  fails as an unknown word too (#4, 5, 15, 23, 28).
+- **Cost:**
+  - Most answers read flat.
+  - Good verdicts are lost: the SOC 2 denial (#14) and the GCC assumption the prompt itself asks for
+    (#10).
+- **Fix direction, either of:**
+  - Give the model a closed template ("Yes, N close matches." / "No exact <X>."), add "sent" to
+    `ANSWER_WORDS`, and drop the sendability question from the prompt. SAM already writes
+    visibility on every line.
+  - Or have SAM write the verdict itself from `missing`, the count and visibility.
+
+**2. The model says "can be sent / shared" regardless of visibility, and the guard misses
+"shared" and "sent" (at least 26 of the 35 model verdicts say it; one got through).**
+- **Repro:** "product video hysecure".
+  - **What came back:** "The library has internal product videos for HySecure; two can be shared."
+  - All three cards are internal only, and two are decks, not videos.
+- **Cause:** `SEND_WORDS` in `agent.ts` (line 656) is
+  `send(ing)?|shar(e|ing)|...`. It matches neither "shared" nor "sent", so `guardVerdict` doesn't
+  fire. `verdictProblem` passes the sentence because every word is in `ANSWER_WORDS` ("shared",
+  "internal", "videos", "product").
+- **Fix:** `send|sent|sending|shar(e|ed|es|ing)`. With that change, #12 gets the sending guard's
+  text.
+
+**3. A named product or topic that no shown card is about still gets no gap and no button (#15, 22,
+23, 7; about 1 in 7 asks).**
+- **Repro:** "remote browser isolation brochure".
+  - **What came back:** two corporate brochures, `missing` false. Neither is about browser
+    isolation, and the Virtual Browser whitepaper (2025) is never shown.
+- **Other repros:**
+  - "hyworks sizing for 500 concurrent users, server specs?": the Graphics Workstation deck passes
+    the `SPECS` "Sizing" check because it is about VDI.
+  - "hysecure datasheet specs - max concurrent users per appliance": the Ecom Express case study
+    satisfies "Concurrent users".
+- **Cause:** `asksAbout()` in `agent.ts` drops `OWN_PRODUCTS`, so a named Accops product (Browser
+  Isolation) is never checked with `isAbout()`. `typeMissing()` is satisfied because the brochures
+  are brochures. `hasEntity()` accepts any card that mentions a spec word.
+- **Fix direction:**
+  - When the rep names a product, and no shown card `isAbout` it while a result that is about it
+    exists, swap that result in.
+  - If none exists, set `missing`.
+- **#7:** when the ask is external and no shown card is public, `finish()` returns
+  `done(final, notes, shown, false)`. `missing` should be true there, so the request button shows.
+
+**4. A sendable public document is in the pool but isn't shown, and the answer says nothing can be
+sent (#31, #5).**
+- **Repro:** the Kerala hospital paragraph (#31).
+  - **What came back:** "None of these is published, so none can be sent outside Accops".
+  - **What exists:** the public *Zulekha Hospital* case study, returned by `/search "hospital case
+    study"` and pulled into the pool by `seedSearch`'s `pub` slot.
+  - **Cause:** `ensurePublished()` (agent.ts line 642) gates on
+    `heuristicFilters(question).audience === "external"`. That is "internal" because the ask
+    also says "my own", even though `EXTERNAL` matches "send the CIO". Gate it on
+    `EXTERNAL.test(question.toLowerCase())`, as `seedSearch` does.
+- **Repro:** "CISO at the bank asked ... what can i send him" (#5).
+  - **Cause:** `EXTERNAL` (line 101) lists them / customer / cio but not him or her, so the ask
+    reads as internal. The public RBI circular is never promoted, and the lines carry no "do not
+    send".
+  - **Fix:** add `him|her` to the object list.
+
+**5. On a follow-up, the named-entity check fires on the walked-back question (#2, #3).**
+- **Repro:** the bank question, then "anything newer?", then "shorter one? something 1-2 pages".
+  - **What came back:** both follow-ups get "No exact match for Citrix", with `missing` true and the
+    request button.
+  - **What should happen:** "these two (2026) are the newest" for the first, and the 2-page Private
+    Bank MFA-ZTNA case study (internal) or "no public 1-2 page one" for the second.
+- **Cause:** `finish()` gets `searchText()`'s joined question, so `coverEntities()` /
+  `asksAbout()` re-check Citrix, restricted to the Case Study type. On the first turn the model had
+  covered Citrix with the internal BFSI deck.
+- **Also:** the short results `seedSearch` puts first are not favoured when the model picks.
+- **Fix:** run the entity and type checks on the rep's current question. Use the joined text for
+  search only.
+
+**6. Off-topic filler in slots 2-3 (#8, 17, 20, 22, 27, 32, 34; about 1 in 5).**
+- **Examples:**
+  - A private-bank bootcamp for "pharma customer proof".
+  - BioAuth deployment decks above the HySecure architecture deck.
+  - The Japanese Nutanix .NEXT Tokyo deck in sizing, GITEX and demo-video answers.
+- **Cause:** on the non-denial path the model's picks are accepted with no relevance floor.
+  `substituteFits` is only used for denials. `withSuccessors()` can also swap a weak pick for its
+  successor, which is just as off-topic: for #17, the 2018 VMware brochure became the Migration
+  Strategy deck.
+- **Fix:** apply `substituteFits` (or `isAbout` for a named product) to the non-denial picks, and
+  back-fill from `hits`.
+
+**7. When an old edition and its successor are both shown, the old one can come first (#17).**
+- **What came back:** *DaaS Brochure (2025)*, internal, with "a newer edition exists - prefer that
+  one", is listed above the public *DaaS ... ZTNA and MFA Built In* (2026).
+- **Cause:** `withSuccessors()` (agent.ts line 394) only reorders when it adds the successor itself.
+  When both were already picked, the old one keeps its place.
+- **Fix:** move the successor ahead, or drop the superseded one.
+
+**8. The ISO 27001 certificate (#13): unchanged, your decision (see "Decision for you" below).**
+
+---
+
 # SAM salesperson re-test, 26 September 2026
 
 **For Siddharth.** The same 35 questions as the 25 Sep test, sent again to production
