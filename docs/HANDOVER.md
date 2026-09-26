@@ -5,6 +5,23 @@ The 25 September section below supersedes anything older it contradicts.
 
 ---
 
+## 26 September 2026: the whole library is carded
+
+| | |
+|---|---|
+| Cards | **311** in `sam_asset_cards` (batches 01-12 in `corpus/cards/`). Uncarded queue: **0**. All 876 SharePoint files are carded, archived, or deliberately excluded |
+| Corpus source | SharePoint Sales Collateral synced by OneDrive to `%USERPROFILE%\OneDrive - Accops Systems Private Limited\Company - Sales Collateral` (876 files, 13.9 GB). This bypasses the Graph Conditional Access block. Queue files are copied into `corpus/sharepoint/` and extracted with `prototype/extract_text.py`; the >50 MB decks extract fine (the size is images) |
+| Content requests | Live: substitutes when the exact thing is missing (`missing` separate from `zero`), an "Ask marketing to create this" button, `/requests` for reps, a Requests tab in `/admin` ranked by distinct reps, WhatsApp `REQUEST`, delivery notifications. Tables `sam_content_requests` + `sam_content_request_votes`. Nobody owns the queue in marketing yet |
+| New guards | "Internal only: do not send outside Accops" appended in code when an internal asset is recommended in sending language (`guardSending`). superseded_by filenames containing " - " no longer truncate (`supersedingFile`) |
+| Registry cleanup | Dead-folder rule now also catches `to_be_deleted` and the misspelled `_archieved` (48 rows). Gartner "Past Symposium Presentations" excluded from carding. Three files holding customer personal/production data archived and their cards removed |
+| Marketing report | `docs/CONTENT-GAPS-2026-09-25.md`: the missing content, plus everything carding found. **Urgent:** the CEO's personal identifiers are on a slide in customer and "sharable" partner decks; "public" partner editions contain the USD 500M ARR target, launch dates and partner tier thresholds; staff mobile numbers in event decks; customer production data in Sales Collateral |
+| Carding rule | Cards must never contain credentials, phone numbers, bank details, personal emails, customer IDs, usernames or IPs. One leak (NanoOS installer credentials) was found and scrubbed |
+| Sessions | This laptop crashed the Claude session several times while several agents ran. Run one heavy agent at a time and have agents commit every few cards |
+
+**Still needs Siddharth:** the ISO warning decision (SAM calls the expired 2013 certificate "suitable for RFP compliance"); `"mode": "report"` → `"write"` in the Power Automate flow "SAM - daily SharePoint snapshot" (the classifier blocks Claude from editing shared flows); a marketing owner for the content-request queue; the rep demo.
+
+---
+
 ## 25 September 2026: state after one long session
 
 Scope is fixed: SAM is Accops' sales & marketing brain. Siddharth said explicitly not to widen it to
