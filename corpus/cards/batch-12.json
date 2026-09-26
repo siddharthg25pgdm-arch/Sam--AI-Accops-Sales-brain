@@ -484,6 +484,145 @@
    "visibility": "internal",
    "internal_reason": "Speaker deck for a closed defence event with opinionated geopolitical content (named state actors, conflicts); no verified public URL.",
    "needs_human": "Two copies share this filename: Government Events (Aug 2026 re-save, 2 extra slides) and Industry Solutions/Defence (Dec 2025 original) - keep one. Delete one of the two About slides and settle the DSCI award year. Slide 50's geopolitical remarks (Israel-Hamas, China, Russia) should be reviewed before the deck is reused outside a defence forum."
+  },
+  {
+   "source": "sharepoint/Accops Nutanix .Next Tokyo 2026 - Japanese v4 with Videos.pptx",
+   "title": "Nutanix .NEXT Tokyo 2026 Session Deck in Japanese (v4 with Videos, Sep 2026): 'Securing End-User Computing in the AI Era' - AI-Exploit Threat, Isolation, APPI, Senior Workforce WFA, Photon, Drop-In VDI on AHV, Japanese Municipal and Kyoto University Cases",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Japanese public-sector stories: a core city of about 200,000 people (Accops Digital Workspace for 500 municipal staff, partly used for My Number systems), a town of 50,000+ (HySecure ZTNA for 300 municipal users), a leading Japanese national university (HyLabs); plus two anonymised large migrations (global L&D labs with 6,000+ concurrent users; 350,000 staff on customer-issued laptops)",
+   "client_actual": "Kyoto University (slide 38, described as Japan's 3rd largest national university); Haebaru Town named in the slide 48 case text; the 350,000-user private-app migration is the TCS story named in the v2 draft",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "Digital Workspace",
+    "VDI",
+    "Photon",
+    "HyLabs",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "BioAuth",
+    "Enterprise Browser",
+    "HyDesk",
+    "UEM",
+    "Remote Browser Isolation"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head",
+    "Local-government IT lead",
+    "Nutanix partner"
+   ],
+   "regulations": [
+    "APPI (Japan Act on the Protection of Personal Information)"
+   ],
+   "key_problem": "AI models now find and chain vulnerabilities faster than patching can keep up, so Japanese enterprises and municipalities need to isolate critical apps and validate every access, not just add endpoint tools.",
+   "key_outcomes": [
+    "Language: the whole deck is in Japanese (a machine-assisted translation of the 2026 English storyline); carded here in English",
+    "Threat opening (slides 2-9): AI vulnerability discovery (Claude Mythos preview: 27-year-old OpenBSD bug, 16-year-old FFmpeg bug, chained Linux privilege escalation), open-source exposure statistics (Black Duck 2025, Sonatype 2026, Chainguard 2024), application attack scenario, why patching/SSE/DLP fall short, 'isolate the crown jewels', where ZTNA/SSE/browser/IAM/VDI/UEM fit, vendor sprawl",
+    "Credentials (10-16): About slide (still '2023 & 2024 Gartner MQ'), HyDesk spec table (countries of origin UK/China/Thailand-Taiwan), JioPC 1.6 million users, 'two consecutive years in the Gartner MQ for DaaS 2025 | 2026', largest-customers slide (Japanese university listed as 'Japan's 3rd largest national university')",
+    "Japan-specific slides added in v4: APPI overview (2003 law, 2022 amendment, PPC regulator, five obligations, fines up to JPY 100 million) on slide 22; 'Work from anywhere for senior workers' - six needs and three employer actions on slide 23",
+    "VDI (24-38): VDI use cases incl. GPU developer workspaces, Digital Workspace on Nutanix/VMware/Azure/Proxmox/Hyper-V/Red Hat OpenShift/HPE VME ('sovereign VDI stack'), Accops Photon display protocol (H.264/H.265/AV1, works over 4G/5G and satellite), Nutanix alliance integrations (Files, Flow, FSLogix, vGPU, Shadow Clones, Prism), drop-in replacement of an ESXi VDI onto AHV, two large migration cases, the 200,000-city municipal VDI case, HyLabs and the Kyoto University case",
+    "Identity and ZTNA (39-51): identity-first statistics (Verizon DBIR 2025, Microsoft, IBM), 150+ apps and USD 250K/year lost to logins for 10,000 users, HyID six factors plus SSO for SAML, AD/LDAP and native apps, HySecure with quantum-safe encryption and QRNG, the 300-user town ZTNA case, enterprise browser, thin-client OS, UEM",
+    "Close (53-54): why Japanese customers choose Accops (closed/isolated environments, customisation, local partner support); contact for demo or free trial"
+   ],
+   "brief": "The latest (v4, last saved 1 September 2026) Japanese-language edition of Accops' session for Nutanix .NEXT Tokyo 2026, 'Securing End-User Computing in the AI Era'. It follows the mid-2026 AI-threat/isolation storyline but localises the proof: the v2 draft's Indian and Middle East case studies and 'Japanese customer case study' placeholders are replaced by two Japanese municipal cases, and it adds slides on Japan's APPI and on remote work for senior workers. Demo videos are embedded (slide 31 is a graphics demo placeholder).",
+   "use_for": "The current deck for a Japanese-speaking audience at a Nutanix event or a Japanese public-sector/education prospect: slide 22 (APPI summary), slide 36 and 48 (Japanese municipal VDI and ZTNA cases), slide 38 (Kyoto University HyLabs), slide 33 (drop-in replacement onto Nutanix AHV), slide 30 (Photon). For an English version use 'Accops-NutanixDotNext-When VDI Is Not Enough-V6' - the file named 'English v4' is blank.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "September 2026. About slide still says '2023 & 2024 Gartner MQ' next to the 2025|2026 slide; the Windows 10 EOL slide is past. The Japanese is machine-assisted in places (e.g. the About slide renders USD 110B revenue as a garbled yen-style figure, and the largest-customers slide mistranslates 'world's 2nd largest service provider'). Kyoto University is '3rd largest national university' here but '2nd' or '5th largest' in other decks.",
+   "superseded_by": "",
+   "confidence": 0.78,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Event deck naming a Japanese university and a municipality as customers and carrying install-base descriptors; no verified public URL or confirmation that the municipal cases are cleared for publication.",
+   "needs_human": "Get a native Japanese reviewer to check the machine-translated slides (About slide revenue figure, largest-customers slide). Confirm Haebaru Town (slide 48) and the 200,000-population city (slide 36) have agreed to be referenced. Pick one Kyoto University descriptor across all decks. The Japanese v2 draft is the earlier working copy of this deck."
+  },
+  {
+   "source": "sharepoint/Accops Nutanix .Next Tokyo 2026 - Japanese v2.pptx",
+   "title": "Nutanix .NEXT Tokyo 2026 Session Deck - Japanese Draft v2 (Aug 2026, Partly Translated): AI-Era EUC Security with Indian and Middle East Case Studies and 'Japanese Case Study' Placeholders",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Named-in-text case slides for a global IT services firm (350,000-user private-app access), India's largest private bank (biometric MFA for 90,000 staff) and a Kuwaiti airline (ZTNA + desktop logon); three slides titled 'Japanese customer case study' are empty placeholders",
+   "client_actual": "TCS (slide 37), Jazeera Airways (slide 54), Kyoto University (slides 16 and 40); the private bank is unnamed",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "Digital Workspace",
+    "VDI",
+    "Photon",
+    "HyLabs",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "BioAuth",
+    "Enterprise Browser",
+    "HyDesk",
+    "UEM",
+    "Spectra"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "CISO",
+    "IT head",
+    "Nutanix partner"
+   ],
+   "regulations": [
+    "APPI (Japan Act on the Protection of Personal Information)",
+    "RBI"
+   ],
+   "key_problem": "Same as the final Tokyo deck: AI-accelerated exploitation outpaces patching, so critical apps must be isolated and every access validated.",
+   "key_outcomes": [
+    "Language: mostly Japanese, with many slides still in English (e.g. slides 6-7, 18-19, 23-24, 31, 34-36) - a translation in progress",
+    "Same storyline as v4: AI-exploit threat, isolation, vendor sprawl, credentials, VDI and Photon, Nutanix integration and drop-in replacement, identity and ZTNA",
+    "Proof is Indian and Middle Eastern: TCS 350,000-user Linux-based VDI replacing a virtual-browser platform whose cost doubled, the largest private bank's biometric MFA (15+ apps in 15 minutes, MFA for 85 more apps), Jazeera Airways HySecure + HyID desktop logon",
+    "Placeholders: slides 38, 47 and 55 read only 'Japanese customer case study'; demo-video placeholders for SSO and 'Spectra'",
+    "Extra back slides dropped in v4: awards (62), technology partnerships incl. Nutanix, Microsoft, Supermicro, Red Hat, HPE, Dell, VMware/Broadcom and Proxmox via Indian distributors (63), MEA reference customers (64)"
+   ],
+   "brief": "A 64-slide working draft (last saved 23 August 2026) of the Japanese-language Nutanix .NEXT Tokyo 2026 session deck. It is partly translated, uses Indian and Middle Eastern customer stories, and has three empty 'Japanese customer case study' slots. The v4 'with Videos' edition saved on 1 September 2026 completes the translation, replaces the foreign cases with Japanese municipal cases and adds APPI and senior-workforce slides.",
+   "use_for": "Only as a source for the TCS, private-bank and Jazeera Airways case slides in Japanese, or the partner/awards back slides that v4 dropped. For presenting, use the v4 'with Videos' edition.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "Draft of August 2026, superseded within days by v4. Machine-assisted translation errors (e.g. the title slide renders 'Nutanix .NEXT' as a literal phrase, and 'Nutanix' is spelt two different ways in katakana).",
+   "superseded_by": "sharepoint/Accops Nutanix .Next Tokyo 2026 - Japanese v4 with Videos.pptx - the finished edition of the same deck, fully translated with Japanese case studies (1 Sep 2026)",
+   "confidence": 0.75,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Unfinished draft with placeholder slides and named customers; no verified public URL.",
+   "needs_human": "Earlier draft of 'Accops Nutanix .Next Tokyo 2026 - Japanese v4 with Videos'. Can it be archived? It names TCS and Jazeera Airways in the text - confirm they are cleared for a Japanese audience if any slide is reused."
+  },
+  {
+   "source": "sharepoint/Accops Nutanix .Next Tokyo 2026 - English v4.pptx",
+   "title": "Nutanix .NEXT Tokyo 2026 - 'English v4' (EMPTY FILE: one blank slide, no content)",
+   "asset_type": "Deck",
+   "industry": "",
+   "client": "",
+   "client_actual": "",
+   "client_named": false,
+   "products": [],
+   "competitors": [],
+   "personas": [],
+   "regulations": [],
+   "key_problem": "None - the file has no content.",
+   "key_outcomes": [
+    "The file (37 KB) contains a single slide with no text, created and saved within seconds on 27 August 2026",
+    "It is not an English version of the Tokyo deck despite its name"
+   ],
+   "brief": "An empty PowerPoint in the Nutanix event folder: one blank slide, created and last saved on 27 August 2026. The English content it was meant to hold does not exist in this file.",
+   "use_for": "Nothing. If someone asks for the English version of the Nutanix .NEXT Tokyo 2026 deck, point them to 'Accops-NutanixDotNext-When VDI Is Not Enough-V6' (the Chicago 2026 English session) or ask marketing for the English source of the Japanese v4 deck.",
+   "publish_year": "2026",
+   "expired": false,
+   "stale_risk": "Empty file.",
+   "superseded_by": "",
+   "confidence": 0.95,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Empty placeholder file.",
+   "needs_human": "Delete this file or replace it with the real English v4 deck; as it stands it misleads anyone looking for the English Tokyo deck."
   }
  ]
 }
