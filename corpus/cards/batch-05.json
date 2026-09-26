@@ -65,7 +65,8 @@
       "confidence": 0.94,
       "public_url": "",
       "visibility": "internal",
-      "internal_reason": "Proposed reference architecture for government security infrastructure. No public URL confirmed."
+      "internal_reason": "Proposed reference architecture for government security infrastructure. No public URL confirmed.",
+      "superseded_by": "public/Accops for Government 2026 V2.pdf - the same content, published on downloads.accops.com, so it can be sent. Prefer it."
     },
     {
       "source": "sharepoint/Accops Defence Brochure Nov 25 V4.pdf",
