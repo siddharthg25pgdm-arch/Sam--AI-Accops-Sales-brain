@@ -122,7 +122,6 @@ export function renderForWhatsApp(answer: string, assets: { title: string; link:
     const trust = a.trust ? `\n_${/^EXPIRED/.test(a.trust) ? "" : "Check first: "}${a.trust}_` : "";
     lines.push(`\n${i + 1}. *${a.title}*${a.year ? ` (${a.year})` : ""}\n${a.why}${trust}\n${where}`);
   });
-  if (ordered.length && ordered.every(a => a.visibility !== "public")) lines.push("\nNone of these has a public version yet. Find it in SharePoint and ask marketing to publish before sending anything to a customer.");
   if (gap) lines.push("\nLogged as a content gap. Reply *REQUEST* to ask marketing to create it (add a note after it, e.g. REQUEST for Axis Bank by Friday).");
   lines.push("\nReply with an industry, product or competitor to narrow it.");
   return lines.join("\n");
