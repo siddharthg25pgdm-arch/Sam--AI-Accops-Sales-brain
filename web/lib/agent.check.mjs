@@ -131,7 +131,7 @@ ok(!/^Pricing/.test((run([call({ query: "hydesk" }), say("- **Accops HyDesk Broc
 // over-rejects ("No pharma case study" over four pharma whitepapers).
 run([say("No media-industry ZTNA whitepaper is available.")]);
 r = await ask("do we have a media industry ZTNA whitepaper?");
-ok(r.missing && !r.zero && r.intent === "gap" && r.assets.length >= 1 && r.assets.length <= 2 && /^No media[^\n]*\nClosest in the library:\n- \*\*/.test(r.text),
+ok(r.missing && !r.zero && r.intent === "gap" && r.assets.length >= 1 && r.assets.length <= 2 && /^No media[^\n]*\nAll internal: don't send outside Accops\.\nClosest in the library:\n- \*\*/.test(r.text),
   `a denial naming nothing still shows up to 2 real substitutes: ${r.text} | ${r.assets.map(a => a.title)}`);
 // ...unless nothing clears the floor: then a plain gap, no cards contradicting the sentence.
 run([say("No Arabic collateral exists.")]);
@@ -229,7 +229,7 @@ run([say(`No Browser Isolation brochure exists yet.
 - **Social-Media-Banners Browser Isolation** - substitute: visuals`)]);
 r = await ask("remote browser isolation brochure");
 ok(!r.zero && r.missing && r.assets.length <= 2 && r.assets.some(a => /Browser Isolation eBook/.test(a.title)) && !r.assets.some(a => /Banners/.test(a.title))
-  && !/Banners/.test(r.text) && r.text.startsWith("No Browser Isolation brochure exists yet.\nClosest in the library:"), `junk named -> real substitutes instead: ${r.text} ${r.assets.map(a => a.title)}`);
+  && !/Banners/.test(r.text) && /^No Browser Isolation brochure exists yet\.\n[^\n]*(send|sent)[^\n]*\nClosest in the library:/.test(r.text), `junk named -> real substitutes instead: ${r.text} ${r.assets.map(a => a.title)}`);
 // 7c. The model says an eBook "fits" a brochure ask: not a denial, but the brochure is still missing.
 run([say(`One asset fits.
 - **Accops Browser Isolation eBook** - covers isolation`)]);
@@ -296,8 +296,8 @@ ok(!r.zero && r.assets[0]?.title === "Accops HyDesk Brochure V6 2026" && seedSaw
   const { pagesWanted } = await jiti.import("./agent.ts");
   ok(pagesWanted("shorter one? something 1-2 pages") === 2 && pagesWanted("one pager on HyID") === 1 && pagesWanted("citrix battlecard") === null, "page limits read from the ask");
 }
-// 8f. "public" only when sending outside.
-ok(/"public" or "published" in the verdict only if the rep is sending/.test(SYSTEM), "the prompt keeps visibility talk out of internal verdicts");
+// 8f. The model never talks about sending: SAM writes that line from the cards (27 Sep: 25 of 35 verdicts lost).
+ok(/SAM says which ones can be sent: never say whether anything can be sent/.test(SYSTEM) && !/can they be sent/.test(SYSTEM), "the prompt leaves sendability to SAM");
 
 // 9. The answer contract (26 Sep): the model picks result numbers and writes one verdict; SAM writes
 // every document line from the card. Invented coverage cannot reach the rep.
@@ -307,7 +307,7 @@ const pickSay = (verdict, ...titles) => (body) => ({ role: "assistant", content:
 {
   run([pickSay("One internal Citrix battlecard fits.", "Accops Powered VDI vs Citrix VDI")]);
   r = await ask("citrix comparison");
-  ok(r.text.startsWith("One internal Citrix battlecard fits.\n- **Accops Powered VDI vs Citrix VDI** (") && r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && !r.missing,
+  ok(r.text.startsWith("One internal Citrix battlecard fits.\nAll internal: don't send outside Accops.\n- **Accops Powered VDI vs Citrix VDI** (") && r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && !r.missing,
     `a picked result is rendered by SAM: ${r.text}`);
   ok(JSON.parse(bodies[0].messages.find(m => m.tool_call_id === "seed").content).results.every(x => Number.isInteger(x.n)), "every result the model sees carries its number");
   // Prose about a document never reaches the rep, even for a real, grounded title.
@@ -317,7 +317,7 @@ const pickSay = (verdict, ...titles) => (body) => ({ role: "assistant", content:
   // A verdict that says what a document covers, or attributes the rep's competitor to it, is replaced.
   run([pickSay("The HyDesk brochure shows how a bank replaced Citrix.", "Accops HyDesk Brochure V6 2026")]);
   r = await ask("hydesk brochure");
-  ok(/^Best matches in the library:/.test(r.text) && !/Citrix/.test(r.text) && traceHas(r, "verdict guard: replaced"), `coverage claim in the verdict is replaced: ${r.text}`);
+  ok(/^Best matches in the library\./.test(r.text) && !/Citrix/.test(r.text) && traceHas(r, "verdict guard: replaced"), `coverage claim in the verdict is replaced: ${r.text}`);
   const { verdictProblem } = await jiti.import("./agent.ts");
   const card = { asset: { title: "Two Leading Indian Private Banks", asset_type: "Case Study", industry: "BFSI", client: "", products: [], key_problem: "", key_outcomes: ["MFA for 60,000 users"],
     brief: "Two private banks secured remote access with MFA.", use_for: "", section: "", file: { path: "x.pdf", year: "2026" }, public_url: "u" }, score: 1, why: "" };
@@ -335,7 +335,7 @@ const pickSay = (verdict, ...titles) => (body) => ({ role: "assistant", content:
 // 9b. A named entity no shown card mentions -> missing, honestly worded, with the request button (#26).
 run([pickSay("The HySecure datasheet can be framed to meet APRA CPS 234.", "Accops HyID Datasheet 2026")]);
 r = await ask("australian gov / APRA CPS 234 angle for hysecure - anything?");
-ok(r.missing && !r.zero && r.intent === "gap" && /^No exact match for APRA or Australia: none of the closest documents mentions them\.\nClosest in the library:/.test(r.text) && !/framed/.test(r.text),
+ok(r.missing && !r.zero && r.intent === "gap" && /^No exact match for APRA or Australia: none of the closest documents mentions them\.\nAll internal[^\n]*\nClosest in the library:/.test(r.text) && !/framed/.test(r.text),
   `APRA on no card -> missing: ${r.text} | ${r.missing}`);
 // 9c. Two entities: the model picks only the Nutanix guide, SAM adds the Proxmox brochure (#21).
 run([pickSay("HyWorks has integration material for both.", "Accops HyWorks and Nutanix AHV Integration Guide")]);
@@ -344,7 +344,9 @@ ok(r.assets.some(a => /Proxmox/.test(a.title)) && r.assets.some(a => /Nutanix/.t
 // 9d. The sending guard reads the verdict (#5): "Send the ... (internal)" is replaced, not appended to.
 run([pickSay("Send the RBI-focused solution document to the CISO.", "Accops RBI Guidelines Solution Document")]);
 r = await ask("CISO at the bank asked how we help with RBI guidelines, what can i send him");
-ok(/^None of these is published, so none can be sent outside Accops/.test(r.text) && traceHas(r, "sending language"), `verdict sending guard: ${r.text}`);
+// "send him" is sending (27 Sep #5), so the public bank case study is added and SAM's line says which can go.
+ok(/^1 of 2 can be sent to a customer; the rest are internal only\./.test(r.text) && !/Send the/.test(r.text) && /RBI Guidelines Solution Document\*\* \([^)]*do not send outside Accops/.test(r.text)
+  && traceHas(r, "sending language"), `verdict sending guard: ${r.text}`);
 // 9e. Pricing: a pricing calculator is never a quote (#6). NO_PRICING, the calculator as a labelled reference.
 run([pickSay("The pricing calculator can be adapted for a 2,000-user quote.", "Accops DaaS Pricing Calculator v2.3 May 2021")]);
 r = await ask("whats the pricing for 2000 users hyworks, customer comparing with citrix quote");
@@ -368,6 +370,56 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   run([say("No exact 1-2 page case study.")]);
   r = await ask("shorter one? something 1-2 pages", [{ role: "user", content: bank }, { role: "assistant", content: "..." }, { role: "user", content: "anything newer?" }, { role: "assistant", content: "..." }]);
   ok(seedSaw("Private Bank MFAZTNA"), "the 2nd follow-up finds the 2-page Private Bank MFA-ZTNA case study");
+}
+
+// 10. The verdict contract (27 Sep: the guard replaced 18 of 35 verdicts, most of them fine). Typical
+// good verdicts - "have we got it / what's closest", about the LIBRARY - must reach the rep.
+{
+  const { verdictProblem, dropSending, sendLine } = await jiti.import("./agent.ts");
+  const c = (title, o = {}) => ({ asset: { title, asset_type: o.type ?? "Case Study", industry: o.industry ?? "", client: "", products: o.products ?? [], key_problem: "", key_outcomes: [],
+    brief: o.brief ?? "", use_for: "", section: "", file: { path: `${title}${o.ext ?? ".pdf"}`, year: o.year ?? null }, public_url: o.pub ? "https://downloads.accops.com/x.pdf" : null }, score: 1, why: "" });
+  const cx1 = c("Accops Powered VDI vs Citrix VDI", { type: "Battlecard", year: "2024" }), cx2 = c("Accops Powered VDI vs Citrix VDI (short)", { type: "Battlecard", year: "2024" });
+  const bank1 = c("Two Leading Indian Private Banks", { industry: "BFSI", year: "2026", pub: 1 }), bank2 = c("Top-5 Indian Private Bank", { industry: "BFSI", year: "2026", pub: 1 });
+  const pharmacy = c("Accops City Pharmacy Case Study", { industry: "Pharma", pub: 1 });
+  const textile = c("A Leading Textile Manufacturer Case Study", { industry: "Manufacturing", brief: "VDI and secure access at a textile plant.", pub: 1 });
+  const hyid = c("Accops HyID Datasheet", { type: "Datasheet", year: "2026" });
+  const mirox = c("Auditor Letter on SOC 1 / SOC 2 Applicability (Mirox, 2022)", { type: "Certification", year: "2022" });
+  const z1 = c("HySecure ZTNA Gateway Deck", { type: "Deck" }), z2 = c("ZTNA for IT Services", { type: "Deck" });
+  const forti = c("Secure Access with Zero Trust vs Fortinet", { type: "Deck", year: "2022" });
+  const v1 = c("Geofencing control", { type: "Video", ext: ".mp4" }), v2 = c("Device posture check", { type: "Video", ext: ".mp4" });
+  const good = [
+    ["The library has two internal 2024 Citrix battlecards.", [cx1, cx2], "citrix battlecard for my own prep", false],
+    ["No telecom case study; closest are two BFSI ones.", [bank1, bank2], "telecom case study", true],
+    ["The library includes a public pharmacy case study.", [pharmacy], "pharma case study", false],
+    ["Yes, one close match for manufacturing VDI.", [textile], "manufacturing plant VDI case study", false],
+    ["The library has the 2026 HyID datasheet.", [hyid], "one pager on HyID", false],
+    ["The library has a related auditor letter, but no SOC 2 Type 2 report.", [mirox], "SOC 2 type 2 report", false],
+    ["Assuming GCC means a global capability centre, the library has two ZTNA decks.", [z1, z2], "ZTNA pitch for a GCC", false],
+    ["The library contains a 2022 Fortinet comparison deck.", [forti], "fortinet vpn replacement pitch", false],
+    ["The library has two HySecure demo videos.", [v1, v2], "hysecure demo video", false],
+    ["These are the newest BFSI case studies in the library.", [bank1, bank2], "anything newer?", false],
+    ["Two close matches, both BFSI case studies from 2026.", [bank1, bank2], "bfsi case study", false],
+    ["No exact Browser Isolation brochure; the closest are two ZTNA decks.", [z1, z2], "remote browser isolation brochure", true],
+  ];
+  const passed = good.filter(([v, shown, q, d]) => verdictProblem(v, shown, q, d) === null);
+  console.log(`agent.check: ${passed.length} of ${good.length} typical good verdicts pass the verdict guard`);
+  for (const [v, shown, q, d] of good) ok(verdictProblem(v, shown, q, d) === null, `good verdict rejected: "${v}" -> ${verdictProblem(v, shown, q, d)}`);
+  // ...while the risky kinds are still caught.
+  for (const [v, shown, q] of [["The deck covers a Citrix migration.", [bank1], "q"], ["The HyID datasheet includes max concurrent users.", [hyid], "q"],
+    ["The library has a case study of a bank that replaced Citrix.", [bank1], "bank moving off citrix"], ["Assuming it means Okta, the library has two decks.", [z1], "zscaler pitch"],
+    ["The library has two public Citrix battlecards.", [cx1, cx2], "citrix battlecard"]])
+    ok(verdictProblem(v, shown, q, false) !== null, `risky verdict passed: "${v}"`);
+  // 11. Sending talk is SAM's, not the model's: every word form is dropped from the verdict (27 Sep #12 "shared").
+  ok(dropSending("The library has internal product videos for HySecure; two can be shared.") === "The library has internal product videos for HySecure.", "'shared' clause dropped");
+  ok(dropSending("The library includes relevant manufacturing VDI case studies and they can be sent.") === "The library includes relevant manufacturing VDI case studies.", "'sent' clause dropped");
+  ok(dropSending("Send the RBI-focused solution document to the CISO.") === "" && dropSending("The library has two decks.") === "The library has two decks.", "all-sending -> empty; no sending -> unchanged");
+  ok(dropSending("Two can be emailed: the library has two HyID datasheets.") === "The library has two HyID datasheets.", "a leading sending clause goes with its separator");
+  ok(sendLine([bank1, bank2], false) === "All 2 are public, so they can be sent to a customer." && sendLine([bank1, cx1, cx2], true) === "1 of 3 can be sent to a customer; the rest are internal only."
+    && sendLine([cx1], false) === "All internal: don't send outside Accops." && /^None of these is published/.test(sendLine([cx1], true)), "sendability is computed from visibility");
+  // Rendered: the model's "two can be shared" about internal documents never reaches the rep.
+  run([pickSay("The library has internal product videos for HySecure; two can be shared.", "Geofencing control", "Device posture check and related data on management console")]);
+  r = await ask("product video hysecure");
+  ok(/^The library has internal product videos for HySecure\.\nAll internal: don't send outside Accops\.\n- \*\*/.test(r.text) && !/shared/.test(r.text), `verdict kept, sending line is SAM's: ${r.text}`);
 }
 
 // 6. Cold start: apiSearch waits for the registry instead of ranking the frozen cards alone.
