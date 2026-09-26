@@ -1792,6 +1792,147 @@
    "visibility": "internal",
    "internal_reason": "Internal SharePoint sharing link; the video's content and audience rights are not recorded.",
    "needs_human": "Check the link still works, confirm the webinar's topic and speakers, and decide whether the recording can be published (e.g. on YouTube) so SAM can offer a shareable URL."
+  },
+  {
+   "source": "sharepoint/Cisco+accops_Joint Presentation_Customer_28May2020-v2.0.pptx",
+   "title": "'Work From Anywhere - Powered by Cisco & Accops' - Joint Customer Presentation v2.0 (28 May 2020): COVID-Era WFH Case, VPN vs VDI, Accops Zero Trust Access, VDI on Cisco HyperFlex, 3-Year Bundle Options - Contains Staff Contact Tables",
+   "asset_type": "Deck",
+   "industry": "Cross-industry",
+   "client": "Generic joint pitch; reference-customer logo slide only",
+   "client_actual": "",
+   "client_named": false,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "HyID",
+    "MFA",
+    "HyDesk",
+    "Thin Clients"
+   ],
+   "competitors": [],
+   "personas": [
+    "CIO",
+    "IT head",
+    "Head of Infrastructure"
+   ],
+   "regulations": [
+    "RBI"
+   ],
+   "key_problem": "The 2020 lockdown forced business-continuity work from home; VPNs extend the office network to insecure home PCs, while VDI needs a data-centre platform that is simple to buy, scale and support.",
+   "key_outcomes": [
+    "WFH framing (slides 2-6): WHO pandemic declaration, WFH as the new normal, IT's security/operations/systems-management pressure, business-continuity challenges",
+    "VPN vs VDI (7-12): traditional vs virtual desktop architecture and a requirements table showing what VDI covers that VPN does not (unpatched devices, no copy/print, low bandwidth, alternate devices, non-Windows devices, auditing and recording)",
+    "Accops (13-18): zero-trust access model, 'PC to VDI to simpler VDI' with Cisco-managed infrastructure (one partner, one support, one cost), HyDesk endpoints, 2020 company slide (600+ customers, 100+ partners, 500,000+ active users, 'RBI & GeM recommended vendor for WFH')",
+    "Cisco HyperFlex (19-28): HCI as the VDI platform - scale-out compute and storage, performance report, resilience, single support, Intersight management, deduplication/compression, investment protection, why HyperFlex for VDI",
+    "Offer (29-30): 3-year bundles - 300-user starter and 100-user add-ons (per-VM sizing, 3-node HX with N+1), with five scopes from DC infrastructure only up to infrastructure + VDI broker + Microsoft + thin clients + backup",
+    "Slides 31-32: Cisco data-centre team and Accops team tables with names, regions, email IDs and mobile-number columns"
+   ],
+   "brief": "A 33-slide joint Cisco and Accops customer presentation from May 2020, pitching Accops VDI and zero-trust access on Cisco HyperFlex hyperconverged infrastructure as a packaged business-continuity/WFH offer with 3-year bundles. It ends with Cisco and Accops contact tables listing named staff.",
+   "use_for": "Historical reference only: how Accops was bundled with Cisco HCI during 2020 WFH demand. Cisco HyperFlex has been discontinued, so the joint offer cannot be sold; the VPN-vs-VDI table (slide 11) is still a usable argument.",
+   "publish_year": "2020",
+   "expired": true,
+   "stale_risk": "May 2020. Cisco HyperFlex has been end-of-lifed, so the bundle is no longer available; company figures, team names and COVID framing are all dated.",
+   "superseded_by": "",
+   "confidence": 0.82,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Joint partner deck with named Cisco and Accops staff contact details (emails, mobile-number column) and a discontinued partner product.",
+   "needs_human": "Slides 31-32 list Cisco and Accops staff with work emails and a mobile-number column - remove before any reuse. Recommend archiving the deck: HyperFlex is discontinued and the bundle offer is dead."
+  },
+  {
+   "source": "sharepoint/VDI Solution - Hybrid Cloud Architecture.pptx",
+   "title": "VDI Solution - Hybrid Cloud Architecture for a Customer-Experience BPO (Jun 2020): Cisco ACI/HyperFlex/Intersight plus Accops HyWorks and Access Gateways across On-Prem, Azure and AWS, Multi-Region VDI Edge Design",
+   "asset_type": "Proposal",
+   "industry": "BPM / BPO",
+   "client": "A global customer-experience BPO with users in India, the Philippines and Dubai",
+   "client_actual": "24]7.ai (named as '24[7]' in the slide titles)",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "VDI",
+    "HySecure",
+    "ZTNA",
+    "DaaS"
+   ],
+   "competitors": [],
+   "personas": [
+    "Head of Infrastructure",
+    "IT head",
+    "Solution architect"
+   ],
+   "regulations": [],
+   "key_problem": "A BPO sending agents home in 2020 needed VDI that could run across its own data centres and public clouds, with users in several countries routed to the nearest site.",
+   "key_outcomes": [
+    "Hybrid-cloud model (slides 2-4): Cisco ACI Anywhere networking, HyperFlex on-prem with Intersight, multicloud management across VMware, Azure, AWS and GCP, Cisco Umbrella and AMP for endpoints, CWOM and CloudCenter",
+    "Accops layer (slide 5): HyWorks managing on-prem, Azure and AWS VDI with Accops access gateways and GSLB sending WFH users to the nearest site",
+    "Accops 'WaaS' / cloud workspace (slide 6): virtual apps, shared hosted desktops and dedicated desktops (Windows and Linux) on Azure, VMware, Hyper-V or Nutanix with central gold-master management",
+    "VDI edge architecture (slide 7): Azure India, Singapore and Dubai vNets connected by site-to-site VPN and ExpressRoute, HySecure gateways, serving India, Philippines and Dubai users"
+   ],
+   "brief": "An 8-slide architecture proposal (created 1 June 2020, last saved 3 June 2020) in the Cisco technical-solutions folder, prepared for a customer-experience BPO: Cisco provides the hybrid-cloud network, HCI and multicloud management; Accops provides VDI management and access gateways across on-prem, Azure and AWS, with a multi-region Azure edge design for users in India, the Philippines and Dubai.",
+   "use_for": "Reference architecture for a multi-region or hybrid-cloud VDI design (slides 5 and 7 show GSLB across on-prem/Azure/AWS and a multi-country Azure edge layout). The Cisco HyperFlex parts are obsolete.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "June 2020. Cisco HyperFlex, CWOM and CloudCenter have been discontinued or renamed; 'WaaS'/cloud workspace is an old product label; Windows 8 is listed.",
+   "superseded_by": "",
+   "confidence": 0.75,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Customer-specific architecture proposal naming the customer.",
+   "needs_human": "Did this proposal turn into a deal? If so, a 24]7.ai case study (multi-country BPO VDI) would fill a gap; otherwise archive with the other Cisco HyperFlex material."
+  },
+  {
+   "source": "sharepoint/Accops VDI for Graphics Workstation-v3 -Internal-Training.pptx",
+   "title": "Accops VDI for Graphics Workstations v3 - Internal Training Edition (PPTX, last saved Apr 2023): User Profiles and VDI Fitment, Physical vs Virtual Workstation Options, Turbo and PCoIP, POC How-To, BoQs, Infra Sizing, Reporting Screens, Reference Customers",
+   "asset_type": "Deck",
+   "industry": "Manufacturing",
+   "client": "Reference slide: a customer running 25 concurrent graphics users plus successful POCs at an automotive OEM, an industrial-automation company and a government atomic-research centre",
+   "client_actual": "vGuard (25 concurrent users), Daimler, Emerson and IGCAR (POCs) on slide 2; Kyoto University and other Japanese customers on the global-customers slide",
+   "client_named": true,
+   "products": [
+    "HyWorks",
+    "Digital Workspace",
+    "VDI",
+    "HySecure",
+    "Turbo",
+    "PCoIP",
+    "HyID",
+    "MFA",
+    "Reporting Server",
+    "Thin Clients"
+   ],
+   "competitors": [
+    "Citrix",
+    "VMware",
+    "Teradici"
+   ],
+   "personas": [
+    "Presales engineer",
+    "Sales rep",
+    "Partner presales"
+   ],
+   "regulations": [],
+   "key_problem": "Engineering, oil and gas, automotive and media teams need to use heavy 3D/2D graphics applications from home without copying design IP out of the workstation.",
+   "key_outcomes": [
+    "Qualification (slides 2-6): reference customer and POCs; user profiles and applications (AutoCAD, CATIA, Matlab, Petrel, Eclipse, DecisionSpace, Siemens NX, Solidworks, Blender; GPU-compute/AI workloads excluded); VDI fitment by profile (3D creators expect 100% of workstation experience, consumers ~80%); business requirements with IP protection at 80% weight; typical workstation spec",
+    "Solution (7-15): two options - remote access to existing physical workstations or virtual GPU workstations; WFH drivers; key features and data controls; comparison vs VPNs and other VDI (device restriction, credential sharing, MFA factors, BYOD, productivity reports); user workflow and end-user device guidance",
+    "Technology (16-23): Turbo performance, protocol options (RemoteFX-based vs Teradici PCoIP add-on), PCoIP text clarity and colour accuracy, 'PCoIP only for personal VDI'",
+    "Internal how-to (24-29): how to run a POC (customer GPU hardware and vGPU licence; Accops holds a small pool of PCoIP evaluation licences renewed yearly via sales ops), sample BoQs for physical-workstation access and virtual workstations, HySecure/HyWorks VM sizing for 100 and 500 users",
+    "Governance screens (30-39): access modes, load statistics, productivity data, usage overview, geo-location alerts, impossible-travel logs, user summary dashboard",
+    "Appendix (40-54): company slides (500+ customers, 400,000+ users - 2020 figures), zero-trust model, product suite, reference customers, cloud and DC POC architectures, cost comparison vs Citrix + separate VPN/MFA/DLP vendors, licensing note (no extra Microsoft licence for a primary user reaching their own licensed workstation - check with Microsoft)"
+   ],
+   "brief": "The 54-slide internal-training PowerPoint behind the 'Accops VDI for Graphics Workstation-v3' PDF (created January 2019, last saved April 2023, marked ACCOPS CONFIDENTIAL). Beyond the customer-facing v3 content (two options, protocols, architecture, BoQ), it adds a named reference-customer slide, user-profile fitment guidance, POC instructions, VM sizing, reporting screenshots and cost-comparison slides meant for training presales staff.",
+   "use_for": "Training presales on graphics-workstation deals and qualifying one: slide 3-4 (which users and apps fit VDI and what experience to promise), slide 24 (how to run a GPU/PCoIP POC), slide 29 (infra VM sizing), slides 27-28 (BoQ templates). For 2026 GPU pitches pair it with the Photon protocol and 'DaaS for GPU workloads' slides in the Aug 2026 VDI deck.",
+   "publish_year": "2020",
+   "expired": false,
+   "stale_risk": "Content is 2020 (COVID WFH framing, 2020 company figures); last saved April 2023. Accops Photon (2026) now replaces PCoIP as the recommended high-graphics protocol in newer decks, and Teradici is now part of HP (Anyware).",
+   "superseded_by": "",
+   "confidence": 0.8,
+   "public_url": "",
+   "visibility": "internal",
+   "internal_reason": "Marked ACCOPS CONFIDENTIAL; internal training content with POC licence practice, named customers and POC prospects.",
+   "needs_human": "Internal-training companion of 'Accops VDI for Graphics Workstation-v3.pdf' (the customer-facing v3). Update for Photon, current company figures and HP Anyware (ex-Teradici) naming. Confirm vGuard, Daimler, Emerson and IGCAR may be named even internally as references."
   }
  ]
 }
