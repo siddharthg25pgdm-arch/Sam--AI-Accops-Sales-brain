@@ -5,6 +5,19 @@ The 25 September section below supersedes anything older it contradicts.
 
 ---
 
+## 28 September 2026: answer quality, and ready for the rep demo
+
+| | |
+|---|---|
+| Salesperson test (35 realistic questions, strict rubric) | 25 Sep 11 happy → 26 Sep 11 → 27 Sep 16 → 27 Sep #2 21 → **28 Sep #3: 19 happy / 12 honest gaps / 4 unsatisfying / 0 false gaps** (31 of #3's answers came from the 20b fallback because 120b's daily limit ran out). Full history: `docs/PERSONA-RETEST-2026-09-26.md` |
+| Answer contract | The model returns one verdict sentence + `PICKS: n, n`. SAM writes every document line from the card (title, year, visibility, card text, trust note) and a sendability line from visibility (`sendLine`). `verdictProblem()` replaces a risky verdict with "Best matches in the library." (3 of 35 in run #3). Invented coverage claims in document lines: structurally impossible |
+| Guards | `ensurePublished` (sending asks get a relevant public doc first), `dropSending` (model never claims sendability), `namedFirst` (no-exact substitutes lead with the named product/type), entity coverage by title/filename/client/industry, newer edition first, pricing only from a current price list |
+| Demo | `docs/DEMO-SCRIPT.md` rewritten 28 Sep: 7 beats, every question verified in production, a pre-demo checklist, questions to avoid, follow-up questions for reps |
+| Known remaining | A competitor mentioned as background ("moving off citrix") can become a required entity on the 20b model; `dropSending` sometimes cuts a useful clause; weak substitutes on some honest gaps (data residency, GCC, SEA); Groq 120b daily token limit (200k) is exhausted by a full test run |
+| Checks | `node web/lib/{agent,cards,metrics,snapshot,requests}.check.mjs` — agent 183 assertions. Offline replay harness: `research/replay.mjs` (gitignored) reproduces production answers from dumped cards + traces |
+
+---
+
 ## 26 September 2026: the whole library is carded
 
 | | |
