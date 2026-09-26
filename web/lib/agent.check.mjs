@@ -141,6 +141,12 @@ run([say("No media-industry ZTNA whitepaper is available.")]);
 r = await ask("do we have a media industry ZTNA whitepaper?");
 ok(r.missing && !r.zero && r.intent === "gap" && r.assets.length >= 1 && r.assets.length <= 2 && /^No media[^\n]*\nAll internal: don't send outside Accops\.\nClosest in the library:\n- \*\*/.test(r.text),
   `a denial naming nothing still shows up to 2 real substitutes: ${r.text} | ${r.assets.map(a => a.title)}`);
+// 28 Sep: "The library has no ..." / "We have no ..." are denials too (they got no request button).
+for (const v of ["The library has no media-industry ZTNA whitepaper.", "We have no media-industry ZTNA whitepaper.", "There's no media-industry ZTNA whitepaper."]) {
+  run([say(v)]);
+  r = await ask("do we have a media industry ZTNA whitepaper?");
+  ok(r.missing && r.intent === "gap", `"${v}" counts as a denial (request button): missing=${r.missing}`);
+}
 // ...unless nothing clears the floor: then a plain gap, no cards contradicting the sentence.
 run([say("No Arabic collateral exists.")]);
 r = await ask("arabic collateral");

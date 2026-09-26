@@ -247,7 +247,7 @@ export function namesAsset(name: string, a: Asset): boolean {
 }
 
 /** An answer whose verdict is "we don't have it". Only acted on when it also names no document. */
-const DENIAL = /^\W*(no\b|none\b|nothing\b|there (is|are) no\b|we (do not|don['’]t) have\b|sam (does not|doesn['’]t) have\b|the library (does not|doesn['’]t) have\b|i (could not|couldn['’]t) find\b|unfortunately\b)/i;
+const DENIAL = /^\W*(no\b|none\b|nothing\b|there (is|are) no\b|we (do not|don['’]t) have\b|sam (does not|doesn['’]t) have\b|the library (does not|doesn['’]t) have\b|(the library|we|sam) (has|have) no\b|there['’]s no\b|i (could not|couldn['’]t) find\b|unfortunately\b)/i;
 const GAP_TEXT = "Nothing in the library matches that, and it has been logged as a content gap. Try a broader industry or product, or browse the catalogue.";
 // "what does hyworks cost", "pricing for HyWorks" - not "cost savings case study".
 // Only a request for ACCOPS pricing: "a customer moving after Broadcom's price hike" is deal context,
