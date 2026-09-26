@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
+import { searchAssets, BROCHURE_MISSPELT, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured, compatModels } from "./agent-openai";
 import { providerFailure, type AskError } from "./events";
 
@@ -97,7 +97,7 @@ export function toolPayload(hits: SearchHit[], note: string | null = null) {
 }
 
 // "public sector" is a vertical, not a request to send something outside Accops.
-const EXTERNAL = /\b(send|sending|email|mail|share|forward|give|hand)\b[^.?!]{0,40}\b(customer|client|prospect|buyer|cio|ciso|cto|them|outside)\b|\bfor (a|the|my|our) (customer|client|prospect)\b|customer-facing|client-facing|\bpublic\b(?! sector)|\bexternal(ly)?\b|\bsend to\b|\bshare with\b|\bforward\b/;
+const EXTERNAL = /\b(send|sending|email|mail|share|forward|give|hand|bhej\w*)\b[^.?!]{0,40}\b(customer|client|prospect|buyer|cio|ciso|cto|them|outside)\b|\b(customer|client|prospect|cio|ciso)\s+(ko|ke liye)\b|\bfor (a|the|my|our) (customer|client|prospect)\b|customer-facing|client-facing|\bpublic\b(?! sector)|\bexternal(ly)?\b|\bsend to\b|\bshare with\b|\bforward\b/;
 
 /** Heuristic slot extraction used by the local fallback, and the ONLY source of `audience` for the
  *  models too. Left to the model, the first search was external almost every time - "which deck has
@@ -139,7 +139,7 @@ const TYPE_WORDS: [string, RegExp][] = [
   ["Whitepaper", /white ?paper|e-?book|thought leadership|\bpov\b/],
   ["Battlecard", /battle ?card|competitive|comparison|compare|\bvs\.?\b|versus/],
   ["Deck", /\bdecks?\b|presentation|\bslides?\b|\bppt/],
-  ["Brochure", /brochure|data ?sheet|leaflet|flyer|one[- ]?pager/],
+  ["Brochure", new RegExp(`${BROCHURE_MISSPELT.source}|data ?sheet|leaflet|flyer|one[- ]?pager`)], // "brocher", "brouchure" too
   ["Video", /\bvideos?\b|\brecordings?\b/],
 ];
 export function typesNamedIn(q: string): string[] {
@@ -344,17 +344,23 @@ export function seedSearch(question: string): SearchRun | null {
   // A type the rep named is a filter too (runSearch drops it again if it finds nothing).
   const asset_type = f.asset_type || typesNamedIn(question)[0] || "";
   const a = runSearch({ query: question, asset_type, vertical: f.vertical, product: f.product }, question);
-  if (!f.vertical && !f.product) return a;
-  // Industry and product tags are keyword guesses, and a mis-tagged asset is invisible to a filtered
-  // search: City Pharmacy is filed under E-commerce / Retail, so "pharma customer proof" never saw it;
-  // HySecure demo videos carry no product tag. So the words alone run too, and fill the list.
-  const b = runSearch({ query: question, asset_type }, question);
+  if (!f.vertical && !f.product && !asset_type && f.audience === "internal") return a;
+  // Every filter here is a preference, not a wall. Industry and product tags are keyword guesses, and
+  // a mis-tagged asset is invisible to a filtered search: City Pharmacy is filed under E-commerce /
+  // Retail, so "pharma customer proof" never saw it; HySecure demo videos carry no product tag. A
+  // named type hid the Virtual Browser whitepaper and eBook from "remote browser isolation brochure"
+  // behind three weak brochures, and "send the customer a hyworks brochure" searched public-only and
+  // found one HySecure datasheet that mentions HyWorks in passing. So the words also run with the
+  // type kept, and with nothing at all, and fill the list after the filtered top three.
+  const b = f.vertical || f.product ? runSearch({ query: question, asset_type }, question).hits : [];
+  const c = searchAssets({ query: question, limit: SEARCH_LIMIT }).results;
   const seen = new Set<string>(), hits: SearchHit[] = [];
-  for (const h of [...a.hits.slice(0, 3), ...b.hits, ...a.hits.slice(3)]) {
+  for (const h of [...a.hits.slice(0, 3), ...[...b, ...c, ...a.hits.slice(3)].sort((x, y) => y.score - x.score)]) {
     const k = assetKey(h.asset);
     if (!seen.has(k) && hits.length < SEARCH_LIMIT + 1) { seen.add(k); hits.push(h); }
   }
-  const note = [a.note, b.hits.some(h => !a.hits.some(x => assetKey(x.asset) === assetKey(h.asset))) ? "some results matched the words without the industry/product filter" : null].filter(Boolean).join("; ") || null;
+  const extra = hits.some(h => !a.hits.some(x => assetKey(x.asset) === assetKey(h.asset)));
+  const note = [a.note, extra ? "results after the first three are not filtered by type, industry, product or audience" : null].filter(Boolean).join("; ") || null;
   return { hits, considered: a.considered, input: a.input, note, payload: toolPayload(hits, note) };
 }
 
