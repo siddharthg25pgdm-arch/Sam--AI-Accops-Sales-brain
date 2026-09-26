@@ -288,7 +288,7 @@ const STOP = new Set(["the", "for", "and", "with", "need", "want", "any", "have"
   // Conversational filler. "citrix battlecard for my own prep before the call tmrw" ranked on "own"
   // and "before" and dropped both 2024 Citrix battlecards. Audience detection reads the raw question,
   // so "share"/"email" still mark an ask external.
-  "own", "before", "after", "call", "calls", "meeting", "tmrw", "tomorrow", "today", "tonight", "asap", "urgent", "urgently", "quick", "quickly",
+  "page", "pages", "pager", "own", "before", "after", "call", "calls", "meeting", "tmrw", "tomorrow", "today", "tonight", "asap", "urgent", "urgently", "quick", "quickly",
   "prep", "prepare", "preparing", "share", "sharing", "email", "mail", "forward", "whats", "how", "when", "where", "who",
   "are", "was", "were", "will", "would", "could", "should", "has", "had", "got", "get", "just", "also", "really", "maybe", "know", "tell",
   "them", "him", "her", "his", "they", "their", "there", "into", "over", "moving", "off", "going", "like",

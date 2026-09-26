@@ -273,6 +273,14 @@ ok(searchText("citrix battlecard", hist) === "citrix battlecard" && searchText("
 run([say("- **Accops HyDesk Brochure V6 2026** - the current edition")]);
 r = await ask("anything newer?", hist);
 ok(!r.zero && r.assets[0]?.title === "Accops HyDesk Brochure V6 2026" && seedSaw("HyDesk"), `follow-up answered: ${r.text} | ${r.assets.map(a => a.title)}`);
+// 8e'. A second follow-up in a row walks back to the last question with a topic (26 Sep #3).
+{
+  const bank = "pvt bank in mumbai moving off citrix, need a bfsi case study i can send them";
+  const h3 = [{ role: "user", content: bank }, { role: "assistant", content: "..." }, { role: "user", content: "anything newer?" }, { role: "assistant", content: "..." }];
+  ok(searchText("shorter one? something 1-2 pages", h3) === `${bank} shorter one? something 1-2 pages`, `2nd follow-up keeps the bank topic: ${searchText("shorter one? something 1-2 pages", h3)}`);
+  const { pagesWanted } = await jiti.import("./agent.ts");
+  ok(pagesWanted("shorter one? something 1-2 pages") === 2 && pagesWanted("one pager on HyID") === 1 && pagesWanted("citrix battlecard") === null, "page limits read from the ask");
+}
 // 8f. "public" only when sending outside.
 ok(/"public" or "published" in the verdict only if the rep is sending/.test(SYSTEM), "the prompt keeps visibility talk out of internal verdicts");
 

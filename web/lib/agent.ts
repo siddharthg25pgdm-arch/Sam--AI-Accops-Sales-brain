@@ -344,7 +344,7 @@ export function seedSearch(question: string): SearchRun | null {
   // A type the rep named is a filter too (runSearch drops it again if it finds nothing).
   const asset_type = f.asset_type || typesNamedIn(question)[0] || "";
   const a = runSearch({ query: question, asset_type, vertical: f.vertical, product: f.product }, question);
-  if (!f.vertical && !f.product && !asset_type && f.audience === "internal") return a;
+  if (!f.vertical && !f.product && !asset_type && f.audience === "internal" && !pagesWanted(question)) return a;
   // Every filter here is a preference, not a wall. Industry and product tags are keyword guesses, and
   // a mis-tagged asset is invisible to a filtered search: City Pharmacy is filed under E-commerce /
   // Retail, so "pharma customer proof" never saw it; HySecure demo videos carry no product tag. A
@@ -354,14 +354,30 @@ export function seedSearch(question: string): SearchRun | null {
   // type kept, and with nothing at all, and fill the list after the filtered top three.
   const b = f.vertical || f.product ? runSearch({ query: question, asset_type }, question).hits : [];
   const c = searchAssets({ query: question, limit: SEARCH_LIMIT }).results;
+  // "shorter one? something 1-2 pages": the short documents that match go first. Only assets whose
+  // page count is known qualify, so an unknown length is never passed off as short.
+  const max = pagesWanted(question);
+  const short = max ? searchAssets({ query: question, asset_type: asset_type || undefined, vertical: f.vertical || undefined, limit: 40 }).results
+    .filter(h => (h.asset.file?.pages ?? 99) <= max).slice(0, 2) : [];
   const seen = new Set<string>(), hits: SearchHit[] = [];
-  for (const h of [...a.hits.slice(0, 3), ...[...b, ...c, ...a.hits.slice(3)].sort((x, y) => y.score - x.score)]) {
+  for (const h of [...short, ...a.hits.slice(0, 3), ...[...b, ...c, ...a.hits.slice(3)].sort((x, y) => y.score - x.score)]) {
     const k = assetKey(h.asset);
     if (!seen.has(k) && hits.length < SEARCH_LIMIT + 1) { seen.add(k); hits.push(h); }
   }
   const extra = hits.some(h => !a.hits.some(x => assetKey(x.asset) === assetKey(h.asset)));
-  const note = [a.note, extra ? "results after the first three are not filtered by type, industry, product or audience" : null].filter(Boolean).join("; ") || null;
+  const note = [a.note, short.length ? `the first ${short.length} result(s) are ${max} pages or fewer` : null,
+    extra ? "results after the first three are not filtered by type, industry, product or audience" : null].filter(Boolean).join("; ") || null;
   return { hits, considered: a.considered, input: a.input, note, payload: toolPayload(hits, note) };
+}
+
+/** The page limit an ask states: "1-2 pages" -> 2, "one pager" -> 1, "shorter" -> 3. */
+export function pagesWanted(q: string): number | null {
+  const p = q.toLowerCase();
+  const n = p.match(/\b(?:\d\s*[-–to]+\s*)?(\d)\s*[- ]?pages?\b/);
+  if (n) return Number(n[1]);
+  if (/\bone[- ]?pag(?:e|er)\b|\bsingle[- ]page\b/.test(p)) return 1;
+  if (/\b(?:shorter|short one|brief one)\b/.test(p)) return 3;
+  return null;
 }
 
 /** What to search for. A short follow-up ("anything newer?", "shorter one? 1-2 pages") means nothing
@@ -369,12 +385,18 @@ export function seedSearch(question: string): SearchRun | null {
  *  ponytail: "no topic words of its own, or opens like a follow-up, and names no type" is the whole
  *  test; "citrix battlecard" after a pharma question is searched on its own, which is right. */
 export function searchText(question: string, history: { role: string; content: string }[] = []): string {
-  const prev = [...history].reverse().find(h => h.role === "user")?.content?.trim();
-  if (!prev) return question;
-  if (typesNamedIn(question).length) return question; // "citrix battlecard" is a new ask
-  const content = queryTokens(question).filter(t => !FOLLOW_WORDS.test(t));
-  const opener = /^\W*(and|also|what about|how about|anything|any|something|shorter|longer|newer|older|another|other|more|same|that|this|it|one|ok|okay)\b/i.test(question);
-  return content.length === 0 || opener ? `${prev} ${question}` : question;
+  if (!isFollowUp(question)) return question;
+  // Walk back to the last question that had a topic of its own: "shorter one?" after "anything
+  // newer?" after the bank question is about the bank question, and searching it with "anything
+  // newer?" alone returned the About Accops one-pager.
+  const prev = [...history].reverse().find(h => h.role === "user" && h.content?.trim() && !isFollowUp(h.content))?.content.trim();
+  return prev ? `${prev} ${question}` : question;
+}
+function isFollowUp(q: string): boolean {
+  if (typesNamedIn(q).length) return false; // "citrix battlecard" is a new ask
+  const content = queryTokens(q).filter(t => !FOLLOW_WORDS.test(t));
+  const opener = /^\W*(and|also|what about|how about|anything|any|something|shorter|longer|newer|older|another|other|more|same|that|this|it|one|ok|okay)\b/i.test(q);
+  return content.length === 0 || opener;
 }
 const FOLLOW_WORDS = /^(newer|older|shorter|longer|smaller|bigger|pages?|another|else|more|one|version|edition|similar|instead|also)$/;
 export const SEED_STEP = "tool call: search_assets (the rep's own words)";
