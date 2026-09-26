@@ -251,10 +251,60 @@ export function supersedingFile(s: string): string | null {
   return m ? m[1].split("/").pop()!.replace(/\.(pdf|pptx|docx|ppt|doc|xlsx)$/i, "") : null;
 }
 
-export function trustNote(a: Asset): string | null {
+/** The card row behind an asset, for the fields an Asset does not carry. */
+function metaOf(a: Asset) {
   const meta = cardMeta();
-  const m = (a.item_id ? meta.get(`id:${a.item_id}`) : undefined)
-    ?? meta.get((a.file?.path ?? "").split("/").pop()?.toLowerCase() ?? "");
+  return (a.item_id ? meta.get(`id:${a.item_id}`) : undefined) ?? meta.get((a.file?.path ?? "").split("/").pop()?.toLowerCase() ?? "");
+}
+
+/** Everything SAM has on file about what a document says: its text fields plus the card's
+ *  competitors, regulations and personas. What an answer may claim about a document is checked
+ *  against this and nothing else. */
+export function cardText(a: Asset): string {
+  const m = metaOf(a);
+  return `${blob(a)} ${[...(m?.competitors ?? []), ...(m?.regulations ?? []), ...(m?.personas ?? [])].join(" ")}`.toLowerCase();
+}
+
+/** The catalogue asset a card's superseded_by points at, following up to three hops, or null when
+ *  the newer edition is not in the catalogue (the note then names it and the rep asks marketing). */
+export function successorOf(a: Asset): Asset | null {
+  const norm = (s: string) => s.toLowerCase().replace(/\.(pdf|docx|pptx|doc|ppt|xlsx)$/, "").replace(/[^a-z0-9]/g, "");
+  let cur = a, found: Asset | null = null;
+  for (let hop = 0; hop < 3; hop++) {
+    const f = supersedingFile(metaOf(cur)?.superseded_by ?? "");
+    const next = f ? allAssets().find(x => norm((x.file?.path ?? "").split("/").pop() ?? "") === norm(f) && dedupeKey(x) !== dedupeKey(cur)) : undefined;
+    if (!next) break;
+    found = cur = next;
+  }
+  return found;
+}
+
+/** One line on what the document is, from its card only - never from model prose. An asset SAM has
+ *  not read (registry-only: a filename and a folder) says so rather than guessing from the title. */
+export function isDescribed(a: Asset): boolean {
+  return Boolean(a.brief?.trim() || a.key_problem?.trim() || a.key_outcomes.length || (a.use_for?.trim() && !a.use_for.startsWith("Filed under ")));
+}
+export function describe(a: Asset): string {
+  const folder = a.section || (a.file?.path ?? "").split("/").slice(0, -1).join("/");
+  const text = isDescribed(a) ? [a.brief, a.use_for.startsWith("Filed under ") ? "" : a.use_for, a.key_problem, a.key_outcomes[0] ?? ""].find(s => s && s.trim()) ?? "" : "";
+  if (!text) return folder ? `Filed under ${folder}; SAM has not read this one, so check what it covers before using it.` : "SAM has not read this one, so check what it covers before using it.";
+  return firstSentence(text, 180);
+}
+
+/** The first sentence of `text`, at most `max` characters. "Accops Systems Pvt. Ltd" is not a sentence end. */
+export function firstSentence(text: string, max: number): string {
+  const t = text.trim();
+  let end = t.length;
+  for (const m of t.matchAll(/[.!?](?=\s|$)/g)) {
+    if (m.index < 30 || /\b(pvt|ltd|inc|co|no|nos|vs|v|e\.g|i\.e|incl|approx|dr|mr|ms|st|u\.s)$/i.test(t.slice(0, m.index))) continue;
+    end = m.index + 1; break;
+  }
+  const s = t.slice(0, end);
+  return s.length <= max ? s : `${s.slice(0, max - 3).replace(/\s+\S*$/, "")}…`;
+}
+
+export function trustNote(a: Asset): string | null {
+  const m = metaOf(a);
   if (m?.expired) {
     return `EXPIRED${m.expiry_date ? ` on ${m.expiry_date}` : ""} - do not send. ${m.needs_human || ""}`.trim();
   }
@@ -284,7 +334,20 @@ export type SearchHit = { asset: Asset; score: number; why: string };
 const STOP = new Set(["the", "for", "and", "with", "need", "want", "any", "have", "our", "case", "study", "studies", "whitepaper",
   "please", "pls", "can", "you", "find", "give", "send", "show", "accops", "vs", "versus", "what", "which", "does", "about",
   "something", "anything", "from", "that", "this", "some", "latest", "newest", "recent", "current",
-  "newer", "older", "shorter", "longer", "smaller", "else", "instead", "similar"]);
+  "newer", "older", "shorter", "longer", "smaller", "else", "instead", "similar",
+  // Conversational filler. "citrix battlecard for my own prep before the call tmrw" ranked on "own"
+  // and "before" and dropped both 2024 Citrix battlecards. Audience detection reads the raw question,
+  // so "share"/"email" still mark an ask external.
+  "page", "pages", "pager", "own", "before", "after", "call", "calls", "meeting", "tmrw", "tomorrow", "today", "tonight", "asap", "urgent", "urgently", "quick", "quickly",
+  "prep", "prepare", "preparing", "share", "sharing", "email", "mail", "forward", "whats", "how", "when", "where", "who",
+  "are", "was", "were", "will", "would", "could", "should", "has", "had", "got", "get", "just", "also", "really", "maybe", "know", "tell",
+  "them", "him", "her", "his", "they", "their", "there", "into", "over", "moving", "off", "going", "like",
+  "customer", "customers", "client", "clients", "prospect", "prospects",
+  // Hinglish: bhai (mate), abhi (now), bhejo (send), chahiye (need), ko/ke liye (to/for), hai (is).
+  "bhai", "abhi", "bhejo", "bhej", "bhejna", "bhejdo", "chahiye", "kya", "hai", "koi", "liye", "wala", "wali", "jaldi"]);
+/** Common misspellings of a document type, so "hyworks brocher" is a brochure ask. Used by the
+ *  ranking here and by type detection in agent.ts. */
+export const BROCHURE_MISSPELT = /\bbr[ou]{1,2}[cs]h?[eu]?re?s?\b/gi;
 // Words naming a KIND of document. They still score (typeHit below depends on them), but an asset
 // matching only these has matched nothing the rep asked about: "do we have a SOC 2 report" should
 // not return every analyst report. When a query is nothing but type words ("decks"), they qualify.
@@ -295,7 +358,7 @@ const SHORT_KEEP = new Set(["ai"]);
 /** Query -> tokens. A 1-2 digit number joins the word before it, so "SOC 2" is the phrase "soc 2"
  *  rather than "soc" (which then found social-media banners) with the "2" thrown away. */
 export function queryTokens(query: string): string[] {
-  const words = (query.toLowerCase().match(/[a-z0-9][a-z0-9.+]*/g) ?? []).map(w => w.replace(/\.+$/, ""));
+  const words = (query.toLowerCase().replace(BROCHURE_MISSPELT, "brochure").match(/[a-z0-9][a-z0-9.+]*/g) ?? []).map(w => w.replace(/\.+$/, ""));
   const out: string[] = [];
   for (const w of words) {
     if (/^\d{1,2}$/.test(w) && out.length && /[a-z]$/.test(out[out.length - 1])) { out[out.length - 1] += ` ${w}`; continue; }
@@ -317,9 +380,56 @@ export function tokenMatcher(t: string): RegExp {
   return new RegExp(`(?<![a-z0-9])${body}${end}`);
 }
 
+/** A product name also matches the features it is known by. Uncarded assets carry only a filename,
+ *  and "Device posture check ... on management console.mp4" and "Geofencing control.mp4" are HySecure
+ *  demos that never say "HySecure", so "hysecure demo video" found the TrueSSO video instead. */
+const PRODUCT_TERMS: Record<string, string[]> = {
+  hysecure: ["ztna", "posture", "geofenc"], hyid: ["mfa", "sso", "passwordless", "password-less", "fido"],
+  hyworks: ["vdi", "daas", "digital workspace"], hydesk: ["thin client"],
+};
+function matcher(t: string): RegExp {
+  const extra = PRODUCT_TERMS[t];
+  return extra ? new RegExp([t, ...extra].map(x => tokenMatcher(x).source).join("|")) : tokenMatcher(t);
+}
+
+/** Named things a rep asks about - competitors, platforms, regulations, regions and languages, and
+ *  Accops' own product names - each with the words that name it. Two uses: an ask naming several gets
+ *  a result about each (searchAssets), and one no shown card mentions makes the answer "missing"
+ *  (agent.ts). ponytail: a word list; an entity not on it is simply not checked. The upgrade is the
+ *  cards' own competitors/regulations fields, which cardMeta() already carries. */
+export const ENTITIES: Record<string, string[]> = {
+  Citrix: ["citrix", "netscaler", "xenapp", "xendesktop"], VMware: ["vmware", "horizon"], Omnissa: ["omnissa"], Broadcom: ["broadcom"],
+  AVD: ["avd", "wvd", "azure virtual desktop", "windows virtual desktop"], "AWS WorkSpaces": ["aws", "workspaces"],
+  Zscaler: ["zscaler"], Cisco: ["cisco", "anyconnect"], Fortinet: ["fortinet", "forticlient", "fortigate"], "Palo Alto": ["palo alto", "globalprotect", "prisma"],
+  Okta: ["okta"], Ivanti: ["ivanti", "pulse secure"], Sophos: ["sophos"], Netskope: ["netskope"], Forcepoint: ["forcepoint"], Cloudflare: ["cloudflare"],
+  Parallels: ["parallels"], Workspot: ["workspot"], "Check Point": ["check point", "checkpoint"], Nutanix: ["nutanix", "ahv"], Proxmox: ["proxmox"],
+  RBI: ["rbi", "reserve bank"], SEBI: ["sebi"], IRDAI: ["irdai", "irda"], APRA: ["apra", "cps 234", "cps234"], "ISO 27001": ["iso 27001", "iso27001"],
+  "SOC 2": ["soc 2", "soc2"], GDPR: ["gdpr"], HIPAA: ["hipaa"], "PCI DSS": ["pci"], DPDP: ["dpdp"], "CERT-In": ["cert-in", "certin"], SAMA: ["sama"],
+  NESA: ["nesa"], PDPA: ["pdpa"], NIST: ["nist"], "Essential Eight": ["essential eight", "essential 8"], IRAP: ["irap"], "Data residency": ["data residency", "data localisation", "data localization"],
+  Australia: ["australia", "australian"], "New Zealand": ["new zealand"], Saudi: ["saudi", "ksa"], UAE: ["uae", "dubai", "abu dhabi", "emirates"],
+  Qatar: ["qatar"], Oman: ["oman"], Kuwait: ["kuwait"], Bahrain: ["bahrain"], "Middle East": ["middle east", "mea", "gulf"], GITEX: ["gitex"], GCC: ["gcc"],
+  Malaysia: ["malaysia", "malaysian"], Indonesia: ["indonesia", "indonesian"], Thailand: ["thailand"], Philippines: ["philippines"], Singapore: ["singapore"],
+  Vietnam: ["vietnam"], "Sri Lanka": ["sri lanka", "colombo"], Japan: ["japan", "japanese"], Africa: ["africa", "kenya", "nigeria"],
+  Arabic: ["arabic"], Bahasa: ["bahasa"], Sizing: ["sizing", "capacity planning"], "Concurrent users": ["concurrent", "concurrency"],
+  HySecure: ["hysecure"], HyID: ["hyid"], HyWorks: ["hyworks"], HyLabs: ["hylabs"], HyDesk: ["hydesk"], BioAuth: ["bioauth"],
+  "Browser Isolation": ["browser isolation", "virtual browser", "vajra"],
+};
+/** Accops' own products among ENTITIES: ranked for coverage, but not required on a card (agent.ts). */
+export const OWN_PRODUCTS = new Set(["HySecure", "HyID", "HyWorks", "HyLabs", "HyDesk", "BioAuth", "Browser Isolation"]);
+const entityRe = new Map(Object.entries(ENTITIES).map(([k, ws]) => [k, new RegExp(ws.map(w => tokenMatcher(w).source).join("|"))]));
+/** The ENTITIES named in `text`. */
+export function namedEntities(text: string): string[] {
+  const t = text.toLowerCase();
+  return [...entityRe].filter(([, re]) => re.test(t)).map(([k]) => k);
+}
+/** True when `text` (lowercased) names the entity. */
+export function mentions(text: string, entity: string): boolean {
+  return entityRe.get(entity)?.test(text.toLowerCase()) ?? false;
+}
+
 export function searchAssets(args: SearchArgs): { results: SearchHit[]; considered: number } {
   const tokens = queryTokens(args.query ?? "");
-  const res = tokens.map(tokenMatcher);
+  const res = tokens.map(matcher);
   const content = tokens.map(t => !TYPE_WORDS.test(t));
   const onlyTypes = !content.some(Boolean);
   const out: SearchHit[] = [];
@@ -356,7 +466,29 @@ export function searchAssets(args: SearchArgs): { results: SearchHit[]; consider
     out.push({ asset: a, score, why: hits.length ? `matched ${hits.slice(0, 5).join(", ")}` : "matched your filters" });
   }
   out.sort((x, y) => y.score - x.score || (yearOf(y.asset) ?? "").localeCompare(yearOf(x.asset) ?? ""));
-  return { results: out.slice(0, args.limit ?? 5), considered: pool.length };
+  return { results: cover(out, args.limit ?? 5, namedEntities(args.query ?? "")), considered: pool.length };
+}
+
+/** The top `limit` of `ranked`, changed so that each named entity has a result ABOUT it (in its title
+ *  or filename) when any result is. "does hyworks support nutanix AHV and proxmox?" ranked five
+ *  Nutanix guides first, and the answer said no Proxmox document exists while the Proxmox brochure
+ *  sat at #6. The missing one replaces the lowest result that no other entity depends on. */
+export function cover(ranked: SearchHit[], limit: number, named: string[]): SearchHit[] {
+  const top = ranked.slice(0, limit);
+  if (named.length < 2) return top;
+  const about = (h: SearchHit, e: string) => mentions(`${h.asset.title} ${h.asset.file?.path.split("/").pop() ?? ""}`, e);
+  for (const e of named) {
+    if (top.some(h => about(h, e))) continue;
+    const add = ranked.slice(limit).find(h => about(h, e));
+    if (!add) continue;
+    // The lowest-ranked result whose removal leaves every other named entity still covered.
+    for (let i = top.length - 1; i >= 0 && top.length >= limit; i--) {
+      const rest = top.filter((_, j) => j !== i);
+      if (named.every(x => x === e || !top.some(h => about(h, x)) || rest.some(h => about(h, x)))) { top.splice(i, 1); break; }
+    }
+    if (top.length < limit) top.push(add);
+  }
+  return top;
 }
 
 export function facetCounts() {

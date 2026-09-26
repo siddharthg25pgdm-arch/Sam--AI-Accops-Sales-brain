@@ -125,4 +125,22 @@ assert.ok(searchAssets({ query: "omega", asset_type: "Deck", limit: 10 }).result
   assert.equal(supersedingFile("A newer edition of the same document exists. SAM should prefer that one."), null);
 }
 
+// 11. 26 Sep repros. Filler words do not rank ("own", "before", "tmrw"); a misspelt brochure is a brochure.
+assert.deepEqual(queryTokens("citrix battlecard for my own prep before the call tmrw"), ["citrix", "battlecard"]);
+assert.deepEqual(queryTokens("bhai urgent hyworks brocher bhejo customer ko abhi"), ["hyworks", "brochure"]);
+{
+  // Coverage: an ask naming two entities gets a result about each, even when one crowds the top.
+  const { namedEntities } = await jiti.import("./cards.ts");
+  await load([
+    ...[1, 2, 3, 4, 5].map(i => row(`N${i}`, "Nutanix", `Zeta HyWorks and Nutanix AHV integration guide ${i}.pdf`)),
+    row("P1", "Brochures", "Zeta Digital Workspace on Proxmox.pdf"),
+    row("V1", "Videos/Demo Videos/Revised", "Zeta Geofencing control.mp4"), row("V2", "Videos/Demo Videos/Revised", "Zeta Huddle.mp4"),
+  ], []);
+  assert.deepEqual(namedEntities("does hyworks support nutanix AHV and proxmox?"), ["Nutanix", "Proxmox", "HyWorks"]);
+  const top = searchAssets({ query: "does hyworks support nutanix AHV and proxmox? need integration doc", limit: 5 }).results.map(r => r.asset.title);
+  assert.ok(top.some(t => /Proxmox/.test(t)) && top.some(t => /Nutanix/.test(t)), `each named entity covered: ${top}`);
+  // A product name matches its features: an uncarded geofencing demo IS a HySecure demo.
+  assert.equal(titles("zeta hysecure demo video")[0], "Zeta Geofencing control", "hysecure matches its feature words");
+}
+
 console.log("cards.check: ok");

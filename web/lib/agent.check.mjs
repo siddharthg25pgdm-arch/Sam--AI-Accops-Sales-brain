@@ -40,7 +40,20 @@ const REG = [
   row("R6", "Social Media", "Social-Media-Banners Browser Isolation.png", "Brand"),
   row("R7", "Videos/Demo Videos/Revised", "Device posture check and related data on management console.mp4", "Video"),
   row("R8", "Brochures & Datasheets/New", "Accops HyID Datasheet.V5 2026.pdf", "Brochure"),
+  // 26 Sep repros
+  row("R9", "Competition/VDI and DaaS", "Accops vs Citrix Feature Table 2018.pdf", "Competitive"),
+  row("R10", "Pricing", "Accops DaaS Pricing Calculator v2.3 May 2021.xlsx", "Pricing"),
+  row("R11", "Solutions/BFSI", "Accops RBI Guidelines Solution Document.pdf", "Solution Document"),
+  row("R12", "Nutanix", "Accops HyWorks and Nutanix AHV Integration Guide.pdf", "Solution Document"),
+  row("R13", "Brochures", "Accops Digital Workspace on Proxmox V2.pdf", "Brochure"),
+  row("R14", "Videos/Demo Videos/Revised", "Geofencing control.mp4", "Video"),
 ];
+// One card: the 2018 table is superseded by the Citrix battlecard (the newer edition must be shown).
+const CARDS = [{ source: "sharepoint/Accops vs Citrix Feature Table 2018.pdf", filename: "Accops vs Citrix Feature Table 2018.pdf",
+  title: "Accops vs Citrix Feature Table 2018", asset_type: "Competitive", industry: "", client: "", products: ["HyWorks"], competitors: ["Citrix"],
+  personas: [], regulations: [], key_problem: "", key_outcomes: [], brief: "A 2018 feature table comparing Accops with Citrix.", use_for: "",
+  publish_year: "2018", expired: false, expiry_date: null, stale_risk: "", superseded_by: "sharepoint/Accops Powered VDI vs Citrix VDI.pdf - the 2024 battlecard",
+  visibility: "internal", internal_reason: "", public_url: "", confidence: 0.9, needs_human: "", batch: "t", item_id: "R9" }];
 
 // ---- stubbed network: Supabase fixtures, and a scripted model
 let script = [], bodies = [], regDelay = 0, logged = [];
@@ -57,7 +70,8 @@ globalThis.fetch = async (url, init = {}) => {
   }
   if (u.includes("sam_sharepoint_files")) { if (regDelay) await new Promise(r => setTimeout(r, regDelay)); return Response.json(REG); }
   if (u.includes("sam_events") && init.method === "POST") { logged.push(JSON.parse(init.body)); return Response.json([{ id: logged.length }]); }
-  return Response.json([]); // sam_asset_cards, sam_events
+  if (u.includes("sam_asset_cards")) return Response.json(CARDS);
+  return Response.json([]); // sam_events
 };
 const call = (args) => () => ({ role: "assistant", content: null, tool_calls: [{ id: `c${Math.random()}`, type: "function", function: { name: "search_assets", arguments: JSON.stringify(args) } }] });
 const say = (text) => () => ({ role: "assistant", content: text });
@@ -65,8 +79,9 @@ const run = (steps) => { script = [...steps]; bodies = []; };
 
 const { ask, heuristicFilters, assetTypeOf, namedTitles, PRICE_ASK, searchText, SYSTEM } = await jiti.import("./agent.ts");
 const { refresh } = await jiti.import("./registry-cache.ts");
+const { refreshCards } = await jiti.import("./cards-cache.ts");
 const { apiSearch, apiAsk } = await jiti.import("./api.ts");
-await refresh();
+await refresh(); await refreshCards();
 const traceHas = (r, s) => r.trace.some(t => `${t.step} ${t.detail}`.includes(s));
 let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; };
 
@@ -116,7 +131,7 @@ ok(!/^Pricing/.test((run([call({ query: "hydesk" }), say("- **Accops HyDesk Broc
 // over-rejects ("No pharma case study" over four pharma whitepapers).
 run([say("No media-industry ZTNA whitepaper is available.")]);
 r = await ask("do we have a media industry ZTNA whitepaper?");
-ok(r.missing && !r.zero && r.intent === "gap" && r.assets.length >= 1 && r.assets.length <= 2 && /^No media.*\nClosest in the library:$/.test(r.text),
+ok(r.missing && !r.zero && r.intent === "gap" && r.assets.length >= 1 && r.assets.length <= 2 && /^No media[^\n]*\nClosest in the library:\n- \*\*/.test(r.text),
   `a denial naming nothing still shows up to 2 real substitutes: ${r.text} | ${r.assets.map(a => a.title)}`);
 // ...unless nothing clears the floor: then a plain gap, no cards contradicting the sentence.
 run([say("No Arabic collateral exists.")]);
@@ -273,8 +288,87 @@ ok(searchText("citrix battlecard", hist) === "citrix battlecard" && searchText("
 run([say("- **Accops HyDesk Brochure V6 2026** - the current edition")]);
 r = await ask("anything newer?", hist);
 ok(!r.zero && r.assets[0]?.title === "Accops HyDesk Brochure V6 2026" && seedSaw("HyDesk"), `follow-up answered: ${r.text} | ${r.assets.map(a => a.title)}`);
+// 8e'. A second follow-up in a row walks back to the last question with a topic (26 Sep #3).
+{
+  const bank = "pvt bank in mumbai moving off citrix, need a bfsi case study i can send them";
+  const h3 = [{ role: "user", content: bank }, { role: "assistant", content: "..." }, { role: "user", content: "anything newer?" }, { role: "assistant", content: "..." }];
+  ok(searchText("shorter one? something 1-2 pages", h3) === `${bank} shorter one? something 1-2 pages`, `2nd follow-up keeps the bank topic: ${searchText("shorter one? something 1-2 pages", h3)}`);
+  const { pagesWanted } = await jiti.import("./agent.ts");
+  ok(pagesWanted("shorter one? something 1-2 pages") === 2 && pagesWanted("one pager on HyID") === 1 && pagesWanted("citrix battlecard") === null, "page limits read from the ask");
+}
 // 8f. "public" only when sending outside.
 ok(/"public" or "published" in the verdict only if the rep is sending/.test(SYSTEM), "the prompt keeps visibility talk out of internal verdicts");
+
+// 9. The answer contract (26 Sep): the model picks result numbers and writes one verdict; SAM writes
+// every document line from the card. Invented coverage cannot reach the rep.
+// The n the model was shown for a title this turn.
+const nOf = (body, title) => { for (const m of body.messages) if (m.role === "tool") for (const x of JSON.parse(m.content).results ?? []) if (x.title === title) return x.n; };
+const pickSay = (verdict, ...titles) => (body) => ({ role: "assistant", content: `${verdict}\nPICKS: ${titles.map(t => nOf(body, t)).join(", ")}` });
+{
+  run([pickSay("One internal Citrix battlecard fits.", "Accops Powered VDI vs Citrix VDI")]);
+  r = await ask("citrix comparison");
+  ok(r.text.startsWith("One internal Citrix battlecard fits.\n- **Accops Powered VDI vs Citrix VDI** (") && r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && !r.missing,
+    `a picked result is rendered by SAM: ${r.text}`);
+  ok(JSON.parse(bodies[0].messages.find(m => m.tool_call_id === "seed").content).results.every(x => Number.isInteger(x.n)), "every result the model sees carries its number");
+  // Prose about a document never reaches the rep, even for a real, grounded title.
+  run([say("Here it is.\n- **Accops HyDesk Brochure V6 2026** - includes list pricing for 500 users and a Citrix migration")]);
+  r = await ask("hydesk brochure");
+  ok(r.assets[0]?.title === "Accops HyDesk Brochure V6 2026" && !/pricing for 500|Citrix migration/.test(r.text), `model prose about a document is not shown: ${r.text}`);
+  // A verdict that says what a document covers, or attributes the rep's competitor to it, is replaced.
+  run([pickSay("The HyDesk brochure shows how a bank replaced Citrix.", "Accops HyDesk Brochure V6 2026")]);
+  r = await ask("hydesk brochure");
+  ok(/^Best matches in the library:/.test(r.text) && !/Citrix/.test(r.text) && traceHas(r, "verdict guard: replaced"), `coverage claim in the verdict is replaced: ${r.text}`);
+  const { verdictProblem } = await jiti.import("./agent.ts");
+  const card = { asset: { title: "Two Leading Indian Private Banks", asset_type: "Case Study", industry: "BFSI", client: "", products: [], key_problem: "", key_outcomes: ["MFA for 60,000 users"],
+    brief: "Two private banks secured remote access with MFA.", use_for: "", section: "", file: { path: "x.pdf", year: "2026" }, public_url: "u" }, score: 1, why: "" };
+  ok(verdictProblem("Two public BFSI case studies you can send.", [card], "pvt bank moving off citrix", false) === null, "a plain verdict passes");
+  ok(/Citrix/.test(verdictProblem("Two public case studies of banks leaving Citrix.", [card], "pvt bank moving off citrix", false)), "the rep's competitor attributed to a card is caught");
+  ok(/includ/.test(verdictProblem("The datasheet includes max concurrent users.", [card], "q", false)), "coverage verbs are caught");
+  ok(/2,000/.test(verdictProblem("Good for a 2,000-user quote.", [card], "pricing for 2,000 users", false)), "a number no card has is caught");
+  ok(/leaving/.test(verdictProblem("Two case studies of banks leaving legacy desktops.", [card], "bank leaving legacy desktops", false)), "a paraphrased claim in words no card has is caught");
+  ok(verdictProblem("No exact Proxmox integration document", [], "does hyworks support proxmox? need integration doc", true) === null, "a denial may name what is missing in the rep's words");
+  // An uncarded asset says so instead of being described from its title.
+  run([pickSay("A HySecure demo video fits.", "Geofencing control")]);
+  r = await ask("hysecure demo video");
+  ok(r.assets.some(a => a.title === "Geofencing control") && /Geofencing control\*\* \([^)]*\) - Filed under Videos\/Demo Videos\/Revised; SAM has not read this one/.test(r.text), `uncarded: filed under, not described: ${r.text}`);
+}
+// 9b. A named entity no shown card mentions -> missing, honestly worded, with the request button (#26).
+run([pickSay("The HySecure datasheet can be framed to meet APRA CPS 234.", "Accops HyID Datasheet 2026")]);
+r = await ask("australian gov / APRA CPS 234 angle for hysecure - anything?");
+ok(r.missing && !r.zero && r.intent === "gap" && /^No exact match for APRA or Australia: none of the closest documents mentions them\.\nClosest in the library:/.test(r.text) && !/framed/.test(r.text),
+  `APRA on no card -> missing: ${r.text} | ${r.missing}`);
+// 9c. Two entities: the model picks only the Nutanix guide, SAM adds the Proxmox brochure (#21).
+run([pickSay("HyWorks has integration material for both.", "Accops HyWorks and Nutanix AHV Integration Guide")]);
+r = await ask("does hyworks support nutanix AHV and proxmox? need integration doc");
+ok(r.assets.some(a => /Proxmox/.test(a.title)) && r.assets.some(a => /Nutanix/.test(a.title)) && !r.missing, `each named platform covered: ${r.assets.map(a => a.title)} | ${r.text}`);
+// 9d. The sending guard reads the verdict (#5): "Send the ... (internal)" is replaced, not appended to.
+run([pickSay("Send the RBI-focused solution document to the CISO.", "Accops RBI Guidelines Solution Document")]);
+r = await ask("CISO at the bank asked how we help with RBI guidelines, what can i send him");
+ok(/^None of these is published, so none can be sent outside Accops/.test(r.text) && traceHas(r, "sending language"), `verdict sending guard: ${r.text}`);
+// 9e. Pricing: a pricing calculator is never a quote (#6). NO_PRICING, the calculator as a labelled reference.
+run([pickSay("The pricing calculator can be adapted for a 2,000-user quote.", "Accops DaaS Pricing Calculator v2.3 May 2021")]);
+r = await ask("whats the pricing for 2000 users hyworks, customer comparing with citrix quote");
+ok(/^Pricing is not in the collateral library/.test(r.text) && /not a quote/.test(r.text) && r.missing && !/adapted/.test(r.text) && r.assets.every(a => /Pricing Calculator/.test(a.title)),
+  `calculator is a reference, not a quote: ${r.text} | ${r.assets.map(a => a.title)}`);
+// 9f. A superseded asset brings its newer edition, newer first (#4).
+run([pickSay("A Citrix comparison fits.", "Accops vs Citrix Feature Table 2018")]);
+r = await ask("citrix battlecard for my own prep before the call tmrw");
+ok(r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && r.assets[1]?.title === "Accops vs Citrix Feature Table 2018" && traceHas(r, "newer edition shown"), `newer edition first: ${r.assets.map(a => a.title)}`);
+// 9g. False gaps from 26 Sep: Hinglish and misspellings (#30), long paragraphs (#31), a 2nd follow-up (#3).
+ok(heuristicFilters("bhai urgent hyworks brocher bhejo customer ko abhi").audience === "external", "bhejo ... customer ko is sending outside");
+{
+  const { typesNamedIn } = await jiti.import("./agent.ts");
+  ok(["brocher", "brouchure", "broucher", "brochure"].every(w => typesNamedIn(`hyworks ${w}`).includes("Brochure")), "misspelt brochure is a brochure ask");
+}
+run([say("No public hospital case study.")]);
+r = await ask("Hospital chain in Kerala, 800 users, currently on Citrix, evaluating Azure Virtual Desktop. Need something I can send the CIO today plus something for my own prep against AVD");
+ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the public Zulekha case study");
+{
+  const bank = "pvt bank in mumbai moving off citrix, need a bfsi case study i can send them";
+  run([say("No exact 1-2 page case study.")]);
+  r = await ask("shorter one? something 1-2 pages", [{ role: "user", content: bank }, { role: "assistant", content: "..." }, { role: "user", content: "anything newer?" }, { role: "assistant", content: "..." }]);
+  ok(seedSaw("Private Bank MFAZTNA"), "the 2nd follow-up finds the 2-page Private Bank MFA-ZTNA case study");
+}
 
 // 6. Cold start: apiSearch waits for the registry instead of ranking the frozen cards alone.
 globalThis.__samReg = undefined; globalThis.__samRegAt = undefined; regDelay = 50;

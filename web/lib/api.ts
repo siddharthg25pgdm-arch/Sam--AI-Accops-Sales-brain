@@ -1,6 +1,6 @@
 /** Shared handlers behind both the REST routes (/api/v1/*) and the MCP tools (/api/mcp).
  *  One implementation, two transports, so the Dwight extension and an MCP client see identical behaviour. */
-import { searchAssets, allAssets, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, trustNote, assetLink, assetLocation, internalLink, VERTICALS, type Asset } from "./cards";
+import { searchAssets, allAssets, describe, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, trustNote, assetLink, assetLocation, internalLink, VERTICALS, type Asset } from "./cards";
 import { ask as askAgent, type AskResult } from "./agent";
 import { logEvent, recentEvents, realOnly } from "./events";
 import { ready } from "./registry-cache";
@@ -161,7 +161,7 @@ export async function apiContextForAccount(p: { company: string; person_title?: 
     const vertical = p.industry ? Object.keys(VERTICALS).find(v => v.toLowerCase().includes(p.industry!.toLowerCase().split(/[ /]/)[0])) : undefined;
     const { results } = searchAssets({ query: [p.industry, p.person_title].filter(Boolean).join(" "), vertical, limit: 3 });
     const fallback = results.length ? results : searchAssets({ query: "", vertical, limit: 3 }).results;
-    r = { ...r, assets: fallback.map(h => ({ title: h.asset.title, asset_type: h.asset.asset_type, industry: h.asset.industry, why: h.why,
+    r = { ...r, assets: fallback.map(h => ({ title: h.asset.title, asset_type: h.asset.asset_type, industry: h.asset.industry, why: describe(h.asset),
       link: assetLink(h.asset), location: assetLocation(h.asset), visibility: h.asset.public_url ? "public" : "internal", year: yearOf(h.asset), stale: isStale(h.asset), trust: trustNote(h.asset), path: h.asset.file?.path ?? null })),
       answer: fallback.length ? `No exact match for ${p.company}. Strongest ${vertical ?? "cross-industry"} assets to lead with:` : r.answer };
   }
