@@ -476,7 +476,10 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   // Rendered: the model's "two can be shared" about internal documents never reaches the rep.
   run([pickSay("The library has internal product videos for HySecure; two can be shared.", "Geofencing control", "Device posture check and related data on management console")]);
   r = await ask("product video hysecure");
-  ok(/^The library has internal product videos for HySecure\.\nAll internal: don't send outside Accops\.\n- \*\*/.test(r.text) && !/shared/.test(r.text), `verdict kept, sending line is SAM's: ${r.text}`);
+  // (Until 30 Sep this expected the model's verdict. No video is named for HySecure, so a general product
+  // video is missing: the button shows and the feature demos stand in - 28 Sep #12.)
+  ok(/^No exact HySecure product video in the library\.\nAll internal: don't send outside Accops\.\nClosest in the library:\n- \*\*/.test(r.text) && !/shared/.test(r.text) && r.missing
+    && r.assets.length === 2 && r.assets.every(a => /Geofencing|Device posture/.test(a.title)), `general product video is missing, demos stand in: ${r.text}`);
 }
 
 // 12. A named Accops product with no document of the asked type about it (27 Sep #15, #7).
@@ -624,6 +627,22 @@ ok(r.trace[0]?.step === "model provider failed, answered by fallback" && /gpt-os
     ["The library has a battlecard that supports SAML federation.", [cxA], "citrix battlecard"],
     ["The deck covers RBI compliance.", [keynote], "RBI framework deck"],
   ]) ok(verdictProblem(dropSending(v), shown, q, false, shown) !== null, `risky verdict passed: "${v}"`);
+}
+// 15b. HySecure demo videos (#12, #34): registry-only feature demos, through ask() on the fixture registry.
+{
+  run([pickSay("The library has no exact HySecure demo video; closest are two demo videos.", "Geofencing control", "Device posture check and related data on management console")]);
+  r = await ask("hysecure demo video");
+  ok(!r.missing && /^The library has two HySecure demo videos\.\n/.test(r.text) && r.assets.length === 2 && traceHas(r, "demo videos found"), `a feature demo answers a demo ask: ${r.text} | ${r.missing}`);
+  run([pickSay("The library has two HySecure demo videos.", "Geofencing control", "Device posture check and related data on management console")]);
+  r = await ask("hysecure demo video");
+  ok(!r.missing && /^The library has two HySecure demo videos\./.test(r.text), `the model's yes stands: ${r.text}`);
+  run([pickSay("The library has no exact HySecure product video; closest are two demo videos.", "Geofencing control", "Device posture check and related data on management console")]);
+  r = await ask("product video hysecure");
+  ok(r.missing && /^No exact HySecure product video in the library\./.test(r.text) && r.assets.every(a => /Geofencing|Device posture/.test(a.title)), `general product video: missing, demos stand in: ${r.text}`);
+  // A HySecure feature demo is not a HyID demo video.
+  run([pickSay("The library has two demo videos.", "Geofencing control", "Device posture check and related data on management console")]);
+  r = await ask("hyid demo video");
+  ok(r.missing && !/^The library has two HyID/.test(r.text), `HySecure demos are not HyID's: ${r.text} | ${r.missing}`);
 }
 
 // 6. Cold start: apiSearch waits for the registry instead of ranking the frozen cards alone.

@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, ENTITIES, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
+import { searchAssets, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, ENTITIES, namesProduct, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured, compatModels } from "./agent-openai";
 import { providerFailure, type AskError } from "./events";
 
@@ -547,7 +547,9 @@ function contextFirst(shown: SearchHit[], turn: string): SearchHit[] {
   return [...shown.filter(lead), ...shown.filter(h => !lead(h))];
 }
 function hasEntity(h: SearchHit, e: string, question: string): boolean {
-  if (OWN_PRODUCTS.has(e)) return isAbout(h.asset, e) || !isDescribed(h.asset);
+  // An unread file counts when its name or folder names the product or one of its features: the
+  // Geofencing demo is HySecure's, not HyID's (it counted for every product before 30 Sep).
+  if (OWN_PRODUCTS.has(e)) return isAbout(h.asset, e) || (!isDescribed(h.asset) && [e, ...(ALIAS[e] ?? [])].some(w => namesProduct(h.asset.file?.path ?? h.asset.title, w)));
   if (!SPECS.has(e)) return entityOn(h.asset, e);
   const product = heuristicFilters(question).product;
   return mentions(h.asset.title, e) && typeGroup(h.asset) !== "Case Study" && (!product || isAbout(h.asset, product));
@@ -769,6 +771,8 @@ export function finish(p: {
   const chosen = [...new Set([...picked, ...named])];
   if (reply.nums.length > picked.length) p.trace.push({ step: "picks: unknown result number", detail: `picked ${reply.nums.join(", ")}; ${reply.nums.length - picked.length} not returned this turn` });
   const denial = !bad.length && DENIAL.test(reply.verdict);
+  const vid = !bad.length ? videoAnswer(own, hits, denial || reply.none || PARTIAL_DENIAL.test(reply.verdict), p.trace) : null;
+  if (vid) return done(vid.verdict, vid.missing ? ["Closest in the library:"] : [], vid.shown, vid.missing);
 
   // "We don't have it": substitutes are the model's picks that clear the relevance floor (max 2), else
   // the best results that do. The model over-rejects - "No pharma case study" over a public pharmacy
@@ -843,6 +847,29 @@ export function finish(p: {
   if (unsendable) p.trace.push({ step: "verdict: nothing sendable", detail: "the rep is sending outside Accops and every shown document is internal" });
   if (partial) p.trace.push({ step: "verdict: partial denial", detail: g });
   return done(final, notes, shown, unsendable || partial);
+}
+
+/** "hysecure demo video" / "product video hysecure" (28 Sep #12, #34). Demo videos are registry-only files
+ *  named for a feature ("Geofencing control.mp4"), so the model cannot see they are HySecure's and wrote
+ *  "The library has no exact HySecure demo video" over two of them. SAM decides from the files: a demo ask
+ *  is met by the product's feature demos; a general product video (overview, intro, walkthrough) only by a
+ *  video named for the product - otherwise it is missing, with the feature demos as substitutes. Null
+ *  leaves the answer to the normal path (not a video ask, no such video, or the model already said yes). */
+const GENERAL_VIDEO = /\b(?:product|overview|intro(?:duction|ductory)?|explainer|corporate|walk-?through)\s+(?:videos?|recordings?)\b/i;
+function videoAnswer(own: string, hits: SearchHit[], modelDenies: boolean, trace: AskResult["trace"]): { verdict: string; shown: SearchHit[]; missing: boolean } | null {
+  const prods = asksAbout(own).filter(e => OWN_PRODUCTS.has(e));
+  if (!typesNamedIn(own).includes("Video") || prods.length !== 1) return null;
+  const p = prods[0], vids = hits.filter(h => isType(h.asset, "Video") && !isJunk(h.asset) && hasEntity(h, p, own));
+  const named = vids.filter(h => isAbout(h.asset, p)), general = GENERAL_VIDEO.test(own);
+  if (!vids.length) return null;
+  if (general && !named.length) {
+    trace.push({ step: "verdict: no product video", detail: `no ${p} video is named for the product; ${vids.length} feature demo(s) stand in` });
+    return { verdict: `No exact ${p} product video in the library.`, shown: vids.slice(0, 2), missing: true };
+  }
+  if (!modelDenies) return null;
+  const show = (general ? named : vids).slice(0, 3), n = ["", "a", "two", "three"][show.length];
+  trace.push({ step: "verdict: demo videos found", detail: `the model denied it, but ${show.map(h => h.asset.title).join("; ")} ${show.length > 1 ? "are" : "is"} ${p}'s`.slice(0, 300) });
+  return { verdict: `The library has ${n} ${p} ${general ? "" : "demo "}video${show.length > 1 ? "s" : ""}.`, shown: show, missing: sending(own) && !show.some(h => h.asset.public_url) };
 }
 
 /** A rep asking for something to SEND gets a sendable document when one was found. Production: for

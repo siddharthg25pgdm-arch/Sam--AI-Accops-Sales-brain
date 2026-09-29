@@ -391,6 +391,10 @@ function matcher(t: string): RegExp {
   const extra = PRODUCT_TERMS[t];
   return extra ? new RegExp([t, ...extra].map(x => tokenMatcher(x).source).join("|")) : tokenMatcher(t);
 }
+/** `text` names the product or a feature it is known by ("Geofencing control" is HySecure). */
+export function namesProduct(text: string, product: string): boolean {
+  return matcher(product.toLowerCase()).test(text.toLowerCase());
+}
 
 /** Named things a rep asks about - competitors, platforms, regulations, regions and languages, and
  *  Accops' own product names - each with the words that name it. Two uses: an ask naming several gets
