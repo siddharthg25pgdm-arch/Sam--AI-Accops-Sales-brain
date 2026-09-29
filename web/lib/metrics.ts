@@ -119,6 +119,19 @@ export async function dashboard(days: number, includeTest: boolean, testUsers: s
   })).data;
 }
 
+export type Usage = {
+  questions: number; people: number; answered: number; gaps: number; instrumented: number; errors: number;
+  model_attempted: number; fallback: number; provider_failures: number; p95: number | null;
+};
+
+/** Real-traffic usage between two instants (sam_usage_window, docs/supabase-sam-digest.sql): the
+ *  dashboard's definitions over a rolling window rather than whole calendar days. */
+export async function usageWindow(from: string, to: string, testUsers: string[]): Promise<Usage | null> {
+  return (await rest<Usage>("rpc/sam_usage_window", {
+    method: "POST", body: JSON.stringify({ p_from: from, p_to: to, p_test_users: testUsers }),
+  })).data;
+}
+
 export type Conversation = {
   id: number; created_at: string; user_id: string; channel: string; session_id: string | null; query: string | null;
   intent: string | null; result_count: number | null; result_ids: string[] | null; result_titles: string[] | null;
