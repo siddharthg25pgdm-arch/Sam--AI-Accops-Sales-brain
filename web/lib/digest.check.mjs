@@ -78,14 +78,15 @@ ok(html.includes("Worth creating") && html.includes("can&rsquo;t describe yet") 
 ok(html.indexOf("Content requests") < html.indexOf("Asked for, never requested") && html.indexOf("Asked for, never requested") < html.indexOf("Library") && html.indexOf("Library") < html.indexOf(">Usage<"), "sections in order");
 
 // --- health rules
-const sick = buildDigest({ ...base, lastFlowWrite: h(60), sync: { scope: "sales", last_run: null, last_result: "snapshot report: 1 would tombstone" }, cardCount: 0,
+const sick = buildDigest({ ...base, lastFlowWrite: h(110), sync: { scope: "sales", last_run: null, last_result: "snapshot report: 1 would tombstone" }, cardCount: 0,
   usage: { ...zero, questions: 10, model_attempted: 10, provider_failures: 4 }, failed: ["usage"] });
 eq(sick.health.length, 5, sick.health.map(x => x.title).join(" | "));
-ok(sick.health.some(x => /change has reached SAM for 3 days/.test(x.title)), "flow silent > 48 h");
+ok(sick.health.some(x => /change has reached SAM for 5 days/.test(x.title)), "flow silent > 96 h");
+ok(!buildDigest({ ...base, lastFlowWrite: h(60) }).health.some(x => /change has reached SAM/.test(x.title)), "a quiet weekend (60 h) is not an alarm");
 ok(sick.health.some(x => /never been checked/.test(x.title) && /report mode \(1 would tombstone\).*"write"/.test(x.detail)), "deletions never applied: report mode named, with the fix");
 ok(busy.lead.endsWith("2 new content requests since yesterday."), busy.lead);
 eq(sick.lead, "No new content requests. 5 things need a look, at the bottom.", "questions but no requests");
-eq(buildDigest({ ...base, lastFlowWrite: h(60) }).lead, "A quiet day. One thing needs a look, at the bottom.", "health only");
+eq(buildDigest({ ...base, lastFlowWrite: h(110) }).lead, "A quiet day. One thing needs a look, at the bottom.", "health only");
 ok(sick.subject.endsWith("5 things to check"), sick.subject);
 const fine = buildDigest({ ...base, lastFlowWrite: h(47), usage: { ...zero, questions: 20, model_attempted: 20, provider_failures: 3 } });
 eq(fine.health.length, 0, "47 h and 15% provider failures are not alarms");

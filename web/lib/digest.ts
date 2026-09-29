@@ -13,7 +13,8 @@ import type { CardingQueueRow, ChangedFile, SyncRow } from "./sharepoint";
 
 /** Distinct reps at which a request is "worth creating". */
 export const WORTH_CREATING = 3;
-const FLOW_STALE_H = 48, DELETIONS_STALE_H = 36;
+// 96 h, not 48: a quiet weekend is normal, and a Monday alarm every week trains everyone to ignore it.
+const FLOW_STALE_H = 96, DELETIONS_STALE_H = 36;
 
 export type DigestInput = {
   now: string;
