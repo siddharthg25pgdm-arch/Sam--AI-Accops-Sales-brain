@@ -444,6 +444,8 @@ accops.com via GTM.
 Requirements, decisions and open questions are in [NOTE-website-chatbot.md](NOTE-website-chatbot.md),
 to be structured in the SAM PRD. Nothing is built.
 
+**PRD (30 Sep 2026, awaiting Siddharth's approval):** [PRD-website-chatbot.md](PRD-website-chatbot.md) - scope by stage, the public-only boundary, 12 open decisions with recommended defaults.
+
 ### P5 - Deliberately not doing yet
 
 - **Embeddings / pgvector.** Held until the usage log shows keyword search missing things. 21 queries
