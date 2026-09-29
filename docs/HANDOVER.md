@@ -18,6 +18,17 @@ The 25 September section below supersedes anything older it contradicts.
 
 ---
 
+## 30 September 2026: eval 28/28
+
+Paced production eval (`prototype/eval.mjs`, 30 questions, all answered by gpt-oss-120b): **hit@3 28/28 = 100%**
+(was 64% on 25 Sep, 89% on 26 Sep, 79% after the answer-contract rewrite). 0 ungrounded names, ~2,100 tokens per
+question. Caveat: 20 of the 30 questions are still modelled, not real asks - replace them from `sam_events` after the
+rep demo. Also merged 30 Sep: context competitors ("moving off X" is not a required entity), precise `dropSending`,
+fairer verdict guard, `nearFirst` substitutes for missing topics, video asks; WhatsApp token expiry warning in the
+morning digest (Meta debug_token, 21 days ahead) + click-by-click guide in `TASK-whatsapp-meta-setup.md`.
+
+---
+
 ## 29 September 2026: the daily loop runs itself
 
 | Time (IST) | What | Where |
