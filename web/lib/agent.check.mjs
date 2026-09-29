@@ -607,6 +607,23 @@ ok(r.trace[0]?.step === "model provider failed, answered by fallback" && /gpt-os
     ["The library has two BFSI case studies that are ready to send.", "The library has two BFSI case studies."],
     ["The library has two decks; both can be shared.", "The library has two decks."],
   ]) ok(dropSending(v) === want, `dropSending("${v}") -> "${dropSending(v)}", want "${want}"`);
+  // 3. Fair verdicts the guard threw away (#5 "supporting", dry-run "can be used"); risky ones still caught.
+  const { verdictProblem } = await jiti.import("./agent.ts");
+  const rbiCase = h("Two Leading Indian Private Banks: Secure Access, MFA and Biometrics", { industry: "BFSI", year: "2026", pub: 1, brief: "RBI-mandated MFA for vendors at two private banks." });
+  const keynote = h("Trusted Access for an Untrusted World: Redefining Cyber Resilience in BFSI - IBA CISO Summit", { type: "Deck", year: "2025" });
+  const cxA = h("Accops Powered VDI vs Citrix VDI", { type: "Battlecard", year: "2024" }), cxB = h("Accops vs Citrix and VMware Horizon", { type: "Battlecard", year: "2024" });
+  for (const [v, shown, q] of [
+    ["The library has a relevant case study and a supporting deck.", [rbiCase, keynote], "CISO at a pvt bank asked about the RBI cyber security framework, what can i send the CISO"],
+    ["The library has two 2024 Citrix battlecards that can be used for prep.", [cxA, cxB], "citrix battlecard for my own prep before the call tmrw"],
+    ["The library has a BFSI case study that supports your RBI conversation.", [rbiCase], "RBI framework, what can i send the CISO"],
+  ]) ok(verdictProblem(dropSending(v), shown, q, false, shown) === null, `fair verdict rejected: "${v}" -> ${verdictProblem(dropSending(v), shown, q, false, shown)}`);
+  for (const [v, shown, q] of [
+    ["The HySecure datasheet can be framed to meet APRA CPS 234.", [cxA], "apra angle for hysecure"],
+    ["The library has a case study that can be used for a bank moving off Citrix.", [b1], "pvt bank moving off citrix, bfsi case study"],
+    ["The library has a deck that supports 10,000 concurrent users.", [keynote], "hysecure sizing deck"],
+    ["The library has a battlecard that supports SAML federation.", [cxA], "citrix battlecard"],
+    ["The deck covers RBI compliance.", [keynote], "RBI framework deck"],
+  ]) ok(verdictProblem(dropSending(v), shown, q, false, shown) !== null, `risky verdict passed: "${v}"`);
 }
 
 // 6. Cold start: apiSearch waits for the registry instead of ranking the frozen cards alone.

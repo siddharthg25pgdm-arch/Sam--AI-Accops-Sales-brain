@@ -371,8 +371,10 @@ export function readReply(text: string): { verdict: string; nums: number[]; none
 }
 
 /** Words that say what a document covers, or that fit it to the rep's situation. None may appear in a
- *  verdict: what a document covers is printed from its card, below the verdict. */
-const COVERAGE = /\b(cover(s|ed|ing)?|includ(e|es|ed|ing)|contain(s|ed|ing)?|show(s|ed|ing|cases?)?|detail(s|ed|ing)?|describ(e|es|ed|ing)|explain(s|ed|ing)?|demonstrat(e|es|ed|ing)|walks? through|outlin(e|es|ed|ing)|highlight(s|ed|ing)?|compar(e|es|ed|ing)|address(es|ed|ing)?|provid(e|es|ed|ing)|spells? out|mapp(ed|ing)|has (a|an|the)|with (a|an|the) (section|slide|chapter|table|figure))\b|\bcan be (framed|adapted|tailored|positioned|used|repurposed|reused)\b|\b(replaced|migrated|moved off|switched from)\b/i;
+ *  verdict: what a document covers is printed from its card, below the verdict. "can be used (for prep)",
+ *  "supports" and "a supporting deck" are not here: they name the rep's purpose, and every word around them
+ *  is still checked (28 Sep #5 and the dry-run Citrix battlecard lost fair verdicts to them). */
+const COVERAGE = /\b(cover(s|ed|ing)?|includ(e|es|ed|ing)|contain(s|ed|ing)?|show(s|ed|ing|cases?)?|detail(s|ed|ing)?|describ(e|es|ed|ing)|explain(s|ed|ing)?|demonstrat(e|es|ed|ing)|walks? through|outlin(e|es|ed|ing)|highlight(s|ed|ing)?|compar(e|es|ed|ing)|address(es|ed|ing)?|provid(e|es|ed|ing)|spells? out|mapp(ed|ing)|has (a|an|the)|with (a|an|the) (section|slide|chapter|table|figure))\b|\bcan be (framed|adapted|tailored|positioned|repurposed|reused)\b|\b(replaced|migrated|moved off|switched from)\b/i;
 
 /** Why a verdict may not be shown, or null when it may. A denial ("No exact APRA material") may name
  *  what is missing in the rep's words; anything else may only name what the shown cards have.
@@ -466,7 +468,8 @@ outreach customer client prospect buyer cio ciso cto team deck slide presentatio
 case study studies video demo certificate certification report guide pager page short shorter long longer brief overview story reference proof
 own you your our its their them they ready right direct directly general generic specific similar same other another more most less least
 nearest instead yet though however which what why how where when who whom whose than then such very just assumed assuming meaning means
-ones related partial partly full complete standalone dedicated product solution`.split(/\s+/)
+ones related partial partly full complete standalone dedicated product solution
+used support supports supporting supported conversation discussion`.split(/\s+/)
   .concat(PRODUCTS.map(p => p.toLowerCase()), [...OWN_PRODUCTS].map(p => p.toLowerCase())));
 
 /** One document's line, written from its card. Nothing in it comes from the model. */
