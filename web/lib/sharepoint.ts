@@ -324,6 +324,32 @@ export async function cardingQueue(reason?: string, limit = 2000): Promise<Cardi
   return (await rest(`sam_carding_queue?${f}select=*&order=modified_at.desc.nullslast&limit=${limit}`)) as CardingQueueRow[];
 }
 
+export type ChangedFile = {
+  item_id: string; filename: string; folder: string; web_url: string;
+  created_at: string | null; deleted: boolean; deleted_at: string | null; last_synced: string | null;
+};
+
+/** Registry rows the change flow wrote, or the snapshot tombstoned, since `since`. For the digest. */
+export async function changedSince(since: string, scope = "sales"): Promise<ChangedFile[]> {
+  if (!configured()) return [];
+  const s = encodeURIComponent(since);
+  return (await rest(`sam_sharepoint_files?scope=eq.${scope}&or=(last_synced.gte.${s},deleted_at.gte.${s})` +
+    `&select=item_id,filename,folder,web_url,created_at,deleted,deleted_at,last_synced&order=last_synced.desc.nullslast&limit=500`)) as ChangedFile[];
+}
+
+/** When the change flow last wrote anything: the newest last_synced in the registry. */
+export async function lastFlowWrite(scope = "sales"): Promise<string | null> {
+  if (!configured()) return null;
+  const rows = (await rest(`sam_sharepoint_files?scope=eq.${scope}&last_synced=not.is.null&select=last_synced&order=last_synced.desc&limit=1`)) as { last_synced: string }[];
+  return rows?.[0]?.last_synced ?? null;
+}
+
+/** Cards whose content changed since `since` (carded_at moves only when card_hash does). */
+export async function cardedSince(since: string): Promise<{ title: string; filename: string; carded_at: string }[]> {
+  if (!configured()) return [];
+  return (await rest(`sam_asset_cards?carded_at=gte.${encodeURIComponent(since)}&select=title,filename,carded_at&order=carded_at.desc&limit=200`)) as { title: string; filename: string; carded_at: string }[];
+}
+
 export type SyncRow ={ scope: string; last_run: string | null; last_result: string | null };
 
 /** When deletions were last reconciled.
