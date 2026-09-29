@@ -10,6 +10,7 @@
 import { ratio, type Ratio, type Usage } from "./metrics";
 import { STATUS_LABEL, type GapSignal, type RankedRequest } from "./requests";
 import type { CardingQueueRow, ChangedFile, SyncRow } from "./sharepoint";
+import { latestRatings, FEEDBACK_LABEL, type Rating } from "./feedback";
 
 /** Distinct reps at which a request is "worth creating". */
 export const WORTH_CREATING = 3;
@@ -35,7 +36,11 @@ export type DigestInput = {
   /** WhatsApp access token, from Meta's debug_token. Omitted when WhatsApp isn't configured.
    *  `expiresAt` null = never expires (a permanent system-user token). */
   whatsapp?: { valid: boolean; expiresAt: string | null };
+  /** Ratings under answers in the last 24 h, real traffic only, each with its question. */
+  ratings?: Rating[] | null;
 };
+
+export type DigestRating = { kind: "wrong_asset" | "missing"; label: string; question: string; shown: string[]; who: string; at: string };
 
 export type DigestRequest = { id: number; title: string; reps: number; new_reps: number; is_new: boolean; worth: boolean;
   first_asked: string; last_asked: string; status: string; owner: string | null; due: string | null; url: string };
@@ -56,6 +61,7 @@ export type Digest = {
     questions: number; people: number; answered: Ratio; gaps: number; errors: number; fallback: Ratio; p95_ms: number | null;
     week: { questions_per_day: number; answered: Ratio; fallback: Ratio; p95_ms: number | null } | null;
   } | null;
+  ratings: { total: number; helpful: number; wrong_asset: number; missing: number; examples: DigestRating[]; url: string } | null;
   health: HealthItem[];
   admin_url: string;
 };
@@ -141,6 +147,15 @@ export function buildDigest(i: DigestInput): Digest {
     week: w && w.questions > 0 ? { questions_per_day: Math.round((w.questions / 7) * 10) / 10, answered: ratio(w.answered, w.questions), fallback: ratio(w.fallback, w.model_attempted), p95_ms: w.p95 } : null,
   } : null;
 
+  // What reps told us: one per rep per answer, the latest. Examples are the ones marketing acts on.
+  const rated = latestRatings(i.ratings ?? []).filter(r => r.created_at >= since);
+  const count = (k: string) => rated.filter(r => r.feedback === k).length;
+  const ratings = rated.length ? {
+    total: rated.length, helpful: count("helpful"), wrong_asset: count("wrong_asset"), missing: count("missing"), url: `${admin}?tab=quality`,
+    examples: rated.filter(r => r.feedback !== "helpful" && r.asked?.query).slice(0, 3).map<DigestRating>(r => ({
+      kind: r.feedback as DigestRating["kind"], label: FEEDBACK_LABEL[r.feedback], question: r.asked!.query!, shown: (r.asked!.result_titles ?? []).slice(0, 2), who: r.user_id, at: r.created_at })),
+  } : null;
+
   // Health: only what is wrong.
   const health: HealthItem[] = [];
   if (i.failed.length) health.push({ title: `Could not read ${i.failed.join(", ")}`, detail: "Those parts are missing from this email, not empty. The server log has the error." });
@@ -177,6 +192,7 @@ export function buildDigest(i: DigestInput): Digest {
     !newReq && !worth && requests && plural(requests.open_count, "open request"),
     changed && plural(changed, "file") + " changed",
     qs && plural(qs, "question"),
+    ratings && plural(ratings.total, "rating"),
     health.length && plural(health.length, "thing") + " to check",
   ].filter(Boolean) as string[];
   const subject = `SAM: ${parts.length ? parts.join(", ") : "nothing new"}`;
@@ -188,13 +204,13 @@ export function buildDigest(i: DigestInput): Digest {
     newReq ? `${plural(newReq, "new content request")} since yesterday.` : requests && !top?.worth && `${plural(requests.open_count, "content request")} open, nothing new since yesterday.`,
   ].filter(Boolean) as string[];
   const lead = !parts.length ? "Nothing new in the last 24 hours. No requests, no library changes, no questions, and nothing needs you."
-    : [...(said.length ? said : [!changed && !qs ? "A quiet day." : "No new content requests."]), ...(health.length ? [needs] : [])].join(" ");
+    : [...(said.length ? said : [!changed && !qs && !ratings ? "A quiet day." : "No new content requests."]), ...(health.length ? [needs] : [])].join(" ");
 
   const p = istParts(i.now);
   return {
     subject, lead, generated_at: i.now,
     period: { from: since, to: i.now, label: `Last 24 hours, to ${p.hh}:${p.mm} IST` },
-    requests, gaps, library, usage, health, admin_url: admin,
+    requests, gaps, library, usage, ratings, health, admin_url: admin,
   };
 }
 
@@ -266,6 +282,17 @@ export function renderHtml(d: Digest): string {
     out.push(section("Asked for, never requested",
       `SAM had nothing for these in the last 7 days and nobody asked marketing.${d.gaps.total > 5 ? ` Top 5 of ${d.gaps.total}.` : ""} Turn one into a request from the queue.`,
       table(items), ["Review", d.gaps.url]));
+  }
+
+  if (d.ratings) {
+    const r = d.ratings;
+    const counts = [r.wrong_asset && `${r.wrong_asset} wrong asset`, r.missing && `${r.missing} doesn&rsquo;t exist`, r.helpful && `${r.helpful} helpful`].filter(Boolean).join(dot);
+    const items = r.examples.map(x => row(td(`padding:10px 0;border-bottom:1px solid ${LINE};`,
+      `<div style="font-size:15px;line-height:21px;color:${INK};">&ldquo;${esc(x.question)}&rdquo;</div>` +
+      `<div style="padding-top:2px;font-size:13px;line-height:18px;color:${GREY};">${meta([
+        pill(x.label, x.kind === "missing" ? "#e8f2ff" : "#fff1e0", x.kind === "missing" ? "#0058b0" : "#9a5b00"), esc(x.who),
+        x.kind === "wrong_asset" && x.shown.length ? `shown ${x.shown.map(esc).join(", ")}` : x.kind === "missing" ? "counted as a content request" : ""])}</div>`))).join("");
+    out.push(section("What reps told us", `${plural(r.total, "rating")} under answers: ${counts}.`, table(items), ["All ratings", r.url]));
   }
 
   if (d.library) {

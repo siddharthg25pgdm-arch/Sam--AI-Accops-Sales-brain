@@ -6,6 +6,7 @@ import { usageWindow } from "@/lib/metrics";
 import { listRequests, unrequestedGaps, ACTIVE, type Status } from "@/lib/requests";
 import { cardedSince, cardingQueue, changedSince, lastFlowWrite, syncStatus } from "@/lib/sharepoint";
 import { cardsReady, cardCacheState } from "@/lib/cards-cache";
+import { loadRatings } from "@/lib/feedback";
 
 export const maxDuration = 30;
 export const dynamic = "force-dynamic";
@@ -55,7 +56,7 @@ export async function GET(req: Request) {
   };
 
   const users = testUsers();
-  const [all, gapEvents, changes, queue, carded, usage, usagePrev, flow, sync, , whatsapp] = await Promise.all([
+  const [all, gapEvents, changes, queue, carded, usage, usagePrev, flow, sync, , whatsapp, ratings] = await Promise.all([
     safe("content requests", listRequests({ statuses: ALL })),
     safe("content gaps", recentEvents(1000, `kind=eq.gap&created_at=gte.${encodeURIComponent(new Date(t - 7 * 86_400_000).toISOString())}&${realOnly()}`)),
     safe("SharePoint changes", changedSince(since)),
@@ -67,6 +68,8 @@ export async function GET(req: Request) {
     syncStatus().catch(() => { failed.push("deletion check status"); return null; }),
     cardsReady(),
     whatsappToken(),
+    // ?test=1 lets the ratings section include test traffic, to check it end to end from local dev.
+    safe("ratings", loadRatings({ from: since, to: now, real: new URL(req.url).searchParams.get("test") !== "1", limit: 500 })),
   ]);
 
   const d = buildDigest({
@@ -74,7 +77,7 @@ export async function GET(req: Request) {
     requests: all ? all.filter(r => ACTIVE.includes(r.status)) : null,
     gaps: all && gapEvents ? unrequestedGaps(gapEvents, all.map(r => r.topic_key)) : null,
     changes, queue, carded, usage, usagePrev, lastFlowWrite: flow, sync,
-    cardCount: cardCacheState().count, failed: [...new Set(failed)], whatsapp,
+    cardCount: cardCacheState().count, failed: [...new Set(failed)], whatsapp, ratings,
   });
 
   const headers = { "Cache-Control": "no-store", "X-SAM-Subject": d.subject };

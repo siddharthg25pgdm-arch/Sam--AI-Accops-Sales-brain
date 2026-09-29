@@ -113,4 +113,28 @@ if (process.env.DIGEST_OUT) {
   ok(!buildDigest({ ...base }).health.some(x => /WhatsApp/.test(x.title)), "WhatsApp not configured is quiet");
 }
 
+// What reps told us: counts, up to 3 examples that need action, one per rep per answer, 24 h only.
+{
+  let id = 1;
+  const rating = (u, fb, q, hrsAgo, extra = {}) => { const qid = id++; return { id: id++, created_at: h(hrsAgo), user_id: u, channel: "web", feedback: fb, ref_event_id: qid, is_test: false,
+    asked: { id: qid, created_at: h(hrsAgo), user_id: u, channel: "web", query: q, answer: "x", result_ids: ["a.pdf", "b.pdf", "c.pdf"], result_titles: ["A <deck>", "B", "C"] }, ...extra }; };
+  const rs = [rating("a", "wrong_asset", "citrix battlecard for a bank", 2), rating("b", "missing", "arabic hysecure brochure", 3), rating("c", "helpful", "hyid datasheet", 4),
+    rating("d", "wrong_asset", "vdi for pharma", 5), rating("e", "missing", "gcc case study", 6), rating("f", "wrong_asset", "old one", 30)];
+  const flipped = { ...rs[2], id: 999, feedback: "wrong_asset", created_at: h(1) };  // "c" changed their mind: latest wins
+  const d = buildDigest({ ...base, ratings: [...rs, rating("x", "helpful", "someone else's", 2, { user_id: "intruder" })] });
+  eq(d.ratings.total, 5, "24 h only, own questions only");
+  ok(d.ratings.wrong_asset === 2 && d.ratings.missing === 2 && d.ratings.helpful === 1, JSON.stringify(d.ratings));
+  eq(d.ratings.examples.length, 3, "at most 3 examples"); ok(d.ratings.examples.every(x => x.kind !== "helpful"), "examples are wrong asset / doesn't exist only");
+  eq(d.ratings.examples[0].question, "citrix battlecard for a bank", "newest first");
+  eq(buildDigest({ ...base, ratings: [...rs, flipped] }).ratings.helpful, 0, "latest rating per answer wins");
+  eq(d.subject, "SAM: 5 ratings", d.subject);
+  ok(d.lead === "No new content requests.", d.lead);
+  const html = renderHtml(d);
+  ok(html.includes("What reps told us") && html.includes("&ldquo;citrix battlecard for a bank&rdquo;") && html.includes("A &lt;deck&gt;") && !html.includes("<deck>"), "section renders, escaped");
+  ok(html.indexOf("What reps told us") > 0 && !renderHtml(buildDigest({ ...base, ratings: [] })).includes("What reps told us"), "left out when empty");
+  eq(buildDigest({ ...base, ratings: [] }).subject, "SAM: nothing new", "no ratings, nothing in the subject");
+  eq(buildDigest({ ...base, ratings: null }).ratings, null, "a failed read is not a section");
+  if (process.env.DIGEST_OUT) fs.writeFileSync(`${process.env.DIGEST_OUT}/ratings.html`, html);
+}
+
 console.log(`digest.check: ${n} assertions passed`);
