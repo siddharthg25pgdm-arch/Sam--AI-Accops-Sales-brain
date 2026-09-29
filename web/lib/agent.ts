@@ -406,7 +406,10 @@ export function verdictProblem(verdict: string, shown: SearchHit[], question: st
     const neg = denial || /^\W*(?:(?:but|though|however|and|although)\s+)?(?:there (?:is|are)\s+)?(?:no|not|none|nothing|without)\b/i.test(clause);
     // Entities only from the SHOWN cards (a region only from their title, client or industry): "GCC"
     // in a card's use_for is not a GCC pitch (#10), "for SEA prospects" not a Malaysia reference (#25).
-    const foreign = namedEntities(clause).filter(e => !OWN_PRODUCTS.has(e) && !(neg && mentions(q, e)) && !shown.some(h => entityOn(h.asset, e)));
+    // The rep's situation in their words ("for a private bank moving off Citrix") may be repeated, but not
+    // as what a document is of or about ("case studies of banks moving off Citrix").
+    const ofPart = clause.match(/\b(?:of|about|where|whose|showing)\b.*$/i)?.[0] ?? "";
+    const foreign = namedEntities(clause).filter(e => !OWN_PRODUCTS.has(e) && !(neg && mentions(q, e)) && !(isContext(question, e) && !mentions(ofPart, e)) && !shown.some(h => entityOn(h.asset, e)));
     if (foreign.length) return `names ${foreign.join(", ")}, which no shown card mentions`;
     const on = `${cards} ${more} ${neg ? q : ""}`;
     const nums = (clause.match(/\b\d[\d,]{2,}\b/g) ?? []).filter(n => !on.includes(n) && !on.includes(n.replace(/,/g, "")));
@@ -970,12 +973,12 @@ function nearFirst(subs: SearchHit[], missing: string[], turn: string, trace: As
   // In the title counts most; mentions in the text count up to two (a 60-slide deck mentions everything).
   const near = (a: Asset) => { const t = cardText(a), title = a.title.toLowerCase(); return (res.some(r => r.test(title)) ? 2 : 0) + Math.min(2, res.filter(r => r.test(t)).length); };
   const prods = [...new Set([heuristicFilters(turn).product, ...asksAbout(turn).filter(e => OWN_PRODUCTS.has(e))].filter(Boolean))];
-  const score = (a: Asset) => near(a) && near(a) + (types.some(t => isType(a, t)) ? 3 : 0) + (prods.some(e => isAbout(a, e)) ? 1 : 0) + substituteQuality(a) * 2;
+  const score = (a: Asset) => { const n = near(a); return n && n + (types.some(t => isType(a, t)) ? 3 : 0) + (prods.some(e => isAbout(a, e)) ? 1 : 0) + substituteQuality(a) * 2; };
   // Two substitutes: the product's own document when namedFirst brought one (`lead`), then near ones.
   const lead = subs.slice(0, productLead ? 1 : 0), rest = subs.slice(lead.length);
   const have = rest.filter(h => near(h.asset) >= 2), want = 2 - lead.length - have.length; // one passing mention ("GCC Security Symposium" on an award slide) is not near
-  const add = want <= 0 ? [] : allAssets().filter(a => !isJunk(a) && regionOk(turn, a) && score(a) > 0 && !subs.some(h => assetKey(h.asset) === assetKey(a)))
-    .sort((x, y) => score(y) - score(x)).slice(0, want).map(a => ({ asset: a, score: 0, why: NEAR_WHY }));
+  const add = want <= 0 ? [] : allAssets().filter(a => !isJunk(a) && regionOk(turn, a) && !subs.some(h => assetKey(h.asset) === assetKey(a)))
+    .map(a => ({ a, s: score(a) })).filter(x => x.s > 0).sort((x, y) => y.s - x.s).slice(0, want).map(({ a }) => ({ asset: a, score: 0, why: NEAR_WHY }));
   if (add.length) trace.push({ step: "substitutes: near the missing topic", detail: `${add.map(h => h.asset.title).join("; ")} for ${missing.join(", ")}`.slice(0, 300) });
   return [...lead, ...have, ...add, ...rest.filter(h => !have.includes(h))];
 }

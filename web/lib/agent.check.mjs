@@ -596,6 +596,10 @@ ok(r.trace[0]?.step === "model provider failed, answered by fallback" && /gpt-os
   const cxCase = h("Private Bank Moves off Citrix: VDI Case Study", { industry: "BFSI", year: "2026", pub: 1 });
   r = fin(bankQ, "The library has three BFSI case studies.\nPICKS: 1, 2, 3", [b1, b2, cxCase]);
   ok(r.assets[0]?.title === cxCase.asset.title && !r.missing, `a case study naming the context competitor goes first: ${r.assets.map(a => a.title)}`);
+  r = fin(bankQ, "The library has two 2026 BFSI case studies for a private bank moving off Citrix.\nPICKS: 1, 2", [b1, b2]);
+  ok(!r.missing && /^The library has two 2026 BFSI case studies for a private bank moving off Citrix\./.test(r.text), `the rep's situation may be repeated in the verdict: ${r.text}`);
+  r = fin(bankQ, "The library has two case studies of banks moving off Citrix.\nPICKS: 1, 2", [b1, b2]);
+  ok(/^Best matches in the library\./.test(r.text), `...but not as what a document is about: ${r.text}`);
   r = fin("citrix battlecard", "The library has a BFSI case study.\nPICKS: 1", [b1]);
   ok(r.missing && /No exact match for Citrix/.test(r.text), `Citrix as the object is still required: ${r.text}`);
   // 2. dropSending strips the sending claim, keeps the description, and fixes a/an (#3, dry-run Kerala).
@@ -622,7 +626,8 @@ ok(r.trace[0]?.step === "model provider failed, answered by fallback" && /gpt-os
   ]) ok(verdictProblem(dropSending(v), shown, q, false, shown) === null, `fair verdict rejected: "${v}" -> ${verdictProblem(dropSending(v), shown, q, false, shown)}`);
   for (const [v, shown, q] of [
     ["The HySecure datasheet can be framed to meet APRA CPS 234.", [cxA], "apra angle for hysecure"],
-    ["The library has a case study that can be used for a bank moving off Citrix.", [b1], "pvt bank moving off citrix, bfsi case study"],
+    ["The library has a case study that can be used to show a Citrix migration.", [b1], "pvt bank moving off citrix, bfsi case study"],
+    ["The library has a case study about a bank moving off Citrix.", [b1], "pvt bank moving off citrix, bfsi case study"],
     ["The library has a deck that supports 10,000 concurrent users.", [keynote], "hysecure sizing deck"],
     ["The library has a battlecard that supports SAML federation.", [cxA], "citrix battlecard"],
     ["The deck covers RBI compliance.", [keynote], "RBI framework deck"],
