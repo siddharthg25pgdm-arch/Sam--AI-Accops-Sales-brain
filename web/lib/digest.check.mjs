@@ -82,7 +82,10 @@ const sick = buildDigest({ ...base, lastFlowWrite: h(60), sync: { scope: "sales"
   usage: { ...zero, questions: 10, model_attempted: 10, provider_failures: 4 }, failed: ["usage"] });
 eq(sick.health.length, 5, sick.health.map(x => x.title).join(" | "));
 ok(sick.health.some(x => /change has reached SAM for 3 days/.test(x.title)), "flow silent > 48 h");
-ok(sick.health.some(x => /never been checked/.test(x.title) && /would tombstone/.test(x.detail)), "deletions never applied, report-mode result shown");
+ok(sick.health.some(x => /never been checked/.test(x.title) && /report mode \(1 would tombstone\).*"write"/.test(x.detail)), "deletions never applied: report mode named, with the fix");
+ok(busy.lead.endsWith("2 new content requests since yesterday."), busy.lead);
+eq(sick.lead, "No new content requests. 5 things need a look, at the bottom.", "questions but no requests");
+eq(buildDigest({ ...base, lastFlowWrite: h(60) }).lead, "A quiet day. One thing needs a look, at the bottom.", "health only");
 ok(sick.subject.endsWith("5 things to check"), sick.subject);
 const fine = buildDigest({ ...base, lastFlowWrite: h(47), usage: { ...zero, questions: 20, model_attempted: 20, provider_failures: 3 } });
 eq(fine.health.length, 0, "47 h and 15% provider failures are not alarms");

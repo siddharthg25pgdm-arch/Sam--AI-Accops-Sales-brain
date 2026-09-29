@@ -59,6 +59,7 @@ export type Digest = {
 // ---------------------------------------------------------------- dates (IST)
 
 const IST = "Asia/Kolkata";
+const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 function istParts(iso: string) {
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: IST, year: "numeric", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", weekday: "long", hourCycle: "h23" })
@@ -76,6 +77,8 @@ export function day(iso: string | null | undefined): string {
 }
 const hoursSince = (iso: string | null | undefined, now: string) => iso ? (Date.parse(now) - Date.parse(iso)) / 3_600_000 : null;
 const daysText = (h: number) => h < 48 ? `${Math.round(h)} hours` : `${Math.round(h / 24)} days`;
+/** "snapshot report: 1 would tombstone, ..." -> "1 would tombstone, ..."; a refusal keeps its reason. */
+const snapText = (r: string) => r.replace(/^snapshot (report|write)( REFUSED)?:\s*/, (_, _m, ref) => ref ? "refused: " : "");
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
 // ---------------------------------------------------------------- assembly (checked)
@@ -123,7 +126,7 @@ export function buildDigest(i: DigestInput): Digest {
   const library = changed || i.carded?.length || q.length ? {
     changed, added: added.map(file), modified: modified.map(file), renamed: renamed.map(file), deleted: deleted.map(file),
     carded: (i.carded ?? []).map(c => ({ title: c.title || c.filename })),
-    deletion_check: syncFresh ? i.sync?.last_result ?? null : null, queue,
+    deletion_check: syncFresh && i.sync?.last_result ? snapText(i.sync.last_result) : null, queue,
   } : null;
 
   // Usage. The 7-day side is the 7 x 24 h before the window, so a day is compared with a day.
@@ -145,7 +148,7 @@ export function buildDigest(i: DigestInput): Digest {
   const delH = hoursSince(i.sync?.last_run, i.now);
   if (delH === null || delH > DELETIONS_STALE_H) health.push({
     title: delH === null ? "Deleted files have never been checked" : `Deleted files not checked for ${daysText(delH)}`,
-    detail: `${i.sync?.last_run ? `Deletions last applied ${day(i.sync.last_run)}. ` : ""}${i.sync?.last_result ? `Latest snapshot run: ${i.sync.last_result}. ` : ""}Only a write-mode run of "SAM - daily SharePoint snapshot" counts. Until one succeeds, SAM may link to files that are gone.`,
+    detail: `${i.sync?.last_run ? `Deletions last applied ${day(i.sync.last_run)}. ` : ""}${/^snapshot report/.test(i.sync?.last_result ?? "") ? `The last run of "SAM - daily SharePoint snapshot" was in report mode (${snapText(i.sync?.last_result ?? "")}), which applies nothing: set "mode" to "write". ` : i.sync?.last_result ? `Latest run: ${snapText(i.sync.last_result)}. ` : `The flow "SAM - daily SharePoint snapshot" has not run. `}Until a write-mode run succeeds, SAM may link to files that are gone.`,
   });
   if (u && u.provider_failures >= 3 && u.provider_failures >= 0.2 * Math.max(u.model_attempted, 1)) health.push({
     title: "The model provider is failing",
@@ -166,12 +169,13 @@ export function buildDigest(i: DigestInput): Digest {
   const subject = `SAM: ${parts.length ? parts.join(", ") : "nothing new"}`;
 
   const top = requests?.items[0];
+  const needs = health.length === 1 ? "One thing needs a look, at the bottom." : `${health.length} things need a look, at the bottom.`;
+  const said = [
+    top?.worth && `"${top.title}" is worth creating: ${plural(top.reps, "rep")} asked.`,
+    newReq ? `${plural(newReq, "new content request")} since yesterday.` : requests && !top?.worth && `${plural(requests.open_count, "content request")} open, nothing new since yesterday.`,
+  ].filter(Boolean) as string[];
   const lead = !parts.length ? "Nothing new in the last 24 hours. No requests, no library changes, no questions, and nothing needs you."
-    : top?.worth ? `"${top.title}" is worth creating: ${plural(top.reps, "rep")} asked.`
-    : newReq ? `${plural(newReq, "new content request")} since yesterday morning.`
-    : requests ? `${plural(requests.open_count, "content request")} open. Nothing new since yesterday.`
-    : health.length && !changed && !qs ? "A quiet day. " + (health.length === 1 ? "One thing needs a look." : `${health.length} things need a look.`)
-    : "No new content requests.";
+    : [...(said.length ? said : [!changed && !qs ? "A quiet day." : "No new content requests."]), ...(health.length ? [needs] : [])].join(" ");
 
   const p = istParts(i.now);
   return {
@@ -197,8 +201,8 @@ const pct = (r: Ratio) => r.den === 0 ? "–" : r.pct == null ? `${r.num} of ${r
 const secs = (ms: number | null) => ms == null ? "–" : ms < 10_000 ? `${(ms / 1000).toFixed(1)} s` : `${Math.round(ms / 1000)} s`;
 
 function section(title: string, sub: string, body: string, link?: [string, string]) {
-  return row(td(`padding:28px 0 0 0;`, table(
-    row(td(`border-top:1px solid ${LINE};padding:22px 0 4px 0;font-size:17px;line-height:22px;font-weight:600;color:${INK};`, esc(title) +
+  return row(td(`padding:24px 0 0 0;`, table(
+    row(td(`border-top:1px solid ${LINE};padding:20px 0 4px 0;font-size:17px;line-height:22px;font-weight:600;color:${INK};`, esc(title) +
       (link ? `<span style="font-size:13px;font-weight:400;">&nbsp;&nbsp;${a(link[1], esc(link[0]) + " &rsaquo;")}</span>` : ""))) +
     (sub ? row(td(`padding:0 0 10px 0;font-size:13px;line-height:18px;color:${GREY};`, sub)) : "") +
     row(td("", body)))));
@@ -217,7 +221,7 @@ export function renderHtml(d: Digest): string {
   const p = istParts(d.generated_at);
 
   out.push(row(td(`padding:0 0 4px 0;font-size:13px;line-height:18px;color:${GREY};letter-spacing:0.2px;`, `SAM${dot}Morning digest`)));
-  out.push(row(td(`padding:0;font-size:24px;line-height:30px;font-weight:700;color:${INK};`, esc(`${p.wd}, ${p.d} ${MONTHS[p.m - 1]}`))));
+  out.push(row(td(`padding:0;font-size:24px;line-height:30px;font-weight:700;color:${INK};`, esc(`${p.wd}, ${p.d} ${FULL_MONTHS[p.m - 1]}`))));
   out.push(row(td(`padding:4px 0 0 0;font-size:13px;line-height:18px;color:${GREY};`, esc(d.period.label))));
   out.push(row(td(`padding:18px 0 0 0;font-size:16px;line-height:23px;color:${INK};`, esc(d.lead))));
 
@@ -297,8 +301,8 @@ export function renderHtml(d: Digest): string {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${esc(d.subject)}</title></head>` +
     `<body style="margin:0;padding:0;background:#f5f5f7;">` +
     `<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${esc(d.lead)}</div>` +
-    table(row(td("padding:24px 12px;", `<!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->` +
-      table(row(td("padding:28px 24px 28px 24px;", table(out.join("")))), "max-width:600px;margin:0 auto;background:#ffffff;border-radius:14px;") +
+    table(row(td("padding:16px 8px;", `<!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->` +
+      table(row(td("padding:26px 20px;background:#ffffff;border-radius:14px;", table(out.join("")))), "max-width:600px;margin:0 auto;background:#ffffff;border-radius:14px;") +
       `<!--[if mso]></td></tr></table><![endif]-->`, `align="center"`)), "background:#f5f5f7;") +
     `</body></html>`;
 }
