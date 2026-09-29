@@ -1,5 +1,5 @@
 -- SAM feedback loop. Applied to accops-marketing-dashboard (ref iwqhayuoxnrhqzozznes) as migration
--- sam_feedback_loop on 30 September 2026. Code: web/lib/feedback.ts, web/app/api/feedback/route.ts.
+-- sam_feedback_loop on 30 September 2026 (function refined in sam_feedback_loop_upgrade, same day). Code: web/lib/feedback.ts, web/app/api/feedback/route.ts.
 --
 -- 1. "What I need doesn't exist" is a content-request vote (source/channel 'feedback'), exactly like
 --    pressing "Ask marketing to create this", keyed by the answered question's topic key.
@@ -50,6 +50,7 @@ declare
   r sam_content_requests;
   v_new_req boolean := false;
   v_new_vote boolean := false;
+  v_upgrade boolean := false;
   n int;
 begin
   if p_event_id is not null and p_user is not null then
@@ -85,15 +86,20 @@ begin
     end;
   end if;
   if p_user is not null then
+    -- An explicit ask on a request this rep only RATED (from another answer) upgrades that vote to the
+    -- rep's own, and reads to the rep as a new ask. A rating never overwrites anything.
+    if coalesce(p_source, 'rep') <> 'feedback' then
+      select exists (select 1 from sam_content_request_votes where request_id = r.id and user_id = p_user and channel = 'feedback') into v_upgrade;
+    end if;
     insert into sam_content_request_votes (request_id, user_id, channel, question, note, event_id)
       values (r.id, p_user, coalesce(p_channel, 'web'), p_question, p_note, p_event_id)
       on conflict (request_id, user_id) do update
         set note = coalesce(excluded.note, sam_content_request_votes.note),
-            -- An explicit ask upgrades a rating's vote to the rep's own.
-            channel = case when sam_content_request_votes.channel = 'feedback' then excluded.channel else sam_content_request_votes.channel end,
-            question = case when sam_content_request_votes.channel = 'feedback' then coalesce(excluded.question, sam_content_request_votes.question) else sam_content_request_votes.question end,
-            event_id = case when sam_content_request_votes.channel = 'feedback' then coalesce(excluded.event_id, sam_content_request_votes.event_id) else sam_content_request_votes.event_id end
+            channel = case when v_upgrade then excluded.channel else sam_content_request_votes.channel end,
+            question = case when v_upgrade then coalesce(excluded.question, sam_content_request_votes.question) else sam_content_request_votes.question end,
+            event_id = case when v_upgrade then coalesce(excluded.event_id, sam_content_request_votes.event_id) else sam_content_request_votes.event_id end
       returning (xmax = 0) into v_new_vote;
+    v_new_vote := v_new_vote or v_upgrade;
     update sam_content_requests set updated_at = now() where id = r.id;
   end if;
   select count(distinct user_id) into n from sam_content_request_votes where request_id = r.id;

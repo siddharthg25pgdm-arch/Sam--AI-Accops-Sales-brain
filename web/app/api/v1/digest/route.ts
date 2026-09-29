@@ -69,7 +69,7 @@ export async function GET(req: Request) {
     cardsReady(),
     whatsappToken(),
     // ?test=1 lets the ratings section include test traffic, to check it end to end from local dev.
-    safe("ratings", loadRatings({ from: since, to: now, real: new URL(req.url).searchParams.get("test") !== "1", limit: 500 })),
+    safe("ratings", loadRatings({ from: since, real: new URL(req.url).searchParams.get("test") !== "1", limit: 500 })),
   ]);
 
   const d = buildDigest({

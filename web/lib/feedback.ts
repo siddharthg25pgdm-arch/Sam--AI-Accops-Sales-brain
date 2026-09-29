@@ -175,11 +175,10 @@ async function rest<T>(path: string, init: RequestInit = {}): Promise<T | null> 
   } catch (e) { console.error("feedback read error", e); return null; }
 }
 
-/** Ratings in [from, to), newest first, each with the question it rated. null when the read failed. */
-export async function loadRatings(p: { from: string; to?: string; real: boolean; limit: number }): Promise<Rating[] | null> {
+/** Ratings since `from` (no upper bound: the DB clock can run ahead of this server), newest first, each with the question it rated. null when the read failed. */
+export async function loadRatings(p: { from: string; real: boolean; limit: number }): Promise<Rating[] | null> {
   const q = ["select=id,created_at,user_id,channel,feedback,ref_event_id,is_test", "kind=eq.feedback", `created_at=gte.${encodeURIComponent(p.from)}`,
     "order=created_at.desc", `limit=${p.limit}`];
-  if (p.to) q.push(`created_at=lt.${encodeURIComponent(p.to)}`);
   if (p.real) q.push(realOnly());
   const rows = await rest<Omit<Rating, "asked">[]>(`sam_events?${q.join("&")}`);
   if (!rows) return null;
