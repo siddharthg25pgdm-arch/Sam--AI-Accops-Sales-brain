@@ -57,11 +57,14 @@ export function Chat({ hasModel, onBrowse, deliveries = [] }: { hasModel: boolea
 function Answer({ turn, onBrowse }: { turn: ChatTurn; onBrowse: (f: { vertical?: string; type?: string; product?: string }) => void }) {
   const [fb, setFb] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
+  const [counted, setCounted] = useState(false);
   async function feedback(v: "helpful" | "wrong_asset" | "missing") {
     setFb(v);
     // "What I need doesn't exist" is exactly the moment to ask marketing for it.
     if (v === "missing") setAsking(true);
-    await fetch("/api/feedback", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ eventId: turn.eventId, feedback: v }) });
+    const r = await fetch("/api/feedback", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ eventId: turn.eventId, feedback: v }) });
+    // The rating itself already counts as a request; the box is for better words or a note.
+    setCounted(v === "missing" && Boolean((await r.json().catch(() => null))?.request));
   }
   const f = turn.filters;
   return (
@@ -69,7 +72,7 @@ function Answer({ turn, onBrowse }: { turn: ChatTurn; onBrowse: (f: { vertical?:
       {/* The document lines in the text are the cards below, written from the same fields; show them once. */}
       <p className="verdict">{turn.assets?.length ? turn.content.split("\n").filter(l => !l.startsWith("- ")).join(" ") : turn.content}</p>
       {turn.assets?.map(a => <ResultCard key={a.path ?? a.title} a={a} eventId={turn.eventId} />)}
-      {turn.eventId !== undefined && <RequestBox turn={turn} open={asking} onOpen={() => setAsking(true)} onClose={() => setAsking(false)}
+      {turn.eventId !== undefined && <RequestBox turn={turn} open={asking} counted={counted} onOpen={() => setAsking(true)} onClose={() => setAsking(false)}
         onBrowse={() => onBrowse({ vertical: f?.vertical })} />}
       {turn.eventId !== undefined && (
         <div className="feedback">
@@ -96,7 +99,7 @@ type Filed = { ok: true; title: string; message: string } | { ok: false; error: 
 
 /** "Ask marketing to create this": inline, prefilled from the question, no modal. Offered on every
  *  answer where the exact thing is missing, and opened by "What I need doesn't exist" on any other. */
-function RequestBox({ turn, open, onOpen, onClose, onBrowse }: { turn: ChatTurn; open: boolean; onOpen: () => void; onClose: () => void; onBrowse: () => void }) {
+function RequestBox({ turn, open, counted, onOpen, onClose, onBrowse }: { turn: ChatTurn; open: boolean; counted?: boolean; onOpen: () => void; onClose: () => void; onBrowse: () => void }) {
   const [title, setTitle] = useState(turn.requestTitle || turn.question || "");
   const [note, setNote] = useState("");
   const [sending, setSending] = useState(false);
@@ -137,6 +140,7 @@ function RequestBox({ turn, open, onOpen, onClose, onBrowse }: { turn: ChatTurn;
     <form className="askmkt form" aria-label="Ask marketing to create this"
       onSubmit={e => { e.preventDefault(); submit(); }}
       onKeyDown={e => { if (e.key === "Escape") { e.preventDefault(); onClose(); requestAnimationFrame(() => openerRef.current?.focus({ preventScroll: true })); } }}>
+      {counted && <p className="hint" role="status">Counted: marketing can see you need this. Reword it or add a note if that helps.</p>}
       <label>
         <span>What should marketing create?</span>
         <input ref={titleRef} value={title} onChange={e => setTitle(e.target.value)} maxLength={120} required />

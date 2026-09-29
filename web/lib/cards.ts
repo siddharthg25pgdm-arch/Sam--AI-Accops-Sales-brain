@@ -1,6 +1,7 @@
 import raw from "@/data/asset_cards.json";
 import { registryAssets, safeLink } from "./registry-cache";
 import { cardAssets, cardMeta } from "./cards-cache";
+import { demotion } from "./feedback";
 
 export type AssetFile = {
   path: string; ext: string; size_mb: number; pages: number | null; modified?: string; year?: string | null;
@@ -351,7 +352,7 @@ export const BROCHURE_MISSPELT = /\bbr[ou]{1,2}[cs]h?[eu]?re?s?\b/gi;
 // Words naming a KIND of document. They still score (typeHit below depends on them), but an asset
 // matching only these has matched nothing the rep asked about: "do we have a SOC 2 report" should
 // not return every analyst report. When a query is nothing but type words ("decks"), they qualify.
-const TYPE_WORDS = /^(deck|datasheet|brochure|battlecard|report|presentation|slides?|ebook|webinar|competitive)s?$/;
+export const TYPE_WORDS = /^(deck|datasheet|brochure|battlecard|report|presentation|slides?|ebook|webinar|competitive)s?$/;
 // Two-letter words worth keeping; everything else that short is noise ("a", "we", "do").
 const SHORT_KEEP = new Set(["ai"]);
 
@@ -367,6 +368,17 @@ export function queryTokens(query: string): string[] {
   // Once each: "RFP ... for the RFP response" counted "rfp" twice, and RFP documents outranked the DaaS
   // and India brochures for a data residency ask (28 Sep #19).
   return [...new Set(out)];
+}
+
+/** Words that say who or how, not what: kept out of a question's topic (topicOf). */
+const NOT_TOPIC = new Set(["document", "documents", "doc", "docs", "material", "collateral", "one", "sheet", "new", "good", "best", "external", "internal",
+  "public", "copy", "version", "exist", "exists", "available", "cio", "ciso", "cto", "buyer", "study", "studies", "whitepaper", "whitepapers"]);
+/** What a question is ABOUT: its search tokens minus document-type and who/how words, singular, sorted.
+ *  "Wrong asset" ratings are grouped by these (lib/feedback.ts), and a learned demotion applies to a
+ *  query whose topic contains the demotion's. */
+export function topicOf(query: string): string[] {
+  return [...new Set(queryTokens(query).filter(t => !TYPE_WORDS.test(t) && !NOT_TOPIC.has(t))
+    .map(t => (t.length > 4 && /[^s]s$/.test(t) ? t.slice(0, -1) : t)))].sort();
 }
 
 /** Word-start matcher for one token. Substring matching let "soc" hit "Social-Media-Banners".
@@ -438,6 +450,7 @@ export function searchAssets(args: SearchArgs): { results: SearchHit[]; consider
   const res = tokens.map(matcher);
   const content = tokens.map(t => !TYPE_WORDS.test(t));
   const onlyTypes = !content.some(Boolean);
+  const topic = topicOf(args.query ?? "");
   const out: SearchHit[] = [];
   const pool = allAssets();
   for (const a of pool) {
@@ -467,7 +480,9 @@ export function searchAssets(args: SearchArgs): { results: SearchHit[]; consider
     // the bonus on "competitive" while matching nothing about Forcepoint.
     const typeToken = tokens.some(t => typeGroup(a).toLowerCase().includes(t) || a.asset_type.toLowerCase().includes(t));
     const typeHit = typeToken && hits.length > 1 ? 3 : 0;
-    const score = hits.length * 2 + titleHits * 1.5 + complete + typeHit + fresh;
+    // Reps said "wrong asset" for this document on this topic (lib/feedback.ts): a modest penalty,
+    // never removal. 0 unless at least two reps agreed and nobody rated it helpful for the topic.
+    const score = hits.length * 2 + titleHits * 1.5 + complete + typeHit + fresh - demotion(assetKey(a), topic);
     if (tokens.length && !hit.some((h, i) => h && (content[i] || onlyTypes))) continue;
     out.push({ asset: a, score, why: hits.length ? `matched ${hits.slice(0, 5).join(", ")}` : "matched your filters" });
   }

@@ -11,7 +11,8 @@ import { allAssets, assetLink } from "@/lib/cards";
 import { apiPublishQueue } from "@/lib/api";
 import { openAICompatConfigured } from "@/lib/agent-openai";
 import { listRequests, unrequestedGaps, ACTIVE, NEXT, STATUS_LABEL, type RankedRequest, type Status } from "@/lib/requests";
-import { saveRequest, mergeRequest, promote } from "./actions";
+import { loadRatings, loadClears, latestRatings, learnDemotions, wrongAssetTally, verdictOf, FEEDBACK_LABEL, DEMOTE_DAYS, DEMOTE_MIN_REPS, DEMOTE_PENALTY, type FeedbackKind, type Rating } from "@/lib/feedback";
+import { saveRequest, mergeRequest, promote, clearRank } from "./actions";
 import { TopBar } from "@/components/TopBar";
 import { Sparkline, Meter, DailyColumns, BarList, Heatmap, Histogram, num, ms } from "@/components/charts";
 
@@ -51,7 +52,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<SP
   const includeTest = one(sp.test) === "1";
   const href = (o: Record<string, string | number | null>) => {
     const u = new URLSearchParams();
-    const cur: Record<string, string> = { tab, days: String(days), test: includeTest ? "1" : "", f: one(sp.f), ch: one(sp.ch), user: one(sp.user), limit: one(sp.limit), rv: one(sp.rv) };
+    const cur: Record<string, string> = { tab, days: String(days), test: includeTest ? "1" : "", f: one(sp.f), ch: one(sp.ch), user: one(sp.user), limit: one(sp.limit), rv: one(sp.rv), fb: one(sp.fb), ev: one(sp.ev) };
     for (const [k, v] of Object.entries({ ...cur, ...Object.fromEntries(Object.entries(o).map(([k, v]) => [k, v == null ? "" : String(v)])) })) {
       if (v && !(k === "tab" && v === "overview") && !(k === "days" && v === "30")) u.set(k, v);
     }
@@ -85,7 +86,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<SP
           </div>
         </header>
         <nav className="tabs-dash" aria-label="Dashboard sections">
-          {TABS.map(([k, label]) => <Link key={k} href={href({ tab: k, f: null, ch: null, user: null, limit: null, rv: null })} aria-current={k === tab ? "page" : undefined}>{label}</Link>)}
+          {TABS.map(([k, label]) => <Link key={k} href={href({ tab: k, f: null, ch: null, user: null, limit: null, rv: null, fb: null, ev: null })} aria-current={k === tab ? "page" : undefined}>{label}</Link>)}
           <span className="spacer" />
           {/* Retyping a number out of a dashboard is how it gets transcribed wrong into a deck. */}
           <span className="export">CSV <a href="/api/v1/export?set=metrics">metrics</a> <a href="/api/v1/export?set=assets">assets</a> <a href="/api/v1/export?set=gaps">registry</a></span>
@@ -96,7 +97,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<SP
 
         {tab === "overview" && d && <Overview d={d} days={days} href={href} includeTest={includeTest} />}
         {tab === "usage" && d && <Usage d={d} href={href} />}
-        {tab === "quality" && d && <Quality d={d} />}
+        {tab === "quality" && d && <Quality d={d} sp={sp} days={days} includeTest={includeTest} href={href} />}
         {tab === "content" && d && <Content d={d} />}
         {tab === "requests" && d && <RequestsTab d={d} sp={sp} days={days} includeTest={includeTest} href={href} />}
         {tab === "system" && <System includeTest={includeTest} />}
@@ -321,11 +322,14 @@ function Usage({ d, href }: { d: Dashboard; href: (o: Record<string, string | nu
 
 // ------------------------------------------------------------------------------------------- quality
 
-function Quality({ d }: { d: Dashboard }) {
+async function Quality({ d, sp, days, includeTest, href }: { d: Dashboard; sp: SP; days: number; includeTest: boolean; href: (o: Record<string, string | number | null>) => string }) {
   const c = d.summary.cur, r = rates(d);
   const errTotal = d.errors.reduce((n, e) => n + e.n, 0);
+  const ok = one(sp.ok), err = one(sp.err);
   return (
     <>
+      {ok && <p className="ok-note" role="status">{ok}</p>}
+      {err && <div className="notice" role="alert">{err}</div>}
       <div className="kpis five">
         <Kpi label="Answered" value={<RateValue r={r.answered[0]} />} viz={<Meter pct={r.answered[0].pct} label="Answered" />} foot={<Of r={r.answered[0]} what="questions" />} />
         <Kpi label="Engaged" value={<RateValue r={r.engaged[0]} />} viz={<Meter pct={r.engaged[0].pct} label="Engaged" />} foot={<Of r={r.engaged[0]} what="web answers" />} />
@@ -364,6 +368,8 @@ function Quality({ d }: { d: Dashboard }) {
         </Section>
       </div>
 
+      <RepsToldUs sp={sp} days={days} includeTest={includeTest} href={href} />
+
       <Section title="Runtime and model" sub="Which path wrote each answer. Releases before 25 Sep 2026 logged the Groq path as “claude”, so Claude rows with no model may be Groq.">
         {d.runtime.length === 0 ? <Empty>No questions in this period.</Empty> : (
           <table><thead><tr><th>Runtime</th><th>Model</th><th className="r">Questions</th><th className="r">p50</th></tr></thead>
@@ -378,6 +384,90 @@ function Quality({ d }: { d: Dashboard }) {
         <Section title="Product"><BarList label="Product" rows={d.product} /></Section>
       </div>
       <p className="note">Asset type, industry and product are the filters SAM searched with: the model&apos;s last search, or the keyword router in retrieval-only mode. “Any” means no filter.</p>
+    </>
+  );
+}
+
+// ------------------------------------------------------------------------------------------- what reps told us
+
+const FB_FILTERS: [FeedbackKind | "all", string][] = [["all", "All"], ["wrong_asset", "Wrong asset"], ["missing", "Doesn't exist"], ["helpful", "Helpful"]];
+
+/** The ratings themselves, not just their counts: what was asked, what SAM said and showed, and what
+ *  the rep made of it. Plus the two things marketing acts on: documents reps keep calling the wrong
+ *  answer, and the demotions search learned from that (a human can clear any of them). */
+async function RepsToldUs({ sp, days, includeTest, href }: { sp: SP; days: number; includeTest: boolean; href: (o: Record<string, string | number | null>) => string }) {
+  const fb = FB_FILTERS.find(x => x[0] === one(sp.fb))?.[0] ?? "all";
+  const from = new Date(Date.now() - Math.max(days, DEMOTE_DAYS) * 86_400_000).toISOString();
+  const periodFrom = new Date(Date.now() - days * 86_400_000).toISOString();
+  const [all, clears] = await Promise.all([loadRatings({ from, real: !includeTest, limit: 2000 }), loadClears()]);
+  if (!all) return <div className="notice">Could not read ratings. The server log has the status code.</div>;
+  const inPeriod = latestRatings(all).filter(x => x.created_at >= periodFrom);
+  const shown = inPeriod.filter(x => fb === "all" || x.feedback === fb);
+  const tally = wrongAssetTally(all.filter(x => x.created_at >= periodFrom)).slice(0, 10);
+  const now = new Date().toISOString();
+  const demotions = learnDemotions(all, now, clears ?? []);
+  // What search actually uses: real ratings only, whatever the toggle says.
+  const live = new Set(learnDemotions(all.filter(x => !x.is_test), now, clears ?? []).map(x => `${x.asset}\n${x.topic.join(" ")}`));
+  const back = new URLSearchParams(href({}).split("?")[1] ?? "").toString();
+  const pill = (k: FeedbackKind) => <span className={`pill ${k === "helpful" ? "good" : "warn"}`}>{FEEDBACK_LABEL[k]}</span>;
+  return (
+    <>
+      <Section title="What reps told us" sub="Every rating in this period, newest first: the question, what SAM said, the documents it showed, and the rating. One per rep per answer, the latest."
+        aside={<nav className="seg small" aria-label="Rating">{FB_FILTERS.map(([k, l]) => <Link key={k} href={href({ fb: k === "all" ? null : k })} aria-current={k === fb ? "true" : undefined}>{l}{k !== "all" ? ` ${inPeriod.filter(x => x.feedback === k).length}` : ""}</Link>)}</nav>}>
+        {shown.length === 0 ? <Empty>{inPeriod.length ? "No ratings of this kind in this period." : "No one rated an answer in this period. The buttons sit under every web answer."}</Empty> : (
+          <ol className="convs">
+            {shown.slice(0, 40).map((x: Rating) => {
+              const a = x.asked!;
+              return (
+                <li key={x.id}>
+                  <div className="cmeta">
+                    <span className="tnum">{fmtTime(x.created_at)}</span><span>{x.user_id}</span><span>{channelName(a.channel)}</span>
+                    {x.is_test && <span className="pill">test</span>}
+                    <span className="spacer" />
+                    {pill(x.feedback)}
+                    <Link href={`${href({ tab: "conversations", ev: a.id, f: null, ch: null, user: null, fb: null, limit: null })}#c${a.id}`}>Conversation</Link>
+                  </div>
+                  <p className="cq">{a.query}</p>
+                  <p className="ca">{verdictOf(a.answer) || "No answer text (catalogue search)."}</p>
+                  {(a.result_titles ?? []).length > 0 && <ul className="cassets">{a.result_titles!.map((t, i) => <li key={i}>{t}</li>)}</ul>}
+                </li>
+              );
+            })}
+          </ol>
+        )}
+        {shown.length > 40 && <p className="note">Showing the newest 40 of {num(shown.length)}.</p>}
+      </Section>
+
+      <div className="two">
+        <Section title="Documents rated wrong asset" sub="Documents shown in answers rated “Wrong asset”, by distinct reps. A rating is of the whole answer, so read it with the questions.">
+          {tally.length === 0 ? <Empty>No “Wrong asset” ratings in this period.</Empty> : (
+            <table><thead><tr><th>Document</th><th className="r">Reps</th><th className="r">Ratings</th></tr></thead>
+              <tbody>{tally.map(t => <tr key={t.key}><td title={t.key}>{t.title}{t.questions.map(q => <div key={q} className="subline">“{q}”</div>)}</td><td className="r">{t.reps}</td><td className="r">{t.ratings}</td></tr>)}</tbody></table>
+          )}
+        </Section>
+        <Section title="Learned demotions" sub={<>When {DEMOTE_MIN_REPS}+ reps call a document the wrong answer for the same topic, search scores it {DEMOTE_PENALTY} points lower on questions about that topic. Never removed; lapses {DEMOTE_DAYS} days after the ratings; a “Helpful” rating for the topic blocks it.</>}>
+          {demotions.length === 0 ? <Empty>No document is demoted. It takes {DEMOTE_MIN_REPS} different reps agreeing.</Empty> : (
+            <table id="demotions"><thead><tr><th>Document</th><th>Topic</th><th className="r">Reps</th><th /></tr></thead>
+              <tbody>{demotions.map(x => {
+                const topic = x.topic.join(" "), on = live.has(`${x.asset}\n${topic}`);
+                return (
+                  <tr key={`${x.asset}|${topic}`}>
+                    <td title={x.asset}>{x.title}{x.questions.map(q => <div key={q} className="subline">“{q}”</div>)}</td>
+                    <td>{x.topic.join(", ")}{!on && <div className="subline"><span className="pill">test only, not applied</span></div>}</td>
+                    <td className="r">{x.reps.length}</td>
+                    <td className="r">
+                      <form action={clearRank}>
+                        <input type="hidden" name="asset" value={x.asset} /><input type="hidden" name="topic" value={topic} /><input type="hidden" name="back" value={back} />
+                        <button className="btn-line" type="submit">Clear</button>
+                      </form>
+                    </td>
+                  </tr>
+                );
+              })}</tbody></table>
+          )}
+          {includeTest && demotions.length > 0 && <p className="note">Including test ratings. Search only ever learns from real ones.</p>}
+        </Section>
+      </div>
     </>
   );
 }
@@ -472,7 +562,7 @@ async function Content({ d }: { d: Dashboard }) {
 
 // ------------------------------------------------------------------------------------------- requests
 
-const REQ_CHANNELS: Record<string, string> = { ...CHANNELS, gap: "Asked SAM" };
+const REQ_CHANNELS: Record<string, string> = { ...CHANNELS, gap: "Asked SAM", feedback: "Rated “doesn't exist”" };
 const ALL_STATUSES: Status[] = ["open", "planned", "in_progress", "done", "declined", "merged"];
 const facetLine = (r: { asset_type: string | null; product: string | null; vertical: string | null }) => [r.asset_type, r.product, r.vertical].filter(Boolean).join(" · ");
 
@@ -561,6 +651,7 @@ function RequestItem({ r, others, back }: { r: RankedRequest; others: RankedRequ
           <h3>{r.title}</h3>
           <span className={`pill ${r.status === "done" ? "good" : r.status === "declined" ? "bad" : r.status === "open" ? "warn" : ""}`}>{STATUS_LABEL[r.status]}</span>
           {r.source === "gap" && <span className="pill">from a gap</span>}
+          {r.source === "feedback" && <span className="pill">from a rating</span>}
           {r.is_test && <span className="pill">test</span>}
         </div>
         <div className="rq-meta">
@@ -665,10 +756,11 @@ async function System({ includeTest }: { includeTest: boolean }) {
 
 async function Conversations({ sp, days, includeTest, href }: { sp: SP; days: number; includeTest: boolean; href: (o: Record<string, string | number | null>) => string }) {
   const f = (["all", "errors", "gaps", "fallbacks"] as const).find(x => x === one(sp.f)) ?? "all";
-  const ch = one(sp.ch), who = one(sp.user);
+  const ch = one(sp.ch), who = one(sp.user), ev = Number(one(sp.ev)) || undefined;
   const limit = Math.min(500, Math.max(25, Number(one(sp.limit)) || 50));
-  const from = new Date(Date.now() - days * 86_400_000).toISOString();
-  const rows = await conversations({ from, filter: f as ConvFilter, channel: ch || undefined, user: who || undefined, limit, real: includeTest ? undefined : realOnly() });
+  // One conversation (the link from a rating): whatever its age, test or not.
+  const from = ev ? "2000-01-01T00:00:00Z" : new Date(Date.now() - days * 86_400_000).toISOString();
+  const rows = await conversations({ from, filter: f as ConvFilter, channel: ch || undefined, user: who || undefined, limit, real: includeTest || ev ? undefined : realOnly(), id: ev });
   await ready();
   const titleOf = new Map<string, string>();
   for (const a of allAssets()) if (a.file?.path) titleOf.set(a.file.path, a.title);
@@ -685,6 +777,7 @@ async function Conversations({ sp, days, includeTest, href }: { sp: SP; days: nu
           {["web", "whatsapp", "api", "mcp"].map(c => <Link key={c} href={href({ ch: c, limit: null })} aria-current={c === ch ? "true" : undefined}>{channelName(c)}</Link>)}
         </nav>
         {who && <span className="pill">Person: {who} <Link href={href({ user: null })} aria-label={`Clear person filter ${who}`}>×</Link></span>}
+        {ev && <span className="pill">One conversation <Link href={href({ ev: null })} aria-label="Show all conversations">×</Link></span>}
       </div>
       <section className="card flush">
         {rows.length === 0 ? <Empty>No conversations match. {f !== "all" || ch || who ? "Try clearing a filter or widening the period." : `Nothing was asked in the last ${days} days.`}</Empty> : (
@@ -695,7 +788,7 @@ async function Conversations({ sp, days, includeTest, href }: { sp: SP; days: nu
               const opened = r.reactions.some(x => x.kind === "catalogue_open");
               const gap = r.intent === "gap" || r.reactions.some(x => x.kind === "gap") || (r.result_count ?? 0) === 0;
               return (
-                <li key={r.id}>
+                <li key={r.id} id={`c${r.id}`}>
                   <div className="cmeta">
                     <span className="tnum">{fmtTime(r.created_at)}</span><span>{r.user_id}</span><span>{channelName(r.channel)}</span>
                     <span>{r.model ?? RUNTIMES[r.runtime ?? "unknown"] ?? r.runtime}</span>

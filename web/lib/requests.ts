@@ -115,7 +115,7 @@ export type Vote = { user_id: string; channel: string; question: string | null; 
 export type RequestRow = {
   id: number; created_at: string; updated_at: string; topic_key: string; title: string; asset_type: string | null; product: string | null; vertical: string | null;
   description: string | null; status: Status; owner: string | null; due_date: string | null; delivered_title: string | null; delivered_url: string | null;
-  decline_reason: string | null; notes: string | null; merged_into: number | null; source: "rep" | "gap"; created_by: string | null; closed_at: string | null;
+  decline_reason: string | null; notes: string | null; merged_into: number | null; source: "rep" | "gap" | "feedback"; created_by: string | null; closed_at: string | null;
   is_test: boolean; votes: Vote[];
 };
 export type RankedRequest = RequestRow & { demand: number; firstAsked: string; lastAsked: string; channels: string[]; examples: string[]; notes_from_reps: string[] };
@@ -180,7 +180,7 @@ async function db<T>(path: string, init: RequestInit = {}): Promise<{ ok: boolea
 export type Filed = { ok: true; id: number; title: string; status: Status; demand: number; new_request: boolean; new_vote: boolean; message: string } | { ok: false; error: string };
 
 /** File a request, or add this rep to the one that already exists. Every channel comes through here. */
-export async function fileRequest(p: { title?: string; question?: string; note?: string; eventId?: number | null; key?: string; source?: "rep" | "gap" } & Partial<Facets>,
+export async function fileRequest(p: { title?: string; question?: string; note?: string; eventId?: number | null; key?: string; source?: "rep" | "gap" | "feedback" } & Partial<Facets>,
   who: string, channel: string): Promise<Filed> {
   const title = (p.title?.trim() || suggestTitle(p.question ?? "")).slice(0, 120);
   if (!title) return { ok: false, error: "Say what you need in a few words." };
@@ -197,8 +197,22 @@ export async function fileRequest(p: { title?: string; question?: string; note?:
   });
   if (!r.ok || !r.data) return { ok: false, error: `Could not file the request${r.status ? ` (${r.status})` : ""}. Try again in a minute.` };
   const d = r.data;
-  if (d.new_vote) await logEvent({ user_id: who, channel, kind: "request", intent: "filed", query: title, ref_event_id: p.eventId ?? null, filters: { request_id: d.id, key, new_request: d.new_request } });
+  // A rating is already its own event (kind feedback); logging it as "asked marketing" would claim
+  // the rep typed a request they did not.
+  if (d.new_vote && p.source !== "feedback") await logEvent({ user_id: who, channel, kind: "request", intent: "filed", query: title, ref_event_id: p.eventId ?? null, filters: { request_id: d.id, key, new_request: d.new_request } });
   return { ok: true, ...d, message: confirmation(d) };
+}
+
+/** "What I need doesn't exist" under an answer: a vote on the request for that question, exactly like
+ *  pressing "Ask marketing to create this", unless the rep already has one for that answer (the SQL
+ *  checks, by event id). A later explicit request for the same answer replaces this vote. */
+export async function fileFromRating(question: string, eventId: number, who: string): Promise<Filed> {
+  return fileRequest({ question, eventId, source: "feedback" }, who, "feedback");
+}
+
+/** The rep changed the rating to something else: take back the vote the rating cast, if any. */
+export async function retractRating(eventId: number, who: string): Promise<void> {
+  await db("rpc/sam_retract_feedback_vote", { method: "POST", body: JSON.stringify({ p_user: who, p_event_id: eventId }) });
 }
 
 const VOTES = "votes:sam_content_request_votes(user_id,channel,question,note,created_at,notified_at)";

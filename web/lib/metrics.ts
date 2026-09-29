@@ -25,7 +25,8 @@ export const DEFINITIONS: [string, string][] = [
   ["Rates with small n", `Below ${MIN_N}, a rate is shown as a fraction (3 of 4) rather than a percentage, because one more question would move it by more than ten points.`],
   ["Time zone", "Days, hours and the activity heatmap are in India Standard Time."],
   ["Content gap", "A question where the exact thing asked for is not in the library. Since 25 Sep 2026 this includes answers that showed substitutes (\"No Browser Isolation brochure; closest: ...\"), so those count as not answered."],
-  ["Content request", "A rep pressed Ask marketing to create this (or replied REQUEST on WhatsApp, or used the API or MCP tool). Repeat asks for the same kind of document (type, product, industry, topic) merge onto one request. Demand is the number of distinct reps on it."],
+  ["Learned demotion", "Two or more different reps rated answers showing a document \"Wrong asset\" for questions sharing the same topic words, in the last 60 days, and nobody rated it helpful for that topic. Search scores it 3 points lower for questions on that topic; it is never removed, and a human can clear it on the Quality tab."],
+  ["Content request", "A rep pressed Ask marketing to create this or rated an answer \"What I need doesn't exist\" (or replied REQUEST on WhatsApp, or used the API or MCP tool). A rating and a request for the same answer count once. Repeat asks for the same kind of document (type, product, industry, topic) merge onto one request. Demand is the number of distinct reps on it."],
 ];
 
 export type Summary = {
@@ -142,7 +143,7 @@ export type Conversation = {
 export type ConvFilter = "all" | "errors" | "gaps" | "fallbacks";
 
 /** Recent questions with what came back and what the asker did next. Two indexed reads. */
-export async function conversations(p: { from: string; filter: ConvFilter; channel?: string; user?: string; limit: number; real?: string }): Promise<Conversation[]> {
+export async function conversations(p: { from: string; filter: ConvFilter; channel?: string; user?: string; limit: number; real?: string; id?: number }): Promise<Conversation[]> {
   const q = [
     "select=id,created_at,user_id,channel,session_id,query,intent,result_count,result_ids,result_titles,runtime,model,latency_ms,answer,error_kind,error_detail,is_test,schema_version",
     "kind=eq.query", `created_at=gte.${encodeURIComponent(p.from)}`, "order=created_at.desc", `limit=${p.limit}`,
@@ -154,6 +155,7 @@ export async function conversations(p: { from: string; filter: ConvFilter; chann
   if (p.filter === "gaps") q.push("or=(intent.eq.gap,result_count.eq.0)");
   if (p.channel) q.push(`channel=eq.${encodeURIComponent(p.channel)}`);
   if (p.user) q.push(`user_id=eq.${encodeURIComponent(p.user)}`);
+  if (p.id) q.push(`id=eq.${p.id}`);
   const rows = (await rest<Omit<Conversation, "reactions">[]>(`sam_events?${q.join("&")}`)).data ?? [];
   if (!rows.length) return [];
   const refs = (await rest<{ ref_event_id: number; kind: string; feedback: string | null; asset_path: string | null }[]>(

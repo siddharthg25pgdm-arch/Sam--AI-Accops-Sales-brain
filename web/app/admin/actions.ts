@@ -5,6 +5,7 @@
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { updateRequest, mergeRequests, promoteGap, type Status } from "@/lib/requests";
+import { clearDemotion } from "@/lib/feedback";
 
 async function admin() {
   const u = await currentUser();
@@ -38,6 +39,13 @@ export async function mergeRequest(fd: FormData) {
   const from = Number(str(fd, "id")), into = Number(str(fd, "into"));
   const r = await mergeRequests(from, into, u.id);
   back(fd, r.ok ? { ok: "Merged. Its askers now count on the other request." } : { err: r.error }, r.ok ? `r${into}` : `r${from}`);
+}
+
+/** A human says a learned "wrong asset" demotion is wrong. It stays cleared until two reps agree again. */
+export async function clearRank(fd: FormData) {
+  const u = await admin();
+  const ok = await clearDemotion(str(fd, "asset") ?? "", str(fd, "topic") ?? "", u.id);
+  back(fd, ok ? { ok: "Demotion cleared. Search scores that document normally again for the topic." } : { err: "Could not clear the demotion. Try again." }, "demotions");
 }
 
 export async function promote(fd: FormData) {
