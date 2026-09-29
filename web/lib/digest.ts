@@ -32,6 +32,9 @@ export type DigestInput = {
   lastFlowWrite: string | null; sync: SyncRow | null; cardCount: number;
   /** Reads that failed. Their sections are missing, not empty, and Health says so. */
   failed: string[];
+  /** WhatsApp access token, from Meta's debug_token. Omitted when WhatsApp isn't configured.
+   *  `expiresAt` null = never expires (a permanent system-user token). */
+  whatsapp?: { valid: boolean; expiresAt: string | null };
 };
 
 export type DigestRequest = { id: number; title: string; reps: number; new_reps: number; is_new: boolean; worth: boolean;
@@ -156,6 +159,15 @@ export function buildDigest(i: DigestInput): Digest {
     detail: `${u.provider_failures} of ${u.model_attempted || u.questions} questions hit a provider failure in the last 24 hours${w?.model_attempted ? ` (7 days before: ${w.provider_failures} of ${w.model_attempted})` : ""}. Usually Groq's daily token limit; answers fall back to the smaller model or to retrieval.`,
   });
   if (!i.cardCount) health.push({ title: "The card cache is empty", detail: "SAM is answering from file names only. Check sam_asset_cards and the server log." });
+  // The 60-day WhatsApp token dies silently: replies just stop. Three weeks' notice is enough time to
+  // make a permanent system-user token (docs/TASK-whatsapp-meta-setup.md, section "Replace the token").
+  if (i.whatsapp && !i.whatsapp.valid) health.push({ title: "The WhatsApp token no longer works",
+    detail: "SAM cannot reply on WhatsApp. Make a permanent token: docs/TASK-whatsapp-meta-setup.md, \"Replace the token\"." });
+  else if (i.whatsapp?.expiresAt) {
+    const days = Math.floor((Date.parse(i.whatsapp.expiresAt) - Date.parse(i.now)) / 86_400_000);
+    if (days <= 21) health.push({ title: `The WhatsApp token expires in ${days <= 0 ? "less than a day" : plural(days, "day")}`,
+      detail: "When it does, SAM stops replying on WhatsApp without any error. Make a permanent token: docs/TASK-whatsapp-meta-setup.md, \"Replace the token\"." });
+  }
 
   // The subject and the lead say the same thing: the subject for the inbox, the lead in the email.
   const newReq = requests?.new_count ?? 0, worth = requests?.worth_count ?? 0, qs = usage?.questions ?? 0;

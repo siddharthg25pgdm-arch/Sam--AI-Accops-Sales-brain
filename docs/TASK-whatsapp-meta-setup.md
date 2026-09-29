@@ -20,6 +20,30 @@
 
 Verified 4 September 2026: `bank case study` from the registered mobile returned three Accops bank case studies with SharePoint links marked internal-only. Vercel logs show the inbound POST and its delivery callbacks, no errors.
 
+### Replace the token (do this before 3 November 2026 - about 5 minutes)
+
+The token SAM uses today is a 60-day token. When it expires, SAM simply stops replying on WhatsApp,
+with no error anywhere. From 30 September the morning digest email warns three weeks ahead ("The
+WhatsApp token expires in N days"). A **system-user token never expires**, so this is a one-time job.
+
+**In Meta (business.facebook.com):**
+1. Open **Settings** (Business settings), then **Users → System users**.
+2. Click **Add**. Name it `SAM`, role **Admin**, and create it.
+3. With `SAM` selected, click **Assign assets**:
+   - **Apps** → the SAM app (ID `4592550320973349`) → **Full control** → Save.
+   - **WhatsApp accounts** → the WhatsApp Business Account `1978455382818275` → **Full control** → Save.
+4. Click **Generate new token**. Pick the SAM app. **Token expiration: Never.** Tick
+   `whatsapp_business_messaging` and `whatsapp_business_management`. Click **Generate**.
+5. Copy the token. It is shown once. Don't paste it into chat or email.
+
+**In Vercel (vercel.com → project `sam-accops`):**
+6. **Settings → Environment Variables** → find `WHATSAPP_ACCESS_TOKEN` → **Edit** → paste the new
+   token → **Save** (Production).
+7. **Deployments** → the latest one → **⋯ → Redeploy**. Variables only take effect on a new deploy.
+
+**Check:** WhatsApp the test number `bank case study` from your registered phone. SAM should reply
+within a few seconds. The next morning email will no longer show the WhatsApp warning.
+
 ### Two expiry dates
 
 - **Access token expires 3 November 2026** (60-day token). Before then, replace it with a permanent System user token: Business settings -> Users -> System users, assign the app, generate with `whatsapp_business_messaging` and `whatsapp_business_management`. Then `vercel env rm WHATSAPP_ACCESS_TOKEN production --yes` and add the new one.

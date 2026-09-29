@@ -102,4 +102,15 @@ if (process.env.DIGEST_OUT) {
   fs.writeFileSync(`${process.env.DIGEST_OUT}/sick.html`, renderHtml(sick));
   fs.writeFileSync(`${process.env.DIGEST_OUT}/empty.html`, emptyHtml);
 }
+// WhatsApp token: warn 21 days ahead, on an invalid token, and stay quiet for a permanent one.
+{
+  const at = (d) => new Date(Date.parse(base.now) + d * 86_400_000).toISOString();
+  const has = (w, re) => buildDigest({ ...base, whatsapp: w }).health.some(x => re.test(x.title));
+  ok(has({ valid: true, expiresAt: at(10) }, /WhatsApp token expires in 10 days/), "token expiring in 10 days warns");
+  ok(!has({ valid: true, expiresAt: at(40) }, /WhatsApp/), "40 days out is quiet");
+  ok(!has({ valid: true, expiresAt: null }, /WhatsApp/), "a permanent token is quiet");
+  ok(has({ valid: false, expiresAt: null }, /WhatsApp token no longer works/), "an invalid token warns");
+  ok(!buildDigest({ ...base }).health.some(x => /WhatsApp/.test(x.title)), "WhatsApp not configured is quiet");
+}
+
 console.log(`digest.check: ${n} assertions passed`);

@@ -14,6 +14,21 @@ const ALL: Status[] = ["open", "planned", "in_progress", "done", "declined", "me
 
 /** The shared secret the Power Automate flows already carry (SP_WEBHOOK_SECRET), compared in
  *  constant time. Hashing first makes the lengths equal, so the length is not leaked either. */
+/** When the WhatsApp token expires, from Meta's debug_token (the token inspects itself). Omitted when
+ *  WhatsApp isn't configured. A failed lookup is not an alarm: Meta being slow is not SAM being broken. */
+async function whatsappToken(): Promise<{ valid: boolean; expiresAt: string | null } | undefined> {
+  const token = process.env.WHATSAPP_ACCESS_TOKEN;
+  if (!token) return undefined;
+  try {
+    const r = await fetch(`https://graph.facebook.com/v21.0/debug_token?input_token=${encodeURIComponent(token)}&access_token=${encodeURIComponent(token)}`,
+      { cache: "no-store", signal: AbortSignal.timeout(5000) });
+    const d = (await r.json())?.data;
+    if (!d) return undefined;
+    const exp = Number(d.expires_at ?? 0);
+    return { valid: d.is_valid === true, expiresAt: exp > 0 ? new Date(exp * 1000).toISOString() : null };
+  } catch { return undefined; }
+}
+
 function secretOk(header: string | null): boolean {
   const expected = process.env.SP_WEBHOOK_SECRET;
   const got = header?.match(/^Bearer\s+(.+)$/i)?.[1]?.trim();
@@ -40,7 +55,7 @@ export async function GET(req: Request) {
   };
 
   const users = testUsers();
-  const [all, gapEvents, changes, queue, carded, usage, usagePrev, flow, sync] = await Promise.all([
+  const [all, gapEvents, changes, queue, carded, usage, usagePrev, flow, sync, , whatsapp] = await Promise.all([
     safe("content requests", listRequests({ statuses: ALL })),
     safe("content gaps", recentEvents(1000, `kind=eq.gap&created_at=gte.${encodeURIComponent(new Date(t - 7 * 86_400_000).toISOString())}&${realOnly()}`)),
     safe("SharePoint changes", changedSince(since)),
@@ -51,6 +66,7 @@ export async function GET(req: Request) {
     lastFlowWrite().catch(() => { failed.push("SharePoint flow status"); return null; }),
     syncStatus().catch(() => { failed.push("deletion check status"); return null; }),
     cardsReady(),
+    whatsappToken(),
   ]);
 
   const d = buildDigest({
@@ -58,7 +74,7 @@ export async function GET(req: Request) {
     requests: all ? all.filter(r => ACTIVE.includes(r.status)) : null,
     gaps: all && gapEvents ? unrequestedGaps(gapEvents, all.map(r => r.topic_key)) : null,
     changes, queue, carded, usage, usagePrev, lastFlowWrite: flow, sync,
-    cardCount: cardCacheState().count, failed: [...new Set(failed)],
+    cardCount: cardCacheState().count, failed: [...new Set(failed)], whatsapp,
   });
 
   const headers = { "Cache-Control": "no-store", "X-SAM-Subject": d.subject };
