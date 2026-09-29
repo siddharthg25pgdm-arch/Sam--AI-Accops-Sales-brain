@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
+import { searchAssets, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, ENTITIES, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured, compatModels } from "./agent-openai";
 import { providerFailure, type AskError } from "./events";
 
@@ -509,7 +509,38 @@ function withSuccessors(shown: SearchHit[], trace: AskResult["trace"]): SearchHi
  *      a HyWorks sizing guide, and a case study's "2,300 concurrent users" is not a per-appliance
  *      maximum (#22, #23). */
 const SPECS = new Set(["Sizing", "Concurrent users"]);
-function asksAbout(question: string): string[] { return namedEntities(question); }
+function asksAbout(question: string): string[] { return namedEntities(question).filter(e => !isContext(question, e)); }
+
+/** A named thing the rep gives as their SITUATION, not what they want: "pvt bank in mumbai moving off
+ *  citrix, need a bfsi case study" got "No exact match for Citrix" over two good BFSI case studies (28 Sep
+ *  dry run, 20b). An entity is context when every mention of it follows "moving off / replacing / leaving /
+ *  currently on / uses / evaluating / after" and none is the object of the ask ("citrix battlecard", "vs
+ *  citrix", "against AVD", "citrix migration deck"). Context is never missing; the seed still searches the
+ *  word, and cards naming it go first (contextFirst). Anything else stays required, as before.
+ *  ponytail: phrase frames, not a parse; a frame not listed here leaves the entity required. */
+const CONTEXT_BEFORE = new RegExp(String.raw`\b(?:(?:mov(?:e|es|ed|ing)|migrat(?:e|es|ed|ing)|switch(?:es|ed|ing)?|shift(?:s|ed|ing)?|transition(?:s|ed|ing)?|com(?:e|es|ing)|exit(?:s|ed|ing)?|getting)\s+(?:off|from|away from|out of)`
+  + String.raw`|replac(?:e|es|ed|ing)|leav(?:e|es|ing)|ditch(?:es|ed|ing)?|(?:currently|already|still|now|today)\s+(?:on|using|uses|use|runs?|running|with|has|have)`
+  + String.raw`|(?:is|are|was|were|they're|theyre)\s+(?:currently\s+|already\s+|still\s+|now\s+)?(?:on|using|running|with)|(?:customers?|clients?|prospects?|banks?|they|who|which)\s+(?:(?:is|are)\s+)?on`
+  + String.raw`|uses?|using|running|runs|evaluating|considering|looking at|unhappy with|frustrated with|after|since|due to|because of)\s+(?:(?:the|their|its|his|her|a|an)\s+)?(?:[\w-]+\s+)?$`, "i");
+const OBJECT_BEFORE = /\b(?:vs\.?|versus|against|compared? (?:to|with)|alternative to|instead of|replacement for|battle ?cards? (?:for|on|against))\s+(?:the\s+)?$/i;
+const OBJECT_AFTER = /^\s*(?:[\w.-]+\s+){0,2}?(?:battle ?cards?|comparisons?|compar\w*|competit\w*|migrat\w*|replacements?|alternatives?|displac\w*|takeouts?|vs\b|versus|decks?|case ?stud\w*|brochures?|white ?papers?|data ?sheets?|pitch\w*)\b/i;
+export function isContext(question: string, e: string): boolean {
+  const words = ENTITIES[e];
+  if (!words) return false;
+  const q = question.toLowerCase(), re = new RegExp(words.map(w => tokenMatcher(w).source).join("|"), "g");
+  const at = [...q.matchAll(re)];
+  return at.length > 0 && at.every(m => {
+    const before = q.slice(0, m.index).split(/[,;.?!]/).pop() ?? "", after = q.slice(m.index + m[0].length).split(/[,;.?!]/)[0];
+    return CONTEXT_BEFORE.test(before) && !OBJECT_BEFORE.test(before) && !OBJECT_AFTER.test(after);
+  });
+}
+/** Cards naming a context entity go first, among those of the asked type (or all, with no type named). */
+function contextFirst(shown: SearchHit[], turn: string): SearchHit[] {
+  const ctx = namedEntities(turn).filter(e => isContext(turn, e)), types = typesNamedIn(turn);
+  if (!ctx.length) return shown;
+  const lead = (h: SearchHit) => ctx.some(e => entityOn(h.asset, e)) && (!types.length || types.some(t => isType(h.asset, t)));
+  return [...shown.filter(lead), ...shown.filter(h => !lead(h))];
+}
 function hasEntity(h: SearchHit, e: string, question: string): boolean {
   if (OWN_PRODUCTS.has(e)) return isAbout(h.asset, e) || !isDescribed(h.asset);
   if (!SPECS.has(e)) return entityOn(h.asset, e);
@@ -765,7 +796,7 @@ export function finish(p: {
   let shown = ensurePublished(onTopic.length ? onTopic : successors, hits, p.question, p.trace);
   shown = shortFirst(shown, fill, own, p.trace);
   const uncovered = coverEntities(shown, fill, own, p.trace);
-  shown = shown.slice(0, 3);
+  shown = contextFirst(shown.slice(0, 3), own);
   const types = typesNamedIn(own);
   const verdict = reply.verdict;
   if (uncovered.length) {

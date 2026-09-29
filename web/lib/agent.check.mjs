@@ -570,6 +570,33 @@ run([() => ({ status: 429, text: "Rate limit reached for model openai/gpt-oss-12
 r = await ask("citrix comparison");
 ok(r.trace[0]?.step === "model provider failed, answered by fallback" && /gpt-oss-120b.*429.*answered by openai\/gpt-oss-20b/.test(r.trace[0].detail), `fallback reason in the trace: ${JSON.stringify(r.trace[0])}`);
 
+// 15. 28 Sep re-run #3, through finish() on hand-made results.
+{
+  const { finish, isContext } = await jiti.import("./agent.ts");
+  const h = (title, o = {}) => ({ asset: { title, asset_type: o.type ?? "Case Study", industry: o.industry ?? "", client: "", products: o.products ?? [], key_problem: "", key_outcomes: [],
+    brief: o.brief ?? title, use_for: o.use_for ?? "", section: "", file: { path: o.path ?? `${title}.pdf`, year: o.year ?? null }, public_url: o.pub ? `https://downloads.accops.com/${encodeURIComponent(title)}.pdf` : null }, score: 1, why: "" });
+  const fin = (question, text, pool) => finish({ question, text, pool, calls: 1, runtime: "openai-compatible", model: "m", trace: [], filters: {}, error: null });
+  // 1. A competitor given as the rep's situation is context, not a required entity (dry run, #1 on 20b).
+  for (const q of ["pvt bank in mumbai moving off citrix, need a bfsi case study i can send them", "bank replacing citrix, need a bfsi case study",
+    "customer uses citrix, need a bfsi case study", "customer moving after the citrix price hike, need a bfsi case study", "hospital currently on Citrix, need a case study"])
+    ok(isContext(q, "Citrix"), `Citrix is context in "${q}"`);
+  for (const q of ["citrix battlecard", "hysecure vs citrix", "citrix comparison", "citrix migration deck", "bank moving off citrix, need the citrix battlecard", "whats our pitch against citrix"])
+    ok(!isContext(q, "Citrix"), `Citrix is the object of "${q}"`);
+  ok(isContext("Kerala hospital, currently on Citrix, evaluating Azure Virtual Desktop, prep against AVD", "Citrix") && !isContext("Kerala hospital, currently on Citrix, evaluating Azure Virtual Desktop, prep against AVD", "AVD"),
+    "AVD named as 'against AVD' stays required even though 'evaluating Azure Virtual Desktop' is context");
+  const b1 = h("Two Leading Indian Private Banks: Secure Access, MFA and Biometrics", { industry: "BFSI", year: "2026", pub: 1 });
+  const b2 = h("Top-5 Indian Private Bank: 3,000 to 25,000 Remote Users", { industry: "BFSI", year: "2026", pub: 1 });
+  const cxDeck = h("Accops BFSI Proposal Deck (2021): Cutting a Bank's Citrix VDI Dependency", { type: "Deck", industry: "BFSI", year: "2021" });
+  const bankQ = "pvt bank in mumbai moving off citrix, need a bfsi case study i can send them";
+  r = fin(bankQ, "The library has two 2026 BFSI case studies for a private bank.\nPICKS: 1, 2", [b1, b2, cxDeck]);
+  ok(!r.missing && !/No exact match for Citrix/.test(r.text) && /^The library has two 2026 BFSI case studies for a private bank\.\nBoth are public/.test(r.text), `Citrix as context is not a gap: ${r.text} | ${r.missing}`);
+  const cxCase = h("Private Bank Moves off Citrix: VDI Case Study", { industry: "BFSI", year: "2026", pub: 1 });
+  r = fin(bankQ, "The library has three BFSI case studies.\nPICKS: 1, 2, 3", [b1, b2, cxCase]);
+  ok(r.assets[0]?.title === cxCase.asset.title && !r.missing, `a case study naming the context competitor goes first: ${r.assets.map(a => a.title)}`);
+  r = fin("citrix battlecard", "The library has a BFSI case study.\nPICKS: 1", [b1]);
+  ok(r.missing && /No exact match for Citrix/.test(r.text), `Citrix as the object is still required: ${r.text}`);
+}
+
 // 6. Cold start: apiSearch waits for the registry instead of ranking the frozen cards alone.
 globalThis.__samReg = undefined; globalThis.__samRegAt = undefined; regDelay = 50;
 const s = await apiSearch({ query: "hyid datasheet" }, "check", "api");
