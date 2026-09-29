@@ -805,7 +805,7 @@ export function finish(p: {
     }
     const fits = hits.filter(h => relevant(p.question, h.asset));
     const missingHere = asksAbout(own).filter(e => !subs.some(h => hasEntity(h, e, own))), led = namedFirst(subs, fits, own, p.trace);
-    subs = nearFirst(led, missingHere, own, p.trace, led[0] !== subs[0]);
+    subs = nearFirst(led, missingHere, own, p.trace);
     subs = shortFirst(ensurePublished(withSuccessors(subs, p.trace).filter(h => h.why === NEAR_WHY || relevant(p.question, h.asset)), fits, p.question, p.trace), fits, own, p.trace).slice(0, 2);
     return done(denial ? denialClause(reply.verdict, p.question) : "No exact match in the library.", ["Closest in the library:"], subs, true);
   }
@@ -828,7 +828,7 @@ export function finish(p: {
     p.trace.push({ step: "verdict: named entity missing", detail: `no shown card has ${uncovered.join(", ")}` });
     const about = uncovered.some(e => OWN_PRODUCTS.has(e) || SPECS.has(e));
     const led = namedFirst(shown, fill, own, p.trace);
-    shown = nearFirst(led, uncovered, own, p.trace, led[0] !== shown[0]).slice(0, 3);
+    shown = nearFirst(led, uncovered, own, p.trace).slice(0, 3);
     return done(`No exact match for ${uncovered.map(e => entityLabel(e, own)).join(" or ")}: none of the closest documents ${about ? "is about" : "mentions"} ${uncovered.length > 1 ? "them" : "it"}.`, ["Closest in the library:"], shown, true);
   }
   // The named type must be met by a document about the named product: a corporate brochure is a
@@ -943,8 +943,12 @@ function namedFirst(subs: SearchHit[], pool: SearchHit[], turn: string, trace: A
   const rank = (h: SearchHit) => kind(h) + substituteQuality(h.asset);
   const best = Math.max(0, ...subs.map(rank));
   if (Math.floor(best) === 3) return subs;
-  // Searched on the product (and type) alone: on the whole long ask, twenty RFP documents outrank it.
-  const wide = [...pool, ...prods.flatMap(p => searchAssets({ query: [p, ...types].join(" "), product: PRODUCTS.includes(p) ? p : undefined, limit: 20 }).results)];
+  // Beyond this turn's results, searched on the product (and type) alone - on the whole long ask, twenty
+  // RFP documents outrank it - and only for a better kind, or a public one when no substitute is: a
+  // fresher internal deck of the same kind is not worth displacing the model's pick (#22).
+  const pubShown = subs.some(h => about(h) && h.asset.public_url);
+  const wide = [...pool, ...prods.flatMap(p => searchAssets({ query: [p, ...types].join(" "), product: PRODUCTS.includes(p) ? p : undefined, limit: 20 }).results)
+    .filter(h => kind(h) > Math.floor(best) || (!pubShown && h.asset.public_url))];
   const add = primaryFirst(wide.filter(h => rank(h) > best && kind(h) % 2 === 1 && relevant(turn, h.asset)), prods[0]).sort((x, y) => rank(y) - rank(x))[0];
   if (!add) return subs;
   trace.push({ step: "substitutes: named product first", detail: `${add.asset.title} is about ${prods.join(" or ")}` });
@@ -966,7 +970,7 @@ const NEAR: Record<string, string[]> = {
   GCC: ["global capability", "gcc", "it services", "ites", "offshore", "outsourc"],
   ...Object.fromEntries(["Malaysia", "Indonesia", "Thailand", "Philippines", "Singapore", "Vietnam"].map(c => [c, SEA])),
 };
-function nearFirst(subs: SearchHit[], missing: string[], turn: string, trace: AskResult["trace"], productLead: boolean): SearchHit[] {
+function nearFirst(subs: SearchHit[], missing: string[], turn: string, trace: AskResult["trace"]): SearchHit[] {
   const words = [...new Set(missing.flatMap(e => NEAR[e] ?? []))];
   if (!words.length) return subs;
   const types = typesNamedIn(turn), res = words.map(w => tokenMatcher(w));
@@ -974,11 +978,12 @@ function nearFirst(subs: SearchHit[], missing: string[], turn: string, trace: As
   const near = (a: Asset) => { const t = cardText(a), title = a.title.toLowerCase(); return (res.some(r => r.test(title)) ? 2 : 0) + Math.min(2, res.filter(r => r.test(t)).length); };
   const prods = [...new Set([heuristicFilters(turn).product, ...asksAbout(turn).filter(e => OWN_PRODUCTS.has(e))].filter(Boolean))];
   const score = (a: Asset) => { const n = near(a); return n && n + (types.some(t => isType(a, t)) ? 3 : 0) + (prods.some(e => isAbout(a, e)) ? 1 : 0) + substituteQuality(a) * 2; };
-  // Two substitutes: the product's own document when namedFirst brought one (`lead`), then near ones.
-  const lead = subs.slice(0, productLead ? 1 : 0), rest = subs.slice(lead.length);
-  const have = rest.filter(h => near(h.asset) >= 2), want = 2 - lead.length - have.length; // one passing mention ("GCC Security Symposium" on an award slide) is not near
+  // Two substitutes: the product's own document when it leads (namedFirst), then near ones. One passing
+  // mention ("GCC Security Symposium" on an award slide, a Singapore office) is not near.
+  const lead = subs.slice(0, subs[0] && prods.some(e => isAbout(subs[0].asset, e)) ? 1 : 0), rest = subs.slice(lead.length);
+  const have = rest.filter(h => near(h.asset) >= 2), want = 2 - lead.length - have.length;
   const add = want <= 0 ? [] : allAssets().filter(a => !isJunk(a) && regionOk(turn, a) && !subs.some(h => assetKey(h.asset) === assetKey(a)))
-    .map(a => ({ a, s: score(a) })).filter(x => x.s > 0).sort((x, y) => y.s - x.s).slice(0, want).map(({ a }) => ({ asset: a, score: 0, why: NEAR_WHY }));
+    .map(a => ({ a, s: near(a) >= 2 ? score(a) : 0 })).filter(x => x.s > 0).sort((x, y) => y.s - x.s).slice(0, want).map(({ a }) => ({ asset: a, score: 0, why: NEAR_WHY }));
   if (add.length) trace.push({ step: "substitutes: near the missing topic", detail: `${add.map(h => h.asset.title).join("; ")} for ${missing.join(", ")}`.slice(0, 300) });
   return [...lead, ...have, ...add, ...rest.filter(h => !have.includes(h))];
 }

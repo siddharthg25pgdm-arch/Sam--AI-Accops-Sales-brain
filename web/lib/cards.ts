@@ -342,7 +342,7 @@ const STOP = new Set(["the", "for", "and", "with", "need", "want", "any", "have"
   "prep", "prepare", "preparing", "share", "sharing", "email", "mail", "forward", "whats", "how", "when", "where", "who",
   "are", "was", "were", "will", "would", "could", "should", "has", "had", "got", "get", "just", "also", "really", "maybe", "know", "tell",
   "them", "him", "her", "his", "they", "their", "there", "into", "over", "moving", "off", "going", "like",
-  "customer", "customers", "client", "clients", "prospect", "prospects", "asks", "asked", "asking", "doc", "docs",
+  "customer", "customers", "client", "clients", "prospect", "prospects", "asks", "asked", "asking",
   // Hinglish: bhai (mate), abhi (now), bhejo (send), chahiye (need), ko/ke liye (to/for), hai (is).
   "bhai", "abhi", "bhejo", "bhej", "bhejna", "bhejdo", "chahiye", "kya", "hai", "koi", "liye", "wala", "wali", "jaldi"]);
 /** Common misspellings of a document type, so "hyworks brocher" is a brochure ask. Used by the
