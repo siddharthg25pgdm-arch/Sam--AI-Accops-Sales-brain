@@ -5,6 +5,19 @@ The 25 September section below supersedes anything older it contradicts.
 
 ---
 
+## 29 September 2026: morning digest
+
+`GET /api/v1/digest` returns the queue owner's morning email: the last 24 h, IST dates, email-safe HTML (tables, inline styles, 600 px, no external anything). `?format=json` returns the same data. The subject is in the `X-SAM-Subject` response header and in JSON `subject`, ASCII on purpose (safe in a header): e.g. `SAM: 2 new requests, 1 worth creating, 4 files changed, 12 questions`, or `SAM: nothing new`.
+
+| | |
+|---|---|
+| Auth | `Authorization: Bearer <SP_WEBHOOK_SECRET>` (the secret the SharePoint flows already carry, constant-time compare), or any SAM API token / session. 401 otherwise |
+| Sections, in order, each left out when empty | Content requests (open queue by distinct reps, New, +N since yesterday, **Worth creating at 3+ reps**, links to `/admin?tab=requests#r<id>`) · Asked for, never requested (top 5 unrequested gaps, 7 days) · Library (added / modified / renamed / deleted in 24 h, cards with `carded_at` in 24 h, the carding queue) · Usage (real traffic, vs the 7 x 24 h before) · Needs a look (change flow silent > 48 h, deletions not applied > 36 h, provider failures >= 3 and >= 20%, card cache empty, any failed read) |
+| Code | `web/lib/digest.ts` (assembly + HTML, pure), `web/app/api/v1/digest/route.ts` (reads), `web/lib/digest.check.mjs`, `web/scripts/digest-shots.mjs`. Usage comes from the new `sam_usage_window` RPC (`docs/supabase-sam-digest.sql`), the dashboard's definitions over a rolling window |
+| The flow (to build) | Recurrence 08:30 India Standard Time → HTTP GET `https://sam-accops.vercel.app/api/v1/digest` with header `Authorization: Bearer <SP_WEBHOOK_SECRET>` → Outlook "Send an email (V2)": To Siddharth, Subject `@{outputs('HTTP')?['headers']?['x-sam-subject']}`, Body `@{body('HTTP')}`, Is HTML Yes. A non-200 should fail the run, not send an empty email |
+
+---
+
 ## 28 September 2026: answer quality, and ready for the rep demo
 
 | | |
