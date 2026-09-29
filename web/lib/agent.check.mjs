@@ -628,6 +628,20 @@ ok(r.trace[0]?.step === "model provider failed, answered by fallback" && /gpt-os
     ["The deck covers RBI compliance.", [keynote], "RBI framework deck"],
   ]) ok(verdictProblem(dropSending(v), shown, q, false, shown) !== null, `risky verdict passed: "${v}"`);
 }
+// 15a. Honest gaps get substitutes near the missing topic, from the whole library (#19, #10, #25).
+{
+  run([say("No exact data residency document.\nPICKS: none")]);
+  r = await ask("RFP asks about data residency - is our DaaS hosted in india? need a doc for the RFP response");
+  ok(r.missing && r.assets.some(a => a.title === "DPDP Compliance and Access Control") && traceHas(r, "near the missing topic"), `data residency gap offers the DPDP whitepaper: ${r.assets.map(a => a.title)}`);
+  run([say("No exact GCC ZTNA pitch.\nPICKS: none")]);
+  r = await ask("whats our ZTNA pitch for a GCC");
+  ok(r.missing && r.assets.some(a => a.title === "ZTNA to Secure Modern ITeS Operations"), `GCC gap offers the ITeS ZTNA whitepaper: ${r.assets.map(a => a.title)}`);
+  const { seedSearch } = await jiti.import("./agent.ts");
+  const { queryTokens } = await jiti.import("./cards.ts");
+  ok(queryTokens("RFP asks about the RFP response").filter(t => t === "rfp").length === 1 && !queryTokens("RFP asks about the RFP response").includes("asks"), "a repeated word counts once; 'asks' is filler");
+  const long = seedSearch("RFP asks about data residency - is our hyworks hosted in india? need a doc for the RFP response");
+  ok(long.hits.length === 6 && long.hits.some(h => /hyworks/i.test(`${h.asset.title} ${h.asset.products[0] ?? ""}`)), `a long ask's seed keeps a slot for the product's own document: ${long.hits.map(h => h.asset.title)}`);
+}
 // 15b. HySecure demo videos (#12, #34): registry-only feature demos, through ask() on the fixture registry.
 {
   run([pickSay("The library has no exact HySecure demo video; closest are two demo videos.", "Geofencing control", "Device posture check and related data on management console")]);

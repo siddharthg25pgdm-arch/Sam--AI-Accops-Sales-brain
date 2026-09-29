@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, ENTITIES, namesProduct, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
+import { searchAssets, allAssets, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, ENTITIES, namesProduct, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured, compatModels } from "./agent-openai";
 import { providerFailure, type AskError } from "./events";
 
@@ -323,10 +323,8 @@ const REGIONS = ["Japan", "Middle East", "UAE", "Saudi", "Qatar", "Oman", "Kuwai
  *      ("hysecure vs zscaler" keeps a Zscaler note).
  *  An ask with no product, industry or topic word ("decks") has nothing to judge by and keeps all. */
 export function relevant(question: string, a: Asset): boolean {
-  const named = namedEntities(question), title = `${a.title} ${(a.file?.path ?? "").split("/").pop()}`;
-  if (/\bjapanese\b|(?:^|[-_ ])jp(?:[-_ ]|$)/i.test(title) && !named.includes("Japan")) return false;
-  const regions = namedEntities(title).filter(e => REGIONS.includes(e));
-  if (regions.length && typeGroup(a) !== "Case Study" && !regions.some(e => named.includes(e))) return false;
+  const named = namedEntities(question);
+  if (!regionOk(question, a)) return false;
   // A file SAM has not read is judged by its type: the model picked "Geofencing control.mp4" by its
   // title for "hysecure demo video", and nothing on it says HySecure.
   if (!isDescribed(a) && typesNamedIn(question).some(t => isType(a, t))) return !isJunk(a);
@@ -335,6 +333,14 @@ export function relevant(question: string, a: Asset): boolean {
   const f = heuristicFilters(question);
   const topic = queryTokens(question).some(w => !typesNamedIn(w).length && !GENERIC.has(w) && !/^(report|webinar|ebook|slides?)$/.test(w));
   return !f.product && !f.vertical && !topic ? !isJunk(a) : substituteFits(question, a);
+}
+
+/** The Japanese-language and regional-deck rules of relevant(), on their own (nearFirst uses them too). */
+function regionOk(question: string, a: Asset): boolean {
+  const named = namedEntities(question), title = `${a.title} ${(a.file?.path ?? "").split("/").pop()}`;
+  if (/\bjapanese\b|(?:^|[-_ ])jp(?:[-_ ]|$)/i.test(title) && !named.includes("Japan")) return false;
+  const regions = namedEntities(title).filter(e => REGIONS.includes(e));
+  return !(regions.length && typeGroup(a) !== "Case Study" && !regions.some(e => named.includes(e)));
 }
 
 // ---- The answer contract: the model picks, SAM writes ------------------------------------------
@@ -662,13 +668,19 @@ export function seedSearch(question: string): SearchRun | null {
     ? searchAssets({ query: question, asset_type: asset_type || undefined, vertical: f.vertical || undefined, audience: "external", limit: 10 }).results
       .filter(h => !front.some(x => assetKey(x.asset) === assetKey(h.asset))).sort((x, y) => titleHits(question, y) - titleHits(question, x) || y.score - x.score).slice(0, 1)
     : [];
+  // A long, many-clause ask spreads its score over every word ("RFP asks about data residency - is our
+  // DaaS hosted in india? need a doc for the RFP response"), and the product's own documents - which
+  // share one word with it - never make the top five (28 Sep #19). Its best document gets a slot.
+  const focus = f.product && queryTokens(question).length >= 7
+    ? primaryFirst(searchAssets({ query: f.product, asset_type: asset_type || undefined, product: f.product, limit: 40 }).results.filter(h => isAbout(h.asset, f.product))
+      .sort((x, y) => substituteQuality(y.asset) - substituteQuality(x.asset)), f.product).slice(0, 1) : [];
   const seen = new Set<string>(), all: SearchHit[] = [];
-  for (const h of [...short, ...front, ...pub, ...[...b, ...c, ...a.hits].sort((x, y) => y.score - x.score)]) {
+  for (const h of [...short, ...front, ...pub, ...focus, ...[...b, ...c, ...a.hits].sort((x, y) => y.score - x.score)]) {
     const k = assetKey(h.asset);
     if (!seen.has(k)) { seen.add(k); all.push(h); }
   }
   // The merge must not undo searchAssets' coverage: every named entity keeps a result about it.
-  const hits = cover(all, SEARCH_LIMIT + 1, namedEntities(question));
+  const hits = cover(all, SEARCH_LIMIT + 1 + focus.length, namedEntities(question));
   const extra = hits.some(h => !a.hits.some(x => assetKey(x.asset) === assetKey(h.asset)));
   const note = [a.note, short.length ? `the first ${short.length} result(s) are ${max} pages or fewer` : null,
     extra ? "results after the first three are not filtered by type, industry, product or audience" : null].filter(Boolean).join("; ") || null;
@@ -789,8 +801,9 @@ export function finish(p: {
       p.trace.push({ step: "substitutes: from the results", detail: `the model picked ${chosen.length ? "only unrelated documents" : "none"}; showing the ${subs.length} closest that share the ask's product, industry or topic` });
     }
     const fits = hits.filter(h => relevant(p.question, h.asset));
-    subs = namedFirst(subs, fits, own, p.trace);
-    subs = shortFirst(ensurePublished(withSuccessors(subs, p.trace).filter(h => relevant(p.question, h.asset)), fits, p.question, p.trace), fits, own, p.trace).slice(0, 2);
+    const missingHere = asksAbout(own).filter(e => !subs.some(h => hasEntity(h, e, own))), led = namedFirst(subs, fits, own, p.trace);
+    subs = nearFirst(led, missingHere, own, p.trace, led[0] !== subs[0]);
+    subs = shortFirst(ensurePublished(withSuccessors(subs, p.trace).filter(h => h.why === NEAR_WHY || relevant(p.question, h.asset)), fits, p.question, p.trace), fits, own, p.trace).slice(0, 2);
     return done(denial ? denialClause(reply.verdict, p.question) : "No exact match in the library.", ["Closest in the library:"], subs, true);
   }
 
@@ -811,7 +824,8 @@ export function finish(p: {
   if (uncovered.length) {
     p.trace.push({ step: "verdict: named entity missing", detail: `no shown card has ${uncovered.join(", ")}` });
     const about = uncovered.some(e => OWN_PRODUCTS.has(e) || SPECS.has(e));
-    shown = namedFirst(shown, fill, own, p.trace).slice(0, 3);
+    const led = namedFirst(shown, fill, own, p.trace);
+    shown = nearFirst(led, uncovered, own, p.trace, led[0] !== shown[0]).slice(0, 3);
     return done(`No exact match for ${uncovered.map(e => entityLabel(e, own)).join(" or ")}: none of the closest documents ${about ? "is about" : "mentions"} ${uncovered.length > 1 ? "them" : "it"}.`, ["Closest in the library:"], shown, true);
   }
   // The named type must be met by a document about the named product: a corporate brochure is a
@@ -911,7 +925,10 @@ function shortFirst(shown: SearchHit[], pool: SearchHit[], turn: string, trace: 
  *  substitutes have none: "No exact datasheet with max concurrent users per appliance" over a logistics
  *  case study and an editions matrix, with the public HySecure datasheet in the results, read as "we
  *  have no HySecure datasheet" (27 Sep #23, #7, #19). The product is an Accops one or the product word
- *  the ask names ("DaaS"); a document of the named type about it beats one only about it. */
+ *  the ask names ("DaaS"); a document of the named type about it beats one only about it. Between two
+ *  about it, a current, public, real document beats a 2021 internal scoping template: the long data
+ *  residency ask (#19) never saw the public 2026 DaaS brochure, so the whole library is searched for the
+ *  product here too, not only this turn's results. */
 function namedFirst(subs: SearchHit[], pool: SearchHit[], turn: string, trace: AskResult["trace"]): SearchHit[] {
   const prods = [...new Set([...asksAbout(turn).filter(e => OWN_PRODUCTS.has(e)), heuristicFilters(turn).product].filter(Boolean))];
   if (!prods.length) return subs;
@@ -919,14 +936,50 @@ function namedFirst(subs: SearchHit[], pool: SearchHit[], turn: string, trace: A
   // ABOUT means the primary product tag here: the 2026 Editions matrix names HySecure and HyID in its
   // title, and passed for both products' datasheet. An untagged file falls back to its title.
   const about = (h: SearchHit) => prods.some(e => h.asset.products.length ? (ALIAS[e] ?? [e.toLowerCase()]).some(w => h.asset.products[0].toLowerCase().includes(w)) : isAbout(h.asset, e));
-  const rank = (h: SearchHit) => (about(h) ? 1 : 0) + (types.some(t => isType(h.asset, t)) ? 2 : 0);
+  const kind = (h: SearchHit) => (about(h) ? 1 : 0) + (types.some(t => isType(h.asset, t)) ? 2 : 0);
+  const rank = (h: SearchHit) => kind(h) + substituteQuality(h.asset);
   const best = Math.max(0, ...subs.map(rank));
-  if (best === 3) return subs;
-  const add = primaryFirst(pool.filter(h => rank(h) > best && rank(h) % 2 === 1), prods[0]).sort((x, y) => rank(y) - rank(x))[0];
+  if (Math.floor(best) === 3) return subs;
+  // Searched on the product (and type) alone: on the whole long ask, twenty RFP documents outrank it.
+  const wide = [...pool, ...prods.flatMap(p => searchAssets({ query: [p, ...types].join(" "), product: PRODUCTS.includes(p) ? p : undefined, limit: 20 }).results)];
+  const add = primaryFirst(wide.filter(h => rank(h) > best && kind(h) % 2 === 1 && relevant(turn, h.asset)), prods[0]).sort((x, y) => rank(y) - rank(x))[0];
   if (!add) return subs;
   trace.push({ step: "substitutes: named product first", detail: `${add.asset.title} is about ${prods.join(" or ")}` });
   return [add, ...subs.filter(h => assetKey(h.asset) !== assetKey(add.asset))];
 }
+/** Under 1, so it only breaks ties between substitutes of the same kind: public, current, a real document. */
+function substituteQuality(a: Asset): number {
+  return (a.public_url ? 0.5 : 0) + (isStale(a) ? 0 : 0.25) + (typeGroup(a) === "Other" && !isType(a, "Video") ? 0 : 0.2);
+}
+
+/** What stands in when a named topic or place is missing: documents that name something near it (28 Sep
+ *  #19 data residency, #10 GCC, #25 Malaysia/Indonesia got a 2021 Nutanix brief, CIO event decks and an
+ *  Indian DTH case study). Searched over the whole library, since a long ask's own results rarely hold
+ *  them. With a product named, one near document joins its product document; without, two.
+ *  ponytail: a hand list for the gaps reps hit; add a row when the gap report shows a new one. */
+const SEA = ["south-east asia", "southeast asia", "asean", "sea", "philippines", "malaysia", "indonesia", "thailand", "singapore", "vietnam"];
+const NEAR: Record<string, string[]> = {
+  "Data residency": ["data residency", "data sovereignty", "sovereign", "sovereignty", "dpdp", "data locali", "hosted in india"],
+  GCC: ["global capability", "gcc", "it services", "ites", "offshore", "outsourc"],
+  ...Object.fromEntries(["Malaysia", "Indonesia", "Thailand", "Philippines", "Singapore", "Vietnam"].map(c => [c, SEA])),
+};
+function nearFirst(subs: SearchHit[], missing: string[], turn: string, trace: AskResult["trace"], productLead: boolean): SearchHit[] {
+  const words = [...new Set(missing.flatMap(e => NEAR[e] ?? []))];
+  if (!words.length) return subs;
+  const types = typesNamedIn(turn), res = words.map(w => tokenMatcher(w));
+  // In the title counts most; mentions in the text count up to two (a 60-slide deck mentions everything).
+  const near = (a: Asset) => { const t = cardText(a), title = a.title.toLowerCase(); return (res.some(r => r.test(title)) ? 2 : 0) + Math.min(2, res.filter(r => r.test(t)).length); };
+  const prods = [...new Set([heuristicFilters(turn).product, ...asksAbout(turn).filter(e => OWN_PRODUCTS.has(e))].filter(Boolean))];
+  const score = (a: Asset) => near(a) && near(a) + (types.some(t => isType(a, t)) ? 3 : 0) + (prods.some(e => isAbout(a, e)) ? 1 : 0) + substituteQuality(a) * 2;
+  // Two substitutes: the product's own document when namedFirst brought one (`lead`), then near ones.
+  const lead = subs.slice(0, productLead ? 1 : 0), rest = subs.slice(lead.length);
+  const have = rest.filter(h => near(h.asset) >= 2), want = 2 - lead.length - have.length; // one passing mention ("GCC Security Symposium" on an award slide) is not near
+  const add = want <= 0 ? [] : allAssets().filter(a => !isJunk(a) && regionOk(turn, a) && score(a) > 0 && !subs.some(h => assetKey(h.asset) === assetKey(a)))
+    .sort((x, y) => score(y) - score(x)).slice(0, want).map(a => ({ asset: a, score: 0, why: NEAR_WHY }));
+  if (add.length) trace.push({ step: "substitutes: near the missing topic", detail: `${add.map(h => h.asset.title).join("; ")} for ${missing.join(", ")}`.slice(0, 300) });
+  return [...lead, ...have, ...add, ...rest.filter(h => !have.includes(h))];
+}
+const NEAR_WHY = "near the missing topic";
 
 /** A denial verdict cut to its denial: "No exact Proxmox integration doc, but the Nutanix guide covers
  *  AHV" keeps only what is missing. Then checked like any verdict; a failing one becomes plain. */
