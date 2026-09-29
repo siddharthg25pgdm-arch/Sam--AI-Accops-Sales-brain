@@ -534,11 +534,13 @@ export function isContext(question: string, e: string): boolean {
     return CONTEXT_BEFORE.test(before) && !OBJECT_BEFORE.test(before) && !OBJECT_AFTER.test(after);
   });
 }
-/** Cards naming a context entity go first, among those of the asked type (or all, with no type named). */
+/** Cards naming a context entity go first among those of the asked type: a BFSI case study that names
+ *  Citrix before one that does not. Not with no type named, and not past a public card on a sending ask:
+ *  the Kerala answer must still lead with the public hospital case study (#31), not a Citrix battlecard. */
 function contextFirst(shown: SearchHit[], turn: string): SearchHit[] {
   const ctx = namedEntities(turn).filter(e => isContext(turn, e)), types = typesNamedIn(turn);
-  if (!ctx.length) return shown;
-  const lead = (h: SearchHit) => ctx.some(e => entityOn(h.asset, e)) && (!types.length || types.some(t => isType(h.asset, t)));
+  if (!ctx.length || !types.length) return shown;
+  const lead = (h: SearchHit) => ctx.some(e => entityOn(h.asset, e)) && types.some(t => isType(h.asset, t)) && (!sending(turn) || Boolean(h.asset.public_url));
   return [...shown.filter(lead), ...shown.filter(h => !lead(h))];
 }
 function hasEntity(h: SearchHit, e: string, question: string): boolean {
@@ -920,7 +922,11 @@ const NEGATED_SEND = /\b(no|do not|don['’]t|not|never|must not|cannot|can['’
 export function dropSending(verdict: string): string {
   // Visibility is SAM's too: "two public BFSI case studies" over one public and one internal card is
   // wrong, and the sendability line under the verdict already says which is which. So the adjective goes.
-  const v = verdict.replace(VIS_ADJ, "$1 ");
+  // "an internal VDI battlecard" -> "a VDI battlecard", not "an VDI battlecard" (28 Sep dry run).
+  // Then the sending PURPOSE goes and the description stays: "short enough for a quick send" -> "short"
+  // (#3 lost the whole "that are short" clause); "ready to send" says nothing else, so its clause goes below.
+  const v = verdict.replace(VIS_ADJ, (m, det: string, off: number, s: string) => `${/^an?$/i.test(det) ? article(det, s.slice(off + m.length)) : det} `)
+    .replace(SEND_PURPOSE, (m, off: number, s: string) => SEND_ONLY.test(s.slice(0, off)) ? m : "");
   if (!SEND_WORDS.test(v) && !VIS_PRED.test(v)) return v === verdict ? verdict : tidy(v);
   // Clauses and the separators between them; a sending clause goes with the separator before it
   // (or after it, when it is the first clause).
@@ -936,6 +942,17 @@ export function dropSending(verdict: string): string {
 const tidy = (s: string) => { const t = s.replace(/\s+/g, " ").trim().replace(/[.!]+$/, ""); return t ? `${t[0].toUpperCase()}${t.slice(1)}.` : ""; };
 /** "two public", "a confidential", "the internal-only": a count or article, then a visibility word. */
 const VIS_ADJ = /\b(a|an|the|one|two|three|four|five|six|several|some|both|all|only|\d+)\s+(?:public|published|unpublished|internal|confidential)(?:[- ]only)?\s+(?!sector\b)/gi;
+/** "(short) enough for a quick send", "(case studies) you can send the CIO": a sending purpose tacked onto
+ *  a description. SEND_ONLY: the word before it that makes the whole clause a sending claim ("ready to send"). */
+const SEND_PURPOSE = /(?:\s+enough)?\s+(?:(?:for|to)\s+(?:a\s+|an\s+)?(?:(?:quick|easy|direct|fast|straight)\s+)?(?:send(?:ing)?|shar(?:e|ing)|e-?mail(?:ing)?|forward(?:ing)?)|(?:that\s+|which\s+)?(?:you|we|i|reps?)\s+(?:can|could|may)\s+(?:send|share|e-?mail|forward))\b(?:\s+(?:to\s+|with\s+)?(?:the|a|an|your|their)\s+[\w-]+|\s+(?:to|with)\s+[\w-]+|\s+(?:it|them|him|her)\b)?/gi;
+const SEND_ONLY = /\b(?:ready|fine|suitable|safe|ok|okay|good|cleared|approved|appropriate|allowed|ideal|used|be)\s*$/i;
+/** "a" or "an" for the word that now follows it. An all-caps acronym is read letter by letter ("an MFA",
+ *  "a VDI"), except SOC, which is said as a word. */
+function article(det: string, next: string): string {
+  const w = next.match(/^[\w]+/)?.[0] ?? "";
+  const an = /^[A-Z0-9]{2,}$/.test(w) && w !== "SOC" ? /^[AEFHILMNORSX8]/.test(w) : /^[aeiou]/i.test(w) && !/^(?:uni|use|usu|eu|one)/i.test(w);
+  return `${det[0] === "A" ? "A" : "a"}${an ? "n" : ""}`;
+}
 /** "both are internal", "it is public". */
 const VIS_PRED = /\b(?:is|are|was|were|remain|remains)\s+(?:all\s+|both\s+|only\s+|still\s+)?(?:public|published|unpublished|internal|confidential)\b/i;
 

@@ -595,6 +595,18 @@ ok(r.trace[0]?.step === "model provider failed, answered by fallback" && /gpt-os
   ok(r.assets[0]?.title === cxCase.asset.title && !r.missing, `a case study naming the context competitor goes first: ${r.assets.map(a => a.title)}`);
   r = fin("citrix battlecard", "The library has a BFSI case study.\nPICKS: 1", [b1]);
   ok(r.missing && /No exact match for Citrix/.test(r.text), `Citrix as the object is still required: ${r.text}`);
+  // 2. dropSending strips the sending claim, keeps the description, and fixes a/an (#3, dry-run Kerala).
+  const { dropSending } = await jiti.import("./agent.ts");
+  for (const [v, want] of [
+    ["The library has two 2026 BFSI case studies that are short enough for a quick send.", "The library has two 2026 BFSI case studies that are short."],
+    ["The library has a 2-page BFSI case study, short enough to email the CIO.", "The library has a 2-page BFSI case study, short."],
+    ["The library has a public hospital case study and an internal VDI battlecard.", "The library has a hospital case study and a VDI battlecard."],
+    ["An internal MFA deck and a public HyID datasheet.", "An MFA deck and a HyID datasheet."],
+    ["A public ISO certificate.", "An ISO certificate."],
+    ["The library has two BFSI case studies you can send the customer.", "The library has two BFSI case studies."],
+    ["The library has two BFSI case studies that are ready to send.", "The library has two BFSI case studies."],
+    ["The library has two decks; both can be shared.", "The library has two decks."],
+  ]) ok(dropSending(v) === want, `dropSending("${v}") -> "${dropSending(v)}", want "${want}"`);
 }
 
 // 6. Cold start: apiSearch waits for the registry instead of ranking the frozen cards alone.
