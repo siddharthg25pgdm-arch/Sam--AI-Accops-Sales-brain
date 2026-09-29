@@ -476,7 +476,10 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   // Rendered: the model's "two can be shared" about internal documents never reaches the rep.
   run([pickSay("The library has internal product videos for HySecure; two can be shared.", "Geofencing control", "Device posture check and related data on management console")]);
   r = await ask("product video hysecure");
-  ok(/^The library has internal product videos for HySecure\.\nAll internal: don't send outside Accops\.\n- \*\*/.test(r.text) && !/shared/.test(r.text), `verdict kept, sending line is SAM's: ${r.text}`);
+  // (Until 30 Sep this expected the model's verdict. No video is named for HySecure, so a general product
+  // video is missing: the button shows and the feature demos stand in - 28 Sep #12.)
+  ok(/^No exact HySecure product video in the library\.\nAll internal: don't send outside Accops\.\nClosest in the library:\n- \*\*/.test(r.text) && !/shared/.test(r.text) && r.missing
+    && r.assets.length === 2 && r.assets.every(a => /Geofencing|Device posture/.test(a.title)), `general product video is missing, demos stand in: ${r.text}`);
 }
 
 // 12. A named Accops product with no document of the asked type about it (27 Sep #15, #7).
@@ -569,6 +572,97 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
 run([() => ({ status: 429, text: "Rate limit reached for model openai/gpt-oss-120b" }), call({ query: "citrix" }), say("- **Accops Powered VDI vs Citrix VDI** - comparison")]);
 r = await ask("citrix comparison");
 ok(r.trace[0]?.step === "model provider failed, answered by fallback" && /gpt-oss-120b.*429.*answered by openai\/gpt-oss-20b/.test(r.trace[0].detail), `fallback reason in the trace: ${JSON.stringify(r.trace[0])}`);
+
+// 15. 28 Sep re-run #3, through finish() on hand-made results.
+{
+  const { finish, isContext } = await jiti.import("./agent.ts");
+  const h = (title, o = {}) => ({ asset: { title, asset_type: o.type ?? "Case Study", industry: o.industry ?? "", client: "", products: o.products ?? [], key_problem: "", key_outcomes: [],
+    brief: o.brief ?? title, use_for: o.use_for ?? "", section: "", file: { path: o.path ?? `${title}.pdf`, year: o.year ?? null }, public_url: o.pub ? `https://downloads.accops.com/${encodeURIComponent(title)}.pdf` : null }, score: 1, why: "" });
+  const fin = (question, text, pool) => finish({ question, text, pool, calls: 1, runtime: "openai-compatible", model: "m", trace: [], filters: {}, error: null });
+  // 1. A competitor given as the rep's situation is context, not a required entity (dry run, #1 on 20b).
+  for (const q of ["pvt bank in mumbai moving off citrix, need a bfsi case study i can send them", "bank replacing citrix, need a bfsi case study",
+    "customer uses citrix, need a bfsi case study", "customer moving after the citrix price hike, need a bfsi case study", "hospital currently on Citrix, need a case study"])
+    ok(isContext(q, "Citrix"), `Citrix is context in "${q}"`);
+  for (const q of ["citrix battlecard", "hysecure vs citrix", "citrix comparison", "citrix migration deck", "bank moving off citrix, need the citrix battlecard", "whats our pitch against citrix"])
+    ok(!isContext(q, "Citrix"), `Citrix is the object of "${q}"`);
+  ok(isContext("Kerala hospital, currently on Citrix, evaluating Azure Virtual Desktop, prep against AVD", "Citrix") && !isContext("Kerala hospital, currently on Citrix, evaluating Azure Virtual Desktop, prep against AVD", "AVD"),
+    "AVD named as 'against AVD' stays required even though 'evaluating Azure Virtual Desktop' is context");
+  const b1 = h("Two Leading Indian Private Banks: Secure Access, MFA and Biometrics", { industry: "BFSI", year: "2026", pub: 1 });
+  const b2 = h("Top-5 Indian Private Bank: 3,000 to 25,000 Remote Users", { industry: "BFSI", year: "2026", pub: 1 });
+  const cxDeck = h("Accops BFSI Proposal Deck (2021): Cutting a Bank's Citrix VDI Dependency", { type: "Deck", industry: "BFSI", year: "2021" });
+  const bankQ = "pvt bank in mumbai moving off citrix, need a bfsi case study i can send them";
+  r = fin(bankQ, "The library has two 2026 BFSI case studies for a private bank.\nPICKS: 1, 2", [b1, b2, cxDeck]);
+  ok(!r.missing && !/No exact match for Citrix/.test(r.text) && /^The library has two 2026 BFSI case studies for a private bank\.\nBoth are public/.test(r.text), `Citrix as context is not a gap: ${r.text} | ${r.missing}`);
+  const cxCase = h("Private Bank Moves off Citrix: VDI Case Study", { industry: "BFSI", year: "2026", pub: 1 });
+  r = fin(bankQ, "The library has three BFSI case studies.\nPICKS: 1, 2, 3", [b1, b2, cxCase]);
+  ok(r.assets[0]?.title === cxCase.asset.title && !r.missing, `a case study naming the context competitor goes first: ${r.assets.map(a => a.title)}`);
+  r = fin(bankQ, "The library has two 2026 BFSI case studies for a private bank moving off Citrix.\nPICKS: 1, 2", [b1, b2]);
+  ok(!r.missing && /^The library has two 2026 BFSI case studies for a private bank moving off Citrix\./.test(r.text), `the rep's situation may be repeated in the verdict: ${r.text}`);
+  r = fin(bankQ, "The library has two case studies of banks moving off Citrix.\nPICKS: 1, 2", [b1, b2]);
+  ok(/^Best matches in the library\./.test(r.text), `...but not as what a document is about: ${r.text}`);
+  r = fin("citrix battlecard", "The library has a BFSI case study.\nPICKS: 1", [b1]);
+  ok(r.missing && /No exact match for Citrix/.test(r.text), `Citrix as the object is still required: ${r.text}`);
+  // 2. dropSending strips the sending claim, keeps the description, and fixes a/an (#3, dry-run Kerala).
+  const { dropSending } = await jiti.import("./agent.ts");
+  for (const [v, want] of [
+    ["The library has two 2026 BFSI case studies that are short enough for a quick send.", "The library has two 2026 BFSI case studies that are short."],
+    ["The library has a 2-page BFSI case study, short enough to email the CIO.", "The library has a 2-page BFSI case study, short."],
+    ["The library has a public hospital case study and an internal VDI battlecard.", "The library has a hospital case study and a VDI battlecard."],
+    ["An internal MFA deck and a public HyID datasheet.", "An MFA deck and a HyID datasheet."],
+    ["A public ISO certificate.", "An ISO certificate."],
+    ["The library has two BFSI case studies you can send the customer.", "The library has two BFSI case studies."],
+    ["The library has two BFSI case studies that are ready to send.", "The library has two BFSI case studies."],
+    ["The library has two decks; both can be shared.", "The library has two decks."],
+  ]) ok(dropSending(v) === want, `dropSending("${v}") -> "${dropSending(v)}", want "${want}"`);
+  // 3. Fair verdicts the guard threw away (#5 "supporting", dry-run "can be used"); risky ones still caught.
+  const { verdictProblem } = await jiti.import("./agent.ts");
+  const rbiCase = h("Two Leading Indian Private Banks: Secure Access, MFA and Biometrics", { industry: "BFSI", year: "2026", pub: 1, brief: "RBI-mandated MFA for vendors at two private banks." });
+  const keynote = h("Trusted Access for an Untrusted World: Redefining Cyber Resilience in BFSI - IBA CISO Summit", { type: "Deck", year: "2025" });
+  const cxA = h("Accops Powered VDI vs Citrix VDI", { type: "Battlecard", year: "2024" }), cxB = h("Accops vs Citrix and VMware Horizon", { type: "Battlecard", year: "2024" });
+  for (const [v, shown, q] of [
+    ["The library has a relevant case study and a supporting deck.", [rbiCase, keynote], "CISO at a pvt bank asked about the RBI cyber security framework, what can i send the CISO"],
+    ["The library has two 2024 Citrix battlecards that can be used for prep.", [cxA, cxB], "citrix battlecard for my own prep before the call tmrw"],
+    ["The library has a BFSI case study that supports your RBI conversation.", [rbiCase], "RBI framework, what can i send the CISO"],
+  ]) ok(verdictProblem(dropSending(v), shown, q, false, shown) === null, `fair verdict rejected: "${v}" -> ${verdictProblem(dropSending(v), shown, q, false, shown)}`);
+  for (const [v, shown, q] of [
+    ["The HySecure datasheet can be framed to meet APRA CPS 234.", [cxA], "apra angle for hysecure"],
+    ["The library has a case study that can be used to show a Citrix migration.", [b1], "pvt bank moving off citrix, bfsi case study"],
+    ["The library has a case study about a bank moving off Citrix.", [b1], "pvt bank moving off citrix, bfsi case study"],
+    ["The library has a deck that supports 10,000 concurrent users.", [keynote], "hysecure sizing deck"],
+    ["The library has a battlecard that supports SAML federation.", [cxA], "citrix battlecard"],
+    ["The deck covers RBI compliance.", [keynote], "RBI framework deck"],
+  ]) ok(verdictProblem(dropSending(v), shown, q, false, shown) !== null, `risky verdict passed: "${v}"`);
+}
+// 15a. Honest gaps get substitutes near the missing topic, from the whole library (#19, #10, #25).
+{
+  run([say("No exact data residency document.\nPICKS: none")]);
+  r = await ask("RFP asks about data residency - is our DaaS hosted in india? need a doc for the RFP response");
+  ok(r.missing && r.assets.some(a => a.title === "DPDP Compliance and Access Control") && traceHas(r, "near the missing topic"), `data residency gap offers the DPDP whitepaper: ${r.assets.map(a => a.title)}`);
+  run([say("No exact GCC ZTNA pitch.\nPICKS: none")]);
+  r = await ask("whats our ZTNA pitch for a GCC");
+  ok(r.missing && r.assets.some(a => a.title === "ZTNA to Secure Modern ITeS Operations"), `GCC gap offers the ITeS ZTNA whitepaper: ${r.assets.map(a => a.title)}`);
+  const { seedSearch } = await jiti.import("./agent.ts");
+  const { queryTokens } = await jiti.import("./cards.ts");
+  ok(queryTokens("RFP asks about the RFP response").filter(t => t === "rfp").length === 1 && !queryTokens("RFP asks about the RFP response").includes("asks"), "a repeated word counts once; 'asks' is filler");
+  const long = seedSearch("RFP asks about data residency - is our hyworks hosted in india? need a doc for the RFP response");
+  ok(long.hits.length === 6 && long.hits.some(h => /hyworks/i.test(`${h.asset.title} ${h.asset.products[0] ?? ""}`)), `a long ask's seed keeps a slot for the product's own document: ${long.hits.map(h => h.asset.title)}`);
+}
+// 15b. HySecure demo videos (#12, #34): registry-only feature demos, through ask() on the fixture registry.
+{
+  run([pickSay("The library has no exact HySecure demo video; closest are two demo videos.", "Geofencing control", "Device posture check and related data on management console")]);
+  r = await ask("hysecure demo video");
+  ok(!r.missing && /^The library has two HySecure demo videos\.\n/.test(r.text) && r.assets.length === 2 && traceHas(r, "demo videos found"), `a feature demo answers a demo ask: ${r.text} | ${r.missing}`);
+  run([pickSay("The library has two HySecure demo videos.", "Geofencing control", "Device posture check and related data on management console")]);
+  r = await ask("hysecure demo video");
+  ok(!r.missing && /^The library has two HySecure demo videos\./.test(r.text), `the model's yes stands: ${r.text}`);
+  run([pickSay("The library has no exact HySecure product video; closest are two demo videos.", "Geofencing control", "Device posture check and related data on management console")]);
+  r = await ask("product video hysecure");
+  ok(r.missing && /^No exact HySecure product video in the library\./.test(r.text) && r.assets.every(a => /Geofencing|Device posture/.test(a.title)), `general product video: missing, demos stand in: ${r.text}`);
+  // A HySecure feature demo is not a HyID demo video.
+  run([pickSay("The library has two demo videos.", "Geofencing control", "Device posture check and related data on management console")]);
+  r = await ask("hyid demo video");
+  ok(r.missing && !/^The library has two HyID/.test(r.text), `HySecure demos are not HyID's: ${r.text} | ${r.missing}`);
+}
 
 // 6. Cold start: apiSearch waits for the registry instead of ranking the frozen cards alone.
 globalThis.__samReg = undefined; globalThis.__samRegAt = undefined; regDelay = 50;

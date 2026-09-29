@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
+import { searchAssets, allAssets, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, ENTITIES, namesProduct, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured, compatModels } from "./agent-openai";
 import { providerFailure, type AskError } from "./events";
 
@@ -323,10 +323,8 @@ const REGIONS = ["Japan", "Middle East", "UAE", "Saudi", "Qatar", "Oman", "Kuwai
  *      ("hysecure vs zscaler" keeps a Zscaler note).
  *  An ask with no product, industry or topic word ("decks") has nothing to judge by and keeps all. */
 export function relevant(question: string, a: Asset): boolean {
-  const named = namedEntities(question), title = `${a.title} ${(a.file?.path ?? "").split("/").pop()}`;
-  if (/\bjapanese\b|(?:^|[-_ ])jp(?:[-_ ]|$)/i.test(title) && !named.includes("Japan")) return false;
-  const regions = namedEntities(title).filter(e => REGIONS.includes(e));
-  if (regions.length && typeGroup(a) !== "Case Study" && !regions.some(e => named.includes(e))) return false;
+  const named = namedEntities(question);
+  if (!regionOk(question, a)) return false;
   // A file SAM has not read is judged by its type: the model picked "Geofencing control.mp4" by its
   // title for "hysecure demo video", and nothing on it says HySecure.
   if (!isDescribed(a) && typesNamedIn(question).some(t => isType(a, t))) return !isJunk(a);
@@ -335,6 +333,14 @@ export function relevant(question: string, a: Asset): boolean {
   const f = heuristicFilters(question);
   const topic = queryTokens(question).some(w => !typesNamedIn(w).length && !GENERIC.has(w) && !/^(report|webinar|ebook|slides?)$/.test(w));
   return !f.product && !f.vertical && !topic ? !isJunk(a) : substituteFits(question, a);
+}
+
+/** The Japanese-language and regional-deck rules of relevant(), on their own (nearFirst uses them too). */
+function regionOk(question: string, a: Asset): boolean {
+  const named = namedEntities(question), title = `${a.title} ${(a.file?.path ?? "").split("/").pop()}`;
+  if (/\bjapanese\b|(?:^|[-_ ])jp(?:[-_ ]|$)/i.test(title) && !named.includes("Japan")) return false;
+  const regions = namedEntities(title).filter(e => REGIONS.includes(e));
+  return !(regions.length && typeGroup(a) !== "Case Study" && !regions.some(e => named.includes(e)));
 }
 
 // ---- The answer contract: the model picks, SAM writes ------------------------------------------
@@ -371,8 +377,10 @@ export function readReply(text: string): { verdict: string; nums: number[]; none
 }
 
 /** Words that say what a document covers, or that fit it to the rep's situation. None may appear in a
- *  verdict: what a document covers is printed from its card, below the verdict. */
-const COVERAGE = /\b(cover(s|ed|ing)?|includ(e|es|ed|ing)|contain(s|ed|ing)?|show(s|ed|ing|cases?)?|detail(s|ed|ing)?|describ(e|es|ed|ing)|explain(s|ed|ing)?|demonstrat(e|es|ed|ing)|walks? through|outlin(e|es|ed|ing)|highlight(s|ed|ing)?|compar(e|es|ed|ing)|address(es|ed|ing)?|provid(e|es|ed|ing)|spells? out|mapp(ed|ing)|has (a|an|the)|with (a|an|the) (section|slide|chapter|table|figure))\b|\bcan be (framed|adapted|tailored|positioned|used|repurposed|reused)\b|\b(replaced|migrated|moved off|switched from)\b/i;
+ *  verdict: what a document covers is printed from its card, below the verdict. "can be used (for prep)",
+ *  "supports" and "a supporting deck" are not here: they name the rep's purpose, and every word around them
+ *  is still checked (28 Sep #5 and the dry-run Citrix battlecard lost fair verdicts to them). */
+const COVERAGE = /\b(cover(s|ed|ing)?|includ(e|es|ed|ing)|contain(s|ed|ing)?|show(s|ed|ing|cases?)?|detail(s|ed|ing)?|describ(e|es|ed|ing)|explain(s|ed|ing)?|demonstrat(e|es|ed|ing)|walks? through|outlin(e|es|ed|ing)|highlight(s|ed|ing)?|compar(e|es|ed|ing)|address(es|ed|ing)?|provid(e|es|ed|ing)|spells? out|mapp(ed|ing)|has (a|an|the)|with (a|an|the) (section|slide|chapter|table|figure))\b|\bcan be (framed|adapted|tailored|positioned|repurposed|reused)\b|\b(replaced|migrated|moved off|switched from)\b/i;
 
 /** Why a verdict may not be shown, or null when it may. A denial ("No exact APRA material") may name
  *  what is missing in the rep's words; anything else may only name what the shown cards have.
@@ -398,7 +406,10 @@ export function verdictProblem(verdict: string, shown: SearchHit[], question: st
     const neg = denial || /^\W*(?:(?:but|though|however|and|although)\s+)?(?:there (?:is|are)\s+)?(?:no|not|none|nothing|without)\b/i.test(clause);
     // Entities only from the SHOWN cards (a region only from their title, client or industry): "GCC"
     // in a card's use_for is not a GCC pitch (#10), "for SEA prospects" not a Malaysia reference (#25).
-    const foreign = namedEntities(clause).filter(e => !OWN_PRODUCTS.has(e) && !(neg && mentions(q, e)) && !shown.some(h => entityOn(h.asset, e)));
+    // The rep's situation in their words ("for a private bank moving off Citrix") may be repeated, but not
+    // as what a document is of or about ("case studies of banks moving off Citrix").
+    const ofPart = clause.match(/\b(?:of|about|where|whose|showing)\b.*$/i)?.[0] ?? "";
+    const foreign = namedEntities(clause).filter(e => !OWN_PRODUCTS.has(e) && !(neg && mentions(q, e)) && !(isContext(question, e) && !mentions(ofPart, e)) && !shown.some(h => entityOn(h.asset, e)));
     if (foreign.length) return `names ${foreign.join(", ")}, which no shown card mentions`;
     const on = `${cards} ${more} ${neg ? q : ""}`;
     const nums = (clause.match(/\b\d[\d,]{2,}\b/g) ?? []).filter(n => !on.includes(n) && !on.includes(n.replace(/,/g, "")));
@@ -466,7 +477,8 @@ outreach customer client prospect buyer cio ciso cto team deck slide presentatio
 case study studies video demo certificate certification report guide pager page short shorter long longer brief overview story reference proof
 own you your our its their them they ready right direct directly general generic specific similar same other another more most less least
 nearest instead yet though however which what why how where when who whom whose than then such very just assumed assuming meaning means
-ones related partial partly full complete standalone dedicated product solution`.split(/\s+/)
+ones related partial partly full complete standalone dedicated product solution
+used support supports supporting supported conversation discussion`.split(/\s+/)
   .concat(PRODUCTS.map(p => p.toLowerCase()), [...OWN_PRODUCTS].map(p => p.toLowerCase())));
 
 /** One document's line, written from its card. Nothing in it comes from the model. */
@@ -509,9 +521,44 @@ function withSuccessors(shown: SearchHit[], trace: AskResult["trace"]): SearchHi
  *      a HyWorks sizing guide, and a case study's "2,300 concurrent users" is not a per-appliance
  *      maximum (#22, #23). */
 const SPECS = new Set(["Sizing", "Concurrent users"]);
-function asksAbout(question: string): string[] { return namedEntities(question); }
+function asksAbout(question: string): string[] { return namedEntities(question).filter(e => !isContext(question, e)); }
+
+/** A named thing the rep gives as their SITUATION, not what they want: "pvt bank in mumbai moving off
+ *  citrix, need a bfsi case study" got "No exact match for Citrix" over two good BFSI case studies (28 Sep
+ *  dry run, 20b). An entity is context when every mention of it follows "moving off / replacing / leaving /
+ *  currently on / uses / evaluating / after" and none is the object of the ask ("citrix battlecard", "vs
+ *  citrix", "against AVD", "citrix migration deck"). Context is never missing; the seed still searches the
+ *  word, and cards naming it go first (contextFirst). Anything else stays required, as before.
+ *  ponytail: phrase frames, not a parse; a frame not listed here leaves the entity required. */
+const CONTEXT_BEFORE = new RegExp(String.raw`\b(?:(?:mov(?:e|es|ed|ing)|migrat(?:e|es|ed|ing)|switch(?:es|ed|ing)?|shift(?:s|ed|ing)?|transition(?:s|ed|ing)?|com(?:e|es|ing)|exit(?:s|ed|ing)?|getting)\s+(?:off|from|away from|out of)`
+  + String.raw`|replac(?:e|es|ed|ing)|leav(?:e|es|ing)|ditch(?:es|ed|ing)?|(?:currently|already|still|now|today)\s+(?:on|using|uses|use|runs?|running|with|has|have)`
+  + String.raw`|(?:is|are|was|were|they're|theyre)\s+(?:currently\s+|already\s+|still\s+|now\s+)?(?:on|using|running|with)|(?:customers?|clients?|prospects?|banks?|they|who|which)\s+(?:(?:is|are)\s+)?on`
+  + String.raw`|uses?|using|running|runs|evaluating|considering|looking at|unhappy with|frustrated with|after|since|due to|because of)\s+(?:(?:the|their|its|his|her|a|an)\s+)?(?:[\w-]+\s+)?$`, "i");
+const OBJECT_BEFORE = /\b(?:vs\.?|versus|against|compared? (?:to|with)|alternative to|instead of|replacement for|battle ?cards? (?:for|on|against))\s+(?:the\s+)?$/i;
+const OBJECT_AFTER = /^\s*(?:[\w.-]+\s+){0,2}?(?:battle ?cards?|comparisons?|compar\w*|competit\w*|migrat\w*|replacements?|alternatives?|displac\w*|takeouts?|vs\b|versus|decks?|case ?stud\w*|brochures?|white ?papers?|data ?sheets?|pitch\w*)\b/i;
+export function isContext(question: string, e: string): boolean {
+  const words = ENTITIES[e];
+  if (!words) return false;
+  const q = question.toLowerCase(), re = new RegExp(words.map(w => tokenMatcher(w).source).join("|"), "g");
+  const at = [...q.matchAll(re)];
+  return at.length > 0 && at.every(m => {
+    const before = q.slice(0, m.index).split(/[,;.?!]/).pop() ?? "", after = q.slice(m.index + m[0].length).split(/[,;.?!]/)[0];
+    return CONTEXT_BEFORE.test(before) && !OBJECT_BEFORE.test(before) && !OBJECT_AFTER.test(after);
+  });
+}
+/** Cards naming a context entity go first among those of the asked type: a BFSI case study that names
+ *  Citrix before one that does not. Not with no type named, and not past a public card on a sending ask:
+ *  the Kerala answer must still lead with the public hospital case study (#31), not a Citrix battlecard. */
+function contextFirst(shown: SearchHit[], turn: string): SearchHit[] {
+  const ctx = namedEntities(turn).filter(e => isContext(turn, e)), types = typesNamedIn(turn);
+  if (!ctx.length || !types.length) return shown;
+  const lead = (h: SearchHit) => ctx.some(e => entityOn(h.asset, e)) && types.some(t => isType(h.asset, t)) && (!sending(turn) || Boolean(h.asset.public_url));
+  return [...shown.filter(lead), ...shown.filter(h => !lead(h))];
+}
 function hasEntity(h: SearchHit, e: string, question: string): boolean {
-  if (OWN_PRODUCTS.has(e)) return isAbout(h.asset, e) || !isDescribed(h.asset);
+  // An unread file counts when its name or folder names the product or one of its features: the
+  // Geofencing demo is HySecure's, not HyID's (it counted for every product before 30 Sep).
+  if (OWN_PRODUCTS.has(e)) return isAbout(h.asset, e) || (!isDescribed(h.asset) && [e, ...(ALIAS[e] ?? [])].some(w => namesProduct(h.asset.file?.path ?? h.asset.title, w)));
   if (!SPECS.has(e)) return entityOn(h.asset, e);
   const product = heuristicFilters(question).product;
   return mentions(h.asset.title, e) && typeGroup(h.asset) !== "Case Study" && (!product || isAbout(h.asset, product));
@@ -624,13 +671,19 @@ export function seedSearch(question: string): SearchRun | null {
     ? searchAssets({ query: question, asset_type: asset_type || undefined, vertical: f.vertical || undefined, audience: "external", limit: 10 }).results
       .filter(h => !front.some(x => assetKey(x.asset) === assetKey(h.asset))).sort((x, y) => titleHits(question, y) - titleHits(question, x) || y.score - x.score).slice(0, 1)
     : [];
+  // A long, many-clause ask spreads its score over every word ("RFP asks about data residency - is our
+  // DaaS hosted in india? need a doc for the RFP response"), and the product's own documents - which
+  // share one word with it - never make the top five (28 Sep #19). Its best document gets a slot.
+  const focus = f.product && queryTokens(question).length >= 7
+    ? primaryFirst(searchAssets({ query: f.product, asset_type: asset_type || undefined, product: f.product, limit: 40 }).results.filter(h => isAbout(h.asset, f.product))
+      .sort((x, y) => substituteQuality(y.asset) - substituteQuality(x.asset)), f.product).slice(0, 1) : [];
   const seen = new Set<string>(), all: SearchHit[] = [];
-  for (const h of [...short, ...front, ...pub, ...[...b, ...c, ...a.hits].sort((x, y) => y.score - x.score)]) {
+  for (const h of [...short, ...front, ...pub, ...focus, ...[...b, ...c, ...a.hits].sort((x, y) => y.score - x.score)]) {
     const k = assetKey(h.asset);
     if (!seen.has(k)) { seen.add(k); all.push(h); }
   }
   // The merge must not undo searchAssets' coverage: every named entity keeps a result about it.
-  const hits = cover(all, SEARCH_LIMIT + 1, namedEntities(question));
+  const hits = cover(all, SEARCH_LIMIT + 1 + focus.length, namedEntities(question));
   const extra = hits.some(h => !a.hits.some(x => assetKey(x.asset) === assetKey(h.asset)));
   const note = [a.note, short.length ? `the first ${short.length} result(s) are ${max} pages or fewer` : null,
     extra ? "results after the first three are not filtered by type, industry, product or audience" : null].filter(Boolean).join("; ") || null;
@@ -733,6 +786,8 @@ export function finish(p: {
   const chosen = [...new Set([...picked, ...named])];
   if (reply.nums.length > picked.length) p.trace.push({ step: "picks: unknown result number", detail: `picked ${reply.nums.join(", ")}; ${reply.nums.length - picked.length} not returned this turn` });
   const denial = !bad.length && DENIAL.test(reply.verdict);
+  const vid = !bad.length ? videoAnswer(own, hits, denial || reply.none || PARTIAL_DENIAL.test(reply.verdict), p.trace) : null;
+  if (vid) return done(vid.verdict, vid.missing ? ["Closest in the library:"] : [], vid.shown, vid.missing);
 
   // "We don't have it": substitutes are the model's picks that clear the relevance floor (max 2), else
   // the best results that do. The model over-rejects - "No pharma case study" over a public pharmacy
@@ -749,8 +804,9 @@ export function finish(p: {
       p.trace.push({ step: "substitutes: from the results", detail: `the model picked ${chosen.length ? "only unrelated documents" : "none"}; showing the ${subs.length} closest that share the ask's product, industry or topic` });
     }
     const fits = hits.filter(h => relevant(p.question, h.asset));
-    subs = namedFirst(subs, fits, own, p.trace);
-    subs = shortFirst(ensurePublished(withSuccessors(subs, p.trace).filter(h => relevant(p.question, h.asset)), fits, p.question, p.trace), fits, own, p.trace).slice(0, 2);
+    const missingHere = asksAbout(own).filter(e => !subs.some(h => hasEntity(h, e, own))), led = namedFirst(subs, fits, own, p.trace);
+    subs = nearFirst(led, missingHere, own, p.trace);
+    subs = shortFirst(ensurePublished(withSuccessors(subs, p.trace).filter(h => h.why === NEAR_WHY || relevant(p.question, h.asset)), fits, p.question, p.trace), fits, own, p.trace).slice(0, 2);
     return done(denial ? denialClause(reply.verdict, p.question) : "No exact match in the library.", ["Closest in the library:"], subs, true);
   }
 
@@ -765,13 +821,14 @@ export function finish(p: {
   let shown = ensurePublished(onTopic.length ? onTopic : successors, hits, p.question, p.trace);
   shown = shortFirst(shown, fill, own, p.trace);
   const uncovered = coverEntities(shown, fill, own, p.trace);
-  shown = shown.slice(0, 3);
+  shown = contextFirst(shown.slice(0, 3), own);
   const types = typesNamedIn(own);
   const verdict = reply.verdict;
   if (uncovered.length) {
     p.trace.push({ step: "verdict: named entity missing", detail: `no shown card has ${uncovered.join(", ")}` });
     const about = uncovered.some(e => OWN_PRODUCTS.has(e) || SPECS.has(e));
-    shown = namedFirst(shown, fill, own, p.trace).slice(0, 3);
+    const led = namedFirst(shown, fill, own, p.trace);
+    shown = nearFirst(led, uncovered, own, p.trace).slice(0, 3);
     return done(`No exact match for ${uncovered.map(e => entityLabel(e, own)).join(" or ")}: none of the closest documents ${about ? "is about" : "mentions"} ${uncovered.length > 1 ? "them" : "it"}.`, ["Closest in the library:"], shown, true);
   }
   // The named type must be met by a document about the named product: a corporate brochure is a
@@ -807,6 +864,29 @@ export function finish(p: {
   if (unsendable) p.trace.push({ step: "verdict: nothing sendable", detail: "the rep is sending outside Accops and every shown document is internal" });
   if (partial) p.trace.push({ step: "verdict: partial denial", detail: g });
   return done(final, notes, shown, unsendable || partial);
+}
+
+/** "hysecure demo video" / "product video hysecure" (28 Sep #12, #34). Demo videos are registry-only files
+ *  named for a feature ("Geofencing control.mp4"), so the model cannot see they are HySecure's and wrote
+ *  "The library has no exact HySecure demo video" over two of them. SAM decides from the files: a demo ask
+ *  is met by the product's feature demos; a general product video (overview, intro, walkthrough) only by a
+ *  video named for the product - otherwise it is missing, with the feature demos as substitutes. Null
+ *  leaves the answer to the normal path (not a video ask, no such video, or the model already said yes). */
+const GENERAL_VIDEO = /\b(?:product|overview|intro(?:duction|ductory)?|explainer|corporate|walk-?through)\s+(?:videos?|recordings?)\b/i;
+function videoAnswer(own: string, hits: SearchHit[], modelDenies: boolean, trace: AskResult["trace"]): { verdict: string; shown: SearchHit[]; missing: boolean } | null {
+  const prods = asksAbout(own).filter(e => OWN_PRODUCTS.has(e));
+  if (!typesNamedIn(own).includes("Video") || prods.length !== 1) return null;
+  const p = prods[0], vids = hits.filter(h => isType(h.asset, "Video") && !isJunk(h.asset) && hasEntity(h, p, own));
+  const named = vids.filter(h => isAbout(h.asset, p)), general = GENERAL_VIDEO.test(own);
+  if (!vids.length) return null;
+  if (general && !named.length) {
+    trace.push({ step: "verdict: no product video", detail: `no ${p} video is named for the product; ${vids.length} feature demo(s) stand in` });
+    return { verdict: `No exact ${p} product video in the library.`, shown: vids.slice(0, 2), missing: true };
+  }
+  if (!modelDenies) return null;
+  const show = (general ? named : vids).slice(0, 3), n = ["", "a", "two", "three"][show.length];
+  trace.push({ step: "verdict: demo videos found", detail: `the model denied it, but ${show.map(h => h.asset.title).join("; ")} ${show.length > 1 ? "are" : "is"} ${p}'s`.slice(0, 300) });
+  return { verdict: `The library has ${n} ${p} ${general ? "" : "demo "}video${show.length > 1 ? "s" : ""}.`, shown: show, missing: sending(own) && !show.some(h => h.asset.public_url) };
 }
 
 /** A rep asking for something to SEND gets a sendable document when one was found. Production: for
@@ -848,7 +928,10 @@ function shortFirst(shown: SearchHit[], pool: SearchHit[], turn: string, trace: 
  *  substitutes have none: "No exact datasheet with max concurrent users per appliance" over a logistics
  *  case study and an editions matrix, with the public HySecure datasheet in the results, read as "we
  *  have no HySecure datasheet" (27 Sep #23, #7, #19). The product is an Accops one or the product word
- *  the ask names ("DaaS"); a document of the named type about it beats one only about it. */
+ *  the ask names ("DaaS"); a document of the named type about it beats one only about it. Between two
+ *  about it, a current, public, real document beats a 2021 internal scoping template: the long data
+ *  residency ask (#19) never saw the public 2026 DaaS brochure, so the whole library is searched for the
+ *  product here too, not only this turn's results. */
 function namedFirst(subs: SearchHit[], pool: SearchHit[], turn: string, trace: AskResult["trace"]): SearchHit[] {
   const prods = [...new Set([...asksAbout(turn).filter(e => OWN_PRODUCTS.has(e)), heuristicFilters(turn).product].filter(Boolean))];
   if (!prods.length) return subs;
@@ -856,14 +939,55 @@ function namedFirst(subs: SearchHit[], pool: SearchHit[], turn: string, trace: A
   // ABOUT means the primary product tag here: the 2026 Editions matrix names HySecure and HyID in its
   // title, and passed for both products' datasheet. An untagged file falls back to its title.
   const about = (h: SearchHit) => prods.some(e => h.asset.products.length ? (ALIAS[e] ?? [e.toLowerCase()]).some(w => h.asset.products[0].toLowerCase().includes(w)) : isAbout(h.asset, e));
-  const rank = (h: SearchHit) => (about(h) ? 1 : 0) + (types.some(t => isType(h.asset, t)) ? 2 : 0);
+  const kind = (h: SearchHit) => (about(h) ? 1 : 0) + (types.some(t => isType(h.asset, t)) ? 2 : 0);
+  const rank = (h: SearchHit) => kind(h) + substituteQuality(h.asset);
   const best = Math.max(0, ...subs.map(rank));
-  if (best === 3) return subs;
-  const add = primaryFirst(pool.filter(h => rank(h) > best && rank(h) % 2 === 1), prods[0]).sort((x, y) => rank(y) - rank(x))[0];
+  if (Math.floor(best) === 3) return subs;
+  // Beyond this turn's results, searched on the product (and type) alone - on the whole long ask, twenty
+  // RFP documents outrank it - and only for a better kind, or a public one when no substitute is: a
+  // fresher internal deck of the same kind is not worth displacing the model's pick (#22).
+  const pubShown = subs.some(h => about(h) && h.asset.public_url);
+  const wide = [...pool, ...prods.flatMap(p => searchAssets({ query: [p, ...types].join(" "), product: PRODUCTS.includes(p) ? p : undefined, limit: 20 }).results)
+    .filter(h => kind(h) > Math.floor(best) || (!pubShown && h.asset.public_url))];
+  const add = primaryFirst(wide.filter(h => rank(h) > best && kind(h) % 2 === 1 && relevant(turn, h.asset)), prods[0]).sort((x, y) => rank(y) - rank(x))[0];
   if (!add) return subs;
   trace.push({ step: "substitutes: named product first", detail: `${add.asset.title} is about ${prods.join(" or ")}` });
   return [add, ...subs.filter(h => assetKey(h.asset) !== assetKey(add.asset))];
 }
+/** Under 1, so it only breaks ties between substitutes of the same kind: public, current, a real document. */
+function substituteQuality(a: Asset): number {
+  return (a.public_url ? 0.5 : 0) + (isStale(a) ? 0 : 0.25) + (typeGroup(a) === "Other" && !isType(a, "Video") ? 0 : 0.2);
+}
+
+/** What stands in when a named topic or place is missing: documents that name something near it (28 Sep
+ *  #19 data residency, #10 GCC, #25 Malaysia/Indonesia got a 2021 Nutanix brief, CIO event decks and an
+ *  Indian DTH case study). Searched over the whole library, since a long ask's own results rarely hold
+ *  them. With a product named, one near document joins its product document; without, two.
+ *  ponytail: a hand list for the gaps reps hit; add a row when the gap report shows a new one. */
+const SEA = ["south-east asia", "southeast asia", "asean", "sea", "philippines", "malaysia", "indonesia", "thailand", "singapore", "vietnam"];
+const NEAR: Record<string, string[]> = {
+  "Data residency": ["data residency", "data sovereignty", "sovereign", "sovereignty", "dpdp", "data locali", "hosted in india"],
+  GCC: ["global capability", "gcc", "it services", "ites", "offshore", "outsourc"],
+  ...Object.fromEntries(["Malaysia", "Indonesia", "Thailand", "Philippines", "Singapore", "Vietnam"].map(c => [c, SEA])),
+};
+function nearFirst(subs: SearchHit[], missing: string[], turn: string, trace: AskResult["trace"]): SearchHit[] {
+  const words = [...new Set(missing.flatMap(e => NEAR[e] ?? []))];
+  if (!words.length) return subs;
+  const types = typesNamedIn(turn), res = words.map(w => tokenMatcher(w));
+  // In the title counts most; mentions in the text count up to two (a 60-slide deck mentions everything).
+  const near = (a: Asset) => { const t = cardText(a), title = a.title.toLowerCase(); return (res.some(r => r.test(title)) ? 2 : 0) + Math.min(2, res.filter(r => r.test(t)).length); };
+  const prods = [...new Set([heuristicFilters(turn).product, ...asksAbout(turn).filter(e => OWN_PRODUCTS.has(e))].filter(Boolean))];
+  const score = (a: Asset) => { const n = near(a); return n && n + (types.some(t => isType(a, t)) ? 3 : 0) + (prods.some(e => isAbout(a, e)) ? 1 : 0) + substituteQuality(a) * 2; };
+  // Two substitutes: the product's own document when it leads (namedFirst), then near ones. One passing
+  // mention ("GCC Security Symposium" on an award slide, a Singapore office) is not near.
+  const lead = subs.slice(0, subs[0] && prods.some(e => isAbout(subs[0].asset, e)) ? 1 : 0), rest = subs.slice(lead.length);
+  const have = rest.filter(h => near(h.asset) >= 2), want = 2 - lead.length - have.length;
+  const add = want <= 0 ? [] : allAssets().filter(a => !isJunk(a) && regionOk(turn, a) && !subs.some(h => assetKey(h.asset) === assetKey(a)))
+    .map(a => ({ a, s: near(a) >= 2 ? score(a) : 0 })).filter(x => x.s > 0).sort((x, y) => y.s - x.s).slice(0, want).map(({ a }) => ({ asset: a, score: 0, why: NEAR_WHY }));
+  if (add.length) trace.push({ step: "substitutes: near the missing topic", detail: `${add.map(h => h.asset.title).join("; ")} for ${missing.join(", ")}`.slice(0, 300) });
+  return [...lead, ...have, ...add, ...rest.filter(h => !have.includes(h))];
+}
+const NEAR_WHY = "near the missing topic";
 
 /** A denial verdict cut to its denial: "No exact Proxmox integration doc, but the Nutanix guide covers
  *  AHV" keeps only what is missing. Then checked like any verdict; a failing one becomes plain. */
@@ -889,7 +1013,11 @@ const NEGATED_SEND = /\b(no|do not|don['’]t|not|never|must not|cannot|can['’
 export function dropSending(verdict: string): string {
   // Visibility is SAM's too: "two public BFSI case studies" over one public and one internal card is
   // wrong, and the sendability line under the verdict already says which is which. So the adjective goes.
-  const v = verdict.replace(VIS_ADJ, "$1 ");
+  // "an internal VDI battlecard" -> "a VDI battlecard", not "an VDI battlecard" (28 Sep dry run).
+  // Then the sending PURPOSE goes and the description stays: "short enough for a quick send" -> "short"
+  // (#3 lost the whole "that are short" clause); "ready to send" says nothing else, so its clause goes below.
+  const v = verdict.replace(VIS_ADJ, (m, det: string, off: number, s: string) => `${/^an?$/i.test(det) ? article(det, s.slice(off + m.length)) : det} `)
+    .replace(SEND_PURPOSE, (m, off: number, s: string) => SEND_ONLY.test(s.slice(0, off)) ? m : "");
   if (!SEND_WORDS.test(v) && !VIS_PRED.test(v)) return v === verdict ? verdict : tidy(v);
   // Clauses and the separators between them; a sending clause goes with the separator before it
   // (or after it, when it is the first clause).
@@ -905,6 +1033,17 @@ export function dropSending(verdict: string): string {
 const tidy = (s: string) => { const t = s.replace(/\s+/g, " ").trim().replace(/[.!]+$/, ""); return t ? `${t[0].toUpperCase()}${t.slice(1)}.` : ""; };
 /** "two public", "a confidential", "the internal-only": a count or article, then a visibility word. */
 const VIS_ADJ = /\b(a|an|the|one|two|three|four|five|six|several|some|both|all|only|\d+)\s+(?:public|published|unpublished|internal|confidential)(?:[- ]only)?\s+(?!sector\b)/gi;
+/** "(short) enough for a quick send", "(case studies) you can send the CIO": a sending purpose tacked onto
+ *  a description. SEND_ONLY: the word before it that makes the whole clause a sending claim ("ready to send"). */
+const SEND_PURPOSE = /(?:\s+enough)?\s+(?:(?:for|to)\s+(?:a\s+|an\s+)?(?:(?:quick|easy|direct|fast|straight)\s+)?(?:send(?:ing)?|shar(?:e|ing)|e-?mail(?:ing)?|forward(?:ing)?)|(?:that\s+|which\s+)?(?:you|we|i|reps?)\s+(?:can|could|may)\s+(?:send|share|e-?mail|forward))\b(?:\s+(?:to\s+|with\s+)?(?:the|a|an|your|their)\s+[\w-]+|\s+(?:to|with)\s+[\w-]+|\s+(?:it|them|him|her)\b)?/gi;
+const SEND_ONLY = /\b(?:ready|fine|suitable|safe|ok|okay|good|cleared|approved|appropriate|allowed|ideal|used|be)\s*$/i;
+/** "a" or "an" for the word that now follows it. An all-caps acronym is read letter by letter ("an MFA",
+ *  "a VDI"), except SOC, which is said as a word. */
+function article(det: string, next: string): string {
+  const w = next.match(/^[\w]+/)?.[0] ?? "";
+  const an = /^[A-Z0-9]{2,}$/.test(w) && w !== "SOC" ? /^[AEFHILMNORSX8]/.test(w) : /^[aeiou]/i.test(w) && !/^(?:uni|use|usu|eu|one)/i.test(w);
+  return `${det[0] === "A" ? "A" : "a"}${an ? "n" : ""}`;
+}
 /** "both are internal", "it is public". */
 const VIS_PRED = /\b(?:is|are|was|were|remain|remains)\s+(?:all\s+|both\s+|only\s+|still\s+)?(?:public|published|unpublished|internal|confidential)\b/i;
 

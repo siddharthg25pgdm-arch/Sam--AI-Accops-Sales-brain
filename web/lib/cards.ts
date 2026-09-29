@@ -342,7 +342,7 @@ const STOP = new Set(["the", "for", "and", "with", "need", "want", "any", "have"
   "prep", "prepare", "preparing", "share", "sharing", "email", "mail", "forward", "whats", "how", "when", "where", "who",
   "are", "was", "were", "will", "would", "could", "should", "has", "had", "got", "get", "just", "also", "really", "maybe", "know", "tell",
   "them", "him", "her", "his", "they", "their", "there", "into", "over", "moving", "off", "going", "like",
-  "customer", "customers", "client", "clients", "prospect", "prospects",
+  "customer", "customers", "client", "clients", "prospect", "prospects", "asks", "asked", "asking",
   // Hinglish: bhai (mate), abhi (now), bhejo (send), chahiye (need), ko/ke liye (to/for), hai (is).
   "bhai", "abhi", "bhejo", "bhej", "bhejna", "bhejdo", "chahiye", "kya", "hai", "koi", "liye", "wala", "wali", "jaldi"]);
 /** Common misspellings of a document type, so "hyworks brocher" is a brochure ask. Used by the
@@ -364,7 +364,9 @@ export function queryTokens(query: string): string[] {
     if (/^\d{1,2}$/.test(w) && out.length && /[a-z]$/.test(out[out.length - 1])) { out[out.length - 1] += ` ${w}`; continue; }
     if ((w.length > 2 || SHORT_KEEP.has(w)) && !STOP.has(w)) out.push(w);
   }
-  return out;
+  // Once each: "RFP ... for the RFP response" counted "rfp" twice, and RFP documents outranked the DaaS
+  // and India brochures for a data residency ask (28 Sep #19).
+  return [...new Set(out)];
 }
 
 /** Word-start matcher for one token. Substring matching let "soc" hit "Social-Media-Banners".
@@ -390,6 +392,10 @@ const PRODUCT_TERMS: Record<string, string[]> = {
 function matcher(t: string): RegExp {
   const extra = PRODUCT_TERMS[t];
   return extra ? new RegExp([t, ...extra].map(x => tokenMatcher(x).source).join("|")) : tokenMatcher(t);
+}
+/** `text` names the product or a feature it is known by ("Geofencing control" is HySecure). */
+export function namesProduct(text: string, product: string): boolean {
+  return matcher(product.toLowerCase()).test(text.toLowerCase());
 }
 
 /** Named things a rep asks about - competitors, platforms, regulations, regions and languages, and
