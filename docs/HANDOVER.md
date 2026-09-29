@@ -5,6 +5,17 @@ The 25 September section below supersedes anything older it contradicts.
 
 ---
 
+## 30 September 2026: the rating buttons act
+
+| | |
+|---|---|
+| Admin, Quality tab | **What reps told us**: every rating (latest per rep per answer, own questions only), filter Wrong asset / Doesn't exist / Helpful, with the question, verdict, documents shown, who/when/channel and a link to that one conversation (`/admin?tab=conversations&ev=<id>`). **Documents rated wrong asset** by distinct reps. **Learned demotions** with a Clear button |
+| "Doesn't exist" | Votes on the content request for that question's topic key, source/channel `feedback` ("from a rating" in the queue). Pressing it twice, or after an explicit request for that answer, adds nothing; an explicit request later replaces the rating's vote; changing the rating to Yes/Wrong asset takes the vote back (and a request only it created). All in SQL: `sam_file_content_request` + `sam_retract_feedback_vote` (`docs/supabase-sam-feedback.sql`). Test traffic lands in is_test requests only |
+| "Wrong asset" | `web/lib/feedback.ts` `learnDemotions`: >= 2 distinct reps, rating answers showing the document, questions sharing topic tokens (`topicOf` in cards.ts) → the document scores **-3** in `searchAssets` for queries containing that topic. Ratings older than 60 days stop counting; any Helpful rating for the topic blocks it; a human Clear (`sam_rank_feedback`) holds until two NEW reps agree. Real traffic only; warm cache, 10 min TTL. Check: `node web/lib/feedback.check.mjs` |
+| Digest | "What reps told us" section (counts + up to 3 wrong-asset / doesn't-exist examples), `N ratings` in the subject. `?test=1` includes test ratings, for checking from local dev |
+
+---
+
 ## 29 September 2026: morning digest
 
 `GET /api/v1/digest` returns the queue owner's morning email: the last 24 h, IST dates, email-safe HTML (tables, inline styles, 600 px, no external anything). `?format=json` returns the same data. The subject is in the `X-SAM-Subject` response header and in JSON `subject`, ASCII on purpose (safe in a header): e.g. `SAM: 2 new requests, 1 worth creating, 4 files changed, 12 questions`, or `SAM: nothing new`.
