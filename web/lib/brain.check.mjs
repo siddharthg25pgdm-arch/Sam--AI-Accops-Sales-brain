@@ -75,7 +75,7 @@ const doc = B.openapi(), refs = JSON.stringify(doc).match(/"#\/components\/(sche
 ok(doc.openapi === "3.1.0" && refs.length > 5 && refs.every(x => { const [, kind, name] = x.slice(1, -1).match(/components\/(\w+)\/(\w+)/); return doc.components[kind][name]; }), "OpenAPI 3.1 with no dangling $ref");
 ok(Object.keys(doc.components.schemas.Asset.properties).join() === names(B.ASSET_COLS).join(), "the Asset schema is the served column list");
 ok(["/assets", "/assets/{id}", "/families/{key}", "/changes", "/public-assets", "/openapi.json"].every(p => doc.paths[p]), "every route is in the spec");
-const saved = fs.readFileSync(new URL("../../docs/sales-brain-openapi.json", import.meta.url), "utf8");
+const saved = fs.readFileSync(new URL("../../docs/sales-brain-openapi.json", import.meta.url), "utf8").replace(/\r\n/g, "\n");   // git may check it out CRLF
 ok(saved === JSON.stringify(doc, null, 2) + "\n", "docs/sales-brain-openapi.json is current (run node scripts/brain-openapi.mjs)");
 
 console.log(`brain.check: ${n} assertions passed`);
