@@ -83,6 +83,10 @@ export function traceTokens(trace: { step: string; detail: string }[] | undefine
 export const MODEL_INFO: Record<string, { provider: string; dailyQuota?: number; usdIn?: number; usdOut?: number }> = {
   "openai/gpt-oss-120b": { provider: "Groq", dailyQuota: 200_000 },
   "openai/gpt-oss-20b": { provider: "Groq", dailyQuota: 200_000 },
+  // gpt-6-luna is SAM's default OpenAI model (docs/TASK-openai-key.md); gpt-5.4-mini the named alternative.
+  // Both from developers.openai.com/api/docs/pricing, checked 30 Sep 2026.
+  "gpt-6-luna": { provider: "OpenAI", usdIn: 0.10, usdOut: 0.50 },
+  "gpt-5.4-mini": { provider: "OpenAI", usdIn: 0.75, usdOut: 4.50 },
   "gpt-5": { provider: "OpenAI", usdIn: 1.25, usdOut: 10 },
   "gpt-5-mini": { provider: "OpenAI", usdIn: 0.25, usdOut: 2 },
   "gpt-5-nano": { provider: "OpenAI", usdIn: 0.05, usdOut: 0.4 },
