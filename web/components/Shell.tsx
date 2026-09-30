@@ -4,7 +4,7 @@ import type { SlimAsset, Facets, Gap, Delivery } from "@/lib/types";
 import { Chat } from "./Chat";
 import { Catalogue } from "./Catalogue";
 
-export function Shell({ assets, facets, gaps, hasModel, deliveries = [] }: { assets: SlimAsset[]; facets: Facets; gaps: Gap[]; hasModel: boolean; deliveries?: Delivery[] }) {
+export function Shell({ assets, facets, gaps, hasModel, deliveries = [], admin = false }: { assets: SlimAsset[]; facets: Facets; gaps: Gap[]; hasModel: boolean; deliveries?: Delivery[]; admin?: boolean }) {
   const [view, setView] = useState<"chat" | "catalogue">("chat");
   const [prefill, setPrefill] = useState<{ vertical?: string; type?: string; product?: string } | null>(null);
   return (
@@ -18,7 +18,7 @@ export function Shell({ assets, facets, gaps, hasModel, deliveries = [] }: { ass
           <Chat hasModel={hasModel} deliveries={deliveries} onBrowse={(f) => { setPrefill(f); setView("catalogue"); }} />
         </section>
         <section className="pane-cat" aria-label="Catalogue">
-          <Catalogue assets={assets} facets={facets} gaps={gaps} prefill={prefill} />
+          <Catalogue assets={assets} facets={facets} gaps={gaps} prefill={prefill} admin={admin} />
         </section>
       </main>
     </>

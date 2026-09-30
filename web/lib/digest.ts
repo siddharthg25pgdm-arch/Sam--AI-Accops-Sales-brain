@@ -9,7 +9,7 @@
  *  flex/grid, no CSS variables, no images or web fonts. */
 import { ratio, type Ratio, type Usage } from "./metrics";
 import { STATUS_LABEL, type GapSignal, type RankedRequest } from "./requests";
-import type { CardingQueueRow, ChangedFile, SyncRow } from "./sharepoint";
+import type { CardingQueueRow, ChangedFile, FamilyRow, SyncRow } from "./sharepoint";
 import { latestRatings, FEEDBACK_LABEL, type Rating } from "./feedback";
 
 /** Distinct reps at which a request is "worth creating". */
@@ -27,7 +27,7 @@ export type DigestInput = {
   gaps: GapSignal[] | null;
   changes: ChangedFile[] | null;
   queue: CardingQueueRow[] | null;
-  carded: { title: string; filename: string; carded_at: string }[] | null;
+  carded: { title: string; filename: string; carded_at: string; item_id?: string | null }[] | null;
   /** Last 24 h, and the 7 x 24 h before it. */
   usage: Usage | null; usagePrev: Usage | null;
   lastFlowWrite: string | null; sync: SyncRow | null; cardCount: number;
@@ -38,6 +38,9 @@ export type DigestInput = {
   whatsapp?: { valid: boolean; expiresAt: string | null };
   /** Ratings under answers in the last 24 h, real traffic only, each with its question. */
   ratings?: Rating[] | null;
+  /** sam_asset_families rows for the files added and carded in the window: which are a new version
+   *  of an existing document, and which are pre-2024 and so excluded from answers. */
+  families?: FamilyRow[] | null;
 };
 
 export type DigestRating = { kind: "wrong_asset" | "missing"; label: string; question: string; shown: string[]; who: string; at: string };
@@ -45,7 +48,7 @@ export type DigestRating = { kind: "wrong_asset" | "missing"; label: string; que
 export type DigestRequest = { id: number; title: string; reps: number; new_reps: number; is_new: boolean; worth: boolean;
   first_asked: string; last_asked: string; status: string; owner: string | null; due: string | null; url: string };
 export type DigestGap = { title: string; people: number; asks: number; last_asked: string; is_new: boolean; example: string | null };
-export type DigestFile = { name: string; folder: string; url: string | null };
+export type DigestFile = { name: string; folder: string; url: string | null; note?: string };
 export type HealthItem = { title: string; detail: string };
 export type Digest = {
   subject: string; lead: string; generated_at: string;
@@ -54,8 +57,14 @@ export type Digest = {
   gaps: { total: number; items: DigestGap[]; url: string } | null;
   library: {
     changed: number; added: DigestFile[]; modified: DigestFile[]; renamed: DigestFile[]; deleted: DigestFile[];
+    /** Added files that belong to a document already in the library (a new version or edition). */
+    new_versions: DigestFile[];
+    /** Added or carded in the window, and pre-2024 by the document's own date: out of answers. */
+    excluded: DigestFile[];
     carded: { title: string }[]; deletion_check: string | null;
-    queue: { uncarded: number; changed_since_card: number; renamed: number; uncarded_names: string[]; changed_names: string[]; renamed_names: string[] };
+    queue: { uncarded: number; changed_since_card: number; renamed: number; uncarded_names: string[]; changed_names: string[]; renamed_names: string[];
+      /** Older copies of carded documents: the nightly job skips them. */
+      older_skipped: number };
   } | null;
   usage: {
     questions: number; people: number; answered: Ratio; gaps: number; errors: number; fallback: Ratio; p95_ms: number | null;
@@ -127,14 +136,27 @@ export function buildDigest(i: DigestInput): Digest {
   const added = live.filter(f => (f.created_at ?? "") >= since);
   const renamed = live.filter(f => !added.includes(f) && renamedIds.has(f.item_id));
   const modified = live.filter(f => !added.includes(f) && !renamed.includes(f));
-  const q = i.queue ?? [];
+  // Older copies of a carded document are skipped by the nightly job, so they are not "waiting".
+  const q = (i.queue ?? []).filter(x => x.family_role !== "older_version");
   const names = (reason: string) => q.filter(x => x.reason === reason).map(x => x.filename);
   const queue = { uncarded: names("uncarded").length, changed_since_card: names("changed_since_card").length, renamed: names("renamed").length,
-    uncarded_names: names("uncarded").slice(0, 3), changed_names: names("changed_since_card").slice(0, 3), renamed_names: names("renamed").slice(0, 3) };
+    uncarded_names: names("uncarded").slice(0, 3), changed_names: names("changed_since_card").slice(0, 3), renamed_names: names("renamed").slice(0, 3),
+    older_skipped: (i.queue ?? []).length - q.length };
+  // Families: a file added to a document the library already has is a new version (or edition), not
+  // new content; and a file whose card dates it before 2024 is out of answers until someone pins it.
+  const fam = new Map((i.families ?? []).filter(r => r.item_id).map(r => [r.item_id!, r]));
+  const versionNote = (r: FamilyRow) => !r.is_head ? `older than ${r.canonical_filename}; answers keep using that`
+    : r.is_canonical ? `now the lead of ${r.family_size} files; older ones stop answering` : `${r.edition || "another"} edition of ${r.canonical_filename}`;
+  const newVersions = added.filter(f => (fam.get(f.item_id)?.family_size ?? 1) > 1);
+  const brandNew = added.filter(f => !newVersions.includes(f));
+  const outIds = new Set([...added.map(f => f.item_id), ...(i.carded ?? []).map(c => c.item_id ?? "")].filter(id => fam.get(id) && !fam.get(id)!.eligible));
+  const excluded = [...outIds].map(id => { const r = fam.get(id)!, f = ch.find(x => x.item_id === id);
+    return { name: r.filename, folder: r.folder ?? "", url: f && !f.deleted ? f.web_url || null : null, note: r.excluded_reason ?? undefined }; });
   const syncFresh = (i.sync?.last_run ?? "") >= since;
   const changed = added.length + modified.length + renamed.length + deleted.length;
   const library = changed || i.carded?.length || q.length ? {
-    changed, added: added.map(file), modified: modified.map(file), renamed: renamed.map(file), deleted: deleted.map(file),
+    changed, added: brandNew.map(file), modified: modified.map(file), renamed: renamed.map(file), deleted: deleted.map(file),
+    new_versions: newVersions.map(f => ({ ...file(f), note: versionNote(fam.get(f.item_id)!) })), excluded,
     carded: (i.carded ?? []).map(c => ({ title: c.title || c.filename })),
     deletion_check: syncFresh && i.sync?.last_result ? snapText(i.sync.last_result) : null, queue,
   } : null;
@@ -244,7 +266,8 @@ function section(title: string, sub: string, body: string, link?: [string, strin
 
 function fileList(label: string, files: DigestFile[], note = "") {
   if (!files.length) return "";
-  const shown = files.slice(0, 5).map(f => f.url ? a(f.url, esc(f.name), `color:${INK};`) : `<span style="color:${GREY};text-decoration:line-through;">${esc(f.name)}</span>`);
+  const shown = files.slice(0, 5).map(f => (f.url ? a(f.url, esc(f.name), `color:${INK};`) : `<span style="color:${GREY};text-decoration:line-through;">${esc(f.name)}</span>`)
+    + (f.note ? ` <span style="color:${GREY};">(${esc(f.note)})</span>` : ""));
   const more = files.length > 5 ? `<span style="color:${GREY};"> and ${files.length - 5} more</span>` : "";
   return row(td(`padding:8px 0;border-bottom:1px solid ${LINE};font-size:14px;line-height:20px;color:${INK};`,
     `<b style="font-weight:600;">${esc(label)} ${files.length}</b>${note ? `<span style="color:${GREY};"> &nbsp;${note}</span>` : ""}<br>${shown.join(dot)}${more}`));
@@ -304,6 +327,8 @@ export function renderHtml(d: Digest): string {
     const l = d.library, qu = l.queue;
     const rows = [
       fileList("Added", l.added, "SAM can link to these now"),
+      fileList("New version of an existing document", l.new_versions, "SAM answers with the newest copy"),
+      fileList("New, pre-2024: excluded from answers", l.excluded, "pin one on the Content tab if it still holds"),
       fileList("Modified", l.modified),
       fileList("Renamed", l.renamed),
       fileList("Deleted", l.deleted, "SAM no longer links to these"),
@@ -314,6 +339,7 @@ export function renderHtml(d: Digest): string {
           qu.uncarded && `${qu.uncarded} SAM can find but can&rsquo;t describe yet <span style="color:${GREY};">(${qu.uncarded_names.map(esc).join(", ")}${qu.uncarded > 3 ? ", &hellip;" : ""})</span>`,
           qu.changed_since_card && `${qu.changed_since_card} changed since their card <span style="color:${GREY};">(${qu.changed_names.map(esc).join(", ")}${qu.changed_since_card > 3 ? ", &hellip;" : ""})</span>`,
           qu.renamed && `${qu.renamed} renamed, card still has the old name <span style="color:${GREY};">(${qu.renamed_names.map(esc).join(", ")}${qu.renamed > 3 ? ", &hellip;" : ""})</span>`,
+          qu.older_skipped && `<span style="color:${GREY};">${plural(qu.older_skipped, "older copy", "older copies")} of carded documents skipped</span>`,
         ].filter(Boolean).join("<br>"))) : "",
       l.deletion_check ? row(td(`padding:8px 0 0 0;font-size:13px;line-height:18px;color:${GREY};`, `Deletion check: ${esc(l.deletion_check)}`)) : "",
     ].join("");

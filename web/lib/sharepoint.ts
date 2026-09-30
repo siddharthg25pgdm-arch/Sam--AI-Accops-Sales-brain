@@ -275,10 +275,26 @@ export type RegistryRow = {
   suggest_ingest: boolean;
 };
 
+/** PostgREST's page size on this project (Supabase max-rows). */
+export const PAGE = 1000;
+/** Every row `path` selects, up to `max`. A response is capped at PAGE rows whatever `limit` says, so
+ *  `limit=5000` silently stopped at 1,000 - harmless at 877 files, wrong at the 1,001st. Pages by
+ *  offset until a short page; `path` must end in an order with a unique tiebreak, or rows shift
+ *  between pages. */
+export async function restAll<T>(path: string, max = 20_000): Promise<T[]> {
+  const out: T[] = [];
+  for (let off = 0; off < max; off += PAGE) {
+    const page = ((await rest(`${path}&limit=${Math.min(PAGE, max - off)}&offset=${off}`)) ?? []) as T[];
+    out.push(...page);
+    if (page.length < Math.min(PAGE, max - off)) break;
+  }
+  return out;
+}
+
 /** Registry read for the catalogue and the reconcile report. */
-export async function registry(scope = "sales", limit = 2000): Promise<RegistryRow[]> {
+export async function registry(scope = "sales", limit = 20_000): Promise<RegistryRow[]> {
   if (!configured()) return [];
-  return (await rest(`sam_sharepoint_files?scope=eq.${scope}&deleted=is.false&select=*&limit=${limit}&order=modified_at.desc`)) as RegistryRow[];
+  return restAll<RegistryRow>(`sam_sharepoint_files?scope=eq.${scope}&deleted=is.false&select=*&order=modified_at.desc.nullslast,item_id`, limit);
 }
 
 /** One asset card: what a document SAYS, written by Claude Enterprise from the real text.
@@ -305,15 +321,48 @@ const CARD_COLS = "source,filename,title,asset_type,industry,client,products,com
 
 /** Every asset card. Explicit column list rather than select=*, so client_actual cannot arrive by
  *  accident when someone adds a column later. */
-export async function cardRows(limit = 2000): Promise<CardRow[]> {
+export async function cardRows(limit = 20_000): Promise<CardRow[]> {
   if (!configured()) return [];
-  return (await rest(`sam_asset_cards?select=${CARD_COLS}&limit=${limit}&order=source`)) as CardRow[];
+  return restAll<CardRow>(`sam_asset_cards?select=${CARD_COLS}&order=source`, limit);
+}
+
+/** Admin pins (docs/supabase-sam-asset-families.sql): documents kept in answers despite their age. */
+export type PinRow = { asset_key: string; pinned_by: string; reason: string | null; created_at: string };
+export async function pinRows(): Promise<PinRow[]> {
+  if (!configured()) return [];
+  return restAll<PinRow>(`sam_asset_pins?select=asset_key,pinned_by,reason,created_at&order=asset_key`);
+}
+export async function setPin(asset_key: string, pinned: boolean, by: string, reason?: string): Promise<void> {
+  if (pinned) await rest(`sam_asset_pins?on_conflict=asset_key`, { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify([{ asset_key, pinned_by: by, reason: reason || null }]) });
+  else await rest(`sam_asset_pins?asset_key=eq.${encodeURIComponent(asset_key)}`, { method: "DELETE" });
+}
+/** Human corrections to family detection: this filename stem belongs to that family. */
+export async function overrideRows(): Promise<{ stem: string; family_key: string }[]> {
+  if (!configured()) return [];
+  return restAll<{ stem: string; family_key: string }>(`sam_asset_family_overrides?select=stem,family_key&order=stem`);
+}
+/** One row of the sam_asset_families view: a document's family, its place in it, and eligibility. */
+export type FamilyRow = {
+  member_key: string; item_id: string | null; source: string | null; filename: string; folder: string | null;
+  family_key: string; edition: string; version: string | null; publish_year: number | null; year: number | null;
+  family_size: number; version_rank: number; is_head: boolean; is_canonical: boolean; superseded: boolean;
+  eligible: boolean; excluded_reason: string | null; pinned: boolean; carded: boolean;
+  canonical_filename: string; carded_in_family: number;
+};
+export async function familyRows(itemIds: string[]): Promise<FamilyRow[]> {
+  if (!configured() || !itemIds.length) return [];
+  const ids = itemIds.map(i => `"${i.replace(/"/g, "")}"`).join(",");
+  return (await rest(`sam_asset_families?item_id=in.(${encodeURIComponent(ids)})&select=*&limit=1000`)) as FamilyRow[];
 }
 
 export type CardingQueueRow = {
   item_id: string; filename: string; folder: string; web_url: string;
   modified_at: string | null; modified_by: string | null;
   reason: "uncarded" | "changed_since_card" | "renamed"; card_updated_at: string | null;
+  /** The file's family (sam_asset_families): an older copy of a carded document, the newest copy of
+   *  one carded from another file, or new. */
+  family_key?: string | null; family_role?: "new" | "new_version" | "older_version"; canonical_filename?: string | null;
 };
 
 /** Files that need a card written or re-checked: the sam_carding_queue view (docs/supabase-sam-carding-queue.sql).
@@ -321,7 +370,7 @@ export type CardingQueueRow = {
 export async function cardingQueue(reason?: string, limit = 2000): Promise<CardingQueueRow[]> {
   if (!configured()) return [];
   const f = reason ? `reason=eq.${encodeURIComponent(reason)}&` : "";
-  return (await rest(`sam_carding_queue?${f}select=*&order=modified_at.desc.nullslast&limit=${limit}`)) as CardingQueueRow[];
+  return restAll<CardingQueueRow>(`sam_carding_queue?${f}select=*&order=modified_at.desc.nullslast,item_id`, limit);
 }
 
 export type ChangedFile = {
@@ -345,9 +394,9 @@ export async function lastFlowWrite(scope = "sales"): Promise<string | null> {
 }
 
 /** Cards whose content changed since `since` (carded_at moves only when card_hash does). */
-export async function cardedSince(since: string): Promise<{ title: string; filename: string; carded_at: string }[]> {
+export async function cardedSince(since: string): Promise<{ title: string; filename: string; carded_at: string; item_id: string | null }[]> {
   if (!configured()) return [];
-  return (await rest(`sam_asset_cards?carded_at=gte.${encodeURIComponent(since)}&select=title,filename,carded_at&order=carded_at.desc&limit=200`)) as { title: string; filename: string; carded_at: string }[];
+  return (await rest(`sam_asset_cards?carded_at=gte.${encodeURIComponent(since)}&select=title,filename,carded_at,item_id&order=carded_at.desc&limit=200`)) as { title: string; filename: string; carded_at: string; item_id: string | null }[];
 }
 
 export type SyncRow ={ scope: string; last_run: string | null; last_result: string | null };
@@ -457,8 +506,10 @@ const brief = (r: SnapRow) => ({ item_id: r.item_id, list_item_id: r.list_item_i
 export async function applySnapshot(snap: Snapshot) {
   const scope = snap.scope || "sales";
   const mode = snap.mode === "write" ? "write" : "report";
-  const rows = (await rest(`sam_sharepoint_files?scope=eq.${encodeURIComponent(scope)}` +
-    `&select=item_id,list_item_id,folder,filename,deleted&limit=5000`)) as SnapRow[];
+  // Every row: a registry read that stopped at 1,000 would make the diff's coverage guards judge a
+  // whole listing against part of the registry.
+  const rows = await restAll<SnapRow>(`sam_sharepoint_files?scope=eq.${encodeURIComponent(scope)}` +
+    `&select=item_id,list_item_id,folder,filename,deleted&order=item_id`);
   const d = diffSnapshot(rows ?? [], snap);
   const now = new Date().toISOString();
 

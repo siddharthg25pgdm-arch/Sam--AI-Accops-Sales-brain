@@ -163,15 +163,19 @@ export async function conversations(p: { from: string; filter: ConvFilter; chann
   return rows.map(r => ({ ...r, reactions: refs.filter(x => x.ref_event_id === r.id) }));
 }
 
-export type CardingRow = { item_id: string; filename: string; folder: string; web_url: string; modified_at: string | null; modified_by: string | null; reason: string; card_updated_at: string | null };
+export type CardingRow = { item_id: string; filename: string; folder: string; web_url: string; modified_at: string | null; modified_by: string | null; reason: string; card_updated_at: string | null;
+  /** From the family (docs/supabase-sam-asset-families.sql): 'older_version' is skipped by the nightly
+   *  job, 'new_version' is carded first. */
+  family_role?: "new" | "new_version" | "older_version"; canonical_filename?: string | null };
 
 /** Files that need a card written or rewritten. The view is owned by the carding work; until it
- *  exists this returns missing: true and the panel says so, rather than showing an error. */
-export async function cardingQueue(limit = 50): Promise<{ rows: CardingRow[]; total: number; missing: boolean }> {
-  const r = await rest<CardingRow[]>(`sam_carding_queue?select=*&order=modified_at.desc.nullslast&limit=${limit}`, { headers: { Prefer: "count=exact" } });
+ *  exists this returns missing: true and the panel says so, rather than showing an error.
+ *  One read, no count=exact: that made PostgREST run the whole view a second time to count it, and the
+ *  queue is small enough to count here (the total says "1000+" only past one page). */
+export async function cardingQueue(limit = 1000): Promise<{ rows: CardingRow[]; total: number; missing: boolean }> {
+  const r = await rest<CardingRow[]>(`sam_carding_queue?select=*&order=modified_at.desc.nullslast,item_id&limit=${Math.min(limit, 1000)}`);
   if (!r.data) return { rows: [], total: 0, missing: r.status === 404 || /42P01|PGRST205/.test(r.body ?? "") || r.status === 0 };
-  const total = Number(r.headers?.get("content-range")?.split("/")[1] ?? r.data.length) || r.data.length;
-  return { rows: r.data, total, missing: false };
+  return { rows: r.data, total: r.data.length, missing: false };
 }
 
 /** Last model answer and last provider failure: provider status from what actually happened,

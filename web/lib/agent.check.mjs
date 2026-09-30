@@ -39,7 +39,8 @@ const REG = [
   row("R5", "eBooks", "Accops Browser Isolation eBook.pdf", "eBook"),
   row("R6", "Social Media", "Social-Media-Banners Browser Isolation.png", "Brand"),
   row("R7", "Videos/Demo Videos/Revised", "Device posture check and related data on management console.mp4", "Video"),
-  row("R8", "Brochures & Datasheets/New", "Accops HyID Datasheet.V5 2026.pdf", "Brochure"),
+  // An older copy of R1 (same family, saved a month earlier): answers must never show it.
+  { ...row("R8", "Brochures & Datasheets/New", "Accops HyID Datasheet.V5 2026.pdf", "Brochure"), modified_at: "2026-08-01T00:00:00Z" },
   // 26 Sep repros
   row("R9", "Competition/VDI and DaaS", "Accops vs Citrix Feature Table 2018.pdf", "Competitive"),
   row("R10", "Pricing", "Accops DaaS Pricing Calculator v2.3 May 2021.xlsx", "Pricing"),
@@ -367,10 +368,11 @@ run([pickSay("The pricing calculator can be adapted for a 2,000-user quote.", "A
 r = await ask("whats the pricing for 2000 users hyworks, customer comparing with citrix quote");
 ok(/^Pricing is not in the collateral library/.test(r.text) && /not a quote/.test(r.text) && r.missing && !/adapted/.test(r.text) && r.assets.every(a => /Pricing Calculator/.test(a.title)),
   `calculator is a reference, not a quote: ${r.text} | ${r.assets.map(a => a.title)}`);
-// 9f. A superseded asset brings its newer edition, newer first (#4).
+// 9f. A superseded asset is an older version of its successor's family (#4): the newer edition answers
+// and the old one never takes a slot (30 Sep: families; it is also a 2018 document, excluded).
 run([pickSay("A Citrix comparison fits.", "Accops vs Citrix Feature Table 2018")]);
 r = await ask("citrix battlecard for my own prep before the call tmrw");
-ok(r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && r.assets[1]?.title === "Accops vs Citrix Feature Table 2018" && traceHas(r, "newer edition shown"), `newer edition first: ${r.assets.map(a => a.title)}`);
+ok(r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && !r.assets.some(a => a.title === "Accops vs Citrix Feature Table 2018"), `newer edition only: ${r.assets.map(a => a.title)}`);
 // 9g. False gaps from 26 Sep: Hinglish and misspellings (#30), long paragraphs (#31), a 2nd follow-up (#3).
 ok(heuristicFilters("bhai urgent hyworks brocher bhejo customer ko abhi").audience === "external", "bhejo ... customer ko is sending outside");
 {
@@ -526,10 +528,11 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   ok(!relevant("hyworks sizing for 500 concurrent users", tokyo) && relevant("hyworks deck for a japanese customer", tokyo), "a Japanese-language deck only when Japan is asked about");
   const mea = { ...tokyo, title: "Partner Bootcamp 2026 - MEA Edition for the Dubai Partner Summit: Middle East Sovereignty", products: ["HySecure"], brief: "Middle East partner programme", file: { path: "x/MEA Bootcamp.pptx" } };
   ok(relevant("middle east event deck, gitex", mea) && !relevant("hysecure event deck for a kerala partner meet", mea), "a regional event deck only for its own region");
-  // 7. Both editions picked, old one first: the newer edition moves ahead (#17).
+  // 7. Both editions picked, old one first (#17): the old one is an older version of the newer one's
+  // family, so no search returns it and only the newer edition is shown (30 Sep: families).
   run([pickSay("The library has two Citrix comparisons.", "Accops vs Citrix Feature Table 2018", "Accops Powered VDI vs Citrix VDI")]);
   r = await ask("citrix battlecard");
-  ok(r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && r.assets[1]?.title === "Accops vs Citrix Feature Table 2018" && traceHas(r, "newer edition first"), `newer edition first when both were picked: ${r.assets.map(a => a.title)}`);
+  ok(r.assets[0]?.title === "Accops Powered VDI vs Citrix VDI" && !r.assets.some(a => a.title === "Accops vs Citrix Feature Table 2018"), `newer edition only, even when both were picked: ${r.assets.map(a => a.title)}`);
 }
 
 // 14. 27 Sep re-run #2, through finish() on hand-made results (the fixture corpus has none of these).

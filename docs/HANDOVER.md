@@ -5,6 +5,19 @@ The 25 September section below supersedes anything older it contradicts.
 
 ---
 
+## 30 September 2026: one document, one answer slot (families) + pre-2024 excluded
+
+| | |
+|---|---|
+| Families | `web/lib/family.ts` (`parseName`, `families`, `isNewer`) and the SQL mirror `docs/supabase-sam-asset-families.sql` (applied) group every version, re-save and edition of a document: version tokens, dates / date prefixes, Final/Draft/Copy/Big/Small/compressed/(1), edition and language tags stripped; product, customer, city, length kept. Canonical: card publish_year, then version (only when both files have one), then modified; hand-set `superseded_by` joins the successor's family and loses. Editions (sharable, Japanese, Japan, MEA) are siblings: one slot, the edition the ask needs. TS and SQL agree on all 1,194 filenames and 409/409 shared assets |
+| Pre-2024 (owner, 30 Sep) | Eligible = card publish_year >= 2024 (uncarded: modified year), or a certificate / analyst report / regulation / third-party research, or pinned (`sam_asset_pins`, Content tab Pin / Unpin). Excluded documents never answer and never substitute. Real library: 254 of 475 assets answerable, 159 excluded, 62 older versions hidden |
+| DB | `sam_asset_families` view (family_key, edition, version_rank, is_head, is_canonical, eligible, excluded_reason, older_versions, canonical_filename), stored `stem` / `fam_*` columns (recompute after changing a function: `update ... set filename = filename`), `sam_asset_family_overrides` (6 seeded false merges), `sam_carding_queue` rebuilt (hash joins, `family_role`) |
+| Where it shows | Answers: `answerable()` is the search / substitute / facet pool; lines say "N older versions not shown". Content tab: honest "Carded N of M", Versions and editions, Excluded from answers. Catalogue: admins see excluded greyed. Digest: "New version of an existing document", "New, pre-2024: excluded". Nightly carding skips older copies, cards new versions first. Export CSV has the family columns |
+| Checks | `node web/lib/family.check.mjs` (63), cards.check pages 2,345 rows through a 1,000-row cap |
+| Needs Siddharth | Logos, icons, email signatures and 2022 testimonial videos are excluded (modified 2021-22, no document year): pin them or make "Brand" an exception. The Nutanix .NEXT Tokyo "English v4" file is an empty deck and leads its family |
+
+---
+
 ## 30 September 2026: the rating buttons act
 
 | | |

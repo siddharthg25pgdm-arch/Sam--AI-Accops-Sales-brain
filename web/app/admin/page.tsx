@@ -6,13 +6,13 @@ import { dashboard, conversations, cardingQueue, providerEvidence, gapWorklist, 
   DEFINITIONS, MIN_N, type Dashboard, type Ratio, type Delta, type ConvFilter } from "@/lib/metrics";
 import { registry, syncStatus } from "@/lib/sharepoint";
 import { ready, cacheState } from "@/lib/registry-cache";
-import { cardCacheState } from "@/lib/cards-cache";
-import { allAssets, assetLink } from "@/lib/cards";
+import { cardCacheState, cardAssets } from "@/lib/cards-cache";
+import { allAssets, assetLink, pinKey, eligibility, type Asset } from "@/lib/cards";
 import { apiPublishQueue } from "@/lib/api";
 import { tiers } from "@/lib/agent-openai";
 import { listRequests, unrequestedGaps, ACTIVE, NEXT, STATUS_LABEL, type RankedRequest, type Status } from "@/lib/requests";
 import { loadRatings, loadClears, latestRatings, learnDemotions, wrongAssetTally, verdictOf, FEEDBACK_LABEL, DEMOTE_DAYS, DEMOTE_MIN_REPS, DEMOTE_PENALTY, type FeedbackKind, type Rating } from "@/lib/feedback";
-import { saveRequest, mergeRequest, promote, clearRank } from "./actions";
+import { saveRequest, mergeRequest, promote, clearRank, pinAsset } from "./actions";
 import { TopBar } from "@/components/TopBar";
 import { Sparkline, Meter, DailyColumns, BarList, Heatmap, Histogram, num, ms } from "@/components/charts";
 
@@ -98,7 +98,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<SP
         {tab === "overview" && d && <Overview d={d} days={days} href={href} includeTest={includeTest} />}
         {tab === "usage" && d && <Usage d={d} href={href} />}
         {tab === "quality" && d && <Quality d={d} sp={sp} days={days} includeTest={includeTest} href={href} />}
-        {tab === "content" && d && <Content d={d} />}
+        {tab === "content" && d && <Content d={d} sp={sp} />}
         {tab === "requests" && d && <RequestsTab d={d} sp={sp} days={days} includeTest={includeTest} href={href} />}
         {tab === "system" && <System />}
         {tab === "conversations" && <Conversations sp={sp} days={days} includeTest={includeTest} href={href} />}
@@ -474,27 +474,40 @@ async function RepsToldUs({ sp, days, includeTest, href }: { sp: SP; days: numbe
 
 // ------------------------------------------------------------------------------------------- content
 
-async function Content({ d }: { d: Dashboard }) {
+async function Content({ d, sp }: { d: Dashboard; sp: SP }) {
+  const ok = one(sp.ok), err = one(sp.err);
   const [regRows, carding, pubQueue] = await Promise.all([registry("sales", 5000), cardingQueue(), apiPublishQueue()]);
   await ready();
-  const answerable = allAssets();
+  const all = allAssets(), answerable = all.filter(a => !a.family || (a.family.head && a.family.eligible));
   const titleOf = new Map<string, string>();
-  for (const a of answerable) { if (a.file?.path) titleOf.set(a.file.path, a.title); titleOf.set(a.title, a.title); }
+  for (const a of all) { if (a.file?.path) titleOf.set(a.file.path, a.title); titleOf.set(a.title, a.title); }
   const linked = answerable.filter(a => assetLink(a)).length;
-  const carded = answerable.filter(a => a.inventory_id !== null).length;
+  // Coverage that means something: of the documents answers can use (newest of each family, 2024 or
+  // later, pinned or a dated record), how many has SAM read. Images and videos have no text to card.
+  // The old figure counted inventory_id, which only the bundled 77 hand-written cards carry.
+  const docs = answerable.filter(a => /^(pdf|pptx?|docx?|xlsx?)$/i.test(a.file?.ext ?? "")), cardedDocs = docs.filter(a => a.carded).length;
+  const cards = cardAssets(), bound = cards.filter(c => c.item_id).length;
+  const olderHidden = all.filter(a => a.family && !a.family.head).length;
+  const excluded = all.filter(a => a.family?.head && !a.family.eligible), pinned = all.filter(a => a.family?.pinned);
+  const byFamily = new Map<string, Asset[]>();
+  for (const a of all) if (a.family) byFamily.set(a.family.key, [...(byFamily.get(a.family.key) ?? []), a]);
+  const multi = [...byFamily.values()].filter(g => g.length > 1).sort((x, y) => y.length - x.length);
   const stale = freshness(regRows);
   const staleTotal = stale.reduce((n, f) => n + f.stale, 0);
   const worklist = gapWorklist(d.gaps);
   return (
     <>
+      {ok && <p className="ok-note" role="status">{ok}</p>}
+      {err && <div className="notice" role="alert">{err}</div>}
       <PublishQueue q={pubQueue} />
       <div className="kpis four">
         <Kpi label="Tracked in SharePoint" value={<b className="kv">{num(regRows.length)}</b>} foot="registry rows, not deleted" />
-        <Kpi label="Answerable" value={<b className="kv">{num(answerable.length)}</b>} foot="after merge and dedupe" />
+        <Kpi label="Answerable" value={<b className="kv">{num(answerable.length)}</b>} foot={`newest of each document; ${num(olderHidden)} older versions and ${num(excluded.length)} pre-2024 left out`} />
         <Kpi label="With a working link" value={<b className="kv">{num(linked)}</b>} foot={answerable.length ? `${Math.round((linked / answerable.length) * 100)}% of answerable` : ""} />
         {/* The real coverage number: everything else is findable by name but cannot be reasoned
             about, because no document text has been read. */}
-        <Kpi label="Carded" value={<b className="kv">{num(carded)}</b>} foot={answerable.length ? `${Math.round((carded / answerable.length) * 100)}% have document detail` : ""} />
+        <Kpi label="Carded" value={<b className="kv">{num(cardedDocs)} <span className="of">of {num(docs.length)}</span></b>}
+          foot={`answerable documents SAM has read · ${num(cards.length)} cards, ${num(bound)} bound to a file`} />
       </div>
 
       <Section title="Returned versus opened" sub="How often SAM offered an asset, and how often someone then opened it. Opens are only observable on web.">
@@ -542,12 +555,63 @@ async function Content({ d }: { d: Dashboard }) {
               <tbody>{carding.rows.slice(0, 20).map(r => (
                 <tr key={r.item_id}>
                   <td>{r.web_url ? <a href={r.web_url} target="_blank" rel="noreferrer">{r.filename}</a> : r.filename}<div className="subline">{r.folder}</div></td>
-                  <td className="nowrap">{r.reason === "uncarded" ? "No card" : r.reason === "changed_since_card" ? "Changed since card" : r.reason === "renamed" ? "Renamed" : r.reason}</td>
+                  <td className="nowrap">{r.reason === "uncarded" ? "No card" : r.reason === "changed_since_card" ? "Changed since card" : r.reason === "renamed" ? "Renamed" : r.reason}
+                    {r.family_role === "new_version" && <div className="subline"><span className="pill">new version of {r.canonical_filename === r.filename ? "a carded document" : r.canonical_filename}</span></div>}
+                    {r.family_role === "older_version" && <div className="subline"><span className="pill">older version, skipped: {r.canonical_filename} is newer</span></div>}</td>
                   <td className="nowrap">{fmtDateY(r.modified_at)}</td><td>{r.modified_by ?? "–"}</td>
                 </tr>
               ))}</tbody></table>
           )}
         {!carding.missing && carding.total > 20 && <p className="note">Showing 20 of {num(carding.total)}, most recently modified first.</p>}
+      </Section>
+
+      <Section title="Versions and editions" sub={<>Files SAM treats as one document. Answers show only the <b>lead</b> (or the edition the ask needs: sharable when sending, Japanese for Japan, MEA for the Middle East); older versions never take an answer slot. A wrong grouping is fixed with a row in <code>sam_asset_family_overrides</code>.</>}
+        aside={<span className="count">{num(multi.length)}</span>}>
+        {multi.length === 0 ? <Empty>No document has more than one copy.</Empty> : (
+          <table><thead><tr><th>Document</th><th>Editions</th><th>Older versions, not shown</th></tr></thead>
+            <tbody>{multi.slice(0, 40).map(g => {
+              const lead = g.find(a => a.family!.canonical) ?? g[0];
+              const sibs = g.filter(a => a.family!.head && a !== lead), old = g.filter(a => !a.family!.head);
+              const nm = (a: Asset) => (a.file?.path ?? a.title).split("/").pop()!;
+              const yr = (a: Asset) => a.file?.year ? ` (${a.file.year})` : "";
+              return (
+                <tr key={lead.family!.key}>
+                  <td>{lead.title}<div className="subline">{nm(lead)}{yr(lead)}{!lead.family!.eligible && <> · <span className="pill">excluded: {lead.family!.excluded}</span></>}</div></td>
+                  <td>{sibs.length ? sibs.map(a => <div key={nm(a)} className="subline">{a.family!.edition || "default"}: {nm(a)}{yr(a)}</div>) : "–"}</td>
+                  <td>{old.length ? old.map(a => <div key={nm(a)} className="subline">{nm(a)}{yr(a)}{a.family!.superseded ? " · superseded" : ""}</div>) : "–"}</td>
+                </tr>
+              );
+            })}</tbody></table>
+        )}
+        {multi.length > 40 && <p className="note">Showing the 40 largest of {num(multi.length)}.</p>}
+      </Section>
+
+      <Section title="Excluded from answers" sub={<>Documents published before 2024 (read from the card; for an uncarded file, the year SharePoint last saw it modified). Certificates, analyst reports and regulations stay whatever their year. Excluded documents never answer and never stand in as a substitute, so a topic with only old material becomes an honest gap with the request button. <b>Pin</b> one that still holds.</>}
+        aside={<span className="count">{num(excluded.length)}</span>}>
+        <div id="excluded" />
+        {pinned.length > 0 && (
+          <table><thead><tr><th>Pinned</th><th>Why it was out</th><th /></tr></thead>
+            <tbody>{pinned.map(a => (
+              <tr key={pinKey(a)}>
+                <td>{a.title}<div className="subline">{(a.file?.path ?? "").split("/").pop()}</div></td>
+                <td>{eligibility(a, new Set()).excluded ?? "–"}</td>
+                <td className="r"><form action={pinAsset}><input type="hidden" name="key" value={pinKey(a)} /><input type="hidden" name="pin" value="0" /><input type="hidden" name="back" value="tab=content" /><button className="btn-line" type="submit">Unpin</button></form></td>
+              </tr>
+            ))}</tbody></table>
+        )}
+        {excluded.length === 0 ? <Empty>Nothing is excluded.</Empty> : (
+          <details open={excluded.length <= 40}>
+            <summary>{num(excluded.length)} excluded, oldest reason first</summary>
+            <table><thead><tr><th>Document</th><th>Why</th><th /></tr></thead>
+              <tbody>{[...excluded].sort((x, y) => (x.family!.excluded ?? "").localeCompare(y.family!.excluded ?? "")).map(a => (
+                <tr key={pinKey(a)} className="muted">
+                  <td>{a.title}<div className="subline">{a.asset_type} · {(a.file?.path ?? "").split("/").pop()}</div></td>
+                  <td className="nowrap">pre-2024: {a.family!.excluded}</td>
+                  <td className="r"><form action={pinAsset}><input type="hidden" name="key" value={pinKey(a)} /><input type="hidden" name="back" value="tab=content" /><button className="btn-line" type="submit">Pin</button></form></td>
+                </tr>
+              ))}</tbody></table>
+          </details>
+        )}
       </Section>
 
       <Section title="Stale assets, by owner" sub={<><b>{num(staleTotal)}</b> documents untouched for over a year. This is SharePoint&apos;s last-modified date, not a publication date: a file touched last week can still hold 2022 numbers, so treat it as a floor.</>}>

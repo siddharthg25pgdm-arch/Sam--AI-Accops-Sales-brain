@@ -3,10 +3,14 @@ export type SlimAsset = {
   key: string; title: string; type: "Case Study" | "Whitepaper" | "Battlecard" | "Deck" | "Brochure" | "Other"; asset_type: string; industry: string; vertical: string;
   products: string[]; use_for: string; brief: string; year: string | null; modified: string | null; stale: boolean;
   visibility: "internal" | "public"; link: string | null; trust: string | null; location: string | null; ext: string | null; pages: number | null; inventoried: boolean;
+  /** Family (lib/family.ts): older versions not shown, the edition, and - admins only see these - why it is out of answers. */
+  older?: number; edition?: string; excluded?: string | null; pin_key?: string;
 };
 export type Facets = { types: [string, number][]; verticals: [string, number][]; products: [string, number][]; years: [string, number][] };
 export type Gap = { vertical: string; type: "Case Study" | "Whitepaper"; product?: string; asked?: number };
-export type ChatAsset = { title: string; asset_type: string; industry: string; why: string; link: string | null; location: string | null; visibility: string; year: string | null; stale: boolean; trust?: string | null; path: string | null };
+export type ChatAsset = { title: string; asset_type: string; industry: string; why: string; link: string | null; location: string | null; visibility: string; year: string | null; stale: boolean; trust?: string | null; path: string | null;
+  /** Older versions of this document in SharePoint that answers do not show. */
+  older?: number };
 export type ChatTurn = { role: "user" | "assistant"; content: string; assets?: ChatAsset[]; trace?: { step: string; detail: string }[]; eventId?: number | null; runtime?: string; zero?: boolean; filters?: Record<string, string>;
   /** The exact thing is not in the library (substitutes may be shown); offers "ask marketing". */
   missing?: boolean; question?: string; requestTitle?: string };

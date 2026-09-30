@@ -1,6 +1,6 @@
 /** Shared handlers behind both the REST routes (/api/v1/*) and the MCP tools (/api/mcp).
  *  One implementation, two transports, so the Dwight extension and an MCP client see identical behaviour. */
-import { searchAssets, allAssets, describe, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, trustNote, assetLink, assetLocation, internalLink, VERTICALS, type Asset } from "./cards";
+import { searchAssets, allAssets, answerable, describe, slim, facetCounts, coverageGaps, verticalOf, typeGroup, yearOf, isStale, trustNote, assetLink, assetLocation, internalLink, VERTICALS, type Asset } from "./cards";
 import { ask as askAgent, type AskResult } from "./agent";
 import { logEvent, recentEvents, realOnly } from "./events";
 import { ready } from "./registry-cache";
@@ -63,7 +63,7 @@ export async function apiAsk(question: string, who: string, channel: Channel, hi
 }
 
 export function apiAssets(p: { vertical?: string; type?: string; product?: string }) {
-  let list = allAssets().map(slim);
+  let list = answerable().map(slim);
   if (p.vertical) list = list.filter(a => a.vertical.toLowerCase() === p.vertical!.toLowerCase());
   if (p.type) list = list.filter(a => a.type.toLowerCase() === p.type!.toLowerCase());
   if (p.product) list = list.filter(a => a.products.some(x => x.toLowerCase() === p.product!.toLowerCase()));

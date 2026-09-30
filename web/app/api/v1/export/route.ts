@@ -24,10 +24,14 @@ export async function GET(req: Request) {
 
   if (set === "assets") {
     await ready();
-    rows = [["title", "type", "industry", "products", "visibility", "link", "year", "path"]];
+    // Every asset, older versions and excluded ones too, with the family columns, so a human can
+    // check the grouping in a spreadsheet: sort by family, read the lead against the rest.
+    rows = [["title", "type", "industry", "products", "visibility", "link", "year", "path", "family", "edition", "shown in answers", "family lead", "older versions", "excluded because"]];
     for (const a of allAssets()) {
+      const f = a.family;
       rows.push([a.title, a.asset_type, a.industry, (a.products ?? []).join("; "),
-        a.visibility, assetLink(a) ?? "", a.file?.year ?? "", a.file?.path ?? ""]);
+        a.visibility, assetLink(a) ?? "", a.file?.year ?? "", a.file?.path ?? "",
+        f?.key ?? "", f?.edition ?? "", f ? (f.head && f.eligible ? "yes" : "no") : "yes", f?.canonical ? "yes" : "", f?.older ?? 0, f?.excluded ?? ""]);
     }
     name = "sam-assets";
   } else if (set === "gaps") {
