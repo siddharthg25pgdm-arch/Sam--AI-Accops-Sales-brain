@@ -6,8 +6,9 @@
  *       superseded_by stops winning, or an edition sibling takes a slot it should not;
  *    3. the pre-2024 rule breaks: a 2021 deck answers, the ISO certificate or a 2020 regulation stops
  *       answering, a pin stops working, or an excluded battlecard comes back as a substitute.
- *  The SQL mirror (docs/supabase-sam-asset-families.sql) must give the same keys: CASES is also run
- *  against it with `select sam_family_key(x) from unnest(array[...]) x` when either side changes. */
+ *  The SQL mirror (docs/supabase-sam-asset-families.sql) must give the same answers: after changing
+ *  either side run `node scripts/family-parity.mjs` (live; every filename and shared asset), and the
+ *  SAME / DIFFERENT pairs through `select sam_family_key(x) from unnest(array[...]) x`. */
 import assert from "node:assert";
 import { createJiti } from "jiti";
 import { fileURLToPath } from "node:url";
