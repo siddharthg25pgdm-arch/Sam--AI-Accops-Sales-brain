@@ -129,11 +129,16 @@ const EXEMPT_TYPE = /certif|analyst report|regulation|third-party research/i;
 export function pinKey(a: Asset): string {
   return a.item_id ? `id:${a.item_id}` : `path:${assetKey(a)}`;
 }
+/** The publication year the card read from the document body, else null. Not `file.year`: after a
+ *  merge that falls back to the registry's created date when the card has no year. */
+function publishYear(a: Asset): number | null {
+  return a.carded ? Number(metaOf(a)?.publish_year) || null : null;
+}
 /** Eligible for answers, and why not. A carded year is what the document says; without one, the year
  *  SharePoint last saw the file modified stands in, and an unknown year is not eligible. */
 export function eligibility(a: Asset, pins: Set<string> = pinnedKeys()): { eligible: boolean; excluded: string | null; pinned: boolean } {
   const pinned = pins.has(pinKey(a));
-  const doc = a.carded ? Number(a.file?.year) || null : null;
+  const doc = publishYear(a);
   const year = doc ?? (Number((a.file?.modified ?? "").slice(0, 4)) || null);
   if (pinned || EXEMPT_TYPE.test(a.asset_type) || (year != null && year >= ELIGIBLE_FROM)) return { eligible: true, excluded: null, pinned };
   return { eligible: false, pinned, excluded: doc ? `published ${doc}` : year ? `year unknown, last modified ${year}` : "year unknown" };
@@ -143,7 +148,7 @@ function withFamilies(pool: Asset[], pins: Set<string>): Asset[] {
   const el = new Map(pool.map(a => [a, eligibility(a, pins)]));
   const fam = families(pool, a => ({
     name: (a.file?.path ?? "").split("/").pop() || a.title,
-    publishYear: a.carded ? Number(a.file?.year) || null : null,
+    publishYear: publishYear(a),
     modified: a.file?.modified ?? null, carded: carded(a), eligible: el.get(a)!.eligible,
     supersededBy: supersedingFile(metaOf(a)?.superseded_by ?? ""),
   }), familyOverrides());
@@ -230,7 +235,10 @@ function merge(seen: Asset, a: Asset): Asset {
           // searchAssets() matches on, so "Competition" stays a findable word.
           path: carded(winner) && other.file.path ? other.file.path : winner.file.path,
           year: dated?.file?.year ?? winner.file.year ?? other.file.year,
-          modified: winner.file.modified ?? other.file.modified,
+          // SharePoint's date, the latest of the two: a hand-written card's `modified` is the day it was
+          // copied to a laptop, and a PDF/PPTX twin re-saved last week means the document was touched.
+          // Pre-2024 eligibility falls back to this, as sam_asset_families does (max over the twins).
+          modified: [winner, other].filter(verified).map(x => x.file?.modified).filter(Boolean).sort().pop() ?? winner.file.modified ?? other.file.modified,
         }
       : (winner.file ?? other.file),
   };

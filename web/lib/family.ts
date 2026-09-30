@@ -107,21 +107,30 @@ export type FamilyInfo = {
 
 const stemOf = (s: string) => s.toLowerCase().replace(/\.(pdf|pptx?|docx?|xlsx?)$/, "").replace(/[^a-z0-9]/g, "");
 
-/** Newer first: a hand-set superseded_by and "outdated" sink; then eligible; then publication year when
- *  both documents state one; then version; then SharePoint's modified date; then a carded one. */
-function newer(a: Member & { superseded: boolean; outdated: boolean; version: number[] }, b: typeof a): number {
-  if (a.superseded !== b.superseded) return a.superseded ? 1 : -1;
-  if (a.outdated !== b.outdated) return a.outdated ? 1 : -1;
-  if (a.eligible !== b.eligible) return a.eligible ? -1 : 1;
-  if (a.publishYear != null && b.publishYear != null && a.publishYear !== b.publishYear) return b.publishYear - a.publishYear;
+/** True when `a` is newer than `b`: a hand-set superseded_by and "outdated" sink; then eligible; then
+ *  publication year when both documents state one; then version when both files carry one; then
+ *  SharePoint's modified date; then a carded one; then the name (code-point order, as SQL's "C").
+ *  Pairwise and deliberately partial, so members are ranked by how many others are newer - a
+ *  definition SQL computes identically (sam_asset_families). */
+type Ranked = Member & { superseded: boolean; outdated: boolean; version: number[] };
+export function isNewer(a: Ranked, b: Ranked): boolean {
+  if (a.superseded !== b.superseded) return b.superseded;
+  if (a.outdated !== b.outdated) return b.outdated;
+  if (a.eligible !== b.eligible) return a.eligible;
+  if (a.publishYear != null && b.publishYear != null && a.publishYear !== b.publishYear) return a.publishYear > b.publishYear;
   // Only when both files carry one: "Nutanix-DotNext-Event.pptx" (the 63-slide working deck, saved
   // June 2024) is not older than "..._SUBMITTED FILE-v2" (May 2024) for lacking a "v".
-  const v = a.version.length && b.version.length ? compareVersion(b.version, a.version) : 0;
-  if (v) return v;
-  const m = (b.modified ?? "").localeCompare(a.modified ?? "");
-  if (m) return m;
-  if (a.carded !== b.carded) return a.carded ? -1 : 1;
-  return a.name.localeCompare(b.name);
+  const v = a.version.length && b.version.length ? compareVersion(a.version, b.version) : 0;
+  if (v) return v > 0;
+  const am = a.modified ? Date.parse(a.modified) : -Infinity, bm = b.modified ? Date.parse(b.modified) : -Infinity;
+  if (am !== bm) return am > bm;
+  if (a.carded !== b.carded) return a.carded;
+  return a.name < b.name;
+}
+/** `xs` newest first: fewest members of `among` newer than it, then name. */
+function byNewest<X extends Ranked>(xs: X[], among: X[] = xs): X[] {
+  const beaten = new Map(xs.map(x => [x, among.filter(o => o !== x && isNewer(o, x)).length]));
+  return [...xs].sort((a, b) => beaten.get(a)! - beaten.get(b)! || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 }
 
 /** Families over `items`, one FamilyInfo per item.
@@ -129,22 +138,24 @@ function newer(a: Member & { superseded: boolean; outdated: boolean; version: nu
  *  A hand-set superseded_by always wins: the superseded document joins its successor's family (they
  *  may be named nothing alike - "ZTNA for Government" -> "Solutions for Govt") and ranks below it -
  *  but only when the successor is actually here; otherwise nothing is hidden and the trust note says
- *  a newer edition exists. `overrides` (filename stem -> family key) is the human escape hatch for a
- *  false merge or split (sam_asset_family_overrides). */
+ *  a newer edition exists. Up to three hops (A -> B -> C puts A and B in C's family), as successorOf()
+ *  in cards.ts. `overrides` (filename stem -> family key) is the human escape hatch for a false merge
+ *  or split (sam_asset_family_overrides). */
 export function families<T>(items: T[], view: (t: T) => Member, overrides: Map<string, string> = new Map()): Map<T, FamilyInfo> {
   const ms = items.map(t => {
-    const m = view(t), p = parseName(m.name);
-    return { t, ...m, ...p, key: overrides.get(stemOf(m.name)) ?? p.key, superseded: false };
+    const m = view(t), p = parseName(m.name), stem = stemOf(m.name);
+    return { t, ...m, ...p, stem, own: overrides.get(stem) ?? p.key, key: "", superseded: false };
   });
-  const byStem = new Map(ms.map(m => [stemOf(m.name), m]));
-  // Up to three hops, as successorOf() in cards.ts: A -> B -> C puts A and B in C's family.
+  const byStem = new Map(ms.map(m => [m.stem, m]));
   for (const m of ms) {
-    let cur = m;
-    for (let hop = 0; hop < 3 && cur.supersededBy; hop++) {
-      const next = byStem.get(stemOf(cur.supersededBy));
-      if (!next || next === m) break;
-      m.superseded = true; m.key = next.key; cur = next;
+    let end = m;
+    for (let hop = 0; hop < 3 && end.supersededBy; hop++) {
+      const next = byStem.get(stemOf(end.supersededBy));
+      if (!next || next === m || next === end) break;
+      end = next;
     }
+    m.superseded = end !== m;
+    m.key = end.own;
   }
   const groups = new Map<string, typeof ms>();
   for (const m of ms) groups.set(m.key, [...(groups.get(m.key) ?? []), m]);
@@ -153,15 +164,16 @@ export function families<T>(items: T[], view: (t: T) => Member, overrides: Map<s
     const heads: typeof ms = [];
     const rank = new Map<(typeof ms)[number], number>();
     for (const ed of new Set(g.map(m => m.edition))) {
-      const e = g.filter(m => m.edition === ed).sort(newer);
+      const e = byNewest(g.filter(m => m.edition === ed));
       e.forEach((m, i) => rank.set(m, i + 1));
       if (!e[0].superseded) heads.push(e[0]);
     }
     // Every edition's head superseded (a chain whose end sits in this family under another edition):
     // keep the best one so a family never vanishes.
-    if (!heads.length) heads.push([...g].sort(newer)[0]);
-    const lead = [...heads].sort((a, b) => Number(b.eligible) - Number(a.eligible) || (a.edition === "" ? -1 : b.edition === "" ? 1 : 0)
-      || (a.edition === "sharable" ? -1 : b.edition === "sharable" ? 1 : 0) || newer(a, b))[0];
+    if (!heads.length) heads.push(byNewest(g)[0]);
+    // The lead: eligible first, then the default edition, then sharable, then the newest.
+    const order = byNewest(heads, g), pref = (m: (typeof ms)[number]) => (m.eligible ? 0 : 4) + (m.edition === "" ? 0 : m.edition === "sharable" ? 1 : 2);
+    const lead = [...order].sort((a, b) => pref(a) - pref(b) || order.indexOf(a) - order.indexOf(b))[0];
     for (const m of g) out.set(m.t, {
       key, edition: m.edition, version: m.version, size: g.length, rank: rank.get(m)!, head: heads.includes(m),
       canonical: m === lead, older: g.length - heads.length, superseded: m.superseded,
@@ -183,10 +195,10 @@ export function editionScore(edition: string, want: { sending: boolean; japan: b
   return s;
 }
 
-/** -1 / 0 / 1, numerically: [3] > [2, 5], [1, 10] > [1, 9], [2] = [2, 0]. */
+/** -1 / 0 / 1, numerically and as Postgres compares int[]: [3] > [2, 5], [1, 10] > [1, 9], [2, 0] > [2]. */
 export function compareVersion(a: number[], b: number[]): number {
   for (let i = 0; i < Math.max(a.length, b.length); i++) {
-    const x = a[i] ?? 0, y = b[i] ?? 0;
+    const x = a[i] ?? -1, y = b[i] ?? -1;
     if (x !== y) return x > y ? 1 : -1;
   }
   return 0;
