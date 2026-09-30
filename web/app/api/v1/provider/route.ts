@@ -1,12 +1,13 @@
 import { resolveCaller, unauthorized } from "@/lib/apiauth";
 import { tiers, requestBody, type Tier } from "@/lib/agent-openai";
 
-/** GET /api/v1/provider (admin cookie or API token): which model providers are configured, in the order SAM
+/** GET /api/v1/provider (admin cookie or API token; a rep's cookie gets 403): which model providers are configured, in the order SAM
  *  tries them, whether each configured model exists for the key and answers a real SAM-shaped request
  *  (same body builder as ask(), tools included, so a model that cannot tool-call fails here, not in front
  *  of a rep). Server side only: the key never leaves the function; only its last 4 characters are shown. */
 export async function GET(req: Request) {
   const who = await resolveCaller(req); if (!who) return unauthorized();
+  if (who.via === "cookie" && !who.admin) return Response.json({ error: "Admins only." }, { status: 403 });
   const ts = tiers();
   const claude = process.env.ANTHROPIC_API_KEY ? (process.env.CLAUDE_MODEL ?? "claude-sonnet-5") : null;
   const order = [...ts.flatMap(t => t.models.map(m => `${m} (${t.provider})`)), ...(claude ? [`${claude} (anthropic)`] : []), "retrieval only"];
