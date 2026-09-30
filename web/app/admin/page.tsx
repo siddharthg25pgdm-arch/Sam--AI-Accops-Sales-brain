@@ -100,7 +100,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<SP
         {tab === "quality" && d && <Quality d={d} sp={sp} days={days} includeTest={includeTest} href={href} />}
         {tab === "content" && d && <Content d={d} />}
         {tab === "requests" && d && <RequestsTab d={d} sp={sp} days={days} includeTest={includeTest} href={href} />}
-        {tab === "system" && <System includeTest={includeTest} />}
+        {tab === "system" && <System />}
         {tab === "conversations" && <Conversations sp={sp} days={days} includeTest={includeTest} href={href} />}
 
         <details className="defs" id="definitions">
@@ -707,9 +707,11 @@ function RequestItem({ r, others, back }: { r: RankedRequest; others: RankedRequ
 
 // ------------------------------------------------------------------------------------------- system
 
-async function System({ includeTest }: { includeTest: boolean }) {
-  const real = includeTest ? "" : realOnly();
-  const [regRows, sync, evidence] = await Promise.all([registry("sales", 5000), syncStatus(), providerEvidence(real || "id=gt.0")]);
+async function System() {
+  // Provider health is about the pipe, not about usage, so it reads every answer whatever the toggle:
+  // with real traffic only, "Last model answer: not recorded yet" showed while Groq answered test
+  // traffic daily (30 Sep: last real model answer = none, last model answer = 29 Sep).
+  const [regRows, sync, evidence] = await Promise.all([registry("sales", 5000), syncStatus(), providerEvidence("id=gt.0")]);
   await ready();
   const reg = cacheState(), cards = cardCacheState();
   const flowLast = regRows.map(r => r.last_synced).filter(Boolean).sort().reverse()[0] ?? null;
