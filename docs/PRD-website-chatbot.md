@@ -50,7 +50,7 @@ accops.com has 222 public pages and a set of public PDFs, but visitors have to f
 
 | Rule | Mechanism |
 |---|---|
-| The website reads public rows only | A Postgres role `sam_web` with `SELECT` on three views and nothing else: `sam_web_cards`, `sam_web_pages`, `sam_web_qa` (approved pairs only). It writes only through one `sam_web_log` function. **The website routes never load the service key** |
+| The website reads public rows only | **Built 30 Sep 2026 for the cards:** role `sam_web_reader` with `SELECT` on `sam_v1_public_assets` only, proven by `docs/supabase-sam-v1-public-proof.sql` (`docs/SALES-BRAIN-PLATFORM.md`); the pages and Q&A views join the same role when they exist. Originally specified as a Postgres role `sam_web` with `SELECT` on three views and nothing else: `sam_web_cards`, `sam_web_pages`, `sam_web_qa` (approved pairs only). It writes only through one `sam_web_log` function. **The website routes never load the service key** |
 | Internal columns stay hidden, even on public cards | `sam_web_cards` exposes title, type, industry, products, descriptive client, brief, outcomes, year and URL. Never `client_actual`, `key_problem`, `use_for`, `stale_risk` or `internal_reason` (rep-facing notes) |
 | Website visibility is deliberate | View filter: public/both, verified URL, not superseded, not expired, Accops-authored. Changing it is a visible data change, not a prompt edit |
 | Pages follow the carding boundary | The nightly carding job diffs the sitemaps by `lastmod`; Claude cards changed pages; the answer model sees cards only, as internally. This keeps a question at ~2,000 tokens |

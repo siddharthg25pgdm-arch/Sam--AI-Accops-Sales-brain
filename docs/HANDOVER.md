@@ -5,6 +5,23 @@ The 25 September section below supersedes anything older it contradicts.
 
 ---
 
+## 30 September 2026: the Sales Brain platform layer (v1 contract) + tracking everything
+
+| | |
+|---|---|
+| Contract | `docs/SALES-BRAIN-PLATFORM.md` is what any tool builds on: boundaries, data dictionary, API, auth, freshness, add-a-tool checklist |
+| Read model (Supabase) | `docs/supabase-sam-v1-brain.sql` (migrations `sam_v1_brain`, `sam_v1_public_rows`): `sam_v1_assets` (452 rows, 233 answerable), `sam_v1_families` (340), `sam_v1_changes` (change log fed by triggers on files, cards and requests, backfilled from existing timestamps, plus ratings), `sam_v1_public_assets` (11: published, accops.com URL, current, eligible, not expired or superseded). `sam_test_users` mirrors `SAM_TEST_USERS` for SQL |
+| Public surface | Role `sam_web_reader` (NOLOGIN, granted to authenticator): SELECT on the public view only. The rows come from a security-definer function because security_invoker views check the session role even behind a definer view (the first proof run failed exactly so). `docs/supabase-sam-v1-public-proof.sql`: 15 objects denied, 9 sensitive columns absent, anon denied everywhere. **Needs Siddharth: issue a JWT for the role (platform doc section 8)** |
+| API | `/api/v1/brain/{assets, assets/:id, families/:key, changes, public-assets, openapi.json}` (`web/lib/brain.ts`, bearer token). OpenAPI 3.1 generated from the served column lists → `docs/sales-brain-openapi.json` (`node web/scripts/brain-openapi.mjs`; `--md` prints the dictionary). Smoke with timings: `node web/scripts/brain-smoke.mjs [base]`. Check: `node web/lib/brain.check.mjs` (35) |
+| Ops log | `sam_ops_runs` (`docs/supabase-sam-ops.sql`): snapshot, carding_prep, carding (the skill's last step, `carding_prep.py --log-run`; live skill copy updated identically), cron, rollup (now nightly with the cron), digest. System tab: Scheduled jobs (last run, status, age, next expected); digest: a line when a daily job has not run in 30 h. `web/lib/ops.ts`, check `ops.check.mjs` (17) |
+| Tokens | `sam_events.tokens` from the answer trace; System tab: per day and model vs Groq 200k/day, OpenAI estimate from the price table in `ops.ts` (empty until production answers again) |
+| Metrics CSV | `sam_rollup_metrics` now uses the dashboard's definitions (IST days, test identities passed in, publish/unregistered and catalogue searches out). `docs/supabase-sam-metrics-parity.sql`: 30/30 days equal, 0 mismatches |
+| Dashboard | Errors = real errors; recovered fallbacks (provider_error answered by another model) shown apart (30 days incl. test: 5 real vs 95 recovered). 390 px tab bar wraps, CSV row visible. One "Content gaps" label everywhere; registry counts say what they count; zero states |
+| Owner decisions applied | Brand assets exempt from pre-2024 (cards.ts + SQL; family-parity 0 differences). The Tokyo "English v4" empty deck excluded via `sam_asset_family_overrides.exclude` (the Japanese deck leads); cards with confidence <= 0.5 and "empty"/"blank" in needs_human are ineligible. Note: the Tokyo card itself has confidence 0.95, so the general rule would not have caught it, the override does |
+| All checks | `node web/scripts/checks.mjs` runs every `lib/*.check.mjs` |
+
+---
+
 ## 30 September 2026: one document, one answer slot (families) + pre-2024 excluded
 
 | | |
