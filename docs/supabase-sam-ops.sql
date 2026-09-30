@@ -255,3 +255,7 @@ $$;
 -- policy change away from a leak.
 revoke execute on function sam_dashboard(int, boolean, text[], text) from public, anon, authenticated;
 grant execute on function sam_dashboard(int, boolean, text[], text) to service_role;
+
+-- Supabase advisor 0011 (migration sam_dashboard_search_path).
+alter function sam_dashboard(int, boolean, text[], text) set search_path = public, pg_catalog;
+alter function sam_usage_window(timestamptz, timestamptz, text[]) set search_path = public, pg_catalog;
