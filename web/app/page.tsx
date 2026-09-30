@@ -12,7 +12,9 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const user = await currentUser();
   if (!user) redirect("/login");
-  const assets = allAssets().map(slim);
+  // Reps browse what answers can use: the newest of each document, every edition, 2024 or later.
+  // Admins also see what is excluded, greyed, with the reason and a Pin button.
+  const assets = allAssets().filter(a => !a.family || (a.family.head && (a.family.eligible || user.admin))).map(slim);
   const facets = facetCounts();
   // Gaps that real people have asked about rank first in "Not available".
   const events = await recentEvents(500, `kind=eq.gap&${realOnly()}`);
@@ -30,7 +32,7 @@ export default async function Home() {
   return (
     <>
       <TopBar user={user} current="home" />
-      <Shell assets={assets} facets={facets} gaps={gaps} deliveries={deliveries} hasModel={Boolean(process.env.ANTHROPIC_API_KEY) || openAICompatConfigured()} />
+      <Shell assets={assets} facets={facets} gaps={gaps} deliveries={deliveries} admin={Boolean(user.admin)} hasModel={Boolean(process.env.ANTHROPIC_API_KEY) || openAICompatConfigured()} />
     </>
   );
 }

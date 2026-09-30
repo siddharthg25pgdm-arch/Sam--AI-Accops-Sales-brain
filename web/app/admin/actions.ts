@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { updateRequest, mergeRequests, promoteGap, type Status } from "@/lib/requests";
 import { clearDemotion } from "@/lib/feedback";
+import { setPin } from "@/lib/sharepoint";
+import { reloadPins } from "@/lib/cards-cache";
 
 async function admin() {
   const u = await currentUser();
@@ -46,6 +48,17 @@ export async function clearRank(fd: FormData) {
   const u = await admin();
   const ok = await clearDemotion(str(fd, "asset") ?? "", str(fd, "topic") ?? "", u.id);
   back(fd, ok ? { ok: "Demotion cleared. Search scores that document normally again for the topic." } : { err: "Could not clear the demotion. Try again." }, "demotions");
+}
+
+/** Keep a pre-2024 document in answers (sam_asset_pins), or take the pin away. The card cache reloads
+ *  so this instance answers with the change at once; others pick it up within their 5-minute TTL. */
+export async function pinAsset(fd: FormData) {
+  const u = await admin();
+  const key = str(fd, "key") ?? "", pin = str(fd, "pin") !== "0";
+  if (!/^(id|path):./.test(key)) back(fd, { err: "No such document." }, "excluded");
+  try { await setPin(key, pin, u.id, str(fd, "reason")); } catch { back(fd, { err: "Could not save the pin. Try again." }, "excluded"); }
+  await reloadPins().catch(() => undefined);
+  back(fd, { ok: pin ? "Pinned. SAM can answer with it again." : "Unpinned. It is excluded from answers again." }, "excluded");
 }
 
 export async function promote(fd: FormData) {

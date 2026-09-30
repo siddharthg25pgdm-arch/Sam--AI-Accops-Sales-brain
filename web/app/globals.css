@@ -440,6 +440,9 @@ details.ca[open] summary { display: none; }
 .rq-merge select { font: inherit; font-size: 13px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; padding: 5px 8px; max-width: 320px; }
 .btn-line { font: inherit; font-size: 13px; font-weight: 600; color: var(--ink) !important; background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; padding: 5px 11px; cursor: pointer; white-space: nowrap; }
 .btn-line:hover { border-color: var(--ink-3); }
+tr.muted td { color: var(--ink-3); }
+.tag.excluded { background: var(--surface); color: var(--ink-3); border: 1px dashed var(--line-2); }
+.doc.excluded { opacity: .55; }
 .dash .ok-note { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; font-size: 13.5px; margin: 0 0 16px; color: var(--ink); }
 .dash .ok-note::before { content: "✓ "; color: var(--good-ink); font-weight: 700; }
 .kpis.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }

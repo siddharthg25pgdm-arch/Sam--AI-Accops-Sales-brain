@@ -5,7 +5,7 @@ import { TrustNote } from "./Chat";
 
 type View = "all" | "latest" | "missing";
 
-export function Catalogue({ assets, facets, gaps, prefill }: { assets: SlimAsset[]; facets: Facets; gaps: Gap[]; prefill: { vertical?: string; type?: string; product?: string } | null }) {
+export function Catalogue({ assets, facets, gaps, prefill, admin = false }: { assets: SlimAsset[]; facets: Facets; gaps: Gap[]; prefill: { vertical?: string; type?: string; product?: string } | null; admin?: boolean }) {
   const [view, setView] = useState<View>("all");
   const [type, setType] = useState<string | null>(null);
   const [vertical, setVertical] = useState<string | null>(null);
@@ -64,7 +64,7 @@ export function Catalogue({ assets, facets, gaps, prefill }: { assets: SlimAsset
           {shelves.map(([name, list]) => (
             <div className="shelf" key={name}>
               <h3>{name} <span>{list.length}</span></h3>
-              <div className="grid">{list.map(a => <Doc key={a.key} a={a} />)}</div>
+              <div className="grid">{list.map(a => <Doc key={a.key} a={a} admin={admin} />)}</div>
             </div>
           ))}
         </>
@@ -100,15 +100,16 @@ function Facet({ label, items, value, onChange }: { label: string; items: [strin
 
 /** A real link stays an anchor; an asset with no verified URL renders as a plain card that shows where it lives. */
 function Wrap({ a, opened, children }: { a: SlimAsset; opened: () => void; children: React.ReactNode }) {
-  if (a.link) return <a className="doc" data-type={a.type} href={a.link} target="_blank" rel="noreferrer" onClick={opened}>{children}</a>;
-  return <div className="doc nolink" data-type={a.type} title={a.location ?? undefined}>{children}</div>;
+  const out = a.excluded ? " excluded" : "";
+  if (a.link) return <a className={`doc${out}`} data-type={a.type} href={a.link} target="_blank" rel="noreferrer" onClick={opened}>{children}</a>;
+  return <div className={`doc nolink${out}`} data-type={a.type} title={a.location ?? undefined}>{children}</div>;
 }
 
 // ponytail: matches trustNote()'s generic age sentence in lib/cards.ts. Half the catalogue carries it,
 // and a box on every other tile drowns the warnings that matter, so that one stays the small tag.
 const GENERIC_AGE = /^Published \d{4}; over two years old/;
 
-function Doc({ a }: { a: SlimAsset }) {
+function Doc({ a, admin }: { a: SlimAsset; admin: boolean }) {
   const note = a.trust && !GENERIC_AGE.test(a.trust) ? a.trust : null;
   function opened() { fetch("/api/open", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: a.key, source: "catalogue" }) }); }
   return (
@@ -123,6 +124,11 @@ function Doc({ a }: { a: SlimAsset }) {
           {!a.link && a.location && <span className="tag where">{a.location}</span>}
           {a.stale && !note && <span className="tag stale">Older than 2 years</span>}
           {!a.inventoried && <span className="tag gap">Not in inventory</span>}
+          {a.older ? <span className="tag">{a.older} older version{a.older === 1 ? "" : "s"} hidden</span> : null}
+          {/* Only admins are sent excluded documents (app/page.tsx). Pinning is a form, and neither a
+              form nor a link may sit inside the card's link, so this opens the Content tab's list. */}
+          {admin && a.excluded && <span className="tag excluded">Pre-2024, excluded ({a.excluded}) · <span role="link" tabIndex={0} style={{ textDecoration: "underline", cursor: "pointer" }}
+            onClick={e => { e.preventDefault(); e.stopPropagation(); location.href = "/admin?tab=content#excluded"; }}>Pin</span></span>}
         </div>
         <TrustNote note={note} />
       </div>

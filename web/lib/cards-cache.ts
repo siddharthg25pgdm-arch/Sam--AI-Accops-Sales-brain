@@ -103,6 +103,10 @@ export function familyOverrides(): Map<string, string> {
   return g.__samFamOv ?? NO_OV;
 }
 const EMPTY = new Set<string>(), NO_OV = new Map<string, string>();
+/** Re-read the pins now (an admin just pinned or unpinned). A new Set, so allAssets() recomputes. */
+export async function reloadPins(): Promise<void> {
+  g.__samPins = new Set((await pinRows()).map(p => p.asset_key));
+}
 
 /** Reload from Supabase. One in-flight load at a time; a failure keeps the previous contents. */
 export async function refreshCards(): Promise<number> {

@@ -656,6 +656,7 @@ export function slim(a: Asset): SlimAsset {
     products: productsOf(a), use_for: a.use_for, brief: a.brief || a.key_problem || "", year: yearOf(a), modified: a.file?.modified ?? null,
     stale: isStale(a), visibility: a.public_url ? "public" : "internal", link: assetLink(a), trust: trustNote(a), location: assetLocation(a), ext: a.file?.ext ?? null,
     pages: a.file?.pages ?? null, inventoried: a.inventory_id !== null,
+    older: a.family?.older ?? 0, edition: a.family?.edition ?? "", excluded: a.family && !a.family.eligible ? a.family.excluded : null, pin_key: pinKey(a),
   };
 }
 

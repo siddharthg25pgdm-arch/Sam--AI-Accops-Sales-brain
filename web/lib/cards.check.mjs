@@ -143,4 +143,22 @@ assert.deepEqual(queryTokens("bhai urgent hyworks brocher bhejo customer ko abhi
   assert.equal(titles("zeta hysecure demo video")[0], "Zeta Geofencing control", "hysecure matches its feature words");
 }
 
+{
+  // 12. PostgREST caps a response at 1,000 rows whatever `limit` says. The registry must page past it.
+  const { registry, cardRows } = await jiti.import("./sharepoint.ts");
+  const many = Array.from({ length: 2345 }, (_, i) => row(`M${i}`, "Bulk", `Zeta bulk ${i}.pdf`));
+  const seen = [];
+  globalThis.fetch = async (url) => {
+    const u = new URL(String(url)); if (u.pathname.includes("sam_sharepoint_files")) seen.push(u.search);
+    const off = Number(u.searchParams.get("offset") ?? 0), lim = Math.min(Number(u.searchParams.get("limit") ?? 1000), 1000);
+    return new Response(JSON.stringify((u.pathname.includes("sam_asset_cards") ? [] : many).slice(off, off + lim)), { status: 200 });
+  };
+  const got = await registry("sales");
+  assert.equal(got.length, 2345, `registry pages past the 1,000-row cap: got ${got.length}`);
+  assert.equal(new Set(got.map(r => r.item_id)).size, 2345, "no row twice, none lost");
+  assert.ok(seen.every(s => /order=[^&]*item_id/.test(s)), "pages are ordered with a unique tiebreak");
+  assert.equal((await registry("sales", 1500)).length, 1500, "max is still honoured");
+  assert.deepEqual(await cardRows(), [], "an empty table is one request, no loop");
+}
+
 console.log("cards.check: ok");
