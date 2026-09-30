@@ -319,3 +319,10 @@ select q.item_id, q.filename, q.folder, q.web_url, q.modified_at, q.modified_by,
        a.canonical_filename
 from q left join sam_asset_families a on a.item_id = q.item_id
 where q.reason is not null;
+
+-- ---------------------------------------------------------------- hardening (Supabase advisor 0011)
+alter function sam_file_stem(text) set search_path = public, pg_catalog;
+alter function sam_family_parts(text) set search_path = public, pg_catalog;
+alter function sam_family_key(text) set search_path = public, pg_catalog;
+alter function sam_superseding_stem(text) set search_path = public, pg_catalog;
+alter function sam_family_newer(boolean, boolean, boolean, int, int[], timestamptz, boolean, text, boolean, boolean, boolean, int, int[], timestamptz, boolean, text) set search_path = public, pg_catalog;
