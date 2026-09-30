@@ -1,8 +1,8 @@
 import raw from "@/data/asset_cards.json";
 import { registryAssets, safeLink } from "./registry-cache";
-import { cardAssets, cardMeta, pinnedKeys, familyOverrides } from "./cards-cache";
+import { cardAssets, cardMeta, pinnedKeys, familyOverrides, excludedStems } from "./cards-cache";
 import { demotion } from "./feedback";
-import { families, editionScore, type FamilyInfo } from "./family";
+import { families, editionScore, stemOf, type FamilyInfo } from "./family";
 
 export type AssetFile = {
   path: string; ext: string; size_mb: number; pages: number | null; modified?: string; year?: string | null;
@@ -122,8 +122,14 @@ export function answerable(): Asset[] {
 
 /** The year answers start from. Owner's decision, 30 Sep 2026. */
 export const ELIGIBLE_FROM = 2024;
-/** Dated records stay whatever their year: a certificate, an analyst report, a regulation. */
-const EXEMPT_TYPE = /certif|analyst report|regulation|third-party research/i;
+/** Stay whatever their year: dated records (a certificate, an analyst report, a regulation) and, owner
+ *  30 Sep 2026, brand assets (logos, icons, email signatures, brand files). Testimonial videos do not. */
+const EXEMPT_TYPE = /certif|analyst report|regulation|third-party research|brand/i;
+/** The carding convention for an empty or blank document (ops/nightly-carding/SKILL.md): confidence at
+ *  most 0.5 and "empty" or "blank" in needs_human. sam_card_says_empty() in SQL. */
+export function cardSaysEmpty(confidence: number | null | undefined, needsHuman: string | null | undefined): boolean {
+  return Number(confidence ?? 1) <= 0.5 && /\b(?:empty|blank)\b/i.test(needsHuman ?? "");
+}
 /** The key a pin is stored under (sam_asset_pins.asset_key): the registry row when there is one, which
  *  survives a rename, else the path. The SQL view uses the same two forms. */
 export function pinKey(a: Asset): string {
@@ -138,6 +144,11 @@ function publishYear(a: Asset): number | null {
  *  SharePoint last saw the file modified stands in, and an unknown year is not eligible. */
 export function eligibility(a: Asset, pins: Set<string> = pinnedKeys()): { eligible: boolean; excluded: string | null; pinned: boolean } {
   const pinned = pins.has(pinKey(a));
+  // Out whatever the year or a pin: a human exclusion, or a card saying the file is empty.
+  const human = excludedStems().get(stemOf((a.file?.path ?? "").split("/").pop() || a.title));
+  if (human) return { eligible: false, excluded: human, pinned };
+  const m = a.carded ? metaOf(a) : undefined;
+  if (m && cardSaysEmpty(m.confidence, m.needs_human)) return { eligible: false, excluded: "the card says the file is empty", pinned };
   const doc = publishYear(a);
   const year = doc ?? (Number((a.file?.modified ?? "").slice(0, 4)) || null);
   if (pinned || EXEMPT_TYPE.test(a.asset_type) || (year != null && year >= ELIGIBLE_FROM)) return { eligible: true, excluded: null, pinned };

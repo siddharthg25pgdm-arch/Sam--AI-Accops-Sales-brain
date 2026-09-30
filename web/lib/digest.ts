@@ -41,6 +41,8 @@ export type DigestInput = {
   /** sam_asset_families rows for the files added and carded in the window: which are a new version
    *  of an existing document, and which are pre-2024 and so excluded from answers. */
   families?: FamilyRow[] | null;
+  /** Scheduled jobs that have not run in 30 h, or whose last run failed (jobHealth in lib/ops.ts). */
+  jobs?: HealthItem[] | null;
 };
 
 export type DigestRating = { kind: "wrong_asset" | "missing"; label: string; question: string; shown: string[]; who: string; at: string };
@@ -200,6 +202,7 @@ export function buildDigest(i: DigestInput): Digest {
     title: "The model provider is failing",
     detail: `${u.provider_failures} of ${u.model_attempted || u.questions} questions hit a provider failure in the last 24 hours${w?.model_attempted ? ` (7 days before: ${w.provider_failures} of ${w.model_attempted})` : ""}. Usually Groq's daily token limit; answers fall back to the smaller model or to retrieval.`,
   });
+  for (const j of i.jobs ?? []) health.push(j);
   if (!i.cardCount) health.push({ title: "The card cache is empty", detail: "SAM is answering from file names only. Check sam_asset_cards and the server log." });
   // The 60-day WhatsApp token dies silently: replies just stop. Three weeks' notice is enough time to
   // make a permanent system-user token (docs/TASK-whatsapp-meta-setup.md, section "Replace the token").

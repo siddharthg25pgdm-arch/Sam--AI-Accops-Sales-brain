@@ -1,0 +1,1252 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Accops Sales Brain API",
+    "version": "1.0.0",
+    "description": "Read-only v1 over the Sales Brain: SharePoint Sales Collateral (via Power Automate) -> Supabase registry -> nightly carding -> families and eligibility. Contract: docs/SALES-BRAIN-PLATFORM.md. Additive changes only within v1; a breaking change ships as /api/v2."
+  },
+  "servers": [
+    {
+      "url": "https://sam-accops.vercel.app/api/v1/brain"
+    },
+    {
+      "url": "http://localhost:3700/api/v1/brain"
+    }
+  ],
+  "security": [
+    {
+      "bearer": []
+    }
+  ],
+  "paths": {
+    "/assets": {
+      "get": {
+        "operationId": "listAssets",
+        "summary": "Assets, filtered and paged",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Free text: SAM's own ranking over answerable assets (current + eligible), best first",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "asset_type, case-insensitive exact",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "industry",
+            "in": "query",
+            "required": false,
+            "description": "industry, case-insensitive exact",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "product",
+            "in": "query",
+            "required": false,
+            "description": "products contains, exact (HySecure, HyID, HyWorks, ZTNA, MFA, VDI, DaaS, ...)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "family",
+            "in": "query",
+            "required": false,
+            "description": "family_key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "required": false,
+            "description": "public | internal",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "public",
+                "internal"
+              ]
+            }
+          },
+          {
+            "name": "current",
+            "in": "query",
+            "required": false,
+            "description": "is_current",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "eligible",
+            "in": "query",
+            "required": false,
+            "description": "eligible",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "answerable",
+            "in": "query",
+            "required": false,
+            "description": "answerable",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "carded",
+            "in": "query",
+            "required": false,
+            "description": "carded",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "description": "updated_at >= since (ISO 8601); orders by updated_at",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "1-200, default 50",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Rows to skip, default 0",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "page"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Asset"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/Page"
+                    },
+                    "query": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/assets/{id}": {
+      "get": {
+        "operationId": "getAsset",
+        "summary": "One asset, with the other members of its family",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "asset_id, URL-encoded (id:... or path:...)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/Asset"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "family_members": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/Member"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/families/{key}": {
+      "get": {
+        "operationId": "getFamily",
+        "summary": "One family and all its members",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/Family"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "members": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/Member"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/changes": {
+      "get": {
+        "operationId": "listChanges",
+        "summary": "What changed since a point in time, oldest first",
+        "description": "Poll with the `next` cursor from the previous response (since + after). Without since: from the beginning of the log.",
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "description": "Exclusive lower bound on at (ISO 8601)",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "description": "change_id tie-break for since (from next.after)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entity",
+            "in": "query",
+            "required": false,
+            "description": "file | card | request | answer",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "file",
+                "card",
+                "request",
+                "answer"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "1-200, default 50",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "page",
+                    "next"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Change"
+                      }
+                    },
+                    "page": {
+                      "type": "object",
+                      "properties": {
+                        "limit": {
+                          "type": "integer"
+                        },
+                        "returned": {
+                          "type": "integer"
+                        },
+                        "more": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "next": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "since": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "after": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/public-assets": {
+      "get": {
+        "operationId": "listPublicAssets",
+        "summary": "Only what a customer may see (the website bot's world)",
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "description": "updated_at >= since",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "1-200, default 50",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Rows to skip, default 0",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "page"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PublicAsset"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/Page"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "operationId": "openapi",
+        "summary": "This document",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "A SAM API token (SAM_API_TOKENS on the server, label:token). A signed-in browser session also works."
+      }
+    },
+    "schemas": {
+      "Asset": {
+        "type": "object",
+        "required": [
+          "asset_id",
+          "family_key",
+          "edition",
+          "visibility",
+          "title",
+          "filename",
+          "asset_type",
+          "industry"
+        ],
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "description": "Stable id: 'id:<SharePoint item id>' for a registry file (survives rename and move), 'path:<card source>' for a card with no live file."
+          },
+          "item_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "SharePoint (Graph driveItem) id, null for a card with no live file."
+          },
+          "card_source": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The card's source path (corpus/...), null when the file is not carded."
+          },
+          "document_key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Same value for a PDF and a PPTX of the same document (twins)."
+          },
+          "family_key": {
+            "type": "string",
+            "description": "Every version, re-save and edition of one document shares it."
+          },
+          "edition": {
+            "type": "string",
+            "description": "'' default (internal/English/global), or 'sharable', 'japanese', 'japan', 'mea' and combinations."
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Version parsed from the filename ('2.3'), null when none."
+          },
+          "version_rank": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "1 = newest in its edition."
+          },
+          "is_current": {
+            "type": "boolean",
+            "description": "Newest in its edition (the only members answers may show)."
+          },
+          "is_family_lead": {
+            "type": "boolean",
+            "description": "The member that represents the family by default."
+          },
+          "superseded": {
+            "type": "boolean",
+            "description": "A hand-set superseded_by points at a successor that is in the library."
+          },
+          "family_size": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Documents in the family, this one included."
+          },
+          "family_older_versions": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Documents in the family that are not current in any edition."
+          },
+          "eligible": {
+            "type": "boolean",
+            "description": "May answer: published 2024+, or a certificate / analyst report / regulation / third-party research / brand asset, or pinned; never when excluded by hand or the card says the file is empty."
+          },
+          "excluded_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Why not eligible ('published 2021', 'year unknown, last modified 2022', 'empty file', ...), null when eligible."
+          },
+          "pinned": {
+            "type": "boolean",
+            "description": "An admin kept it in answers despite its age."
+          },
+          "answerable": {
+            "type": "boolean",
+            "description": "is_current AND eligible: what SAM's answers can use."
+          },
+          "visibility": {
+            "type": "string",
+            "description": "'public' = published (card visibility both, with a public URL); 'internal' = never send outside Accops."
+          },
+          "public_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The public link, when published."
+          },
+          "public_url_verified": {
+            "type": "boolean",
+            "description": "public_url is on an accops.com host (third-party papers are public but not ours)."
+          },
+          "sharepoint_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Verified SharePoint link (Graph web_url, viewer mode). Needs an Accops login; never forward outside Accops."
+          },
+          "title": {
+            "type": "string",
+            "description": "Card title, else the filename without extension."
+          },
+          "filename": {
+            "type": "string",
+            "description": "Current filename."
+          },
+          "folder": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Folder inside Sales Collateral, null for a card with no live file."
+          },
+          "ext": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "File extension, lowercase."
+          },
+          "asset_type": {
+            "type": "string",
+            "description": "Card type (Case Study, Whitepaper, Deck, Battlecard, Brochure, Datasheet, Certification, ...), else the folder/filename tag."
+          },
+          "industry": {
+            "type": "string",
+            "description": "Card industry, else the folder/filename tag; '' when none."
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Accops products the document covers."
+          },
+          "competitors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Competitors it names."
+          },
+          "regulations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Regulations it names (card only)."
+          },
+          "personas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Who it is for (card only)."
+          },
+          "publish_year": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Publication year read from the document body by carding, never from the filename."
+          },
+          "eligibility_year": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The year the pre-2024 rule used: publish_year, else the year SharePoint last saw it modified."
+          },
+          "expired": {
+            "type": "boolean",
+            "description": "The document states an expiry that has passed."
+          },
+          "expiry_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "That expiry."
+          },
+          "stale_risk": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Why it might mislead even though not expired (carding note)."
+          },
+          "superseded_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "'sharepoint/<newer file> - why', when carding found a newer edition."
+          },
+          "carded": {
+            "type": "boolean",
+            "description": "SAM has read it (a card exists)."
+          },
+          "client": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Descriptive, anonymised customer ('India's largest private bank'). Real names are never served."
+          },
+          "brief": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "What the document is, from the card."
+          },
+          "key_problem": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The problem it addresses (internal)."
+          },
+          "key_outcomes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Outcomes it states."
+          },
+          "use_for": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "When a rep should use it (internal)."
+          },
+          "confidence": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "The card writer's 0-1 estimate that the card is faithful."
+          },
+          "needs_human": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "What carding flagged for a person (internal)."
+          },
+          "internal_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Why it is internal (internal)."
+          },
+          "size_bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "File size."
+          },
+          "file_created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "SharePoint created."
+          },
+          "modified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "SharePoint last modified."
+          },
+          "modified_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Who last modified it in SharePoint."
+          },
+          "first_seen": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the registry first saw the file."
+          },
+          "last_synced": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the change flow last wrote the row."
+          },
+          "carded_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the card content last changed."
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Latest of modified_at, last_synced, carded_at: the since= filter."
+          }
+        }
+      },
+      "Family": {
+        "type": "object",
+        "required": [
+          "family_key",
+          "lead_asset_id",
+          "lead_title",
+          "lead_filename"
+        ],
+        "properties": {
+          "family_key": {
+            "type": "string",
+            "description": "The family."
+          },
+          "lead_asset_id": {
+            "type": "string",
+            "description": "The member that represents it."
+          },
+          "lead_title": {
+            "type": "string",
+            "description": "Its title."
+          },
+          "lead_filename": {
+            "type": "string",
+            "description": "Its filename."
+          },
+          "assets": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Asset rows (twins counted separately)."
+          },
+          "documents": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Documents (twins counted once)."
+          },
+          "older_versions": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Documents that are not current."
+          },
+          "answerable_assets": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Members answers can use."
+          },
+          "answerable": {
+            "type": "boolean",
+            "description": "At least one member is answerable."
+          },
+          "editions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Editions present ('' = default)."
+          },
+          "carded_documents": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Documents with a card."
+          },
+          "has_public_asset": {
+            "type": "boolean",
+            "description": "A current, eligible, published member on accops.com exists."
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Latest member update."
+          }
+        }
+      },
+      "Change": {
+        "type": "object",
+        "required": [
+          "change_id",
+          "entity",
+          "entity_id",
+          "change"
+        ],
+        "properties": {
+          "change_id": {
+            "type": "string",
+            "description": "Stable, sortable id ('log:000000001234', 'event:000000005678'). Tie-break for the cursor."
+          },
+          "at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When it happened."
+          },
+          "entity": {
+            "type": "string",
+            "description": "file | card | request | answer"
+          },
+          "entity_id": {
+            "type": "string",
+            "description": "file/card: the asset_id; request: 'request:<id>'; answer: 'event:<question event id>'."
+          },
+          "change": {
+            "type": "string",
+            "description": "file: added | modified | renamed | moved | status | deleted | restored. card: card_created | card_updated. request: request_created | request_status. answer: feedback."
+          },
+          "detail": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "filename/folder/scope; from/to for renames, moves and status; feedback kind; backfilled: true for history reconstructed on 30 Sep 2026."
+          }
+        }
+      },
+      "PublicAsset": {
+        "type": "object",
+        "required": [
+          "asset_id",
+          "family_key",
+          "edition",
+          "title",
+          "asset_type",
+          "industry",
+          "public_url"
+        ],
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "description": "As sam_v1_assets."
+          },
+          "family_key": {
+            "type": "string",
+            "description": "As sam_v1_assets."
+          },
+          "edition": {
+            "type": "string",
+            "description": "As sam_v1_assets."
+          },
+          "title": {
+            "type": "string",
+            "description": "Title."
+          },
+          "asset_type": {
+            "type": "string",
+            "description": "Type."
+          },
+          "industry": {
+            "type": "string",
+            "description": "Industry, '' when none."
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Products."
+          },
+          "client": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Descriptive, anonymised customer."
+          },
+          "brief": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "What it is."
+          },
+          "key_outcomes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Outcomes it states."
+          },
+          "publish_year": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Year from the document body."
+          },
+          "public_url": {
+            "type": "string",
+            "description": "The public link (accops.com)."
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Latest update."
+          }
+        }
+      },
+      "Member": {
+        "type": "object",
+        "description": "An asset's family view: a subset of Asset.",
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "description": "Stable id: 'id:<SharePoint item id>' for a registry file (survives rename and move), 'path:<card source>' for a card with no live file."
+          },
+          "title": {
+            "type": "string",
+            "description": "Card title, else the filename without extension."
+          },
+          "filename": {
+            "type": "string",
+            "description": "Current filename."
+          },
+          "folder": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Folder inside Sales Collateral, null for a card with no live file."
+          },
+          "edition": {
+            "type": "string",
+            "description": "'' default (internal/English/global), or 'sharable', 'japanese', 'japan', 'mea' and combinations."
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Version parsed from the filename ('2.3'), null when none."
+          },
+          "version_rank": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "1 = newest in its edition."
+          },
+          "is_current": {
+            "type": "boolean",
+            "description": "Newest in its edition (the only members answers may show)."
+          },
+          "is_family_lead": {
+            "type": "boolean",
+            "description": "The member that represents the family by default."
+          },
+          "superseded": {
+            "type": "boolean",
+            "description": "A hand-set superseded_by points at a successor that is in the library."
+          },
+          "eligible": {
+            "type": "boolean",
+            "description": "May answer: published 2024+, or a certificate / analyst report / regulation / third-party research / brand asset, or pinned; never when excluded by hand or the card says the file is empty."
+          },
+          "excluded_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Why not eligible ('published 2021', 'year unknown, last modified 2022', 'empty file', ...), null when eligible."
+          },
+          "answerable": {
+            "type": "boolean",
+            "description": "is_current AND eligible: what SAM's answers can use."
+          },
+          "visibility": {
+            "type": "string",
+            "description": "'public' = published (card visibility both, with a public URL); 'internal' = never send outside Accops."
+          },
+          "publish_year": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Publication year read from the document body by carding, never from the filename."
+          },
+          "modified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "SharePoint last modified."
+          }
+        }
+      },
+      "Page": {
+        "type": "object",
+        "required": [
+          "limit",
+          "offset",
+          "returned",
+          "next_offset"
+        ],
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "returned": {
+            "type": "integer"
+          },
+          "total": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "next_offset": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Pass as offset for the next page; null at the end."
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "A parameter is wrong; error says which.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "No or unknown bearer token.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "No such id or key.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  }
+}

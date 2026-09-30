@@ -122,6 +122,10 @@ const REG = [
   row("Q9", "Events", "v2026-06-30-Public-Shareable-Zeta Partner Bootcamp Deck.pptx", "Deck"),
   row("Q10", "Events", "v2026-09-04 - Zeta Partner Bootcamp Deck Japanese.pptx", "Deck"),
   row("Q11", "Logos", "zeta_logo@2x.png", "Brand", "2021-05-01T00:00:00Z"),
+  row("Q12", "Videos", "Zeta Case studies - CISO testimonial.mp4", "Video", "2022-03-01T00:00:00Z"),
+  row("Q13", "Events", "Zeta Tokyo Deck 2026 - English v4.pptx", "Deck"),
+  row("Q14", "Events", "Zeta Tokyo Deck 2026 - Japanese v4.pptx", "Deck"),
+  row("Q15", "Presentations", "Zeta Blank Template 2026.pptx", "Deck"),
 ];
 const CARDS = [
   card("Zeta Portfolio Deck 2021.pptx", "Q1", { title: "Zeta Portfolio Deck (2021)", asset_type: "Deck", publish_year: "2021", brief: "The 2021 zeta portfolio deck." }),
@@ -129,12 +133,15 @@ const CARDS = [
   card("RBI-2020-Zeta Cyber Framework.pdf", "Q3", { title: "RBI Cyber Security Framework for Zeta Banks (2020)", asset_type: "Regulation", publish_year: "2020", brief: "The RBI zeta cyber framework circular." }),
   card("Zeta vs Omega Battlecard.pptx", "Q4", { title: "Zeta vs Omega Battlecard (2022)", asset_type: "Battlecard", publish_year: "2022", competitors: ["Omega"], brief: "Zeta against Omega, feature by feature." }),
   card("Zeta vs Sigma Battlecard.pptx", "Q5", { title: "Zeta vs Sigma Battlecard (2022)", asset_type: "Battlecard", publish_year: "2022", competitors: ["Sigma"], brief: "Zeta against Sigma, feature by feature." }),
+  card("Zeta Blank Template 2026.pptx", "Q15", { title: "Zeta Blank Template", asset_type: "Deck", publish_year: "2026", confidence: 0.3, needs_human: "The file is empty: one blank slide.", brief: "An empty zeta deck." }),
 ];
 let pins = [];
+const OVERRIDES = [{ stem: "zetatokyodeck2026englishv4", family_key: "zetatokyodeck", exclude: true, reason: "empty file" }];
 globalThis.fetch = async (url, init = {}) => {
   const u = String(url);
   if (u.includes("groq.stub")) return Response.json({ choices: [{ message: { role: "assistant", content: "No Zeta battlecard for Omega exists.\nPICKS: none" } }], usage: { total_tokens: 10 } });
   if (u.includes("sam_asset_pins")) return Response.json(pins);
+  if (u.includes("sam_asset_family_overrides")) return Response.json(OVERRIDES);
   if (u.includes("sam_sharepoint_files")) return Response.json(REG);
   if (u.includes("sam_asset_cards")) return Response.json(CARDS);
   return Response.json([]);
@@ -152,7 +159,11 @@ const inAnswers = f => answerable().some(a => (a.file?.path ?? "").endsWith(f));
 ok(!inAnswers("Zeta Portfolio Deck 2021.pptx") && byFile("Zeta Portfolio Deck 2021.pptx").family.excluded === "published 2021", "a 2021 deck is excluded, and says why");
 ok(inAnswers("ISO Certificate- Zeta Systems.pdf"), "the 2021 ISO certificate stays (owner's decision)");
 ok(inAnswers("RBI-2020-Zeta Cyber Framework.pdf"), "a 2020 regulation stays");
-ok(!inAnswers("zeta_logo@2x.png") && byFile("zeta_logo@2x.png").family.excluded === "year unknown, last modified 2021", "an uncarded file with no document year falls back to modified");
+ok(inAnswers("zeta_logo@2x.png"), "a 2021 logo stays: brand assets are exempt (owner, 30 Sep)");
+ok(!inAnswers("Zeta Case studies - CISO testimonial.mp4") && byFile("Zeta Case studies - CISO testimonial.mp4").family.excluded === "year unknown, last modified 2022", "a 2022 testimonial video is excluded: an uncarded file with no document year falls back to modified");
+ok(!inAnswers("Zeta Tokyo Deck 2026 - English v4.pptx") && byFile("Zeta Tokyo Deck 2026 - English v4.pptx").family.excluded === "empty file"
+  && byFile("Zeta Tokyo Deck 2026 - Japanese v4.pptx").family.canonical && inAnswers("Zeta Tokyo Deck 2026 - Japanese v4.pptx"), "a hand-excluded empty English deck is out and the Japanese edition leads");
+ok(!inAnswers("Zeta Blank Template 2026.pptx") && byFile("Zeta Blank Template 2026.pptx").family.excluded === "the card says the file is empty", "a card saying the file is empty (low confidence) takes it out");
 ok(!inAnswers("Zeta Gateway Datasheet V4.pdf") && inAnswers("Zeta Gateway Datasheet V5 2026.pdf") && byFile("Zeta Gateway Datasheet V5 2026.pdf").family.older === 1, "the older version never answers; the newer counts it");
 ok(!inAnswers("Zeta vs Omega Battlecard.pptx") && !inAnswers("Zeta vs Sigma Battlecard.pptx"), "unpinned 2022 battlecards are excluded");
 ok(!searchAssets({ query: "zeta omega battlecard" }).results.some(h => /Omega/.test(h.asset.title)), "search never returns an excluded battlecard");

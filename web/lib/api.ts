@@ -4,6 +4,7 @@ import { searchAssets, allAssets, answerable, describe, slim, facetCounts, cover
 import { ask as askAgent, type AskResult } from "./agent";
 import { logEvent, recentEvents, realOnly } from "./events";
 import { ready } from "./registry-cache";
+import { traceTokens } from "./ops";
 
 export type Channel = "web" | "api" | "mcp" | "whatsapp";
 
@@ -51,7 +52,7 @@ export async function askAndLog(question: string, who: string, channel: Channel,
   const eventId = await logEvent({ user_id: who, channel, session_id: sessionId ?? null, kind: "query", query: question, intent: r.intent, filters: r.filters,
     result_count: r.assets.length, result_ids: r.assets.map(a => a.path ?? a.title), result_titles: r.assets.map(a => a.title),
     runtime: r.runtime, model: r.model, answer: r.text, error_kind: r.error?.kind ?? null, error_detail: r.error?.detail ?? null,
-    latency_ms: Date.now() - t0 });
+    latency_ms: Date.now() - t0, tokens: traceTokens(r.trace) });
   // missing, not zero: substitutes shown for an absent document are still a gap in the library.
   if (r.missing) await logEvent({ user_id: who, channel, session_id: sessionId ?? null, kind: "gap", query: question, filters: r.filters, ref_event_id: eventId });
   return { r, eventId };

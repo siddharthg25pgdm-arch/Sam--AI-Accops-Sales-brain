@@ -563,8 +563,43 @@
     </div>
   </div>
 
+  <!-- ============================================================ 4. PLATFORM (30 Sep) -->
+  <h2>4 · The platform layer: one contract for every tool</h2>
+  <p class="lede">Added 30 September 2026. Both gaps above are closed (the carding queue and nightly carding; the daily snapshot flow in write mode). On top of the two pipelines sits a versioned read model, so SAM chat, the digest, the website bot, Dwight or a content engine read the same answers without re-implementing families, eligibility or visibility. Contract: <code>docs/SALES-BRAIN-PLATFORM.md</code>.</p>
+
+  <div class="cards c3">
+    <div class="card">
+      <p class="eyebrow">Read model</p>
+      <div class="card-header"><span class="dot ink"></span><h3>v1 views in Supabase</h3></div>
+      <ul>
+        <li><code>sam_v1_assets</code>: one row per file or card, current copy, eligible, visibility, trust notes</li>
+        <li><code>sam_v1_families</code>: every version and edition of one document</li>
+        <li><code>sam_v1_changes</code>: what changed and when, fed by triggers</li>
+        <li><code>/api/v1/brain/*</code> with a bearer token; OpenAPI 3.1</li>
+      </ul>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Public surface</p>
+      <div class="card-header"><span class="dot coral"></span><h3>Only what a customer may see</h3></div>
+      <ul>
+        <li><code>sam_v1_public_assets</code>: published, accops.com link, current, eligible, not expired (11 today)</li>
+        <li>Role <code>sam_web_reader</code> can read that and nothing else (proof script)</li>
+        <li>Never real customer names, internal notes or SharePoint links</li>
+      </ul>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Tracking</p>
+      <div class="card-header"><span class="dot muted"></span><h3>Every job leaves a row</h3></div>
+      <ul>
+        <li><code>sam_ops_runs</code>: snapshot, carding, cron, rollup, digest</li>
+        <li>30 hours without a run shows on System and in the digest</li>
+        <li>Tokens per answer, per day and model against the Groq quota</li>
+      </ul>
+    </div>
+  </div>
+
   <div class="footer">
-    <span>Traced from web/lib, web/app/api and prototype/ at commit c5d9d53</span>
+    <span>Traced from web/lib, web/app/api and prototype/ at commit c5d9d53; section 4 added 30 Sep 2026</span>
     <span>Live counts from Supabase, 24 Sep 2026</span>
   </div>
 

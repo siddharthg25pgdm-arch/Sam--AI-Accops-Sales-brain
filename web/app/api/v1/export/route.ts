@@ -1,5 +1,7 @@
 import { resolveCaller, unauthorized } from "@/lib/apiauth";
 import { daily, rollup } from "@/lib/metrics";
+import { testUsers } from "@/lib/events";
+import { logRun } from "@/lib/ops";
 import { registry } from "@/lib/sharepoint";
 import { ready } from "@/lib/registry-cache";
 import { allAssets, assetLink } from "@/lib/cards";
@@ -45,7 +47,9 @@ export async function GET(req: Request) {
   } else {
     // The admin page used to refresh the rollup on every render; it reads sam_dashboard now, so the
     // export refreshes its own recent window instead. Real traffic only (see the rollup SQL).
-    await rollup(3);
+    // The dashboard's test identities, so the CSV counts what the dashboard counts.
+    const started = new Date().toISOString(), n = await rollup(3, testUsers());
+    await logRun({ job: "rollup", started_at: started, status: n == null ? "failed" : "ok", summary: n == null ? "sam_rollup_metrics failed" : `${n} day x channel rows, last 3 days`, details: { trigger: "export", by: who.id } });
     const d = await daily(90);
     rows = [["day", "channel", "queries", "users", "sessions", "gaps", "zero_results",
              "catalogue_opens", "feedback_total", "feedback_helpful", "p50_ms", "p95_ms", "max_ms"]];

@@ -7,6 +7,7 @@ import { listRequests, unrequestedGaps, ACTIVE, type Status } from "@/lib/reques
 import { cardedSince, cardingQueue, changedSince, familyRows, lastFlowWrite, syncStatus } from "@/lib/sharepoint";
 import { cardsReady, cardCacheState } from "@/lib/cards-cache";
 import { loadRatings } from "@/lib/feedback";
+import { jobHealth, jobStates, logRun, recentRuns } from "@/lib/ops";
 
 export const maxDuration = 30;
 export const dynamic = "force-dynamic";
@@ -56,7 +57,7 @@ export async function GET(req: Request) {
   };
 
   const users = testUsers();
-  const [all, gapEvents, changes, queue, carded, usage, usagePrev, flow, sync, , whatsapp, ratings] = await Promise.all([
+  const [all, gapEvents, changes, queue, carded, usage, usagePrev, flow, sync, , whatsapp, ratings, ops] = await Promise.all([
     safe("content requests", listRequests({ statuses: ALL })),
     safe("content gaps", recentEvents(1000, `kind=eq.gap&created_at=gte.${encodeURIComponent(new Date(t - 7 * 86_400_000).toISOString())}&${realOnly()}`)),
     safe("SharePoint changes", changedSince(since)),
@@ -70,6 +71,7 @@ export async function GET(req: Request) {
     whatsappToken(),
     // ?test=1 lets the ratings section include test traffic, to check it end to end from local dev.
     safe("ratings", loadRatings({ from: since, real: new URL(req.url).searchParams.get("test") !== "1", limit: 500 })),
+    safe("scheduled job log", recentRuns()),
   ]);
 
   // Families of what arrived: a new version of an existing document is reported apart from new content,
@@ -83,7 +85,14 @@ export async function GET(req: Request) {
     gaps: all && gapEvents ? unrequestedGaps(gapEvents, all.map(r => r.topic_key)) : null,
     changes, queue, carded, usage, usagePrev, lastFlowWrite: flow, sync,
     cardCount: cardCacheState().count, failed: [...new Set(failed)], whatsapp, ratings, families,
+    // The digest itself is running, so it is left out of its own job check.
+    jobs: ops ? jobHealth(jobStates(ops.runs, now, ops.since).filter(j => j.job !== "digest")) : null,
   });
+
+  // One run per fetch: the Power Automate flow calls this once a morning, so its absence is visible.
+  const url = new URL(req.url);
+  if (url.searchParams.get("test") !== "1") await logRun({ job: "digest", started_at: now, status: d.health.length ? "warn" : "ok", summary: d.subject,
+    details: { format: url.searchParams.get("format") ?? "html", health: d.health.map(h => h.title), failed: [...new Set(failed)] } });
 
   const headers = { "Cache-Control": "no-store", "X-SAM-Subject": d.subject };
   if (new URL(req.url).searchParams.get("format") === "json") return Response.json(d, { headers });

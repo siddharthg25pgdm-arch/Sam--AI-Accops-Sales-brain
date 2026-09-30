@@ -10,6 +10,7 @@ import { cardCacheState, cardAssets } from "@/lib/cards-cache";
 import { allAssets, assetLink, pinKey, eligibility, type Asset } from "@/lib/cards";
 import { apiPublishQueue } from "@/lib/api";
 import { tiers } from "@/lib/agent-openai";
+import { jobStates, recentRuns, tokenRows, tokenUsage, STALE_H, INPUT_SHARE } from "@/lib/ops";
 import { listRequests, unrequestedGaps, ACTIVE, NEXT, STATUS_LABEL, type RankedRequest, type Status } from "@/lib/requests";
 import { loadRatings, loadClears, latestRatings, learnDemotions, wrongAssetTally, verdictOf, FEEDBACK_LABEL, DEMOTE_DAYS, DEMOTE_MIN_REPS, DEMOTE_PENALTY, type FeedbackKind, type Rating } from "@/lib/feedback";
 import { saveRequest, mergeRequest, promote, clearRank, pinAsset } from "./actions";
@@ -41,6 +42,8 @@ function ago(iso?: string | null) {
   return h < 1 ? "under an hour ago" : h < 48 ? `${Math.round(h)} hours ago` : `${Math.round(h / 24)} days ago`;
 }
 const basename = (p: string) => p.split("/").pop()!.replace(/\.(pdf|pptx?|docx?|xlsx?)$/i, "");
+/** One label for a content gap, the same on Overview and Content: "BFSI · Case Study · ZTNA", "any" left out. */
+const gapLabel = (g: { vertical: string; type: string; product: string }) => [g.vertical, g.type, g.product].filter(x => x && x !== "any").join(" · ") || "Anything (no type, industry or product)";
 
 export default async function Admin({ searchParams }: { searchParams: Promise<SP> }) {
   const user = await currentUser();
@@ -167,7 +170,10 @@ function rates(d: Dashboard) {
     answered: [ratio(c.answered, c.questions), ratio(p.answered, p.questions)] as const,
     engaged: [ratio(c.engaged, c.web_answered), ratio(p.engaged, p.web_answered)] as const,
     helpful: [ratio(c.helpful, c.rated), ratio(p.helpful, p.rated)] as const,
-    errors: [ratio(c.errors, c.instrumented), ratio(p.errors, p.instrumented)] as const,
+    // Real errors: the rep saw a failure or a degraded answer. A recovered fallback (provider_error: one
+    // provider failed and another model answered) is counted apart - it is invisible to the rep.
+    errors: [ratio((c.errors ?? 0) - (c.recovered ?? 0), c.instrumented), ratio((p.errors ?? 0) - (p.recovered ?? 0), p.instrumented)] as const,
+    recovered: [ratio(c.recovered, c.instrumented), ratio(p.recovered, p.instrumented)] as const,
     fallback: [ratio(c.fallback, c.model_attempted), ratio(p.fallback, p.model_attempted)] as const,
   };
 }
@@ -229,16 +235,17 @@ async function Overview({ d, days, href, includeTest }: { d: Dashboard; days: nu
           foot={<>{(q / days).toFixed(1)} a day on average</>} />
         <Kpi label="Answered" value={<RateValue r={r.answered[0]} />} viz={<Meter pct={r.answered[0].pct} label="Answered" />}
           deltaEl={<DeltaText d={rateDelta(r.answered[0], r.answered[1])} prevLabel={prevLabel} />}
-          foot={<>n = {num(q)} questions</>} />
+          foot={q ? <>n = {num(q)} questions</> : <>No questions yet</>} />
         <Kpi label="Engaged" value={<RateValue r={r.engaged[0]} />} viz={<Meter pct={r.engaged[0].pct} label="Engaged" />}
           deltaEl={<DeltaText d={rateDelta(r.engaged[0], r.engaged[1])} prevLabel={prevLabel} />}
-          foot={<>of {num(c.web_answered)} web answers, opened or rated helpful</>} />
-        <Kpi label="Error rate" value={<RateValue r={r.errors[0]} />} viz={<Meter pct={r.errors[0].pct} label="Error rate" />}
+          foot={c.web_answered ? <>of {num(c.web_answered)} web answers, opened or rated helpful</> : <>No web answers yet</>} />
+        <Kpi label="Errors" value={<RateValue r={r.errors[0]} />} viz={<Meter pct={r.errors[0].pct} label="Errors" />}
           deltaEl={<DeltaText d={rateDelta(r.errors[0], r.errors[1])} goodWhen="down" prevLabel={prevLabel} />}
-          foot={(c.instrumented ?? 0) === 0 ? <>Recording {d.instrumented_since ? `since ${fmtDate(d.instrumented_since)}` : "starts with this release"}</> : <>n = {num(c.instrumented)} recorded questions</>} />
+          foot={(c.instrumented ?? 0) === 0 ? <>Recording {d.instrumented_since ? `since ${fmtDate(d.instrumented_since)}` : "starts with this release"}</>
+            : <>that the rep saw · n = {num(c.instrumented)}<br /><b className="tnum">{num(c.recovered ?? 0)}</b> recovered fallbacks not counted: another model answered</>} />
         <Kpi label="Response time, p95" value={<b className="kv">{c.p95 == null ? "–" : ms(c.p95)}</b>}
           deltaEl={<DeltaText d={(c.latency_n ?? 0) >= MIN_N && (p.latency_n ?? 0) >= MIN_N ? delta(c.p95 ?? null, p.p95 ?? null, "%") : null} goodWhen="down" prevLabel={prevLabel} />}
-          foot={<>p50 {ms(c.p50)} · n = {num(c.latency_n)}</>} />
+          foot={c.latency_n ? <>p50 {ms(c.p50)} · n = {num(c.latency_n)}</> : <>No timed answers yet</>} />
       </div>
 
       <RequestsStrip d={d} includeTest={includeTest} href={href} />
@@ -254,10 +261,10 @@ async function Overview({ d, days, href, includeTest }: { d: Dashboard; days: nu
               <tbody>{d.top_questions.slice(0, 8).map(t => <tr key={t.key}><td>{t.key}</td><td className="r">{t.n}</td><td className="r">{t.people}</td><td className="r">{t.answered}</td></tr>)}</tbody></table>
           )}
         </Section>
-        <Section title="Gaps worth filling" sub="What people asked for and did not get, ranked by how many different people asked." aside={<Link className="more" href={href({ tab: "content" })}>All gaps</Link>}>
+        <Section title="Content gaps" sub="Asked for, not in the library, ranked by how many different people asked. The same list as the Content tab." aside={<Link className="more" href={href({ tab: "content" })}>All content gaps</Link>}>
           {worklist.length === 0 ? <Empty>Nothing went unanswered in this period.</Empty> : (
             <table><thead><tr><th>Wanted</th><th className="r">People</th><th className="r">Asks</th></tr></thead>
-              <tbody>{worklist.slice(0, 6).map(g => <tr key={g.key}><td>{[g.vertical, g.type, g.product].filter(x => x && x !== "any").join(" · ") || "Unspecified"}<div className="subline">{g.examples[0]}</div></td><td className="r">{g.users.length}</td><td className="r">{g.asks}</td></tr>)}</tbody></table>
+              <tbody>{worklist.slice(0, 6).map(g => <tr key={g.key}><td>{gapLabel(g)}<div className="subline">{g.examples[0]}</div></td><td className="r">{g.users.length}</td><td className="r">{g.asks}</td></tr>)}</tbody></table>
           )}
         </Section>
       </div>
@@ -330,11 +337,12 @@ async function Quality({ d, sp, days, includeTest, href }: { d: Dashboard; sp: S
     <>
       {ok && <p className="ok-note" role="status">{ok}</p>}
       {err && <div className="notice" role="alert">{err}</div>}
-      <div className="kpis five">
+      <div className="kpis">
         <Kpi label="Answered" value={<RateValue r={r.answered[0]} />} viz={<Meter pct={r.answered[0].pct} label="Answered" />} foot={<Of r={r.answered[0]} what="questions" />} />
         <Kpi label="Engaged" value={<RateValue r={r.engaged[0]} />} viz={<Meter pct={r.engaged[0].pct} label="Engaged" />} foot={<Of r={r.engaged[0]} what="web answers" />} />
         <Kpi label="Rated helpful" value={<RateValue r={r.helpful[0]} />} viz={<Meter pct={r.helpful[0].pct} label="Rated helpful" />} foot={<Of r={r.helpful[0]} what="ratings" />} />
-        <Kpi label="Error rate" value={<RateValue r={r.errors[0]} />} viz={<Meter pct={r.errors[0].pct} label="Error rate" />} foot={<Of r={r.errors[0]} what="recorded questions" />} />
+        <Kpi label="Errors" value={<RateValue r={r.errors[0]} />} viz={<Meter pct={r.errors[0].pct} label="Errors" />} foot={<Of r={r.errors[0]} what="recorded questions" />} />
+        <Kpi label="Recovered fallbacks" value={<RateValue r={r.recovered[0]} />} viz={<Meter pct={r.recovered[0].pct} label="Recovered fallbacks" />} foot={<>another model answered · <Of r={r.recovered[0]} what="recorded questions" /></>} />
         <Kpi label="Fallback rate" value={<RateValue r={r.fallback[0]} />} viz={<Meter pct={r.fallback[0].pct} label="Fallback rate" />} foot={<Of r={r.fallback[0]} what="model attempts" />} />
       </div>
       {(c.instrumented ?? 0) < (c.questions ?? 0) && (
@@ -344,7 +352,7 @@ async function Quality({ d, sp, days, includeTest, href }: { d: Dashboard; sp: S
         </p>
       )}
 
-      <Section title="What went wrong" sub="Each question is counted once, under the worst thing that happened while answering it.">
+      <Section title="What went wrong" sub="Each question is counted once, under the worst thing that happened while answering it. “provider error” is a recovered fallback (another model answered, the rep saw nothing); every other kind is a real error.">
         {errTotal === 0 ? <Empty>{(c.instrumented ?? 0) === 0 ? "No questions have been recorded with error tracking in this period yet." : `No errors in ${num(c.instrumented)} recorded questions.`}</Empty> : (
           <table><thead><tr><th>Kind</th><th className="r">Questions</th><th className="r">Share</th><th>Last seen</th><th>Last detail</th></tr></thead>
             <tbody>{d.errors.map(e => (
@@ -501,7 +509,7 @@ async function Content({ d, sp }: { d: Dashboard; sp: SP }) {
       {err && <div className="notice" role="alert">{err}</div>}
       <PublishQueue q={pubQueue} />
       <div className="kpis four">
-        <Kpi label="Tracked in SharePoint" value={<b className="kv">{num(regRows.length)}</b>} foot="registry rows, not deleted" />
+        <Kpi label="Tracked in SharePoint" value={<b className="kv">{num(regRows.length)}</b>} foot={`registry files, not deleted: ${num(regRows.filter(r => r.status !== "archived").length)} active (the registry CSV), ${num(regRows.filter(r => r.status === "archived").length)} in archive folders`} />
         <Kpi label="Answerable" value={<b className="kv">{num(answerable.length)}</b>} foot={`newest of each document; ${num(olderHidden)} older versions and ${num(excluded.length)} pre-2024 left out`} />
         <Kpi label="With a working link" value={<b className="kv">{num(linked)}</b>} foot={answerable.length ? `${Math.round((linked / answerable.length) * 100)}% of answerable` : ""} />
         {/* The real coverage number: everything else is findable by name but cannot be reasoned
@@ -527,12 +535,12 @@ async function Content({ d, sp }: { d: Dashboard; sp: SP }) {
         )}
       </Section>
 
-      <Section title="Content gaps, ranked by demand" sub="Ranked by how many different people asked, not how many times: one person rephrasing is not demand.">
+      <Section title="Content gaps" sub="Asked for, not in the library, ranked by how many different people asked, not how many times: one person rephrasing is not demand. The Requests tab shows which of these nobody has asked marketing for.">
         {worklist.length === 0 ? <Empty>Nothing has gone unanswered in this period.</Empty> : (
-          <table><thead><tr><th>Industry</th><th>Type</th><th>Product</th><th className="r">People</th><th className="r">Asks</th><th>What they typed</th><th>Last asked</th></tr></thead>
+          <table><thead><tr><th>Wanted</th><th className="r">People</th><th className="r">Asks</th><th>What they typed</th><th>Last asked</th></tr></thead>
             <tbody>{worklist.slice(0, 15).map(g => (
               <tr key={g.key}>
-                <td>{g.vertical}</td><td>{g.type}</td><td>{g.product || "–"}</td>
+                <td>{gapLabel(g)}</td>
                 <td className="r">{g.users.length}</td><td className="r">{g.asks}</td>
                 <td>
                   {g.examples[0]}
@@ -586,7 +594,7 @@ async function Content({ d, sp }: { d: Dashboard; sp: SP }) {
         {multi.length > 40 && <p className="note">Showing the 40 largest of {num(multi.length)}.</p>}
       </Section>
 
-      <Section title="Excluded from answers" sub={<>Documents published before 2024 (read from the card; for an uncarded file, the year SharePoint last saw it modified). Certificates, analyst reports and regulations stay whatever their year. Excluded documents never answer and never stand in as a substitute, so a topic with only old material becomes an honest gap with the request button. <b>Pin</b> one that still holds.</>}
+      <Section title="Excluded from answers" sub={<>Documents published before 2024 (read from the card; for an uncarded file, the year SharePoint last saw it modified). Certificates, analyst reports, regulations and brand assets (logos, icons, email signatures) stay whatever their year. Files a human excluded (<code>sam_asset_family_overrides.exclude</code>) and files whose card says they are empty are out whatever their year or pin. Excluded documents never answer and never stand in as a substitute, so a topic with only old material becomes an honest gap with the request button. <b>Pin</b> one that still holds.</>}
         aside={<span className="count">{num(excluded.length)}</span>}>
         <div id="excluded" />
         {pinned.length > 0 && (
@@ -606,7 +614,7 @@ async function Content({ d, sp }: { d: Dashboard; sp: SP }) {
               <tbody>{[...excluded].sort((x, y) => (x.family!.excluded ?? "").localeCompare(y.family!.excluded ?? "")).map(a => (
                 <tr key={pinKey(a)} className="muted">
                   <td>{a.title}<div className="subline">{a.asset_type} · {(a.file?.path ?? "").split("/").pop()}</div></td>
-                  <td className="nowrap">pre-2024: {a.family!.excluded}</td>
+                  <td className="nowrap">{/^(published|year unknown)/.test(a.family!.excluded ?? "") ? "pre-2024: " : ""}{a.family!.excluded}</td>
                   <td className="r"><form action={pinAsset}><input type="hidden" name="key" value={pinKey(a)} /><input type="hidden" name="back" value="tab=content" /><button className="btn-line" type="submit">Pin</button></form></td>
                 </tr>
               ))}</tbody></table>
@@ -643,7 +651,7 @@ async function RequestsStrip({ d, includeTest, href }: { d: Dashboard; includeTe
       <Kpi label="Open content requests" value={<b className="kv">{num(active.length)}</b>} foot={<>{num(waiting)} {waiting === 1 ? "rep" : "reps"} waiting · <Link href={href({ tab: "requests" })}>Open the queue</Link></>} />
       <Kpi label="Most wanted" value={top ? <b className="kv small">{top.title}</b> : <b className="kv muted">–</b>}
         foot={top ? <>{top.demand} {top.demand === 1 ? "rep" : "reps"} · {STATUS_LABEL[top.status]}</> : "Nothing requested yet"} />
-      <Kpi label="Asked for, never requested" value={<b className="kv">{num(unrequested.length)}</b>} foot="content gaps nobody has turned into a request" />
+      <Kpi label="Content gaps nobody requested" value={<b className="kv">{num(unrequested.length)}</b>} foot="asked SAM, not in the library, never asked of marketing" />
     </div>
   );
 }
@@ -681,7 +689,7 @@ async function RequestsTab({ d, sp, days, includeTest, href }: { d: Dashboard; s
         )}
       </Section>
 
-      <Section title="Asked for, never requested" sub="The weaker, automatic signal: people asked SAM for these in this period and did not get them, but nobody asked marketing. Promote one to put it in the queue; the people who asked will hear when it is delivered.">
+      <Section title="Content gaps nobody has requested" sub="The weaker, automatic signal: content gaps (asked SAM, not in the library) in this period that nobody turned into a request to marketing. Promote one to put it in the queue; the people who asked will hear when it is delivered.">
         {gaps.length === 0 ? <Empty>Every content gap in this period is already a request, or there were none.</Empty> : (
           <table><thead><tr><th>Wanted</th><th className="r">People</th><th className="r">Asks</th><th>Last asked</th><th /></tr></thead>
             <tbody>{gaps.slice(0, 15).map(g => (
@@ -775,7 +783,11 @@ async function System() {
   // Provider health is about the pipe, not about usage, so it reads every answer whatever the toggle:
   // with real traffic only, "Last model answer: not recorded yet" showed while Groq answered test
   // traffic daily (30 Sep: last real model answer = none, last model answer = 29 Sep).
-  const [regRows, sync, evidence] = await Promise.all([registry("sales", 5000), syncStatus(), providerEvidence("id=gt.0")]);
+  const [regRows, sync, evidence, ops, toks] = await Promise.all([registry("sales", 5000), syncStatus(), providerEvidence("id=gt.0"),
+    recentRuns(), tokenRows(new Date(Date.now() - 8 * 86_400_000).toISOString())]);
+  const now = new Date().toISOString();
+  const jobs = ops ? jobStates(ops.runs, now, ops.since) : null;
+  const usage = tokenUsage(toks);
   await ready();
   const reg = cacheState(), cards = cardCacheState();
   const flowLast = regRows.map(r => r.last_synced).filter(Boolean).sort().reverse()[0] ?? null;
@@ -799,10 +811,13 @@ async function System() {
     { name: "Deletion check", state: delAgeH === null || delAgeH > 36 ? "bad" : "ok",
       value: sync?.last_run ? `Last run ${fmtTime(sync.last_run)} (${ago(sync.last_run)})` : "Never run",
       note: <>{sync?.last_result ? <>Result: {sync.last_result}. </> : null}Deletions are caught by the daily Power Automate snapshot flow; report-mode and refused runs show a result here but do not count as a check. Stale after 36 hours.</> },
-    { name: "Registry cache", state: reg.count ? "ok" : "bad", value: `${num(reg.count)} rows`, note: reg.loadedAt ? `Loaded ${fmtTime(new Date(reg.loadedAt).toISOString())} on this server instance` : "Not loaded" },
-    { name: "Card cache", state: cards.count ? "ok" : "bad", value: `${num(cards.count)} cards`, note: cards.loadedAt ? `Loaded ${fmtTime(new Date(cards.loadedAt).toISOString())} on this server instance` : "Not loaded" },
+    { name: "Registry cache", state: reg.count ? "ok" : "bad", value: `${num(reg.count)} usable files of ${num(regRows.length)} tracked`,
+      note: <>Usable = active, not in an archive folder, not a temp file, shortcut or CSV: what answers are built from. Tracked = every registry file not deleted (the Content tab&apos;s figure). {reg.loadedAt ? `Loaded ${fmtTime(new Date(reg.loadedAt).toISOString())} on this server instance.` : "Not loaded."}</> },
+    { name: "Card cache", state: cards.count ? "ok" : "bad", value: `${num(cards.count)} cards`, note: cards.loadedAt ? `Every row of sam_asset_cards. Loaded ${fmtTime(new Date(cards.loadedAt).toISOString())} on this server instance` : "Not loaded" },
   ];
   const label = { ok: "OK", warn: "Check", bad: "Needs attention", off: "Off" };
+  const hours = (h: number | null) => h == null ? "–" : h < 1 ? "under an hour" : h < 48 ? `${Math.round(h)} h` : `${Math.round(h / 24)} days`;
+  const days = [...new Set(usage.map(u => u.day))].slice(0, 7);
   return (
     <>
       <DeletionBanner />
@@ -816,6 +831,36 @@ async function System() {
           ))}
         </ul>
       </section>
+
+      <Section title="Scheduled jobs" sub={<>The last run of every daily job (<code>sam_ops_runs</code>). Not run for {STALE_H} hours shows here and in the morning digest, so a quiet day and a missed run look different. Times are India time.{ops?.since ? <> Run logging began {fmtDateY(ops.since)}.</> : null}</>}>
+        {!jobs ? <div className="notice">Could not read <code>sam_ops_runs</code>. Apply <code>docs/supabase-sam-ops.sql</code>; the server log has the status.</div> : (
+          <div className="scroll-x"><table><thead><tr><th>Job</th><th>Status</th><th>Last run</th><th className="r">Age</th><th>Next expected</th><th>Last result</th></tr></thead>
+            <tbody>{jobs.map(j => (
+              <tr key={j.job}>
+                <td>{j.label}<div className="subline">{j.writer}</div></td>
+                <td className="nowrap"><span className={`status ${j.state}`}><i aria-hidden="true" />{j.stale ? "Not run" : j.last ? j.last.status : "No run yet"}</span></td>
+                <td className="nowrap">{j.last ? fmtTime(j.last.started_at) : "–"}</td>
+                <td className="r nowrap">{hours(j.ageH)}</td>
+                <td className="nowrap">{fmtTime(j.next)}<div className="subline">daily {j.at}</div></td>
+                <td className="clip" title={j.last?.summary ?? ""}>{j.last?.summary || "–"}</td>
+              </tr>
+            ))}</tbody></table></div>
+        )}
+      </Section>
+
+      <Section title="Model tokens, last 7 days" sub={<>Tokens the answering model used per day (India time), test traffic included: it spends the same quota. Groq&apos;s free tier caps each model at about 200,000 tokens a day, after which SAM falls back to the next model. OpenAI has no daily cap; its cost is an estimate from the price table in <code>lib/ops.ts</code>, assuming {Math.round(INPUT_SHARE * 100)}% of tokens are prompt.</>}>
+        {usage.length === 0 ? <Empty>No answer has recorded tokens yet. Token recording began with this release; retrieval-only answers (local development) use none.</Empty> : (
+          <div className="scroll-x"><table><thead><tr><th>Day</th><th>Model</th><th>Provider</th><th className="r">Answers</th><th className="r">Tokens</th><th className="r">Of daily quota</th><th className="r">Est. cost</th></tr></thead>
+            <tbody>{usage.filter(u => days.includes(u.day)).map(u => (
+              <tr key={`${u.day}|${u.model}`}>
+                <td className="nowrap">{new Date(`${u.day}T00:00:00Z`).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" })}</td>
+                <td>{u.model}</td><td>{u.provider}</td><td className="r">{num(u.answers)}</td><td className="r tnum">{num(u.tokens)}</td>
+                <td className="r">{u.pctOfQuota == null ? "no daily cap" : <><span className={u.pctOfQuota >= 80 ? "pill warn" : ""}>{u.pctOfQuota}%</span><div className="subline">of {num(u.quota)}</div></>}</td>
+                <td className="r">{u.usd == null ? (u.quota ? "free tier" : "not in price table") : `USD ${u.usd.toFixed(2)}`}</td>
+              </tr>
+            ))}</tbody></table></div>
+        )}
+      </Section>
     </>
   );
 }

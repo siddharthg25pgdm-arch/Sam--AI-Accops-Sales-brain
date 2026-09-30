@@ -30,7 +30,7 @@ const TTL_MS = 5 * 60_000;
 const g = globalThis as unknown as {
   __samCards?: Asset[]; __samCardsAt?: number; __samCardsBusy?: boolean;
   __samCardMeta?: Map<string, CardRow>;
-  __samPins?: Set<string>; __samFamOv?: Map<string, string>;
+  __samPins?: Set<string>; __samFamOv?: Map<string, string>; __samExcl?: Map<string, string>;
 };
 
 /** Card row -> Asset.
@@ -102,6 +102,10 @@ export function pinnedKeys(): Set<string> {
 export function familyOverrides(): Map<string, string> {
   return g.__samFamOv ?? NO_OV;
 }
+/** Files a human took out of answers: filename stem -> reason (sam_asset_family_overrides.exclude). */
+export function excludedStems(): Map<string, string> {
+  return g.__samExcl ?? NO_OV;
+}
 const EMPTY = new Set<string>(), NO_OV = new Map<string, string>();
 /** Re-read the pins now (an admin just pinned or unpinned). A new Set, so allAssets() recomputes. */
 export async function reloadPins(): Promise<void> {
@@ -117,7 +121,10 @@ export async function refreshCards(): Promise<number> {
     // keeps the previous set and never costs SAM its cards.
     const [pins, ov] = await Promise.all([pinRows().catch(() => null), overrideRows().catch(() => null)]);
     if (pins) g.__samPins = new Set(pins.map(p => p.asset_key));
-    if (ov) g.__samFamOv = new Map(ov.map(o => [o.stem, o.family_key]));
+    if (ov) {
+      g.__samFamOv = new Map(ov.map(o => [o.stem, o.family_key]));
+      g.__samExcl = new Map(ov.filter(o => o.exclude).map(o => [o.stem, o.reason || "excluded by hand"]));
+    }
     const rows = await cardRows(2000);
     g.__samCards = rows.map(cardToAsset);
     // Two keys per card: `id:<item_id>` survives a rename, the filename covers unbound cards.

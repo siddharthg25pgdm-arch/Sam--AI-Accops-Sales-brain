@@ -1,4 +1,5 @@
 import { applySnapshot, configured, type Snapshot } from "@/lib/sharepoint";
+import { logRun } from "@/lib/ops";
 
 export const maxDuration = 60;
 
@@ -22,8 +23,11 @@ export async function POST(req: Request) {
   if (body.secret !== expected) return new Response("bad secret", { status: 401 });
   if (!configured()) return new Response("supabase not configured", { status: 503 });
 
+  const started = new Date().toISOString();
   const r = await applySnapshot(body);
   console.log(`sharepoint snapshot: ${r.result}`);
+  await logRun({ job: "snapshot", started_at: started, status: !r.ok ? "refused" : r.mode === "write" ? "ok" : "warn", summary: r.result,
+    details: { mode: r.mode, applied: r.applied, listed: r.listed, tombstoned: r.tombstone_count, restored: r.restore_count, unknown: r.unknown_count } });
   // A refusal is 409, so the flow run goes RED instead of green-while-nothing-happened. Power
   // Automate's default retry policy retries 408/429/5xx only, so a 409 is not re-sent.
   return Response.json(r, { status: r.ok ? 200 : 409 });
