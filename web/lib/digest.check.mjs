@@ -86,7 +86,12 @@ ok(!buildDigest({ ...base, lastFlowWrite: h(60) }).health.some(x => /change has 
 ok(sick.health.some(x => /never been checked/.test(x.title) && /report mode \(1 would tombstone\).*"write"/.test(x.detail)), "deletions never applied: report mode named, with the fix");
 ok(busy.lead.endsWith("2 new content requests since yesterday."), busy.lead);
 eq(sick.lead, "No new content requests. 5 things need a look, at the bottom.", "questions but no requests");
-eq(buildDigest({ ...base, lastFlowWrite: h(110) }).lead, "A quiet day. One thing needs a look, at the bottom.", "health only");
+// A silent flow is only an alarm when the snapshot can't vouch for it (stale, or it found unknown files).
+const dirty = { scope: "sales", last_run: h(10), last_result: "snapshot write: 0 tombstoned, 0 restored, 877 listed, 2 unknown" };
+eq(buildDigest({ ...base, lastFlowWrite: h(110), sync: dirty }).lead, "A quiet day. One thing needs a look, at the bottom.", "health only");
+ok(!buildDigest({ ...base, lastFlowWrite: h(120) }).health.some(x => /change has reached SAM/.test(x.title)), "a quiet week with a clean recent snapshot (0 unknown) is not an alarm");
+ok(buildDigest({ ...base, lastFlowWrite: h(120), sync: dirty }).health.some(x => /change has reached SAM/.test(x.title)), "silent flow + snapshot found unknown files = alarm");
+ok(buildDigest({ ...base, lastFlowWrite: h(120), sync: { ...healthy.sync, last_run: h(50) } }).health.some(x => /change has reached SAM/.test(x.title)), "silent flow + stale snapshot = alarm");
 ok(sick.subject.endsWith("5 things to check"), sick.subject);
 const fine = buildDigest({ ...base, lastFlowWrite: h(47), usage: { ...zero, questions: 20, model_attempted: 20, provider_failures: 3 } });
 eq(fine.health.length, 0, "47 h and 15% provider failures are not alarms");

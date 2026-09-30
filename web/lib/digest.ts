@@ -160,7 +160,12 @@ export function buildDigest(i: DigestInput): Digest {
   const health: HealthItem[] = [];
   if (i.failed.length) health.push({ title: `Could not read ${i.failed.join(", ")}`, detail: "Those parts are missing from this email, not empty. The server log has the error." });
   const flowH = hoursSince(i.lastFlowWrite, i.now);
-  if (flowH === null || flowH > FLOW_STALE_H) health.push({
+  // A silent change flow is only suspicious if something may have been missed. The nightly snapshot
+  // lists every file, so a recent clean one ("0 unknown": no file SAM doesn't know about) proves no
+  // addition was missed - the library was simply quiet. The first digest (30 Sep) cried wolf on this.
+  const snapH = hoursSince(i.sync?.last_run ?? null, i.now);
+  const snapshotClean = snapH !== null && snapH <= DELETIONS_STALE_H && /\b0 unknown\b/.test(i.sync?.last_result ?? "");
+  if (flowH === null || (flowH > FLOW_STALE_H && !snapshotClean)) health.push({
     title: flowH === null ? "The SharePoint change flow has never written" : `No SharePoint change has reached SAM for ${daysText(flowH)}`,
     detail: `${i.lastFlowWrite ? `Last write ${day(i.lastFlowWrite)}. ` : ""}If files were added or edited since, the Power Automate change flow is probably off, and SAM cannot link to anything new.`,
   });
