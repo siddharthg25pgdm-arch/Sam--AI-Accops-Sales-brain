@@ -105,7 +105,8 @@ export type FamilyInfo = {
   superseded: boolean;
 };
 
-const stemOf = (s: string) => s.toLowerCase().replace(/\.(pdf|pptx?|docx?|xlsx?)$/, "").replace(/[^a-z0-9]/g, "");
+/** The PDF/PPTX twin key (sam_file_stem in SQL): lowercase, one document extension off, [a-z0-9] only. */
+export const stemOf = (s: string) => s.toLowerCase().replace(/\.(pdf|pptx?|docx?|xlsx?)$/, "").replace(/[^a-z0-9]/g, "");
 
 /** True when `a` is newer than `b`: a hand-set superseded_by and "outdated" sink; then eligible; then
  *  publication year when both documents state one; then version when both files carry one; then

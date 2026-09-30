@@ -586,7 +586,7 @@ async function Content({ d, sp }: { d: Dashboard; sp: SP }) {
         {multi.length > 40 && <p className="note">Showing the 40 largest of {num(multi.length)}.</p>}
       </Section>
 
-      <Section title="Excluded from answers" sub={<>Documents published before 2024 (read from the card; for an uncarded file, the year SharePoint last saw it modified). Certificates, analyst reports and regulations stay whatever their year. Excluded documents never answer and never stand in as a substitute, so a topic with only old material becomes an honest gap with the request button. <b>Pin</b> one that still holds.</>}
+      <Section title="Excluded from answers" sub={<>Documents published before 2024 (read from the card; for an uncarded file, the year SharePoint last saw it modified). Certificates, analyst reports, regulations and brand assets (logos, icons, email signatures) stay whatever their year. Files a human excluded (<code>sam_asset_family_overrides.exclude</code>) and files whose card says they are empty are out whatever their year or pin. Excluded documents never answer and never stand in as a substitute, so a topic with only old material becomes an honest gap with the request button. <b>Pin</b> one that still holds.</>}
         aside={<span className="count">{num(excluded.length)}</span>}>
         <div id="excluded" />
         {pinned.length > 0 && (
@@ -606,7 +606,7 @@ async function Content({ d, sp }: { d: Dashboard; sp: SP }) {
               <tbody>{[...excluded].sort((x, y) => (x.family!.excluded ?? "").localeCompare(y.family!.excluded ?? "")).map(a => (
                 <tr key={pinKey(a)} className="muted">
                   <td>{a.title}<div className="subline">{a.asset_type} · {(a.file?.path ?? "").split("/").pop()}</div></td>
-                  <td className="nowrap">pre-2024: {a.family!.excluded}</td>
+                  <td className="nowrap">{/^(published|year unknown)/.test(a.family!.excluded ?? "") ? "pre-2024: " : ""}{a.family!.excluded}</td>
                   <td className="r"><form action={pinAsset}><input type="hidden" name="key" value={pinKey(a)} /><input type="hidden" name="back" value="tab=content" /><button className="btn-line" type="submit">Pin</button></form></td>
                 </tr>
               ))}</tbody></table>

@@ -337,10 +337,12 @@ export async function setPin(asset_key: string, pinned: boolean, by: string, rea
     body: JSON.stringify([{ asset_key, pinned_by: by, reason: reason || null }]) });
   else await rest(`sam_asset_pins?asset_key=eq.${encodeURIComponent(asset_key)}`, { method: "DELETE" });
 }
-/** Human corrections to family detection: this filename stem belongs to that family. */
-export async function overrideRows(): Promise<{ stem: string; family_key: string }[]> {
+/** Human corrections to family detection: this filename stem belongs to that family, and (exclude) is
+ *  out of answers whatever its year or pin, for `reason` ("empty file"). */
+export type OverrideRow = { stem: string; family_key: string; exclude: boolean; reason: string };
+export async function overrideRows(): Promise<OverrideRow[]> {
   if (!configured()) return [];
-  return restAll<{ stem: string; family_key: string }>(`sam_asset_family_overrides?select=stem,family_key&order=stem`);
+  return restAll<OverrideRow>(`sam_asset_family_overrides?select=stem,family_key,exclude,reason&order=stem`);
 }
 /** One row of the sam_asset_families view: a document's family, its place in it, and eligibility. */
 export type FamilyRow = {

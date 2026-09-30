@@ -1,4 +1,5 @@
--- SAM document families + answer eligibility. Applied 30 September 2026.
+-- SAM document families + answer eligibility. Applied 30 September 2026; eligibility v2 (Brand exempt,
+-- empty files out, human exclusions) applied 30 September 2026 as migration sam_eligibility_v2.
 -- Project: iwqhayuoxnrhqzozznes (shared - sam_ objects only).
 --
 -- The library holds the same document many times: v1/v2/V5, Big/Small/compressed, Final/Draft/(1),
@@ -133,6 +134,9 @@ create table if not exists sam_asset_family_overrides (
   created_at timestamptz not null default now()
 );
 alter table sam_asset_family_overrides enable row level security;
+-- exclude = a human took this file out of answers whatever its year or pin (reason says why). Owner, 30 Sep:
+-- the Nutanix .NEXT Tokyo "English v4" file is an empty deck and must not lead its family.
+alter table sam_asset_family_overrides add column if not exists exclude boolean not null default false;
 insert into sam_asset_family_overrides (stem, family_key, reason, set_by) values
   ('accopsindustrysolutionhealthcare', 'industrysolutionhealthcare2pager', 'The 2020 two-page one-pager, not the 43-slide healthcare deck v4', 'claude 30 Sep audit'),
   ('corporatedeck2026', 'corporatekeynote2026', 'A 20-slide CEO/CTO keynote (Jun 2026), not an edition of the corporate presentation', 'claude 30 Sep audit'),
@@ -141,8 +145,18 @@ insert into sam_asset_family_overrides (stem, family_key, reason, set_by) values
   ('reviewaccessmanagementaccopsaccopshyiddisplay1', 'reviewaccessmanagementhyiddisplay1', 'A different Gartner Peer Insights review, not a Windows duplicate', 'claude 30 Sep audit'),
   ('reviewdesktopasaserviceaccopsaccopshyworksdisplay1', 'reviewdesktopasaservicehyworksdisplay1', 'A different Gartner Peer Insights review, not a Windows duplicate', 'claude 30 Sep audit')
 on conflict (stem) do nothing;
+insert into sam_asset_family_overrides (stem, family_key, reason, set_by, exclude) values
+  ('accopsnutanixnexttokyo2026englishv4', 'nutanixnexttokyo', 'empty file', 'owner 30 Sep', true)
+on conflict (stem) do update set exclude = true, reason = excluded.reason, set_by = excluded.set_by;
 
 -- ---------------------------------------------------------------- the view
+
+-- The carding convention for an empty or blank document (ops/nightly-carding/SKILL.md): confidence <= 0.5
+-- and "empty" or "blank" in needs_human. Mirrors cardSaysEmpty() in web/lib/cards.ts.
+create or replace function sam_card_says_empty(confidence numeric, needs_human text) returns boolean
+language sql immutable parallel safe as $$
+  select coalesce(confidence, 1) <= 0.5 and coalesce(needs_human, '') ~* '\y(empty|blank)\y'
+$$;
 
 -- True when document b is newer than document a. Mirrors isNewer() in family.ts: superseded and
 -- outdated sink; eligible first; publication year when both state one; version when both carry one;
@@ -173,11 +187,11 @@ with recursive f as (
 -- A card belongs to a live file by its binding, else by stem (the app's merge rule). Two equi-joins,
 -- not one OR-join, so both are hash joins.
 cf as (
-  select distinct on (x.stem) x.stem, x.source, x.publish_year, x.asset_type, x.sup_stem, x.item_id
+  select distinct on (x.stem) x.stem, x.source, x.publish_year, x.asset_type, x.sup_stem, x.item_id, x.empty
   from (
-    select f.stem, c.source, c.publish_year, c.asset_type, c.sup_stem, c.item_id, 0 as pri, c.carded_at from f join sam_asset_cards c on c.item_id = f.item_id
+    select f.stem, c.source, c.publish_year, c.asset_type, c.sup_stem, c.item_id, 0 as pri, c.carded_at, sam_card_says_empty(c.confidence, c.needs_human) as empty from f join sam_asset_cards c on c.item_id = f.item_id
     union all
-    select f.stem, c.source, c.publish_year, c.asset_type, c.sup_stem, c.item_id, 1, c.carded_at from f join sam_asset_cards c on c.stem = f.stem
+    select f.stem, c.source, c.publish_year, c.asset_type, c.sup_stem, c.item_id, 1, c.carded_at, sam_card_says_empty(c.confidence, c.needs_human) from f join sam_asset_cards c on c.stem = f.stem
   ) x order by x.stem, x.pri, x.carded_at desc
 ),
 reg_docs as (   -- one document per stem: PDF/PPTX twins and same-name copies are one
@@ -188,7 +202,7 @@ reg_docs as (   -- one document per stem: PDF/PPTX twins and same-name copies ar
 ),
 card_docs as (  -- cards with no live file: public-only cards, cards whose file was archived
   select distinct on (c.stem) c.stem, c.filename as name, c.fam_key, c.fam_edition, c.fam_version, c.fam_outdated,
-         c.source, c.publish_year, c.asset_type, c.sup_stem, c.item_id
+         c.source, c.publish_year, c.asset_type, c.sup_stem, c.item_id, sam_card_says_empty(c.confidence, c.needs_human) as empty
   from sam_asset_cards c
   where not exists (select 1 from f where f.item_id = c.item_id) and not exists (select 1 from f where f.stem = c.stem)
   order by c.stem, c.carded_at desc
@@ -196,23 +210,27 @@ card_docs as (  -- cards with no live file: public-only cards, cards whose file 
 docs0 as (
   select r.stem, r.name, r.fam_key, r.fam_edition, r.fam_version, r.fam_outdated, r.modified, r.item_ids, cf.source,
          case when cf.publish_year ~ '^[0-9]{4}$' then cf.publish_year::int end as publish_year,
-         coalesce(cf.asset_type, r.reg_type, '') as asset_type, cf.sup_stem, cf.source is not null as carded
+         coalesce(cf.asset_type, r.reg_type, '') as asset_type, cf.sup_stem, cf.source is not null as carded, coalesce(cf.empty, false) as empty
   from reg_docs r left join cf on cf.stem = r.stem
   union all
   select d.stem, d.name, d.fam_key, d.fam_edition, d.fam_version, d.fam_outdated, null, case when d.item_id is null then '{}'::text[] else array[d.item_id] end, d.source,
-         case when d.publish_year ~ '^[0-9]{4}$' then d.publish_year::int end, coalesce(d.asset_type, ''), d.sup_stem, true
+         case when d.publish_year ~ '^[0-9]{4}$' then d.publish_year::int end, coalesce(d.asset_type, ''), d.sup_stem, true, d.empty
   from card_docs d
 ),
 docs as (
-  select d.*, coalesce(o.family_key, d.fam_key) as own_key,
+  select d.*, coalesce(o.family_key, d.fam_key) as own_key, case when o.exclude then coalesce(nullif(o.reason, ''), 'excluded by hand') end as human_out,
          coalesce(d.publish_year, extract(year from d.modified)::int) as year,
          exists (select 1 from sam_asset_pins p where p.asset_key = any (array(select 'id:' || i from unnest(d.item_ids) i) || ('path:' || coalesce(d.source, '')))) as pinned
   from docs0 d left join sam_asset_family_overrides o on o.stem = d.stem
 ),
+-- Out first (a human exclusion, or a card saying the file is empty: beats a pin), then the pre-2024 rule
+-- with its exceptions: dated records and, owner 30 Sep, brand assets (logos, icons, signatures).
 docs_el as (
   select d.*,
-         (d.pinned or d.asset_type ~* 'certif|analyst report|regulation|third-party research' or coalesce(d.year >= 2024, false)) as eligible,
-         case when d.pinned or d.asset_type ~* 'certif|analyst report|regulation|third-party research' or coalesce(d.year >= 2024, false) then null
+         (d.human_out is null and not d.empty and (d.pinned or d.asset_type ~* 'certif|analyst report|regulation|third-party research|brand' or coalesce(d.year >= 2024, false))) as eligible,
+         case when d.human_out is not null then d.human_out
+              when d.empty then 'the card says the file is empty'
+              when d.pinned or d.asset_type ~* 'certif|analyst report|regulation|third-party research|brand' or coalesce(d.year >= 2024, false) then null
               when d.publish_year is not null then 'published ' || d.publish_year
               when d.year is not null then 'year unknown, last modified ' || d.year
               else 'year unknown' end as excluded_reason
@@ -325,4 +343,5 @@ alter function sam_file_stem(text) set search_path = public, pg_catalog;
 alter function sam_family_parts(text) set search_path = public, pg_catalog;
 alter function sam_family_key(text) set search_path = public, pg_catalog;
 alter function sam_superseding_stem(text) set search_path = public, pg_catalog;
+alter function sam_card_says_empty(numeric, text) set search_path = public, pg_catalog;
 alter function sam_family_newer(boolean, boolean, boolean, int, int[], timestamptz, boolean, text, boolean, boolean, boolean, int, int[], timestamptz, boolean, text) set search_path = public, pg_catalog;
