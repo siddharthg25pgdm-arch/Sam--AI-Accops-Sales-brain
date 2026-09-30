@@ -18,7 +18,10 @@ export const DEFINITIONS: [string, string][] = [
   ["Answered", "The headline success rate. A question is answered when SAM returned at least one asset, did not log it as a content gap, and did not fail outright (server error, empty answer, or ran out of steps). Necessary, not sufficient: it says SAM found something, not that it was right. Engaged and Rated helpful are the checks on that."],
   ["Engaged", "Answered on web, and the asker then opened one of the returned assets within 30 minutes or rated the answer helpful. Web only, because opens are not observable on WhatsApp, the API or MCP. Shown over web answers."],
   ["Rated helpful", "Helpful ratings over all ratings in the period. Only a minority of answers get rated, so read it with its n."],
-  ["Error rate", "Questions with a recorded error over questions logged since error recording shipped (the date is shown beside the figure). Older questions are left out of both sides, because an old row with no error may simply predate the recording."],
+  ["Errors", "Questions with a real error (the rep got a failure or a degraded answer: server error, timeout, every model failed, out of steps, empty answer) over questions logged since error recording shipped (the date is shown beside the figure). Older questions are left out of both sides, because an old row with no error may simply predate the recording. Recovered fallbacks are not counted here."],
+  ["Recovered fallback", "One model provider failed (usually Groq's rate limit) and another model answered, so the rep saw a normal answer. Recorded as provider_error, shown apart from Errors."],
+  ["Tokens", "Tokens the answering model used for a question, every tool round included, read from the answer trace (since 30 Sep 2026). Groq's free tier allows about 200,000 tokens a day per model; OpenAI bills per token with no daily cap, so its figure is an estimate from a price table in code (lib/ops.ts), assuming 90% of tokens are prompt."],
+  ["Scheduled jobs", "Each daily job writes one row per run (sam_ops_runs). A job with no run for 30 hours shows as not run, and the morning digest says so, so a quiet day and a missed run look different."],
   ["Fallback rate", "Questions where a model was tried but retrieval answered instead (timeout or every provider failed), over questions where a model was tried. Local development has no model key, so it never counts here."],
   ["Response time", "Server time from receiving the question to having the answer, p50 and p95. Plain catalogue searches (runtime search) are excluded: they are an in-memory ranking, not a model round trip."],
   ["Change", "Compared with the previous period of the same length, ending the same number of hours ago. Counts show % change; rates show the difference in percentage points. No change is shown without a baseline, and rates need at least 10 in both periods."],
@@ -32,6 +35,8 @@ export const DEFINITIONS: [string, string][] = [
 export type Summary = {
   questions?: number; answered?: number; web_answered?: number; engaged?: number;
   instrumented?: number; errors?: number; model_attempted?: number; fallback?: number;
+  /** Of `errors`: provider_error, one provider failed and another model answered (docs/supabase-sam-ops.sql). */
+  recovered?: number;
   latency_n?: number; p50?: number | null; p95?: number | null;
   people: number; new_people: number; rated: number; helpful: number; wrong_asset: number; missing: number;
   opens: number; gap_events: number;
