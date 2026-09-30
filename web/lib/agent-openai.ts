@@ -1,20 +1,28 @@
-/** Optional second model provider for anyone who wants a free-tier model.
- *  Any OpenAI-compatible chat-completions endpoint with tool calling works (Groq, Cerebras, Mistral, OpenRouter, a local Ollama).
- *    LLM_PROVIDER=openai-compatible
- *    OPENAI_COMPAT_BASE_URL=https://api.groq.com/openai/v1
- *    OPENAI_COMPAT_API_KEY=...
- *    OPENAI_COMPAT_MODEL=openai/gpt-oss-120b
- *    OPENAI_COMPAT_FALLBACK_MODEL=openai/gpt-oss-20b   (default; "" disables) - tried when the primary fails, e.g. a 429
- *    OPENAI_COMPAT_REASONING_EFFORT=low                (default for gpt-oss; "" sends none)
+/** The OpenAI-compatible model path: OpenAI itself and/or any OpenAI-compatible chat-completions endpoint
+ *  with tool calling (Groq, Cerebras, Mistral, OpenRouter, a local Ollama). Tiers, tried in this order:
+ *    1. OpenAI - on when OPENAI_API_KEY is set:
+ *         OPENAI_API_KEY=sk-...
+ *         OPENAI_MODEL=gpt-6-luna                   (default)
+ *         OPENAI_FALLBACK_MODEL=                     (optional second OpenAI model; default none)
+ *         OPENAI_REASONING_EFFORT=                   (optional; default per model family, see openAIEffort)
+ *         OPENAI_BASE_URL=https://api.openai.com/v1  (default; https://in.api.openai.com/v1 = India data residency)
+ *    2. OpenAI-compatible (production: Groq) - on when all of:
+ *         LLM_PROVIDER=openai-compatible
+ *         OPENAI_COMPAT_BASE_URL=https://api.groq.com/openai/v1
+ *         OPENAI_COMPAT_API_KEY=...
+ *         OPENAI_COMPAT_MODEL=openai/gpt-oss-120b
+ *         OPENAI_COMPAT_FALLBACK_MODEL=openai/gpt-oss-20b   (default; "" disables) - tried when the primary fails, e.g. a 429
+ *         OPENAI_COMPAT_REASONING_EFFORT=low                (default for gpt-oss; "" sends none)
+ *  then Claude (agent.ts), then retrieval only. A compat base URL on api.openai.com gets OpenAI's request shape.
  *  Read the provider's data-use terms before pointing it at collateral that names customers: free tiers often
- *  reserve the right to train on prompts. Production runs this path (Groq), so runtime is reported as
- *  "openai-compatible" with the model name - it used to say "claude", which made every dashboard
- *  number about "Claude" actually about Groq. */
+ *  reserve the right to train on prompts (OpenAI's API does not by default - docs/TASK-openai-key.md).
+ *  Runtime is "openai-compatible" for both tiers, with the model name - it used to say "claude", which made
+ *  every dashboard number about "Claude" actually about Groq. The trace's model step names the tier. */
 import { VERTICALS, PRODUCTS, type SearchHit } from "./cards";
 import { SYSTEM, ASSET_TYPES, MAX_SEARCHES, BUDGET_USED, SEED_STEP, runSearch, seedSearch, searchText, finish, toolPayload, numbering, type AskResult } from "./agent";
 import type { AskError } from "./events";
 
-type Msg = { role: "system" | "user" | "assistant" | "tool"; content: string | null; tool_calls?: ToolCall[]; tool_call_id?: string; name?: string };
+export type Msg = { role: "system" | "user" | "assistant" | "tool"; content: string | null; tool_calls?: ToolCall[]; tool_call_id?: string; name?: string };
 type ToolCall = { id: string; type: "function"; function: { name: string; arguments: string } };
 
 // Lenient schema on purpose: Groq validates tool arguments strictly against the schema, and open models often send
@@ -41,25 +49,71 @@ const toolDef = () => [{
   },
 }];
 
-export function openAICompatConfigured() {
-  return process.env.LLM_PROVIDER === "openai-compatible" && Boolean(process.env.OPENAI_COMPAT_API_KEY && process.env.OPENAI_COMPAT_BASE_URL && process.env.OPENAI_COMPAT_MODEL);
+export type Tier = { provider: "openai" | "openai-compatible"; base: string; key: string; models: string[] };
+
+const isOpenAI = (base: string) => /^https:\/\/([a-z0-9-]+\.)*api\.openai\.com(\/|$)/i.test(base);
+
+/** Configured model tiers, in the order ask() tries them. */
+export function tiers(): Tier[] {
+  const e = process.env, out: Tier[] = [];
+  if (e.OPENAI_API_KEY) out.push({ provider: "openai", base: (e.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, ""), key: e.OPENAI_API_KEY,
+    models: [e.OPENAI_MODEL || "gpt-6-luna", e.OPENAI_FALLBACK_MODEL ?? ""] });
+  if (e.LLM_PROVIDER === "openai-compatible" && e.OPENAI_COMPAT_API_KEY && e.OPENAI_COMPAT_BASE_URL && e.OPENAI_COMPAT_MODEL) {
+    const base = e.OPENAI_COMPAT_BASE_URL.replace(/\/$/, ""), openai = isOpenAI(base);
+    out.push({ provider: openai ? "openai" : "openai-compatible", base, key: e.OPENAI_COMPAT_API_KEY,
+      models: [e.OPENAI_COMPAT_MODEL, e.OPENAI_COMPAT_FALLBACK_MODEL ?? (openai ? "" : "openai/gpt-oss-20b")] });
+  }
+  return out.map(t => ({ ...t, models: t.models.filter(Boolean) }));
 }
 
-/** Models to try, in order: the configured one, then the fallback. */
+export function openAICompatConfigured() { return tiers().length > 0; }
+
+/** Models to try, in order, across tiers: OpenAI primary, OpenAI fallback, compat primary, compat fallback. */
 export function compatModels(): string[] {
-  const models = [process.env.OPENAI_COMPAT_MODEL ?? "", process.env.OPENAI_COMPAT_FALLBACK_MODEL ?? "openai/gpt-oss-20b"];
-  return models.filter((m, i) => m && models.indexOf(m) === i);
+  const models = tiers().flatMap(t => t.models);
+  return models.filter((m, i) => models.indexOf(m) === i);
+}
+
+/** reasoning_effort for an OpenAI model; null = do not send it. Chat Completions only does function calling
+ *  on GPT-6 Sol / Luna with effort "none" (gpt-6-astra and gpt-6.1-sol cannot tool-call there at all - they
+ *  would need the Responses API). gpt-5 / -mini / -nano predate "none", o-series has none of it either, and
+ *  GPT-4.x is not a reasoning model. Everything newer (gpt-5.1+, gpt-6 sol/luna) takes "none". */
+export function openAIEffort(model: string): string | null {
+  const env = process.env.OPENAI_REASONING_EFFORT;
+  if (env !== undefined) return env || null;
+  if (/^(gpt-4|gpt-3\.5|chatgpt-)/.test(model)) return null;
+  if (/^o\d/.test(model)) return "low";
+  if (/^gpt-5(-mini|-nano)?(-\d{4}-\d{2}-\d{2})?$/.test(model)) return "minimal";
+  return "none";
+}
+
+/** The chat/completions body. The compat (Groq) body is byte-for-byte what production always sent.
+ *  OpenAI's differs where its API does: max_completion_tokens (max_tokens is deprecated and rejected by
+ *  reasoning models), temperature only when not reasoning (rejected otherwise), reasoning_effort only for
+ *  reasoning models, no `name` on tool messages, and store:false. */
+export function requestBody(tier: Tier, model: string, messages: Msg[], final: boolean): Record<string, unknown> {
+  const tool_choice = final ? "none" : "auto";
+  if (tier.provider === "openai-compatible") {
+    // gpt-oss spends most of its output on reasoning; "low" is plenty for picking a search and a
+    // three-line reply, and it is output tokens that the per-minute limit counts too.
+    const effort = process.env.OPENAI_COMPAT_REASONING_EFFORT ?? (/gpt-oss/.test(model) ? "low" : "");
+    return { model, messages, tools: toolDef(), tool_choice, temperature: 0.2, max_tokens: 800, ...(effort ? { reasoning_effort: effort } : {}) };
+  }
+  const effort = openAIEffort(model), thinking = effort !== null && effort !== "none";
+  return { model, messages: messages.map(({ name: _name, ...m }) => m), tools: toolDef(), tool_choice,
+    ...(thinking ? {} : { temperature: 0.2 }),
+    // Reasoning tokens count against max_completion_tokens, so a reasoning effort needs headroom.
+    max_completion_tokens: thinking ? 2000 : 800,
+    ...(effort !== null ? { reasoning_effort: effort } : {}), store: false };
 }
 
 /** `deadline` is an absolute ms timestamp. Each call gets whatever time is left, so four slow steps
  *  cannot add up past the route's 60 s limit - where the function would be killed with nothing logged.
  *  Throws on a provider failure (rate limit, outage, timeout) so ask() can try the next model. */
 export async function askOpenAICompat(question: string, history: { role: "user" | "assistant"; content: string }[], t0: number,
-  deadline = t0 + 40_000, model = process.env.OPENAI_COMPAT_MODEL!): Promise<AskResult> {
-  const base = process.env.OPENAI_COMPAT_BASE_URL!.replace(/\/$/, ""), key = process.env.OPENAI_COMPAT_API_KEY!;
-  // gpt-oss spends most of its output on reasoning; "low" is plenty for picking a search and a
-  // three-line reply, and it is output tokens that the per-minute limit counts too.
-  const effort = process.env.OPENAI_COMPAT_REASONING_EFFORT ?? (/gpt-oss/.test(model) ? "low" : "");
+  deadline = t0 + 40_000, model = compatModels()[0]): Promise<AskResult> {
+  const tier = tiers().find(t => t.models.includes(model));
+  if (!tier) throw new Error(`${model}: no configured provider serves this model`);
   const messages: Msg[] = [{ role: "system", content: SYSTEM }, ...history.slice(-4).map(h => ({ role: h.role, content: h.content }) as Msg), { role: "user", content: question }];
   const trace: AskResult["trace"] = [];
   const pool: SearchHit[] = [];
@@ -74,17 +128,16 @@ export async function askOpenAICompat(question: string, history: { role: "user" 
   }
   let filters: Record<string, unknown> = seed ? { ...seed.input } : {}, calls = seed ? 1 : 0, tokens = 0;
   const done = (text: string, error: AskError | null) => {
-    trace.push({ step: "model", detail: `${model} (openai-compatible) · ${((Date.now() - t0) / 1000).toFixed(1)}s · ${tokens} tokens` });
+    trace.push({ step: "model", detail: `${model} (${tier.provider}) · ${((Date.now() - t0) / 1000).toFixed(1)}s · ${tokens} tokens` });
     return finish({ question: sq, turn: question, text, pool, calls, runtime: "openai-compatible", model, trace, filters, error });
   };
   for (let round = 0; ; round++) {
     // The last round runs with tools off, so the model must answer from what it found. Before, it
     // could search on every round and the rep was shown "The model ran out of steps before answering."
     const final = calls >= MAX_SEARCHES || round >= MAX_SEARCHES;
-    const r = await fetch(`${base}/chat/completions`, {
-      method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model, messages, tools: toolDef(), tool_choice: final ? "none" : "auto", temperature: 0.2, max_tokens: 800,
-        ...(effort ? { reasoning_effort: effort } : {}) }),
+    const r = await fetch(`${tier.base}/chat/completions`, {
+      method: "POST", headers: { Authorization: `Bearer ${tier.key}`, "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody(tier, model, messages, final)),
       signal: AbortSignal.timeout(Math.max(1000, deadline - Date.now())),
     });
     if (!r.ok) {

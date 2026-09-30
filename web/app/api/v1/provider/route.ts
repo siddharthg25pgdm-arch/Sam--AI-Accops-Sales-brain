@@ -1,25 +1,47 @@
 import { resolveCaller, unauthorized } from "@/lib/apiauth";
+import { tiers, requestBody, type Tier } from "@/lib/agent-openai";
 
-/** GET /api/v1/provider (admin cookie or API token): which model provider is configured, whether it answers,
- *  and which models the key can use. Server side only, the key never leaves the function. */
+/** GET /api/v1/provider (admin cookie or API token; a rep's cookie gets 403): which model providers are configured, in the order SAM
+ *  tries them, whether each configured model exists for the key and answers a real SAM-shaped request
+ *  (same body builder as ask(), tools included, so a model that cannot tool-call fails here, not in front
+ *  of a rep). Server side only: the key never leaves the function; only its last 4 characters are shown. */
 export async function GET(req: Request) {
   const who = await resolveCaller(req); if (!who) return unauthorized();
-  const provider = process.env.LLM_PROVIDER === "openai-compatible" && process.env.OPENAI_COMPAT_API_KEY ? "openai-compatible" : process.env.ANTHROPIC_API_KEY ? "anthropic" : "none";
-  const out: Record<string, unknown> = { provider, model: provider === "openai-compatible" ? process.env.OPENAI_COMPAT_MODEL : provider === "anthropic" ? (process.env.CLAUDE_MODEL ?? "claude-sonnet-5") : null };
-  if (provider === "openai-compatible") {
-    const base = (process.env.OPENAI_COMPAT_BASE_URL ?? "").replace(/\/$/, ""), key = process.env.OPENAI_COMPAT_API_KEY!;
-    out.base_url = base;
-    try {
-      const r = await fetch(`${base}/models`, { headers: { Authorization: `Bearer ${key}` } });
-      const j = await r.json();
-      out.models = r.ok ? (j.data ?? []).map((m: { id: string }) => m.id).sort() : { http: r.status, error: j.error?.message ?? j };
-    } catch (e) { out.models = { error: (e as Error).message }; }
-    try {
-      const r = await fetch(`${base}/chat/completions`, { method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: process.env.OPENAI_COMPAT_MODEL, messages: [{ role: "user", content: "Reply with the single word ok." }], max_tokens: 5 }) });
-      const j = await r.json();
-      out.configured_model_test = r.ok ? { ok: true, reply: j.choices?.[0]?.message?.content } : { ok: false, http: r.status, error: j.error?.message ?? j };
-    } catch (e) { out.configured_model_test = { ok: false, error: (e as Error).message }; }
-  }
+  if (who.via === "cookie" && !who.admin) return Response.json({ error: "Admins only." }, { status: 403 });
+  const ts = tiers();
+  const claude = process.env.ANTHROPIC_API_KEY ? (process.env.CLAUDE_MODEL ?? "claude-sonnet-5") : null;
+  const order = [...ts.flatMap(t => t.models.map(m => `${m} (${t.provider})`)), ...(claude ? [`${claude} (anthropic)`] : []), "retrieval only"];
+  const out: Record<string, unknown> = {
+    // Kept for older callers: the first provider and model SAM will use.
+    provider: ts[0]?.provider ?? (claude ? "anthropic" : "none"), model: ts[0]?.models[0] ?? claude,
+    order, tiers: await Promise.all(ts.map(check)),
+  };
   return Response.json(out);
+}
+
+async function check(t: Tier) {
+  const auth = { Authorization: `Bearer ${t.key}` };
+  const res: Record<string, unknown> = { provider: t.provider, base_url: t.base, key: `...${t.key.slice(-4)}`, models: t.models };
+  try {
+    const r = await fetch(`${t.base}/models`, { headers: auth, signal: AbortSignal.timeout(10_000) });
+    const j = await r.json();
+    if (r.ok) {
+      const ids = new Set<string>((j.data ?? []).map((m: { id: string }) => m.id));
+      res.key_valid = true;
+      res.available = Object.fromEntries(t.models.map(m => [m, ids.has(m)]));
+    } else { res.key_valid = [401, 403].includes(r.status) ? false : null; res.models_error = { http: r.status, error: j.error?.message ?? j }; }
+  } catch (e) { res.models_error = (e as Error).message; }
+  res.ping = await Promise.all(t.models.map(async model => {
+    const t0 = Date.now();
+    try {
+      const body = requestBody(t, model, [{ role: "system", content: "Reply with the single word ok." }, { role: "user", content: "ping" }], true);
+      const r = await fetch(`${t.base}/chat/completions`, { method: "POST", headers: { ...auth, "Content-Type": "application/json" },
+        body: JSON.stringify(body), signal: AbortSignal.timeout(20_000) });
+      const j = await r.json();
+      const ms = Date.now() - t0;
+      return r.ok ? { model, ok: true, answered_by: j.model, reply: j.choices?.[0]?.message?.content, ms, tokens: j.usage?.total_tokens }
+        : { model, ok: false, http: r.status, error: j.error?.message ?? j, ms };
+    } catch (e) { return { model, ok: false, error: (e as Error).message, ms: Date.now() - t0 }; }
+  }));
+  return res;
 }
