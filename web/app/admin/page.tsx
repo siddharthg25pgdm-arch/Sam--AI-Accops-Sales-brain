@@ -9,7 +9,7 @@ import { ready, cacheState } from "@/lib/registry-cache";
 import { cardCacheState } from "@/lib/cards-cache";
 import { allAssets, assetLink } from "@/lib/cards";
 import { apiPublishQueue } from "@/lib/api";
-import { openAICompatConfigured } from "@/lib/agent-openai";
+import { tiers } from "@/lib/agent-openai";
 import { listRequests, unrequestedGaps, ACTIVE, NEXT, STATUS_LABEL, type RankedRequest, type Status } from "@/lib/requests";
 import { loadRatings, loadClears, latestRatings, learnDemotions, wrongAssetTally, verdictOf, FEEDBACK_LABEL, DEMOTE_DAYS, DEMOTE_MIN_REPS, DEMOTE_PENALTY, type FeedbackKind, type Rating } from "@/lib/feedback";
 import { saveRequest, mergeRequest, promote, clearRank } from "./actions";
@@ -714,13 +714,15 @@ async function System({ includeTest }: { includeTest: boolean }) {
   const reg = cacheState(), cards = cardCacheState();
   const flowLast = regRows.map(r => r.last_synced).filter(Boolean).sort().reverse()[0] ?? null;
   const delAgeH = sync?.last_run ? (Date.now() - Date.parse(sync.last_run)) / 3_600_000 : null;
-  const provider = openAICompatConfigured() ? "OpenAI-compatible" : process.env.ANTHROPIC_API_KEY ? "Anthropic" : null;
-  const model = openAICompatConfigured() ? process.env.OPENAI_COMPAT_MODEL : process.env.ANTHROPIC_API_KEY ? (process.env.CLAUDE_MODEL ?? "claude-sonnet-5") : null;
+  // Every configured tier in the order ask() tries them, so "OpenAI, then Groq" is visible, not just the first.
+  const chain = [...tiers().map(t => `${t.provider === "openai" ? "OpenAI" : "OpenAI-compatible"} · ${t.models.join(", ")}`),
+    ...(process.env.ANTHROPIC_API_KEY ? [`Anthropic · ${process.env.CLAUDE_MODEL ?? "claude-sonnet-5"}`] : [])];
+  const provider = chain.length ? chain.join(" → then ") : null;
   const failNewer = evidence.lastFailure && (!evidence.lastAnswer || evidence.lastFailure.created_at > evidence.lastAnswer.created_at);
   type Row = { name: string; state: "ok" | "warn" | "bad" | "off"; value: React.ReactNode; note?: React.ReactNode };
   const rows: Row[] = [
     { name: "Model provider", state: !provider ? "off" : failNewer ? "warn" : "ok",
-      value: provider ? `${provider} · ${model}` : "None configured: retrieval only",
+      value: provider ?? "None configured: retrieval only",
       note: <>Last model answer {evidence.lastAnswer ? `${fmtTime(evidence.lastAnswer.created_at)} (${evidence.lastAnswer.model})` : "not recorded yet"}.
         {evidence.lastFailure && <> Last failure {fmtTime(evidence.lastFailure.created_at)}: {evidence.lastFailure.error_kind.replace(/_/g, " ")}.</>}
         {" "}<a href="/api/v1/provider">Live check</a></> },
