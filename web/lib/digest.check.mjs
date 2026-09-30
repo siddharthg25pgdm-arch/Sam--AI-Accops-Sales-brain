@@ -65,6 +65,26 @@ eq(L.renamed.map(f => f.name).join(), "Renamed.pdf", "renamed via the carding qu
 eq(L.deleted.map(f => f.name).join(), "Gone.pdf", "deleted"); eq(L.deleted[0].url, null, "no link to a deleted file");
 eq(L.changed, 4, "four files changed");
 eq(L.queue.uncarded, 1, "uncarded count"); ok(L.deletion_check?.includes("tombstoned"), "fresh snapshot result shown");
+{
+  // Families: a new file of an existing document is a new version, not new content; a file carded as
+  // pre-2024 is listed as excluded; an older copy the nightly job skips is not "waiting for a card".
+  const fr = (item_id, filename, o = {}) => ({ item_id, filename, folder: "Presentations", family_size: 1, is_head: true, is_canonical: true, eligible: true,
+    excluded_reason: null, canonical_filename: filename, edition: "", ...o });
+  const f = buildDigest({ ...base,
+    changes: [file("v", "Deck v5.pptx", { created_at: h(3) }), file("b", "Brand new.pdf", { created_at: h(3) }), file("o", "Deck v2.pptx", { created_at: h(3) }), file("c", "Old ebook.pdf")],
+    queue: [{ item_id: "o", filename: "Deck v2.pptx", reason: "uncarded", family_role: "older_version" }, { item_id: "b", filename: "Brand new.pdf", reason: "uncarded", family_role: "new" }],
+    carded: [{ title: "An old ebook", filename: "Old ebook.pdf", carded_at: h(2), item_id: "c" }],
+    families: [fr("v", "Deck v5.pptx", { family_size: 3 }), fr("b", "Brand new.pdf"), fr("o", "Deck v2.pptx", { family_size: 3, is_head: false, is_canonical: false, canonical_filename: "Deck v5.pptx" }),
+      fr("c", "Old ebook.pdf", { eligible: false, excluded_reason: "published 2021" })],
+  }).library;
+  eq(f.added.map(x => x.name).join(), "Brand new.pdf", "brand-new files only under Added");
+  eq(f.new_versions.map(x => x.name).join(), "Deck v5.pptx,Deck v2.pptx", "new versions of existing documents listed apart");
+  ok(/lead of 3 files/.test(f.new_versions[0].note) && /older than Deck v5\.pptx/.test(f.new_versions[1].note), `version notes: ${f.new_versions.map(x => x.note)}`);
+  eq(f.excluded.map(x => `${x.name}: ${x.note}`).join(), "Old ebook.pdf: published 2021", "a pre-2024 card is listed as excluded");
+  ok(f.queue.uncarded === 1 && f.queue.older_skipped === 1, "an older copy is skipped, not waiting");
+  const fh = renderHtml({ ...busy, library: f });
+  ok(fh.includes("New version of an existing document 2") && fh.includes("New, pre-2024: excluded from answers 1") && fh.includes("older copy of carded documents skipped"), "the email says so");
+}
 eq(busy.usage.answered.pct, 83.3, "answered rate"); eq(busy.usage.week.questions_per_day, 9, "7-day daily average");
 eq(busy.health.length, 0, "healthy system says nothing");
 eq(busy.subject, "SAM: 2 new requests, 1 worth creating, 4 files changed, 12 questions", busy.subject);

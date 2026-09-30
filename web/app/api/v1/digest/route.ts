@@ -4,7 +4,7 @@ import { buildDigest, renderHtml } from "@/lib/digest";
 import { recentEvents, realOnly, testUsers } from "@/lib/events";
 import { usageWindow } from "@/lib/metrics";
 import { listRequests, unrequestedGaps, ACTIVE, type Status } from "@/lib/requests";
-import { cardedSince, cardingQueue, changedSince, lastFlowWrite, syncStatus } from "@/lib/sharepoint";
+import { cardedSince, cardingQueue, changedSince, familyRows, lastFlowWrite, syncStatus } from "@/lib/sharepoint";
 import { cardsReady, cardCacheState } from "@/lib/cards-cache";
 import { loadRatings } from "@/lib/feedback";
 
@@ -72,12 +72,17 @@ export async function GET(req: Request) {
     safe("ratings", loadRatings({ from: since, real: new URL(req.url).searchParams.get("test") !== "1", limit: 500 })),
   ]);
 
+  // Families of what arrived: a new version of an existing document is reported apart from new content,
+  // and a file carded as pre-2024 is reported as excluded from answers.
+  const ids = [...new Set([...(changes ?? []).filter(f => !f.deleted && (f.created_at ?? "") >= since).map(f => f.item_id), ...(carded ?? []).map(c => c.item_id)].filter((x): x is string => Boolean(x)))];
+  const families = ids.length ? await safe("document families", familyRows(ids)) : [];
+
   const d = buildDigest({
     now, base: new URL(req.url).origin,
     requests: all ? all.filter(r => ACTIVE.includes(r.status)) : null,
     gaps: all && gapEvents ? unrequestedGaps(gapEvents, all.map(r => r.topic_key)) : null,
     changes, queue, carded, usage, usagePrev, lastFlowWrite: flow, sync,
-    cardCount: cardCacheState().count, failed: [...new Set(failed)], whatsapp, ratings,
+    cardCount: cardCacheState().count, failed: [...new Set(failed)], whatsapp, ratings, families,
   });
 
   const headers = { "Cache-Control": "no-store", "X-SAM-Subject": d.subject };

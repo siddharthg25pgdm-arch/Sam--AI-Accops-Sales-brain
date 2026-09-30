@@ -394,9 +394,9 @@ export async function lastFlowWrite(scope = "sales"): Promise<string | null> {
 }
 
 /** Cards whose content changed since `since` (carded_at moves only when card_hash does). */
-export async function cardedSince(since: string): Promise<{ title: string; filename: string; carded_at: string }[]> {
+export async function cardedSince(since: string): Promise<{ title: string; filename: string; carded_at: string; item_id: string | null }[]> {
   if (!configured()) return [];
-  return (await rest(`sam_asset_cards?carded_at=gte.${encodeURIComponent(since)}&select=title,filename,carded_at&order=carded_at.desc&limit=200`)) as { title: string; filename: string; carded_at: string }[];
+  return (await rest(`sam_asset_cards?carded_at=gte.${encodeURIComponent(since)}&select=title,filename,carded_at,item_id&order=carded_at.desc&limit=200`)) as { title: string; filename: string; carded_at: string; item_id: string | null }[];
 }
 
 export type SyncRow ={ scope: string; last_run: string | null; last_result: string | null };
