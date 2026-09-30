@@ -18,7 +18,9 @@ Runs unattended before Siddharth's 08:30 morning digest. The digest reports what
   emails, customer IDs, employee usernames/hours, IP/MAC addresses. Describe their presence instead
   ("contains staff phone numbers").
 - Never invent. Card only what the document says; if the text is empty, card from title/folder with
-  `confidence` ≤ 0.5 and say so in `needs_human`.
+  `confidence` ≤ 0.5 and say so in `needs_human`. If the FILE itself is empty or blank (a deck with one
+  blank slide, a placeholder), set `confidence` ≤ 0.5 and put the word "empty" or "blank" in
+  `needs_human`: that takes it out of answers (sam_card_says_empty / cardSaysEmpty).
 - Commits are authored as siddharth.g25pgdm@gmail.com (check `git config user.email`). Messages end
   with the Co-Authored-By line from your session's attribution instructions. Only commit
   `corpus/cards/*.json`. Never commit anything else under `corpus/`.
@@ -28,7 +30,8 @@ Runs unattended before Siddharth's 08:30 morning digest. The digest reports what
 1. `git pull --ff-only` (stop and log if it fails).
 2. Run `prototype/carding_prep.py` (default limit 15). It reads the carding queue, copies each file
    from OneDrive into `corpus/sharepoint/`, extracts text, and writes `corpus/queue-tonight.json`
-   (`todo`, `skipped`). If `todo` is empty, log "nothing to card" and stop.
+   (`todo`, `skipped`), and records its own run in `sam_ops_runs` (job `carding_prep`). If `todo` is
+   empty, do step 7 with "nothing to card" and stop.
 3. Read `corpus/cards/batch-13.json` and two cards from `batch-12.json` for the exact schema and
    conventions (`source: "sharepoint/<filename>"`, `client` anonymised vs `client_actual`,
    `publish_year` from the body never the filename, `superseded_by` as
@@ -47,8 +50,14 @@ Runs unattended before Siddharth's 08:30 morning digest. The digest reports what
    0 title differences).
 6. `git add corpus/cards/*.json && git commit -m "carding (nightly): N new, M updated - <short list>"`
    then `git push`.
-7. Append one line to `C:/Users/Siddharth.gupta/.claude/logs/sam-nightly-carding.log`:
-   `<ISO time> carded N new, M updated, K skipped (<reasons>), commit <hash>` - or the failure.
+7. Record the outcome, both places, always (also for "nothing to card" and for a failure):
+   - append one line to `C:/Users/Siddharth.gupta/.claude/logs/sam-nightly-carding.log`:
+     `<ISO time> carded N new, M updated, K skipped (<reasons>), commit <hash>` - or the failure;
+   - `grep -q -- --log-run prototype/carding_prep.py && prototype/.venv/Scripts/python.exe prototype/carding_prep.py --log-run carding <status> "<same line>"`
+     (the grep guards a checkout that predates run logging: there, `--log-run` would start a real prep)
+     where status is `ok` (carded and loaded, or nothing to card), `warn` (done, but something was left
+     for a human: renamed files, cards not loaded, a skipped gate) or `failed`. This row is what the
+     System tab's Scheduled jobs panel and the morning digest read; without it the night looks missed.
 
 If anything fails midway, commit what is valid, do not load a card file that fails the gate, and log
-the failure plainly. The morning digest will show whatever is still in the queue.
+the failure plainly (step 7 with `failed`). The morning digest will show whatever is still in the queue.

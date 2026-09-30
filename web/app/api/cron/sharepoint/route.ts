@@ -1,7 +1,10 @@
 import { configured, registry, syncStatus } from "@/lib/sharepoint";
 import { ready, cacheState } from "@/lib/registry-cache";
 import { cardCacheState } from "@/lib/cards-cache";
-import { allAssets, assetLink } from "@/lib/cards";
+import { allAssets, answerable as answerableAssets, assetLink } from "@/lib/cards";
+import { rollup } from "@/lib/metrics";
+import { testUsers } from "@/lib/events";
+import { logRun } from "@/lib/ops";
 
 export const maxDuration = 60;
 
@@ -42,6 +45,10 @@ export async function GET(req: Request) {
     return Response.json({ ok: false, reason: "SUPABASE_URL / SUPABASE_SERVICE_KEY not set" });
   }
 
+  const started = new Date().toISOString();
+  // The nightly metrics rollup rides on this cron (docs/supabase-sam-metrics.sql always meant it to).
+  const rolled = await rollup(3, testUsers());
+  await logRun({ job: "rollup", started_at: started, status: rolled == null ? "failed" : "ok", summary: rolled == null ? "sam_rollup_metrics failed" : `${rolled} day x channel rows, last 3 days`, details: { trigger: "cron" } });
   const [rows, sync] = await Promise.all([registry("sales", 5000), syncStatus()]);
   const synced = rows.map(r => r.modified_at).filter(Boolean).sort().reverse();
   const newest = synced[0] ?? null;
@@ -51,13 +58,22 @@ export async function GET(req: Request) {
   // Reported here because "874 rows are tracked" and "SAM can answer about 696 things" are different
   // numbers, and only the second one is what a user experiences.
   await ready();
-  const answerable = allAssets();
+  // "answerable" used to be allAssets() (every merged asset, older versions and pre-2024 included).
+  // Now it is what answers can use; `assets` is the merged total.
+  const assets = allAssets().length, answerable = answerableAssets();
   const withLink = answerable.filter(a => assetLink(a)).length;
+  const flowLast = rows.map(r => r.last_synced).filter(Boolean).sort().reverse()[0] ?? null;
+  const deletesStale = sync?.last_run ? (Date.now() - Date.parse(sync.last_run)) > 36 * 3_600_000 : true;
+  await logRun({ job: "cron", started_at: started, status: deletesStale || !cardCacheState().count ? "warn" : "ok",
+    summary: `${rows.length} tracked, ${answerable.length} answerable of ${assets} assets, cards ${cardCacheState().count}${deletesStale ? ", deletions not checked in 36 h" : ""}`,
+    details: { tracked: rows.length, assets, answerable: answerable.length, with_link: withLink, flow_last_write: flowLast } });
 
   return Response.json({
     ok: true,
     ran_at: new Date().toISOString(),
+    // Registry rows not deleted (archived included) / merged assets / what answers can use.
     tracked: rows.length,
+    assets,
     answerable: answerable.length,
     answerable_with_link: withLink,
     registry_cache: cacheState(),

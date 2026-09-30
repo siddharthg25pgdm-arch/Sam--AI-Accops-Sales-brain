@@ -10,6 +10,11 @@ writes. Kept separate so the copy/extract step can be run and checked on its own
   python prototype/carding_prep.py --limit 5
   python prototype/carding_prep.py --dry-run  # show the queue, copy nothing
   python prototype/carding_prep.py --self-check
+  python prototype/carding_prep.py --log-run carding ok "carded 3 new, 1 updated, commit abc123"
+
+Every run records itself in sam_ops_runs (docs/supabase-sam-ops.sql) as job "carding_prep"; the skill's
+last step records the night's outcome as job "carding" with --log-run, so the System tab and the morning
+digest can tell "nothing to card" from "did not run".
 
 Families (docs/supabase-sam-asset-families.sql): an older copy of an already-carded document is
 skipped and logged; the newest copy of a family carded from another file is carded first.
@@ -17,7 +22,7 @@ skipped and logged; the newest copy of a family carded from another file is card
 Why OneDrive: Microsoft Graph is blocked by a Conditional Access policy, but the OneDrive client
 syncs the whole library to this laptop (Siddharth set it to "Always keep on this device").
 """
-import json, os, shutil, subprocess, sys, urllib.request
+import datetime, json, os, shutil, subprocess, sys, urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
@@ -41,6 +46,21 @@ def queue() -> list[dict]:
                                  f"&order=modified_at.desc.nullslast,item_id&limit=1000",
                                  headers={"apikey": key, "Authorization": f"Bearer {key}"})
     return json.load(urllib.request.urlopen(req, timeout=60))
+
+
+def log_run(job: str, status: str, summary: str, details: dict | None = None, started_at: str | None = None) -> None:
+    """One row in sam_ops_runs. Never raises: the job must not fail because its log did."""
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    try:
+        e = env()
+        url, key = e["SUPABASE_URL"].rstrip("/"), e["SUPABASE_SERVICE_KEY"]
+        body = json.dumps({"job": job, "status": status, "summary": summary[:500], "details": details or {},
+                           "started_at": started_at or now, "finished_at": now}).encode("utf-8")
+        req = urllib.request.Request(f"{url}/rest/v1/sam_ops_runs", data=body, method="POST",
+                                     headers={"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json", "Prefer": "return=minimal"})
+        urllib.request.urlopen(req, timeout=30).close()
+    except Exception as ex:  # noqa: BLE001 - logging only
+        print(f"(could not record the run in sam_ops_runs: {ex})")
 
 
 def plan(rows: list[dict]) -> tuple[list[dict], list[dict]]:
@@ -76,7 +96,21 @@ def xlsx_text(p: Path) -> str:
 def main() -> None:
     if "--self-check" in sys.argv:
         return self_check()
+    if "--log-run" in sys.argv:
+        job, status, summary = sys.argv[sys.argv.index("--log-run") + 1:][:3]
+        assert status in {"ok", "warn", "failed", "refused"}, f"status must be ok|warn|failed|refused, not {status}"
+        return log_run(job, status, summary)
+    started = datetime.datetime.now(datetime.timezone.utc).isoformat()
     dry = "--dry-run" in sys.argv
+    try:
+        prep(dry, started)
+    except Exception as ex:
+        if not dry:
+            log_run("carding_prep", "failed", f"{type(ex).__name__}: {ex}", started_at=started)
+        raise
+
+
+def prep(dry: bool, started: str) -> None:
     limit = int(sys.argv[sys.argv.index("--limit") + 1]) if "--limit" in sys.argv else 15
     rows = queue()
     print(f"queue: {len(rows)} ({', '.join(f'{r} {sum(1 for x in rows if x['reason']==r)}' for r in sorted({x['reason'] for x in rows}))})" if rows else "queue: empty")
@@ -115,6 +149,12 @@ def main() -> None:
         print(f"  {t['reason']:<20} {t['filename']}" + ("  (new version of a carded document: carded first)" if t.get("family_role") == "new_version" else "") + ("" if dry or t.get("has_text") else "  (NO TEXT - card from title/folder, low confidence)"))
     for s in skipped:
         print(f"  skip  {s['filename']}: {s['why']}")
+    if not dry:
+        no_text = sum(1 for t in todo if not t.get("has_text"))
+        log_run("carding_prep", "warn" if no_text else "ok",
+                f"queue {len(rows)}: {len(todo)} to card tonight, {len(skipped)} skipped" + (f", {no_text} with no text" if no_text else ""),
+                {"queue_total": len(rows), "todo": [t["filename"] for t in todo], "skipped": [{"filename": s["filename"], "why": s["why"]} for s in skipped][:50]},
+                started_at=started)
 
 
 if __name__ == "__main__":

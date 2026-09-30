@@ -204,9 +204,11 @@ export async function daily(days = 30): Promise<DailyMetric[]> {
   return (await rest<DailyMetric[]>(`sam_metrics_daily?day=gte.${since}&order=day.desc,channel.asc`)).data ?? [];
 }
 
-/** Recompute the rollup's recent window. Idempotent; failure leaves the last good rollup. */
-export async function rollup(daysBack = 3): Promise<void> {
-  await rest("rpc/sam_rollup_metrics", { method: "POST", body: JSON.stringify({ days_back: daysBack }) });
+/** Recompute the rollup's recent window on the dashboard's definitions (IST days, the same test
+ *  identities: docs/supabase-sam-ops.sql). Idempotent; failure leaves the last good rollup. Returns the
+ *  rows written, or null when the call failed. */
+export async function rollup(daysBack = 3, testUsers?: string[]): Promise<number | null> {
+  return (await rest<number>("rpc/sam_rollup_metrics", { method: "POST", body: JSON.stringify({ days_back: daysBack, ...(testUsers ? { p_test_users: testUsers } : {}) }) })).data;
 }
 
 // ---------------------------------------------------------------- worklists (checked)

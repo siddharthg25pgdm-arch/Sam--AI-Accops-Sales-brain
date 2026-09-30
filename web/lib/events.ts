@@ -36,6 +36,8 @@ export type SamEvent = {
   feedback?: "helpful" | "wrong_asset" | "missing" | null; ref_event_id?: number | null; asset_path?: string | null;
   is_test?: boolean; error_kind?: ErrorKind | null; error_detail?: string | null; model?: string | null;
   answer?: string | null; result_titles?: string[] | null; schema_version?: number | null;
+  /** Tokens the answering model used for this question (all rounds), from the trace. null = no model. */
+  tokens?: number | null;
 };
 
 /** Identities whose traffic is test, not use. Applied at write time (is_test) AND at read time
