@@ -310,6 +310,36 @@ export async function cardRows(limit = 2000): Promise<CardRow[]> {
   return (await rest(`sam_asset_cards?select=${CARD_COLS}&limit=${limit}&order=source`)) as CardRow[];
 }
 
+/** Admin pins (docs/supabase-sam-asset-families.sql): documents kept in answers despite their age. */
+export type PinRow = { asset_key: string; pinned_by: string; reason: string | null; created_at: string };
+export async function pinRows(): Promise<PinRow[]> {
+  if (!configured()) return [];
+  return (await rest(`sam_asset_pins?select=asset_key,pinned_by,reason,created_at&limit=5000`)) as PinRow[];
+}
+export async function setPin(asset_key: string, pinned: boolean, by: string, reason?: string): Promise<void> {
+  if (pinned) await rest(`sam_asset_pins?on_conflict=asset_key`, { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify([{ asset_key, pinned_by: by, reason: reason || null }]) });
+  else await rest(`sam_asset_pins?asset_key=eq.${encodeURIComponent(asset_key)}`, { method: "DELETE" });
+}
+/** Human corrections to family detection: this filename stem belongs to that family. */
+export async function overrideRows(): Promise<{ stem: string; family_key: string }[]> {
+  if (!configured()) return [];
+  return (await rest(`sam_asset_family_overrides?select=stem,family_key&limit=5000`)) as { stem: string; family_key: string }[];
+}
+/** One row of the sam_asset_families view: a document's family, its place in it, and eligibility. */
+export type FamilyRow = {
+  member_key: string; item_id: string | null; source: string | null; filename: string; folder: string | null;
+  family_key: string; edition: string; version: string | null; publish_year: number | null; year: number | null;
+  family_size: number; version_rank: number; is_head: boolean; is_canonical: boolean; superseded: boolean;
+  eligible: boolean; excluded_reason: string | null; pinned: boolean; carded: boolean;
+  canonical_filename: string; carded_in_family: number;
+};
+export async function familyRows(itemIds: string[]): Promise<FamilyRow[]> {
+  if (!configured() || !itemIds.length) return [];
+  const ids = itemIds.map(i => `"${i.replace(/"/g, "")}"`).join(",");
+  return (await rest(`sam_asset_families?item_id=in.(${encodeURIComponent(ids)})&select=*&limit=1000`)) as FamilyRow[];
+}
+
 export type CardingQueueRow = {
   item_id: string; filename: string; folder: string; web_url: string;
   modified_at: string | null; modified_by: string | null;

@@ -1,7 +1,8 @@
 import raw from "@/data/asset_cards.json";
 import { registryAssets, safeLink } from "./registry-cache";
-import { cardAssets, cardMeta } from "./cards-cache";
+import { cardAssets, cardMeta, pinnedKeys, familyOverrides } from "./cards-cache";
 import { demotion } from "./feedback";
+import { families, editionScore, type FamilyInfo } from "./family";
 
 export type AssetFile = {
   path: string; ext: string; size_mb: number; pages: number | null; modified?: string; year?: string | null;
@@ -20,6 +21,17 @@ export type Asset = {
    *  filename, is what joins a card to its file, because a SharePoint rename changes the filename and
    *  keeps the item_id. */
   item_id?: string;
+  /** Set by allAssets(): the document family (every version and edition of this document) and
+   *  whether answers may use it at all. */
+  family?: AssetFamily;
+};
+export type AssetFamily = FamilyInfo & {
+  /** May occupy an answer slot or stand in as a substitute: published 2024 or later, or a dated
+   *  record (certificate, analyst report, regulation), or pinned by an admin. */
+  eligible: boolean;
+  /** Why not, when not eligible: "published 2021", "year unknown, last modified 2022". */
+  excluded: string | null;
+  pinned: boolean;
 };
 
 const data = raw as unknown as { counts: Record<string, number>; assets: Asset[] };
@@ -87,11 +99,66 @@ function richness(a: Asset): number {
  *  are grafted on from the loser. verified() is true only for registry-sourced URLs, so a
  *  constructed one can never overwrite a real one.
  *
- *  Not memoised: both caches refresh on a TTL, so a frozen result would go stale and never notice. */
+ *  Memoised on the cache arrays themselves: both caches REPLACE their arrays on refresh, so a new
+ *  array is a new result and a stale one is never served.
+ *
+ *  Every asset carries its `family` (lib/family.ts): answers use answerable(), which is the newest of
+ *  each family's editions, eligible only. */
 export function allAssets(): Asset[] {
+  const reg = registryAssets(), cards = cardAssets(), pins = pinnedKeys();
+  if (memo && memo.reg === reg && memo.cards === cards && memo.pins === pins) return memo.out;
+  const out = withFamilies(mergedAssets(reg), pins);
+  memo = { reg, cards, pins, out };
+  return out;
+}
+let memo: { reg: Asset[]; cards: Asset[]; pins: Set<string>; out: Asset[] } | null = null;
+
+/** What answers may use: the newest member of each family edition, published 2024 or later (or a
+ *  dated record, or pinned). Older versions and excluded documents never take an answer slot and are
+ *  never offered as a substitute; admins still see them in the catalogue and the Content tab. */
+export function answerable(): Asset[] {
+  return allAssets().filter(a => !a.family || (a.family.head && a.family.eligible));
+}
+
+/** The year answers start from. Owner's decision, 30 Sep 2026. */
+export const ELIGIBLE_FROM = 2024;
+/** Dated records stay whatever their year: a certificate, an analyst report, a regulation. */
+const EXEMPT_TYPE = /certif|analyst report|regulation|third-party research/i;
+/** The key a pin is stored under (sam_asset_pins.asset_key): the registry row when there is one, which
+ *  survives a rename, else the path. The SQL view uses the same two forms. */
+export function pinKey(a: Asset): string {
+  return a.item_id ? `id:${a.item_id}` : `path:${assetKey(a)}`;
+}
+/** Eligible for answers, and why not. A carded year is what the document says; without one, the year
+ *  SharePoint last saw the file modified stands in, and an unknown year is not eligible. */
+export function eligibility(a: Asset, pins: Set<string> = pinnedKeys()): { eligible: boolean; excluded: string | null; pinned: boolean } {
+  const pinned = pins.has(pinKey(a));
+  const doc = a.carded ? Number(a.file?.year) || null : null;
+  const year = doc ?? (Number((a.file?.modified ?? "").slice(0, 4)) || null);
+  if (pinned || EXEMPT_TYPE.test(a.asset_type) || (year != null && year >= ELIGIBLE_FROM)) return { eligible: true, excluded: null, pinned };
+  return { eligible: false, pinned, excluded: doc ? `published ${doc}` : year ? `year unknown, last modified ${year}` : "year unknown" };
+}
+
+function withFamilies(pool: Asset[], pins: Set<string>): Asset[] {
+  const el = new Map(pool.map(a => [a, eligibility(a, pins)]));
+  const fam = families(pool, a => ({
+    name: (a.file?.path ?? "").split("/").pop() || a.title,
+    publishYear: a.carded ? Number(a.file?.year) || null : null,
+    modified: a.file?.modified ?? null, carded: carded(a), eligible: el.get(a)!.eligible,
+    supersededBy: supersedingFile(metaOf(a)?.superseded_by ?? ""),
+  }), familyOverrides());
+  return pool.map(a => ({ ...a, family: { ...fam.get(a)!, ...el.get(a)! } }));
+}
+
+/** The members of `a`'s family, newest first within each edition, `a` included. */
+export function familyOf(a: Asset): Asset[] {
+  const k = a.family?.key;
+  return k ? allAssets().filter(x => x.family?.key === k).sort((x, y) => Number(y.family!.head) - Number(x.family!.head) || x.family!.rank - y.family!.rank) : [a];
+}
+
+function mergedAssets(reg: Asset[]): Asset[] {
   const usable = data.assets.filter(a => a.asset_type !== "Data File" && a.asset_type !== "Content Calendar");
   const best = new Map<string, Asset>();
-  const reg = registryAssets();
   // A bound card merges under its registry row's CURRENT key, not its own filename. Keyed by filename
   // alone, a rename split one document into two entries: the card with the description and no link,
   // and the bare row with the link. Using the row's key (rather than matching item_id directly) keeps
@@ -327,7 +394,13 @@ export function blob(a: Asset): string {
     a.brief, a.use_for, a.section, a.file?.path ?? "", a.file?.text_excerpt ?? ""].join(" ").toLowerCase();
 }
 
-export type SearchArgs = { query?: string; asset_type?: string; vertical?: string; product?: string; audience?: "internal" | "external"; limit?: number };
+export type SearchArgs = { query?: string; asset_type?: string; vertical?: string; product?: string; audience?: "internal" | "external"; limit?: number;
+  /** The rep is sending outside Accops even though this search is not public-only (a public-only
+   *  search that found nothing, retried internal): the sharable edition of a family leads. */
+  sending?: boolean };
+
+// "public sector" is a vertical, not a request to send something outside Accops.
+export const EXTERNAL = /\b(send|sending|email|mail|share|forward|give|hand|bhej\w*)\b[^.?!]{0,40}\b(customer|client|prospect|buyer|cio|ciso|cto|them|him|her|outside)\b|\b(customer|client|prospect|cio|ciso)\s+(ko|ke liye)\b|\bfor (a|the|my|our) (customer|client|prospect)\b|customer-facing|client-facing|\bpublic\b(?! sector)|\bexternal(ly)?\b|\bsend to\b|\bshare with\b|\bforward\b|\b(i|we) (can|could) (send|e-?mail|mail|forward)\b|\b(sendable|shareable)\b/;
 export type SearchHit = { asset: Asset; score: number; why: string };
 
 // Words that carry no retrieval signal. "accops" is in nearly every blob, so "Accops vs Forcepoint"
@@ -452,7 +525,7 @@ export function searchAssets(args: SearchArgs): { results: SearchHit[]; consider
   const onlyTypes = !content.some(Boolean);
   const topic = topicOf(args.query ?? "");
   const out: SearchHit[] = [];
-  const pool = allAssets();
+  const pool = answerable();
   for (const a of pool) {
     // A battlecard IS a deck to a rep: "which deck has the Citrix comparison?" filtered to Deck and
     // dropped both Citrix battlecards, answering with a licensing spreadsheet-deck instead.
@@ -487,7 +560,28 @@ export function searchAssets(args: SearchArgs): { results: SearchHit[]; consider
     out.push({ asset: a, score, why: hits.length ? `matched ${hits.slice(0, 5).join(", ")}` : "matched your filters" });
   }
   out.sort((x, y) => y.score - x.score || (yearOf(y.asset) ?? "").localeCompare(yearOf(x.asset) ?? ""));
-  return { results: cover(out, args.limit ?? 5, namedEntities(args.query ?? "")), considered: pool.length };
+  return { results: cover(oneEdition(out, args), args.limit ?? 5, namedEntities(args.query ?? "")), considered: pool.length };
+}
+
+/** A sharable and a confidential edition, or an English and a Japanese one, are one document: one
+ *  answer slot, at the family's best rank, taken by the edition the ask needs - sharable when the rep
+ *  is sending, Japanese for Japan, MEA for the Middle East, else the family's canonical. */
+function oneEdition(ranked: SearchHit[], args: SearchArgs): SearchHit[] {
+  const q = args.query ?? "", named = namedEntities(q);
+  const want = {
+    sending: args.audience === "external" || Boolean(args.sending) || EXTERNAL.test(q.toLowerCase()),
+    japan: named.includes("Japan"),
+    mea: named.some(e => ["Middle East", "UAE", "Saudi", "Qatar", "Oman", "Kuwait", "Bahrain", "GITEX"].includes(e)),
+  };
+  const groups = new Map<string, SearchHit[]>();
+  for (const h of ranked) { const k = h.asset.family?.key ?? assetKey(h.asset); groups.set(k, [...(groups.get(k) ?? []), h]); }
+  const out: SearchHit[] = [];
+  for (const g of groups.values()) {
+    const pick = g.length === 1 ? g[0] : [...g].sort((x, y) => editionScore(y.asset.family?.edition ?? "", want) - editionScore(x.asset.family?.edition ?? "", want)
+      || Number(y.asset.family?.canonical) - Number(x.asset.family?.canonical))[0];
+    out.push(pick === g[0] ? pick : { ...pick, score: g[0].score });
+  }
+  return out;
 }
 
 /** The top `limit` of `ranked`, changed so that each named entity has a result ABOUT it (in its title
@@ -513,7 +607,7 @@ export function cover(ranked: SearchHit[], limit: number, named: string[]): Sear
 }
 
 export function facetCounts() {
-  const pool = allAssets();
+  const pool = answerable();
   const count = (f: (a: Asset) => string[]) => {
     const m = new Map<string, number>();
     for (const a of pool) for (const k of f(a)) m.set(k, (m.get(k) ?? 0) + 1);
@@ -529,7 +623,7 @@ export function facetCounts() {
 
 /** Combinations a salesperson could reasonably ask for that have zero assets. This is the "Not available" view. */
 export function coverageGaps(): { vertical: string; type: "Case Study" | "Whitepaper"; product?: string }[] {
-  const pool = allAssets();
+  const pool = answerable();
   const gaps: { vertical: string; type: "Case Study" | "Whitepaper"; product?: string }[] = [];
   for (const v of Object.keys(VERTICALS)) {
     for (const t of ["Case Study", "Whitepaper"] as const) {
@@ -543,7 +637,7 @@ export function coverageGaps(): { vertical: string; type: "Case Study" | "Whitep
 }
 
 export function latest(n = 12): Asset[] {
-  return [...allAssets()].sort((x, y) => (y.file?.modified ?? "").localeCompare(x.file?.modified ?? "")).slice(0, n);
+  return [...answerable()].sort((x, y) => (y.file?.modified ?? "").localeCompare(x.file?.modified ?? "")).slice(0, n);
 }
 export function counts() { return data.counts; }
 

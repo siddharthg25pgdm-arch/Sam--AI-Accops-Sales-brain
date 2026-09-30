@@ -22,7 +22,7 @@
  *      Gartner research, competitive battlecards, a deck listing thirty named customers.
  */
 import type { Asset } from "./cards";
-import { cardRows, type CardRow } from "./sharepoint";
+import { cardRows, pinRows, overrideRows, type CardRow } from "./sharepoint";
 
 const TTL_MS = 5 * 60_000;
 
@@ -30,6 +30,7 @@ const TTL_MS = 5 * 60_000;
 const g = globalThis as unknown as {
   __samCards?: Asset[]; __samCardsAt?: number; __samCardsBusy?: boolean;
   __samCardMeta?: Map<string, CardRow>;
+  __samPins?: Set<string>; __samFamOv?: Map<string, string>;
 };
 
 /** Card row -> Asset.
@@ -93,11 +94,26 @@ export function cardMeta(): Map<string, CardRow> {
   return g.__samCardMeta ?? new Map();
 }
 
+/** Assets an admin pinned into answers despite their age (sam_asset_pins.asset_key, see pinKey()). */
+export function pinnedKeys(): Set<string> {
+  return g.__samPins ?? EMPTY;
+}
+/** Human corrections to family detection: filename stem -> family key (sam_asset_family_overrides). */
+export function familyOverrides(): Map<string, string> {
+  return g.__samFamOv ?? NO_OV;
+}
+const EMPTY = new Set<string>(), NO_OV = new Map<string, string>();
+
 /** Reload from Supabase. One in-flight load at a time; a failure keeps the previous contents. */
 export async function refreshCards(): Promise<number> {
   if (g.__samCardsBusy) return g.__samCards?.length ?? 0;
   g.__samCardsBusy = true;
   try {
+    // Pins and overrides are small and optional: a missing table (not migrated yet) or a failed read
+    // keeps the previous set and never costs SAM its cards.
+    const [pins, ov] = await Promise.all([pinRows().catch(() => null), overrideRows().catch(() => null)]);
+    if (pins) g.__samPins = new Set(pins.map(p => p.asset_key));
+    if (ov) g.__samFamOv = new Map(ov.map(o => [o.stem, o.family_key]));
     const rows = await cardRows(2000);
     g.__samCards = rows.map(cardToAsset);
     // Two keys per card: `id:<item_id>` survives a rename, the filename covers unbound cards.

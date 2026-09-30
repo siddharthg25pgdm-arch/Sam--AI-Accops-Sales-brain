@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchAssets, allAssets, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, ENTITIES, namesProduct, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
+import { searchAssets, answerable, EXTERNAL, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, ENTITIES, namesProduct, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured, compatModels } from "./agent-openai";
 import { providerFailure, type AskError } from "./events";
 
@@ -81,7 +81,7 @@ export function toCard(h: SearchHit) {
     visibility: a.public_url ? "public" : "internal", year: yearOf(a), stale: isStale(a),
     // Why a rep should hesitate, in words. Null for most assets; an expiry or a newer edition for
     // the ones where sending the wrong copy actually costs something.
-    trust: trustNote(a), path: a.file?.path ?? null };
+    trust: trustNote(a), path: a.file?.path ?? null, older: a.family?.older ?? 0 };
 }
 /** What the model sees of each result. Every field here is re-sent on every later round of the
  *  question, so it is the biggest token cost SAM has: short brief, two outcomes, empty fields dropped. */
@@ -98,8 +98,6 @@ export function toolPayload(hits: SearchHit[], note: string | null = null, ids: 
     visibility: a.public_url ? "public" : "internal", matched: why })) });
 }
 
-// "public sector" is a vertical, not a request to send something outside Accops.
-const EXTERNAL = /\b(send|sending|email|mail|share|forward|give|hand|bhej\w*)\b[^.?!]{0,40}\b(customer|client|prospect|buyer|cio|ciso|cto|them|him|her|outside)\b|\b(customer|client|prospect|cio|ciso)\s+(ko|ke liye)\b|\bfor (a|the|my|our) (customer|client|prospect)\b|customer-facing|client-facing|\bpublic\b(?! sector)|\bexternal(ly)?\b|\bsend to\b|\bshare with\b|\bforward\b|\b(i|we) (can|could) (send|e-?mail|mail|forward)\b|\b(sendable|shareable)\b/;
 
 /** Heuristic slot extraction used by the local fallback, and the ONLY source of `audience` for the
  *  models too. Left to the model, the first search was external almost every time - "which deck has
@@ -175,7 +173,7 @@ export function runSearch(raw: Record<string, unknown>, question: string): Searc
   };
   let { results, considered } = searchAssets(args);
   if (!results.length && args.audience === "external") {
-    args = { ...args, audience: "internal" }; ({ results, considered } = searchAssets(args));
+    args = { ...args, audience: "internal", sending: true }; ({ results, considered } = searchAssets(args));
     notes.push("nothing published matches, so these are internal only");
   }
   // The product goes first: it is a keyword guess, while asset_type is kept only when the rep named
@@ -485,8 +483,10 @@ used support supports supporting supported conversation discussion`.split(/\s+/)
 function assetLine(h: SearchHit, external: boolean): string {
   const a = h.asset, y = yearOf(a), t = trustNote(a);
   const vis = a.public_url ? "public" : external ? "internal only: do not send outside Accops" : "internal only";
+  // Older versions never take a slot; the line says they exist, so "is this the latest?" is answered.
+  const old = a.family?.older ? `${a.family.older} older version${a.family.older === 1 ? "" : "s"} not shown` : "";
   // The full trust note is on the card; the line keeps its first sentence so three lines stay scannable.
-  return `- **${a.title}** (${[y, vis].filter(Boolean).join(", ")}) - ${describe(a)}${t ? ` ${/^EXPIRED/.test(t) ? "" : "Check first: "}${firstSentence(t, 140)}` : ""}`;
+  return `- **${a.title}** (${[y, vis, old].filter(Boolean).join(", ")}) - ${describe(a)}${t ? ` ${/^EXPIRED/.test(t) ? "" : "Check first: "}${firstSentence(t, 140)}` : ""}`;
 }
 
 /** Each shown asset that has a newer edition in the catalogue brings it in, newer first. The trust
@@ -775,7 +775,9 @@ export function finish(p: {
   // documents offered as internal references, labelled as not a quote.
   if (PRICE_ASK.test(p.question) && !hits.some(h => isPriceList(h.asset))) {
     p.trace.push({ step: "grounding guard: pricing", detail: "no returned document is a current price list" });
-    const refs = priceReferences(hits, p.question);
+    // The question's own words too: entity coverage can push a calculator out of the merged results
+    // (a "vs citrix" ask keeps a Citrix document instead), and it is the one reference that fits.
+    const refs = priceReferences([...hits, ...searchAssets({ query: p.question, limit: 10 }).results], p.question);
     return done(NO_PRICING, refs.length ? ["For your own reference only, not a quote:"] : [], refs, true);
   }
 
@@ -982,7 +984,7 @@ function nearFirst(subs: SearchHit[], missing: string[], turn: string, trace: As
   // mention ("GCC Security Symposium" on an award slide, a Singapore office) is not near.
   const lead = subs.slice(0, subs[0] && prods.some(e => isAbout(subs[0].asset, e)) ? 1 : 0), rest = subs.slice(lead.length);
   const have = rest.filter(h => near(h.asset) >= 2), want = 2 - lead.length - have.length;
-  const add = want <= 0 ? [] : allAssets().filter(a => !isJunk(a) && regionOk(turn, a) && !subs.some(h => assetKey(h.asset) === assetKey(a)))
+  const add = want <= 0 ? [] : answerable().filter(a => !isJunk(a) && regionOk(turn, a) && !subs.some(h => assetKey(h.asset) === assetKey(a)))
     .map(a => ({ a, s: near(a) >= 2 ? score(a) : 0 })).filter(x => x.s > 0).sort((x, y) => y.s - x.s).slice(0, want).map(({ a }) => ({ asset: a, score: 0, why: NEAR_WHY }));
   if (add.length) trace.push({ step: "substitutes: near the missing topic", detail: `${add.map(h => h.asset.title).join("; ")} for ${missing.join(", ")}`.slice(0, 300) });
   return [...lead, ...have, ...add, ...rest.filter(h => !have.includes(h))];
@@ -1172,7 +1174,7 @@ function askLocal(question: string, t0: number): AskResult {
   // Asked for something sendable and nothing is published: widen to internal (sendLine says none
   // can be sent), rather than reporting a gap for an asset the library actually holds.
   if (!results.length && askedExternal) {
-    args = { ...args, audience: "internal" as const };
+    args = { ...args, audience: "internal" as const, sending: true };
     trace.push({ step: "tool call: search_assets (internal fallback)", detail: JSON.stringify(args) });
     ({ results, considered } = searchAssets(args));
   }
