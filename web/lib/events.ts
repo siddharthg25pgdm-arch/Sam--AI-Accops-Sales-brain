@@ -87,10 +87,18 @@ function cfg() {
 export function persistent() { return Boolean(cfg()); }
 
 /** Never throws: analytics must not break an answer. */
+
+/** Key-shaped strings never reach sam_events (see lib/redact.ts; duplicated here because this file
+ *  has no imports on purpose). */
+const scrub = <T extends string | null | undefined>(v: T): T => (typeof v === "string"
+  ? v.replace(/\bsk-(?:proj-|svcacct-|admin-)?[A-Za-z0-9_-]{16,}|\bgsk_[A-Za-z0-9]{16,}|\bsk-ant-[A-Za-z0-9_-]{16,}|\bsb_secret_[A-Za-z0-9_-]{16,}|\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g, "[redacted]")
+      .replace(/(Bearer\s+)[^\s"',;]+/gi, "$1[redacted]")
+  : v) as T;
+
 export async function logEvent(e: SamEvent): Promise<number | null> {
   const row: SamEvent = {
     ...e, channel: e.channel ?? "web", is_test: await isTest(e), schema_version: 2,
-    answer: e.answer?.slice(0, 2000) ?? e.answer, error_detail: e.error_detail?.slice(0, 500) ?? e.error_detail,
+    answer: scrub(e.answer?.slice(0, 2000) ?? e.answer), error_detail: scrub(e.error_detail?.slice(0, 500) ?? e.error_detail),
   };
   const c = cfg();
   if (!c) { const m = { ...row, id: memId++, created_at: new Date().toISOString() }; g.__samMemId = memId; mem.unshift(m); if (mem.length > 2000) mem.pop(); return m.id!; }

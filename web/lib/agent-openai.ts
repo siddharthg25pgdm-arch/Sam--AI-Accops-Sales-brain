@@ -21,6 +21,7 @@
 import { VERTICALS, PRODUCTS, type SearchHit } from "./cards";
 import { SYSTEM, ASSET_TYPES, MAX_SEARCHES, BUDGET_USED, SEED_STEP, runSearch, seedSearch, searchText, finish, toolPayload, numbering, type AskResult } from "./agent";
 import type { AskError } from "./events";
+import { cleanKey, redact } from "./redact";
 
 export type Msg = { role: "system" | "user" | "assistant" | "tool"; content: string | null; tool_calls?: ToolCall[]; tool_call_id?: string; name?: string };
 type ToolCall = { id: string; type: "function"; function: { name: string; arguments: string } };
@@ -53,14 +54,26 @@ export type Tier = { provider: "openai" | "openai-compatible"; base: string; key
 
 const isOpenAI = (base: string) => /^https:\/\/([a-z0-9-]+\.)*api\.openai\.com(\/|$)/i.test(base);
 
+/** Keys that are set but malformed (pasted twice, line breaks). Such a tier is skipped - never sent as
+ *  a header, because fetch's "invalid header value" error echoes the whole key - and the reason is
+ *  reported by /api/v1/provider. The reason never contains the key. */
+export function keyProblems(): string[] {
+  const e = process.env;
+  return [cleanKey(e.OPENAI_API_KEY, "OPENAI_API_KEY").problem,
+    e.LLM_PROVIDER === "openai-compatible" ? cleanKey(e.OPENAI_COMPAT_API_KEY, "OPENAI_COMPAT_API_KEY").problem : null]
+    .filter((p): p is string => Boolean(p));
+}
+
 /** Configured model tiers, in the order ask() tries them. */
 export function tiers(): Tier[] {
   const e = process.env, out: Tier[] = [];
-  if (e.OPENAI_API_KEY) out.push({ provider: "openai", base: (e.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, ""), key: e.OPENAI_API_KEY,
+  const openaiKey = cleanKey(e.OPENAI_API_KEY, "OPENAI_API_KEY").key;
+  const compatKey = cleanKey(e.OPENAI_COMPAT_API_KEY, "OPENAI_COMPAT_API_KEY").key;
+  if (openaiKey) out.push({ provider: "openai", base: (e.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, ""), key: openaiKey,
     models: [e.OPENAI_MODEL || "gpt-6-luna", e.OPENAI_FALLBACK_MODEL ?? ""] });
-  if (e.LLM_PROVIDER === "openai-compatible" && e.OPENAI_COMPAT_API_KEY && e.OPENAI_COMPAT_BASE_URL && e.OPENAI_COMPAT_MODEL) {
+  if (e.LLM_PROVIDER === "openai-compatible" && compatKey && e.OPENAI_COMPAT_BASE_URL && e.OPENAI_COMPAT_MODEL) {
     const base = e.OPENAI_COMPAT_BASE_URL.replace(/\/$/, ""), openai = isOpenAI(base);
-    out.push({ provider: openai ? "openai" : "openai-compatible", base, key: e.OPENAI_COMPAT_API_KEY,
+    out.push({ provider: openai ? "openai" : "openai-compatible", base, key: compatKey,
       models: [e.OPENAI_COMPAT_MODEL, e.OPENAI_COMPAT_FALLBACK_MODEL ?? (openai ? "" : "openai/gpt-oss-20b")] });
   }
   return out.map(t => ({ ...t, models: t.models.filter(Boolean) }));
@@ -141,7 +154,7 @@ export async function askOpenAICompat(question: string, history: { role: "user" 
       signal: AbortSignal.timeout(Math.max(1000, deadline - Date.now())),
     });
     if (!r.ok) {
-      const detail = `${model} returned ${r.status}: ${(await r.text()).slice(0, 200)}`;
+      const detail = redact(`${model} returned ${r.status}: ${(await r.text()).slice(0, 200)}`);
       // A rate limit or an outage is for the next model in the chain. Anything else on the forced
       // round (Groq can 400 with "tool choice is none, but model called a tool") is answered from
       // what the searches already found, not thrown away.

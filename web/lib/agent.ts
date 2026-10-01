@@ -1,3 +1,4 @@
+import { redact } from "./redact";
 import Anthropic from "@anthropic-ai/sdk";
 import { searchAssets, answerable, EXTERNAL, cover, firstSentence, BROCHURE_MISSPELT, describe, isDescribed, cardText, successorOf, namedEntities, mentions, OWN_PRODUCTS, ENTITIES, namesProduct, queryTokens, tokenMatcher, facetCounts, VERTICALS, PRODUCTS, yearOf, isStale, trustNote, assetLink, assetLocation, assetKey, typeGroup, productsOf, verticalOf, type SearchHit, type SearchArgs, type Asset } from "./cards";
 import { askOpenAICompat, openAICompatConfigured, compatModels } from "./agent-openai";
@@ -1080,10 +1081,10 @@ export async function ask(question: string, history: { role: "user" | "assistant
   const failures: { model: string; message: string; timeout: boolean }[] = [];
   const failed = (model: string, err: unknown) => {
     const e = err as Error & { cause?: { code?: string; message?: string } };
-    console.error(`${model} failed, falling back`, e);
+    console.error(`${model} failed, falling back`, redact(e?.message ?? String(err)));
     // fetch() reports network failures as a bare "fetch failed"; the reason is on .cause.
     const cause = e?.cause ? `${e.cause.code ?? ""} ${e.cause.message ?? ""}`.trim() : "";
-    const message = [e?.message ?? String(err), cause].filter(Boolean).join(": ");
+    const message = redact([e?.message ?? String(err), cause].filter(Boolean).join(": "));
     failures.push({ model, message, timeout: e?.name === "TimeoutError" || e?.name === "APIConnectionTimeoutError" || /time(d)? ?out/i.test(message) });
   };
   // A model that answers after an earlier provider failed keeps its own error if it has one (an

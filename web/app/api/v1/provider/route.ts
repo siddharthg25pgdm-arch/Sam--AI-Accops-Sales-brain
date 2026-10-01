@@ -1,5 +1,6 @@
 import { resolveCaller, unauthorized } from "@/lib/apiauth";
-import { tiers, requestBody, type Tier } from "@/lib/agent-openai";
+import { tiers, requestBody, keyProblems, type Tier } from "@/lib/agent-openai";
+import { redact } from "@/lib/redact";
 
 /** GET /api/v1/provider (admin cookie or API token; a rep's cookie gets 403): which model providers are configured, in the order SAM
  *  tries them, whether each configured model exists for the key and answers a real SAM-shaped request
@@ -15,8 +16,11 @@ export async function GET(req: Request) {
     // Kept for older callers: the first provider and model SAM will use.
     provider: ts[0]?.provider ?? (claude ? "anthropic" : "none"), model: ts[0]?.models[0] ?? claude,
     order, tiers: await Promise.all(ts.map(check)),
+    // A set-but-malformed key (pasted twice, line breaks) is skipped, not sent. Said here, never echoed.
+    ...(keyProblems().length ? { key_problems: keyProblems() } : {}),
   };
-  return Response.json(out);
+  // Last line of defence: nothing key-shaped leaves this route, whatever produced it.
+  return new Response(redact(out), { headers: { "Content-Type": "application/json" } });
 }
 
 async function check(t: Tier) {
@@ -29,8 +33,8 @@ async function check(t: Tier) {
       const ids = new Set<string>((j.data ?? []).map((m: { id: string }) => m.id));
       res.key_valid = true;
       res.available = Object.fromEntries(t.models.map(m => [m, ids.has(m)]));
-    } else { res.key_valid = [401, 403].includes(r.status) ? false : null; res.models_error = { http: r.status, error: j.error?.message ?? j }; }
-  } catch (e) { res.models_error = (e as Error).message; }
+    } else { res.key_valid = [401, 403].includes(r.status) ? false : null; res.models_error = { http: r.status, error: redact(j.error?.message ?? j) }; }
+  } catch (e) { res.models_error = redact(e); }
   res.ping = await Promise.all(t.models.map(async model => {
     const t0 = Date.now();
     try {
@@ -40,8 +44,8 @@ async function check(t: Tier) {
       const j = await r.json();
       const ms = Date.now() - t0;
       return r.ok ? { model, ok: true, answered_by: j.model, reply: j.choices?.[0]?.message?.content, ms, tokens: j.usage?.total_tokens }
-        : { model, ok: false, http: r.status, error: j.error?.message ?? j, ms };
-    } catch (e) { return { model, ok: false, error: (e as Error).message, ms: Date.now() - t0 }; }
+        : { model, ok: false, http: r.status, error: redact(j.error?.message ?? j), ms };
+    } catch (e) { return { model, ok: false, error: redact(e), ms: Date.now() - t0 }; }
   }));
   return res;
 }
