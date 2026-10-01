@@ -1076,7 +1076,9 @@ function best(pool: SearchHit[]): SearchHit[] {
 // Leaves ~20 s of the route's 60 s maxDuration for retrieval, logging and a second provider.
 const MODEL_BUDGET_MS = 40_000;
 
-export async function ask(question: string, history: { role: "user" | "assistant"; content: string }[] = []): Promise<AskResult> {
+/** `opts.model` pins one configured model (test traffic only - see /api/v1/ask): no fallback to other
+ *  models, so a head-to-head eval measures that model alone. */
+export async function ask(question: string, history: { role: "user" | "assistant"; content: string }[] = [], opts: { model?: string } = {}): Promise<AskResult> {
   const t0 = Date.now(), deadline = t0 + MODEL_BUDGET_MS;
   const failures: { model: string; message: string; timeout: boolean }[] = [];
   const failed = (model: string, err: unknown) => {
@@ -1096,7 +1098,7 @@ export async function ask(question: string, history: { role: "user" | "assistant
     // Primary, then a second model on the same provider. Groq's free-tier limits are per model, so
     // when gpt-oss-120b is out of tokens for the minute (429) gpt-oss-20b usually is not - better a
     // smaller model than none. Skipped when there is too little time left for a whole answer.
-    for (const model of compatModels()) {
+    for (const model of (opts.model ? compatModels().filter(m => m === opts.model) : compatModels())) {
       if (Date.now() > deadline - 5_000) break;
       try { return withFailures(await askOpenAICompat(question, history, t0, deadline, model)); }
       catch (err) { failed(model, err); }

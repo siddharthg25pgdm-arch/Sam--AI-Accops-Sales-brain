@@ -59,6 +59,25 @@ The 25 September section below supersedes anything older it contradicts.
 
 ---
 
+## NEXT SESSION - start here (written 1 Oct 2026)
+
+1. **Fair Groq vs OpenAI comparison (unfinished).** The 30 Sep Groq run (28/28) used the old 475-asset pool; the
+   1 Oct luna run (27/28) used today's 283 eligible assets, so they are not comparable. A test-only pin now exists:
+   `POST /api/v1/ask {question, model}` is honoured only for an API token sending `x-sam-test: 1`, and the model gets
+   no fallback. Run both back to back on the same build, then decide the primary:
+   `SAM_API_TOKEN=... node prototype/eval.mjs --pace 8000 --model gpt-6-luna` and
+   `... --model openai/gpt-oss-120b` (Groq's 200k tokens/day: one 30-question run uses ~64k). Compare hit@3, p50/p95
+   latency (sam_events by model) and cost.
+2. **Remind Siddharth: revoke the exposed OpenAI key (ends ...CQA)** and paste a fresh one once into `OPENAI_API_KEY`,
+   then redeploy and re-check `/api/v1/provider`.
+3. Still with Siddharth: the rep demo (`docs/DEMO-SCRIPT.md`), PRD review (`docs/PRD-website-chatbot.md`), WhatsApp
+   token before 3 Nov (`docs/TASK-whatsapp-meta-setup.md`), main Outlook connection in Power Automate, marketing
+   fixes in `docs/CONTENT-GAPS-2026-09-25.md`, the reader-role JWT when the website bot is built.
+4. Daily loop (all verified 30 Sep): change flow → 02:00 snapshot (write) → 07:00 `SamNightlyCarding` → 08:30
+   digest email. Check `sam_ops_runs` / the System tab "Scheduled jobs" panel if anything looks quiet.
+
+---
+
 ## 1 October 2026: OpenAI gpt-6-luna is the primary model
 
 Chain: **gpt-6-luna (OpenAI) → Groq gpt-oss-120b → gpt-oss-20b → retrieval**. Paced production eval on luna:

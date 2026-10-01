@@ -22,6 +22,8 @@ const arg = (name, dflt) => (args.includes(name) ? args[args.indexOf(name) + 1] 
 const base = arg("--base", "https://sam-accops.vercel.app");
 const local = /localhost|127\.0\.0\.1/.test(base);
 const pace = Number(arg("--pace", local ? 0 : 20000));
+// --model <name> pins one configured model (no fallback) for a head-to-head run; needs x-sam-test, which this script sends.
+const pinModel = arg("--model", "");
 const token = process.env.SAM_API_TOKEN;
 const THRESHOLD = 85;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -56,7 +58,7 @@ async function ask(q) {
     const r = await fetch(`${base}/api/v1/ask`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "x-sam-test": "1" },
-      body: JSON.stringify({ question: q }),
+      body: JSON.stringify(pinModel ? { question: q, model: pinModel } : { question: q }),
     });
     if ((r.status === 429 || r.status === 503) && attempt < 3) { await sleep(Number(r.headers.get("retry-after")) * 1000 || 30000); continue; }
     if (!r.ok) throw new Error(`${r.status} ${(await r.text()).slice(0, 120)}`);

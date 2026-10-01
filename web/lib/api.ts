@@ -38,12 +38,12 @@ export async function apiSearch(p: { query?: string; asset_type?: string; vertic
  *  here, so the query event always carries the answer, the model, the latency and the error kind.
  *  A thrown error is logged as a question with error_kind server_error (so it counts in the error
  *  rate's denominator and numerator alike) and then rethrown, so callers behave as before. */
-export async function askAndLog(question: string, who: string, channel: Channel, history: { role: "user" | "assistant"; content: string }[] = [], sessionId?: string | null) {
+export async function askAndLog(question: string, who: string, channel: Channel, history: { role: "user" | "assistant"; content: string }[] = [], sessionId?: string | null, opts: { model?: string } = {}) {
   const t0 = Date.now();
   let r: AskResult;
   // Same as apiSearch: web, REST, MCP and WhatsApp all ask through here, so all of them wait for a
   // cold library. Returns at once when warm.
-  try { await ready(); r = await askAgent(question, history); }
+  try { await ready(); r = await askAgent(question, history, opts); }
   catch (err) {
     await logEvent({ user_id: who, channel, session_id: sessionId ?? null, kind: "query", query: question, intent: "other", result_count: 0,
       latency_ms: Date.now() - t0, error_kind: "server_error", error_detail: (err as Error)?.stack ?? String(err) });
@@ -58,8 +58,8 @@ export async function askAndLog(question: string, who: string, channel: Channel,
   return { r, eventId };
 }
 
-export async function apiAsk(question: string, who: string, channel: Channel, history: { role: "user" | "assistant"; content: string }[] = [], sessionId?: string | null) {
-  const { r, eventId } = await askAndLog(question, who, channel, history, sessionId);
+export async function apiAsk(question: string, who: string, channel: Channel, history: { role: "user" | "assistant"; content: string }[] = [], sessionId?: string | null, opts: { model?: string } = {}) {
+  const { r, eventId } = await askAndLog(question, who, channel, history, sessionId, opts);
   return { answer: r.text, assets: r.assets, gap: r.zero, missing: r.missing, runtime: r.runtime, model: r.model, trace: r.trace, event_id: eventId };
 }
 
