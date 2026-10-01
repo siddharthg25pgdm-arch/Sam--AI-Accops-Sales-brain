@@ -59,6 +59,19 @@ The 25 September section below supersedes anything older it contradicts.
 
 ---
 
+## 1 October 2026: OpenAI gpt-6-luna is the primary model
+
+Chain: **gpt-6-luna (OpenAI) → Groq gpt-oss-120b → gpt-oss-20b → retrieval**. Paced production eval on luna:
+**27/28 = 96%** hit@3 (the one miss: "do we have a pharma ZTNA case study?" led with the Single-Slide Case Studies
+library, which names 9 pharma customers), 0 ungrounded names, ~2,120 tokens/question, p50 956 ms / p95 3.2 s
+(Groq 120b on 30 Sep: 28/28, p50 627 ms / p95 2.2 s). Cost estimate ~USD 0.0003/question; the whole 30-question
+run ~USD 0.01. No daily cap (Groq's 200k/day was the bottleneck). Owner: never use gpt-6 Sol or Astra.
+**Security:** the key was pasted three times; `/api/v1/provider` echoed it in an error (fixed: `web/lib/redact.ts`,
+`cleanKey`, `redact.check.mjs`; nothing reached `sam_events`). That key (ends …CQA) must be revoked and replaced
+with a fresh one pasted once.
+
+---
+
 ## 30 September 2026: eval 28/28
 
 Paced production eval (`prototype/eval.mjs`, 30 questions, all answered by gpt-oss-120b): **hit@3 28/28 = 100%**
