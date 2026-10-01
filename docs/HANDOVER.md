@@ -2,6 +2,7 @@
 
 **Written 7 September 2026, updated 25 September 2026.** Paste the prompt at the bottom into a fresh session.
 The 25 September section below supersedes anything older it contradicts.
+**The whole build history, in date order: [BUILD-LOG.md](BUILD-LOG.md).**
 
 ---
 
