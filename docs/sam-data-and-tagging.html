@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SAM - how it tags, analyses and stores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #faf7f2; --paper-2: #f2ede4; --ink: #1c1917; --muted: #57534e; --soft: #78716c;
+      --rule: rgba(28,25,23,0.12); --accent: #b5523a; --accent-tint: rgba(181,82,58,0.08); --link: #2563eb;
+      --sans: 'Geist', system-ui, sans-serif; --serif: 'Instrument Serif', 'Times New Roman', serif;
+      --mono: 'Geist Mono', ui-monospace, Menlo, monospace;
+    }
+    body { font-family: var(--sans); background: var(--paper); color: var(--ink); padding: 3rem 2rem; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .eyebrow { font-family: var(--mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.75rem, 3vw + 1rem, 2.5rem); letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 0.5rem; }
+    h2 { font-family: var(--serif); font-weight: 400; font-size: 1.6rem; letter-spacing: -0.01em; margin: 3.5rem 0 0.4rem; }
+    h3.sub { font-size: 0.95rem; font-weight: 600; margin: 1.75rem 0 0.25rem; }
+    .subtitle, .lede { color: var(--muted); font-size: 1rem; line-height: 1.55; max-width: 72ch; }
+    .lede { margin-bottom: 1.25rem; font-size: 0.95rem; }
+    .diagram { background: var(--paper-2); border: 1px solid var(--rule); border-radius: 8px; padding: 1.5rem; overflow-x: auto; }
+    svg { width: 100%; min-width: 960px; display: block; }
+    .cards { display: grid; gap: 1rem; margin-top: 1.25rem; }
+    .c3 { grid-template-columns: repeat(3, 1fr); }
+    .c2 { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 860px) { .c3, .c2 { grid-template-columns: 1fr; } }
+    .card { background: #fff; border: 1px solid var(--rule); border-radius: 6px; padding: 1.25rem; }
+    .card .eyebrow { font-size: 0.55rem; margin-bottom: 0.5rem; }
+    .card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(28,25,23,0.08); }
+    .card-header .n { margin-left: auto; font-family: var(--mono); font-size: 0.7rem; color: var(--soft); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .dot.ink { background: var(--ink); } .dot.muted { background: var(--muted); } .dot.coral { background: var(--accent); } .dot.link { background: var(--link); }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card p, .card li { color: var(--muted); font-size: 0.8125rem; line-height: 1.55; }
+    .card p + p { margin-top: 0.5rem; }
+    .card ul { list-style: none; }
+    .card li { padding-left: 0.875rem; position: relative; margin-bottom: 0.3rem; }
+    .card li::before { content: '—'; position: absolute; left: 0; color: rgba(28,25,23,0.25); font-size: 0.75rem; }
+    .card b { color: var(--ink); font-weight: 600; }
+    code { font-family: var(--mono); font-size: 0.75rem; color: var(--ink); background: rgba(28,25,23,0.05); padding: 0 0.25rem; border-radius: 3px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; margin-top: 1.25rem; font-size: 0.8125rem; }
+    th { font-family: var(--mono); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 0.75rem 1rem; background: var(--paper-2); border-bottom: 1px solid var(--rule); }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid rgba(28,25,23,0.07); color: var(--muted); line-height: 1.5; vertical-align: top; }
+    td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+    tr.group td { background: var(--paper-2); font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    tr:last-child td { border-bottom: 0; }
+    .bad { color: var(--accent); font-weight: 500; }
+    .stats { display: flex; flex-wrap: wrap; gap: 2.5rem; margin-top: 1.25rem; padding: 1rem 1.25rem; border: 1px solid var(--rule); border-radius: 6px; background: #fff; }
+    .stat b { display: block; font-family: var(--serif); font-size: 1.9rem; font-weight: 400; line-height: 1; }
+    .stat span { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .stat.accent b { color: var(--accent); }
+    .formula { margin-top: 1.25rem; padding: 1rem 1.25rem; background: #fff; border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 6px; font-family: var(--mono); font-size: 0.85rem; line-height: 1.8; }
+    .formula small { display: block; font-family: var(--sans); color: var(--muted); font-size: 0.78rem; }
+    .footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid rgba(28,25,23,0.10); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+    /* svg text */
+    .t  { font-family: 'Geist', system-ui, sans-serif; font-size: 13px; fill: #1c1917; font-weight: 600; }
+    .ts { font-family: 'Geist', system-ui, sans-serif; font-size: 11px; fill: #57534e; }
+    .tm { font-family: 'Geist Mono', monospace; font-size: 9.5px; fill: #78716c; letter-spacing: 0.12em; text-transform: uppercase; }
+    .ta { font-family: 'Geist', system-ui, sans-serif; font-size: 10.5px; fill: #b5523a; font-weight: 500; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <p class="eyebrow">SAM · Data, tagging and analysis · 2 October 2026</p>
+    <h1>How SAM tags, analyses and stores collateral</h1>
+    <p class="subtitle">Companion to <code>sam-how-it-works.html</code>. Traced from the code (<code>web/lib/sharepoint.ts</code>, <code>web/lib/cards.ts</code>, <code>prototype/carding_prep.py</code>, the nightly carding skill, the <code>docs/supabase-*.sql</code> migrations), with numbers read from the live Supabase database today.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>875</b><span>files in SharePoint</span></div>
+    <div class="stat"><b>440</b><span>archived by name rule</span></div>
+    <div class="stat"><b>452</b><span>assets in catalogue</span></div>
+    <div class="stat"><b>317</b><span>cards written</span></div>
+    <div class="stat accent"><b>233</b><span>answerable today</span></div>
+    <div class="stat"><b>18</b><span>safe to send outside</span></div>
+  </div>
+
+  <!-- ============================================================ 1. WHOLE SYSTEM -->
+  <h2>1 · The whole system on one page</h2>
+  <p class="lede">Two feeds fill the database. A <b>nightly snapshot</b> records <em>where</em> every file is and tags it from its folder and filename. A <b>nightly carding job</b> has Claude read new or edited documents and write a card describing <em>what each one says</em>. Views merge the two into one catalogue, and every channel answers from that catalogue.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1160 560" role="img" aria-label="SAM system flow">
+      <defs>
+        <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#57534e"/></marker>
+        <marker id="ac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b5523a"/></marker>
+      </defs>
+      <!-- column labels -->
+      <text class="tm" x="20" y="22">Sources</text>
+      <text class="tm" x="260" y="22">Ingest (nightly, automatic)</text>
+      <text class="tm" x="540" y="22">Supabase (main database)</text>
+      <text class="tm" x="840" y="22">Serve (every question)</text>
+
+      <!-- sources -->
+      <rect x="20" y="50" width="190" height="78" rx="6" fill="#fff" stroke="#1c1917"/>
+      <text class="t" x="34" y="74">SharePoint</text>
+      <text class="ts" x="34" y="92">Company › Sales Collateral</text>
+      <text class="ts" x="34" y="108">875 files, propalmsnetwork tenant</text>
+
+      <rect x="20" y="262" width="190" height="62" rx="6" fill="#fff" stroke="#1c1917"/>
+      <text class="t" x="34" y="286">OneDrive synced copy</text>
+      <text class="ts" x="34" y="304">same library, on this laptop</text>
+
+      <rect x="20" y="342" width="190" height="62" rx="6" fill="#fff" stroke="#1c1917"/>
+      <text class="t" x="34" y="366">Public bucket</text>
+      <text class="ts" x="34" y="384">downloads.accops.com PDFs</text>
+
+      <!-- pipeline A -->
+      <rect x="260" y="44" width="230" height="56" rx="6" fill="#fff" stroke="#57534e"/>
+      <text class="t" x="274" y="67">Power Automate snapshot</text>
+      <text class="ts" x="274" y="85">~02:00 IST · lists every file + link</text>
+      <rect x="260" y="116" width="230" height="56" rx="6" fill="#fff" stroke="#57534e"/>
+      <text class="t" x="274" y="139">Rule tagger · tagsFor()</text>
+      <text class="ts" x="274" y="157">tags from folder + filename (§2)</text>
+      <line x1="210" y1="80" x2="258" y2="72" stroke="#57534e" marker-end="url(#a)"/>
+      <line x1="375" y1="100" x2="375" y2="114" stroke="#57534e" marker-end="url(#a)"/>
+
+      <!-- pipeline B -->
+      <rect x="260" y="248" width="230" height="56" rx="6" fill="#fff" stroke="#b5523a"/>
+      <text class="t" x="274" y="271">07:00 carding_prep.py</text>
+      <text class="ts" x="274" y="289">queue → copy file → extract text</text>
+      <rect x="260" y="320" width="230" height="56" rx="6" fill="#fff" stroke="#b5523a"/>
+      <text class="t" x="274" y="343">Claude reads the document</text>
+      <text class="ts" x="274" y="361">writes one card per file (§3)</text>
+      <rect x="260" y="392" width="230" height="56" rx="6" fill="#fff" stroke="#b5523a"/>
+      <text class="t" x="274" y="415">Gates before loading</text>
+      <text class="ts" x="274" y="433">compare · JSON · sensitive-data scan</text>
+      <line x1="210" y1="293" x2="258" y2="280" stroke="#57534e" marker-end="url(#a)"/>
+      <line x1="210" y1="373" x2="258" y2="350" stroke="#57534e" marker-end="url(#a)"/>
+      <line x1="375" y1="304" x2="375" y2="318" stroke="#b5523a" marker-end="url(#ac)"/>
+      <line x1="375" y1="376" x2="375" y2="390" stroke="#b5523a" marker-end="url(#ac)"/>
+
+      <!-- database -->
+      <rect x="540" y="50" width="250" height="70" rx="6" fill="#fff" stroke="#1c1917" stroke-width="1.5"/>
+      <text class="t" x="554" y="74">sam_sharepoint_files</text>
+      <text class="ts" x="554" y="92">WHERE each file is: link, dates,</text>
+      <text class="ts" x="554" y="107">rule tags, archived / deleted</text>
+      <line x1="490" y1="144" x2="538" y2="100" stroke="#57534e" marker-end="url(#a)"/>
+
+      <rect x="540" y="168" width="250" height="84" rx="6" fill="#fdf3f0" stroke="#b5523a" stroke-width="1.5"/>
+      <text class="t" x="554" y="192">sam_v1_assets (view)</text>
+      <text class="ts" x="554" y="210">files + cards merged, versions grouped,</text>
+      <text class="ts" x="554" y="225">eligibility decided (§2c)</text>
+      <text class="ta" x="554" y="242">452 assets · 233 answerable</text>
+
+      <rect x="540" y="300" width="250" height="70" rx="6" fill="#fff" stroke="#1c1917" stroke-width="1.5"/>
+      <text class="t" x="554" y="324">sam_asset_cards</text>
+      <text class="ts" x="554" y="342">WHAT each file says: 40 fields,</text>
+      <text class="ts" x="554" y="357">the only thing the AI model sees</text>
+      <line x1="490" y1="420" x2="560" y2="372" stroke="#b5523a" marker-end="url(#ac)"/>
+
+      <line x1="665" y1="120" x2="665" y2="166" stroke="#57534e" marker-end="url(#a)"/>
+      <line x1="665" y1="300" x2="665" y2="254" stroke="#57534e" marker-end="url(#a)"/>
+
+      <!-- queue loop -->
+      <path d="M540,112 C 510,180 520,230 492,262" fill="none" stroke="#b5523a" stroke-dasharray="4 3" marker-end="url(#ac)"/>
+      <text class="ta" x="440" y="214" transform="rotate(-62 470 214)">carding queue</text>
+
+      <rect x="540" y="420" width="250" height="78" rx="6" fill="#fff" stroke="#57534e"/>
+      <text class="t" x="554" y="444">Activity tables</text>
+      <text class="ts" x="554" y="462">sam_events · feedback · content</text>
+      <text class="ts" x="554" y="477">requests · change_log · ops_runs</text>
+
+      <!-- serve -->
+      <rect x="840" y="44" width="300" height="56" rx="6" fill="#fff" stroke="#1c1917"/>
+      <text class="t" x="854" y="67">A rep asks</text>
+      <text class="ts" x="854" y="85">web app · WhatsApp · Dwight (MCP) · REST API</text>
+      <rect x="840" y="124" width="300" height="56" rx="6" fill="#fff" stroke="#57534e"/>
+      <text class="t" x="854" y="147">Search + rank the answerable cards</text>
+      <text class="ts" x="854" y="165">score formula in §4, one edition per document</text>
+      <rect x="840" y="204" width="300" height="62" rx="6" fill="#fff" stroke="#57534e"/>
+      <text class="t" x="854" y="227">Model picks + writes the verdict</text>
+      <text class="ts" x="854" y="245">gpt-6-luna → Groq 120b → 20b → retrieval only</text>
+      <rect x="840" y="290" width="300" height="62" rx="6" fill="#fff" stroke="#57534e"/>
+      <text class="t" x="854" y="313">Guard</text>
+      <text class="ts" x="854" y="331">document lines + links written from the card,</text>
+      <text class="ts" x="854" y="345">never by the model; invented titles removed</text>
+      <rect x="840" y="376" width="300" height="50" rx="6" fill="#1c1917"/>
+      <text class="t" x="854" y="406" style="fill:#faf7f2">Answer + SharePoint / public link</text>
+      <rect x="840" y="450" width="300" height="56" rx="6" fill="#fff" stroke="#57534e"/>
+      <text class="t" x="854" y="473">08:30 morning digest email</text>
+      <text class="ts" x="854" y="491">changes, requests, failed jobs, ratings</text>
+
+      <line x1="990" y1="100" x2="990" y2="122" stroke="#57534e" marker-end="url(#a)"/>
+      <line x1="990" y1="180" x2="990" y2="202" stroke="#57534e" marker-end="url(#a)"/>
+      <line x1="990" y1="266" x2="990" y2="288" stroke="#57534e" marker-end="url(#a)"/>
+      <line x1="990" y1="352" x2="990" y2="374" stroke="#57534e" marker-end="url(#a)"/>
+      <line x1="790" y1="200" x2="838" y2="156" stroke="#b5523a" marker-end="url(#ac)"/>
+      <line x1="840" y1="410" x2="792" y2="448" stroke="#57534e" marker-end="url(#a)"/>
+      <text class="ts" x="772" y="418">logged</text>
+      <line x1="790" y1="480" x2="838" y2="480" stroke="#57534e" marker-end="url(#a)"/>
+
+      <text class="ts" x="20" y="540">Grey = automatic rules · Coral = Claude reads the document · Document bodies never enter Supabase or reach the answering model; only cards and links do.</text>
+    </svg>
+  </div>
+
+  <!-- ============================================================ 2. TAGGING -->
+  <h2>2 · How a file gets tagged and categorised</h2>
+  <p class="lede">Tagging happens in three layers. Each one corrects the one before it, and the third layer decides whether a file can appear in answers at all.</p>
+
+  <h3 class="sub">2a · Layer 1: rule tags from the folder and filename (every file, every night)</h3>
+  <p class="lede">Nothing is read at this stage. A tag means "the library says so". If the folder and the filename disagree on type, the folder wins, because filing a document in a folder is a deliberate choice. Code: <code>tagsFor()</code> in <code>web/lib/sharepoint.ts</code>, a copy of <code>prototype/sp_tags.py</code>.</p>
+  <table>
+    <tr><th>Facet</th><th>How it is decided</th><th>Values it can produce</th></tr>
+    <tr><td>Asset type</td><td>Top folder first (<code>Presentations</code> → Deck, <code>Competition</code> → Competitive, <code>zCase Studies</code> → Case Study…), then filename words (<i>vs</i>, <i>battlecard</i>, <i>datasheet</i>, <i>webinar</i>…). A file can carry several types.</td><td>Case Study, Deck, Video, Whitepaper, Brochure, eBook, Competitive, Analyst Report, Certification, Brand, Event, Webinar, Solution Brief, Product Info, Pricing, Proposal, Roadmap, FAQ, Demo, Other</td></tr>
+    <tr><td>Industry</td><td>Keywords anywhere in the folder path or filename: <i>bank, nbfc, insurance</i> → BFSI; <i>govt, psu, defence, police</i> → Government; <i>hospital, pharma</i> → Pharma / Healthcare…</td><td>BFSI, Government, Pharma / Healthcare, Manufacturing, IT / ITeS, Education, E-commerce / Retail, Media, Telecom</td></tr>
+    <tr><td>Product</td><td>Product names in the path: <i>hysecure, hyid, ztna, mfa, vdi, daas, browser isolation</i>…</td><td>HySecure, HyID, HyWorks, HyLabs, HyDesk, ZTNA, MFA, VDI, DaaS, BioAuth, Nutanix, Thin Client, Browser Isolation</td></tr>
+    <tr><td>Competitor</td><td>Vendor names in the path</td><td>Citrix, VMware, Omnissa, Forcepoint, SonicWall, Fortinet, AWS WorkSpaces, Azure Virtual Desktop, Array Networks, ThinPrint</td></tr>
+    <tr><td>Team</td><td>Which SharePoint site the file came from</td><td>Sales, Marketing</td></tr>
+    <tr><td>Status</td><td>The folder or filename looks like an archive: <i>z-prefixed archive, DONOTUSE, obsolete, backup, to delete, old, wip, draft, temp, raw</i></td><td><b>archived</b> (440 files, never offered) or active</td></tr>
+  </table>
+
+  <h3 class="sub">2b · Layer 2: card tags from reading the document (carded files only)</h3>
+  <p class="lede">For the 317 carded files, Claude reads the text and sets type, industry, products, competitors, personas and regulations from what the document actually says (full list in §3). When a file has both, SAM keeps the <b>richer record</b>, which is almost always the card. Two things are fixed whichever record is kept: the year read from the document body beats a filename year, and the real SharePoint link and folder always come from the registry. Code: <code>merge()</code> in <code>web/lib/cards.ts</code>.</p>
+
+  <h3 class="sub">2c · Layer 3: versions and eligibility, which decide what can be answered</h3>
+  <p class="lede">The database groups copies of the same document into a <b>family</b> (same name stem with a different version, edition or language), then runs every asset through the checks below, top to bottom. The SQL lives in <code>docs/supabase-sam-asset-families.sql</code>, with the same rules in <code>web/lib/family.ts</code>.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1160 300" role="img" aria-label="Eligibility checks">
+      <defs><marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#57534e"/></marker>
+      <marker id="bc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b5523a"/></marker></defs>
+
+      <g>
+        <rect x="10" y="30" width="150" height="78" rx="6" fill="#fff" stroke="#1c1917"/>
+        <text class="tm" x="22" y="50">1</text><text class="t" x="22" y="70">Archived or deleted?</text><text class="ts" x="22" y="88">name rule, or gone</text><text class="ts" x="22" y="101">from SharePoint</text>
+        <rect x="175" y="30" width="150" height="78" rx="6" fill="#fff" stroke="#1c1917"/>
+        <text class="tm" x="187" y="50">2</text><text class="t" x="187" y="70">Card says empty?</text><text class="ts" x="187" y="88">confidence ≤ 0.5 and</text><text class="ts" x="187" y="101">"empty / blank" noted</text>
+        <rect x="340" y="30" width="150" height="78" rx="6" fill="#fff" stroke="#1c1917"/>
+        <text class="tm" x="352" y="50">3</text><text class="t" x="352" y="70">Admin excluded?</text><text class="ts" x="352" y="88">family override with</text><text class="ts" x="352" y="101">exclude = true</text>
+        <rect x="505" y="30" width="150" height="78" rx="6" fill="#fff" stroke="#1c1917"/>
+        <text class="tm" x="517" y="50">4</text><text class="t" x="517" y="70">Pinned or exempt?</text><text class="ts" x="517" y="88">pin · Certification · Analyst</text><text class="ts" x="517" y="101">Report · Regulation · Brand</text>
+        <rect x="670" y="30" width="150" height="78" rx="6" fill="#fff" stroke="#1c1917"/>
+        <text class="tm" x="682" y="50">5</text><text class="t" x="682" y="70">Published 2024+?</text><text class="ts" x="682" y="88">year read from the body;</text><text class="ts" x="682" y="101">else last-modified year</text>
+        <rect x="835" y="30" width="150" height="78" rx="6" fill="#fff" stroke="#1c1917"/>
+        <text class="tm" x="847" y="50">6</text><text class="t" x="847" y="70">Newest in family?</text><text class="ts" x="847" y="88">by publish year, then</text><text class="ts" x="847" y="101">version, then modified</text>
+        <rect x="1000" y="30" width="150" height="78" rx="6" fill="#1c1917"/>
+        <text class="t" x="1014" y="64" style="fill:#faf7f2">ANSWERABLE</text><text class="ts" x="1014" y="84" style="fill:#d6d3d1">233 assets</text>
+      </g>
+      <line x1="160" y1="69" x2="173" y2="69" stroke="#57534e" marker-end="url(#b)"/>
+      <line x1="325" y1="69" x2="338" y2="69" stroke="#57534e" marker-end="url(#b)"/>
+      <line x1="490" y1="69" x2="503" y2="69" stroke="#57534e" marker-end="url(#b)"/>
+      <line x1="655" y1="69" x2="668" y2="69" stroke="#57534e" marker-end="url(#b)"/>
+      <line x1="820" y1="69" x2="833" y2="69" stroke="#57534e" marker-end="url(#b)"/>
+      <line x1="985" y1="69" x2="998" y2="69" stroke="#57534e" marker-end="url(#b)"/>
+      <path d="M580,108 C 580,140 900,140 900,108" fill="none" stroke="#57534e" stroke-dasharray="4 3" marker-end="url(#b)"/>
+      <text class="ts" x="600" y="152">yes → skips the year rule</text>
+
+      <!-- outs -->
+      <line x1="85" y1="108" x2="85" y2="196" stroke="#b5523a" marker-end="url(#bc)"/>
+      <line x1="250" y1="108" x2="250" y2="196" stroke="#b5523a" marker-end="url(#bc)"/>
+      <line x1="415" y1="108" x2="415" y2="196" stroke="#b5523a" marker-end="url(#bc)"/>
+      <line x1="745" y1="108" x2="745" y2="196" stroke="#b5523a" marker-end="url(#bc)"/>
+      <line x1="910" y1="108" x2="910" y2="196" stroke="#b5523a" marker-end="url(#bc)"/>
+      <text class="ta" x="92" y="160">yes</text><text class="ta" x="257" y="160">yes</text><text class="ta" x="422" y="160">yes</text><text class="ta" x="752" y="178">no</text><text class="ta" x="917" y="178">no</text>
+
+      <rect x="10" y="200" width="150" height="62" rx="6" fill="#fdf3f0" stroke="#b5523a"/><text class="t" x="22" y="224">Never offered</text><text class="ts" x="22" y="242">440 archived files</text>
+      <rect x="175" y="200" width="150" height="62" rx="6" fill="#fdf3f0" stroke="#b5523a"/><text class="t" x="187" y="224">Out</text><text class="ts" x="187" y="242">1 asset</text>
+      <rect x="340" y="200" width="150" height="62" rx="6" fill="#fdf3f0" stroke="#b5523a"/><text class="t" x="352" y="224">Out</text><text class="ts" x="352" y="242">human decision</text>
+      <rect x="670" y="200" width="150" height="62" rx="6" fill="#fdf3f0" stroke="#b5523a"/><text class="t" x="682" y="224">Out · 182</text><text class="ts" x="682" y="242">162 pre-2024 · 20 no year</text>
+      <rect x="835" y="200" width="150" height="62" rx="6" fill="#fdf3f0" stroke="#b5523a"/><text class="t" x="847" y="224">Hidden · 69</text><text class="ts" x="847" y="242">newest shown instead</text>
+    </svg>
+  </div>
+
+  <!-- ============================================================ 3. ANALYSIS PARAMETERS -->
+  <h2>3 · How a document is analysed: the card</h2>
+  <p class="lede">The carding job runs every night at 07:00 IST (<code>/sam-nightly-carding</code>). It takes files from the <b>carding queue</b>, meaning files that are <i>uncarded</i>, <i>changed since their card</i> or <i>renamed</i>, up to 15 a night, newest version of a document first. Older copies of documents that already have a card are skipped. Each file is copied from OneDrive and its text extracted (PDF, DOCX, PPTX, XLSX). Claude then reads that text and fills in these fields:</p>
+
+  <table>
+    <tr><th>Parameter</th><th>What Claude reads it from / the rule</th><th>What SAM uses it for</th></tr>
+    <tr class="group"><td colspan="3">Identity</td></tr>
+    <tr><td>title</td><td>Clean human title, not the filename</td><td>Shown to reps; title words score extra in search</td></tr>
+    <tr><td>asset_type</td><td>What the document actually is (Deck, Battlecard, Case Study, Datasheet, Whitepaper, Analyst Report, Certification… 21 values in use)</td><td>Filter, and the type bonus in ranking</td></tr>
+    <tr><td>industry</td><td>The vertical it is written for</td><td>Vertical filter, gap report (<span class="bad">148 of 317 cards are blank</span>)</td></tr>
+    <tr class="group"><td colspan="3">What it is about</td></tr>
+    <tr><td>products · competitors</td><td>Products covered; vendors named or clearly implied</td><td>Product filter; "Citrix battlecard"-style asks</td></tr>
+    <tr><td>personas</td><td>Who it is written for: CIO, CISO, IT head, procurement…</td><td>Search text</td></tr>
+    <tr><td>regulations</td><td>RBI, SEBI, IRDAI, RMiT, GDPR, HIPAA… only if named in the text</td><td>Compliance asks ("RBI-compliant case study")</td></tr>
+    <tr><td>key_problem · key_outcomes · brief · use_for</td><td>≤40-word problem, up to 5 outcomes with their numbers, ≤80-word summary, ≤30 words on when a rep should send it</td><td>What the model reads to choose; use_for also covers regions</td></tr>
+    <tr class="group"><td colspan="3">Customer</td></tr>
+    <tr><td>client</td><td>Anonymised description: "India's largest private sector bank"</td><td>Safe to put in a prompt</td></tr>
+    <tr><td>client_actual · client_named</td><td>Real names as printed, and whether the customer is named at all</td><td><b>Never sent to the model</b>; kept for humans</td></tr>
+    <tr class="group"><td colspan="3">Trust and freshness</td></tr>
+    <tr><td>publish_year</td><td>From the <b>document body</b>, never the filename. One file named 2026-06-11 has a 2022 title slide.</td><td>The 2024+ eligibility rule; age note after 2 years</td></tr>
+    <tr><td>expired · expiry_date</td><td>An expiry the document states that has passed</td><td>"EXPIRED - do not send" note, which outranks every other note</td></tr>
+    <tr><td>stale_risk · superseded_by</td><td>Why it might mislead; a newer edition, checked against the files that actually exist</td><td>"A newer edition exists: …" note; family ordering</td></tr>
+    <tr><td>visibility · public_url · internal_reason</td><td><i>internal</i> unless a public URL has been verified (18 cards are <i>both</i>)</td><td>Whether SAM says "safe to send to the customer"</td></tr>
+    <tr><td>confidence · needs_human</td><td>Claude's own 0-1 estimate of how faithful the card is, plus anything a person must do. Empty files get ≤0.5 and "empty".</td><td>Empty files drop out; needs_human feeds the digest</td></tr>
+    <tr class="group"><td colspan="3">Bookkeeping (set by the loader and database)</td></tr>
+    <tr><td>source · item_id · stem · fam_*</td><td>Corpus path, SharePoint file ID, family key, edition, version</td><td>Links the card to its file and its family</td></tr>
+    <tr><td>batch · generated_by · carded_at · card_hash</td><td>Which run wrote it and when; a hash of its content</td><td>Traces a bad prompt to its batch; re-card detection</td></tr>
+  </table>
+
+  <div class="cards c3">
+    <div class="card"><div class="card-header"><span class="dot coral"></span><h3>Rules Claude follows</h3></div><ul>
+      <li>Never invent numbers, clients or outcomes that aren't in the text</li>
+      <li>No passwords, phone numbers, bank details, personal emails, customer IDs or IP addresses. Note that they exist ("contains staff phone numbers") without copying them.</li>
+      <li>Little or no text: card from the title and folder with confidence ≤ 0.5, and say so</li></ul></div>
+    <div class="card"><div class="card-header"><span class="dot ink"></span><h3>Gates before loading</h3></div><ul>
+      <li><code>compare_cards.py</code>: sanity check against existing cards</li>
+      <li>Valid JSON and a scan for sensitive data</li>
+      <li><code>load_cards.py --dry-run</code>, then load, then <code>--check</code>: 0 missing, 0 extra, 0 title differences</li></ul></div>
+    <div class="card"><div class="card-header"><span class="dot muted"></span><h3>The boundary</h3></div><ul>
+      <li>Only Claude reads document bodies</li>
+      <li>Only the card goes to Supabase, so you can read every row and see exactly what the answering model sees</li>
+      <li>Cards are also committed to git as <code>corpus/cards/*.json</code></li></ul></div>
+  </div>
+
+  <!-- ============================================================ 4. RANKING -->
+  <h2>4 · How a question is matched to documents</h2>
+  <p class="lede">The search runs over the 233 answerable assets only. First the filters (type, vertical, product, "for a customer" → public only), then each remaining card is scored on its title, type, industry, products, brief, use_for and so on. Code: <code>searchAssets()</code> in <code>web/lib/cards.ts</code>.</p>
+  <div class="formula">
+    score = 2 × <i>query words found</i> + 1.5 × <i>words found in the title</i> + 6 <i>if every word matched</i> + 3 <i>if a type word matched alongside something else</i> + 0.4 <i>if under 2 years old</i> − <i>demotion</i>
+    <small>Demotion applies only when at least 2 reps rated an asset "wrong asset" for the same topic and nobody rated it helpful. It fades after 60 days. Each document gets one slot: the shareable edition when the rep wants to send it. The rep's own words are always searched first, before the model's search terms.</small>
+  </div>
+  <div class="cards c3">
+    <div class="card"><div class="card-header"><span class="dot ink"></span><h3>Model step</h3></div><p>The model reads the top cards and returns a verdict plus the numbers of the documents it picks. Fallback order: gpt-6-luna → Groq 120b → Groq 20b → retrieval only. Each question costs ~1.3k tokens.</p></div>
+    <div class="card"><div class="card-header"><span class="dot coral"></span><h3>Guard step</h3></div><p>SAM writes every document line, link and "safe to send" line from the card itself. Verdicts that name documents not in the results get replaced. A denial that names nothing is logged as a content gap.</p></div>
+    <div class="card"><div class="card-header"><span class="dot muted"></span><h3>Gap step</h3></div><p>If nothing fits, SAM offers real substitutes plus an <b>Ask marketing</b> button. The request goes to <code>sam_content_requests</code>, ranked by how many different reps asked.</p></div>
+  </div>
+
+  <!-- ============================================================ 5. WHAT IS STORED -->
+  <h2>5 · Everything Supabase stores</h2>
+  <p class="lede">All tables live in the <code>accops-marketing-dashboard</code> project and are prefixed <code>sam_</code>. Row-level security is on with no public rules, so only the server key can read or write them. <b>No document bodies are stored</b>, only where each file is and what its card says.</p>
+
+  <table>
+    <tr><th>Table</th><th>Rows</th><th>What one row is · main columns</th></tr>
+    <tr class="group"><td colspan="3">Where documents live</td></tr>
+    <tr><td>sam_sharepoint_files</td><td>877</td><td>One SharePoint file. item_id (stable across renames and moves), folder, filename, web_url (the real link), created / modified / modified_by, rule tags (asset_type, industry, product, competitor, team), status, etag / ctag (edit markers), deleted, family key.</td></tr>
+    <tr><td>sam_sharepoint_sync</td><td>1</td><td>One watched drive: resume token, last run, result.</td></tr>
+    <tr class="group"><td colspan="3">What documents say</td></tr>
+    <tr><td>sam_asset_cards</td><td>317</td><td>One card, with the 40 fields in §3.</td></tr>
+    <tr><td>sam_asset_family_overrides</td><td>7</td><td>A human correction: "this file belongs to that family" or "exclude it".</td></tr>
+    <tr><td>sam_asset_pins</td><td>0</td><td>Admin pin: keep an old document answerable.</td></tr>
+    <tr class="group"><td colspan="3">What people do</td></tr>
+    <tr><td>sam_events</td><td>1,575</td><td>One query, rating or catalogue open: user, channel, question, intent, filters, results, answer, model, tokens, latency, error, is_test (only 38 are real, non-test events).</td></tr>
+    <tr><td>sam_rank_feedback</td><td>0</td><td>A "wrong asset" vote for an asset on a topic, which feeds the demotion.</td></tr>
+    <tr><td>sam_content_requests · _votes</td><td>0 · 0</td><td>A missing-collateral request (topic, type, product, vertical, status, owner, delivered link) and one row per rep who asked.</td></tr>
+    <tr><td>sam_publish_requests</td><td>0</td><td>A rep asking for an internal document to be made public.</td></tr>
+    <tr class="group"><td colspan="3">Running the system</td></tr>
+    <tr><td>sam_change_log</td><td>1,196</td><td>Every file, card or request change, written by triggers. Feeds the digest and the <code>/changes</code> API.</td></tr>
+    <tr><td>sam_ops_runs</td><td>10</td><td>One scheduled job run (snapshot, carding, digest, rollup): status and summary.</td></tr>
+    <tr><td>sam_metrics_daily</td><td>2</td><td>Daily rollup: queries, users, gaps, zero results, latency p50 / p95.</td></tr>
+    <tr><td>sam_test_users</td><td>2</td><td>Logins excluded from real usage numbers.</td></tr>
+    <tr class="group"><td colspan="3">Views (computed, nothing stored)</td></tr>
+    <tr><td>sam_v1_assets / _families / _changes / _public_assets</td><td>—</td><td>The contract every tool reads: the merged catalogue, families, change feed, and the public-only list for the future website bot (role <code>sam_web_reader</code>).</td></tr>
+    <tr><td>sam_carding_queue</td><td>0 now</td><td>Files waiting for a card, each with a reason (uncarded, changed, renamed) and a family role.</td></tr>
+  </table>
+
+  <!-- ============================================================ 6. GAPS -->
+  <h2>6 · Where the structure needs work</h2>
+  <div class="cards c2">
+    <div class="card"><div class="card-header"><span class="dot coral"></span><h3>Two tag lists that don't match</h3></div><p>Layer 1 and layer 2 use different words for the same thing: <i>Competitive</i> vs <i>Battlecard</i>, <i>Solution Brief</i> vs <i>Solution Document</i>. Card industries are free text, with three versions of Government and four of IT. Only 79 of 875 files have a rule-based industry. <b>Fix:</b> one fixed list per facet, enforced by the database.</p></div>
+    <div class="card"><div class="card-header"><span class="dot coral"></span><h3>Loose card-to-file link</h3></div><p>Cards are keyed on a path on this laptop, not the SharePoint item_id, and the database doesn't enforce the link. 4 SharePoint cards are linked to no file. Visibility is called <i>both</i> in cards but <i>public</i> in the view. <b>Fix:</b> make item_id required and enforced for SharePoint cards.</p></div>
+  </div>
+
+  <div class="footer"><span>SAM · docs/sam-data-and-tagging.html</span><span>Numbers from live Supabase, 2 Oct 2026</span></div>
+</div>
+</body>
+</html>
