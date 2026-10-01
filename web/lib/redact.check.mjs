@@ -13,8 +13,14 @@ const { redact, cleanKey } = await jiti.import("./redact.ts");
 const { tiers, keyProblems } = await jiti.import("./agent-openai.ts");
 let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; };
 // 1. a malformed key is refused, not sent, and the reason never contains it
-ok(!tiers().some(t => t.provider === "openai" && t.base.includes("api.openai.com")), "a key pasted three times does not become a tier");
-ok(keyProblems().length === 1 && /contains 3 separate values/.test(keyProblems()[0]) && !keyProblems()[0].includes("sk-"), `reason given without the key: ${keyProblems()}`);
+// the same key pasted three times is unambiguous: used once, no problem reported
+ok(tiers().some(t => t.provider === "openai" && t.key === KEY), "the same key pasted three times is used once");
+ok(keyProblems().length === 0, "no problem for a repeated identical key");
+// two DIFFERENT values together are refused, and the reason never contains either
+process.env.OPENAI_API_KEY = `${KEY}
+sk-proj-${"Z".repeat(30)}`;
+ok(!tiers().some(t => t.provider === "openai" && t.base.includes("api.openai.com")), "two different keys do not become a tier");
+ok(keyProblems().length === 1 && /contains 2 separate values/.test(keyProblems()[0]) && !keyProblems()[0].includes("sk-"), `reason given without the key: ${keyProblems()}`);
 ok(cleanKey(`  ${KEY}  `, "X").key === KEY, "surrounding whitespace is trimmed");
 // 2. the exact production error message is scrubbed
 const leaked = `Headers.append: "Bearer ${KEY}\n${KEY}" is an invalid header value.`;

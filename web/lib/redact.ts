@@ -35,6 +35,8 @@ export function cleanKey(raw: string | undefined, name: string): { key: string |
   const v = raw.trim();
   if (!v) return { key: null, problem: `${name} is empty` };
   const parts = v.split(/\s+/);
+  // The same key pasted several times is unambiguous: use it once. Different values together are not.
+  if (parts.length > 1 && parts.every(p => p === parts[0])) return { key: parts[0], problem: null };
   if (parts.length > 1) return { key: null, problem: `${name} contains ${parts.length} separate values (pasted more than once or with spaces/line breaks). It must be exactly one key on one line.` };
   return { key: v, problem: null };
 }
