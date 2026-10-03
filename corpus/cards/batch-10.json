@@ -2012,7 +2012,7 @@
   },
   {
    "source": "sharepoint/Accops Corporate Deck - 25 Aug 2026.pptx",
-   "title": "Accops Corporate Presentation, 25 August 2026: 'Virtualize. Secure. Deliver.' - Six-Pillar Platform, Named Case Studies, Two Years in the Gartner DaaS MQ, JAS Offers",
+   "title": "Accops Corporate Presentation, 25 August 2026: 'Virtualize. Secure. Deliver.' - Six-Pillar Platform, Accops + Forcepoint SSE, Named Case Studies, Two Years in the Gartner DaaS MQ, JAS Offers",
    "asset_type": "Deck",
    "industry": "",
    "client": "Named case slides for India's largest e-commerce platform (franchise warehouses), a private bank (biometric MFA for 90,000+ staff), a Gulf payments processor (VDI replacement) and India's biggest shipbuilder (internet via Virtual Browser for 2,500 users); anonymised largest-customers slide; MEA and Japan reference lists",
@@ -2037,7 +2037,10 @@
     "MFA",
     "SSO",
     "Digital Workspace",
-    "Thin Clients"
+    "Thin Clients",
+    "Remote Browser Isolation",
+    "Forcepoint SSE",
+    "DaaS"
    ],
    "competitors": [
     "NComputing",
@@ -2058,19 +2061,23 @@
     "Six pillars, each with a summary slide: ZTNA gateway (posture, micro-tunnels, reverse proxy, quantum-safe encryption, on-demand DLP, web-app protection), IAM/MFA/SSO, virtual apps and desktops, Enterprise Browser (600+ controls, content filtering, AI phishing control), thin client/OS (repurpose old PCs, NComputing LeafOS, Dell, HP), UEM (Accops Spectra / HyMobile)",
     "Named problem/challenge/need/solution cases: e-commerce franchise warehouses needing high uptime and no PII copying (slide 15), bank MFA for 90,000+ staff (slide 19), payments processor replacing a costlier VDI (slide 23), shipbuilder replacing internet kiosks with Virtual Browser for 2,500 users (slide 29)",
     "HySecure on-prem and as a service, DaaS managed-desktops architecture, HyLabs, RBI for internet and for critical apps, AirBridge (8/16 AV + CDR), HyDesk spec table",
-    "Largest-customers slide incl. 'VDI for internal users and app virtualisation for client banks (4,000 users)'; closing JAS offers (free VDI licences until incumbent expiry; free legacy-app SSO 6 months and 50% off in FY27) and 'talk to us for demo / free trial'"
+    "Accops + Forcepoint joint slide (16): one Secure Service Edge picture splitting Accops (ZTNA private access, IAM/SSO/MFA/password-less, virtual apps and desktops, secure enterprise browser, data-less PC / thin OS) from Forcepoint (web proxy/SWG, CASB, endpoint and network DLP, DSPM)",
+    "VDI use-case slide (22), six reasons in one page: delay or avoid PC purchase, protect critical apps from network threats, BYOD for vendors, workspace for privileged users, replace an existing VDI provider, GPU-ready developer workspace for AI workloads",
+    "Sovereignty and hypervisor independence stated on the VDI pillar: 'sovereign VDI stack on any hypervisor including Red Hat OpenShift, HPE VME, Proxmox'; ZTNA pillar describes a sovereign ZTNA with quantum-safe encryption and QRNG and ZTNA-as-a-service keeping logs and telemetry in a sovereign cloud",
+    "Largest-customers slide (10) is descriptor-only (Indian federal government IT division, world's 7th largest life insurer, largest e-commerce company of India, largest TPA in UK, 3rd largest private bank, 5th largest university of Japan, largest company of India, largest digital payment company in MEA, largest Indian bank, world's 2nd largest service provider) with install-base sizes from 4,000 to 500,000 users; HyLabs claims ~60% saving over five years for a 200-PC lab",
+    "Closing JAS offers (free VDI licences until incumbent expiry; free legacy-app SSO 6 months and 50% off in FY27) and 'talk to us for demo / free trial'"
    ],
-   "brief": "The newest corporate presentation in SharePoint: 39 slides dated 25 August 2026 in the filename and last saved 23 September 2026. It is far shorter than the 190-slide August 2025 corporate deck: company credentials, the six-pillar unified platform, reference and largest customers, technology partners, a summary slide for each pillar followed by product slides and one named case study per area, then the JAS-quarter offers and 'Why Accops'.",
-   "use_for": "The current answer to 'send me the latest corporate / company deck' for a first meeting or partner briefing (internal file - present rather than send). Use the August 2025 corporate deck only as a slide bank for depth (edition matrices, appendices).",
+   "brief": "The newest corporate presentation in SharePoint: 39 slides dated 25 August 2026 in the filename, re-saved in SharePoint on 2 October 2026 and re-read against that version. It is far shorter than the 190-slide August 2025 corporate deck: company credentials, the six-pillar unified platform (ZTNA gateway, IAM/MFA/SSO, virtual apps and desktops, enterprise browser, thin client/OS, endpoint management), reference and largest customers, technology partners, then a summary slide for each pillar followed by product slides and one named case study per area - with the Accops + Forcepoint SSE slide sitting between the ZTNA and IAM modules and a six-reason VDI use-case page before the payments case - then the JAS-quarter offers and 'Why Accops'. The HyDesk hardware spec table appears twice, once out of sequence at slide 4 (between 'What We Do' and the Gartner slide) and again in its proper place at slide 33.",
+   "use_for": "The current answer to 'send me the latest corporate / company deck' for a first meeting or partner briefing (internal file - present rather than send). Pull slide 16 when a prospect already runs Forcepoint or asks how Accops sits next to an SSE stack, slide 22 when they ask 'who else uses VDI and what for', and slide 10 when they want install-base scale without customer names. Use the August 2025 corporate deck only as a slide bank for depth (edition matrices, appendices).",
    "publish_year": "2026",
    "expired": false,
-   "stale_risk": "August 2026 and current. The About slide still says 'In 2023 & 2024 Gartner MQ' while slide 5 says two years in the 2025 and 2026 MQ. Offers are quarter-bound (JAS, FY27).",
+   "stale_risk": "August 2026 and current. The About slide (2) still says 'In 2023 & 2024 Gartner Magic Quadrant, as well as 2023 Market Guide for DaaS' while slide 5 claims two consecutive years in the 2025 and 2026 MQ - the two slides contradict each other three slides apart. Offers are quarter-bound (JAS, FY27). The HyDesk spec table is duplicated at slides 4 and 33. The shipbuilder case (29) mixes its own benefits with the payments case's ('got concurrent user pricing with perpetual license').",
    "superseded_by": "",
    "confidence": 0.86,
    "public_url": "",
    "visibility": "internal",
    "internal_reason": "Names customers in case studies and offers time-limited commercial terms; no verified public URL.",
-   "needs_human": "This is newer than 'Accops-Corporate Deck-Aug2025.pdf' (batch 09) - mark the 2025 deck as superseded for 'latest corporate deck' requests? Fix the Gartner years on the About slide. A PDF export without the offers would be a candidate public corporate deck."
+   "needs_human": "Re-carded 3 October 2026 after a 2 October re-save; still 39 slides with the same four named case studies in the same places, so nothing a rep was told before has been withdrawn. This is newer than 'Accops-Corporate Deck-Aug2025.pdf' (batch 09) - mark the 2025 deck as superseded for 'latest corporate deck' requests? Fix the Gartner years on the About slide and delete the duplicate HyDesk table at slide 4. Confirm the Accops + Forcepoint slide may be shown to customers outside a partner setting. A PDF export without the offers would be a candidate public corporate deck."
   },
   {
    "source": "sharepoint/Corporate Deck 2026.pptx",
