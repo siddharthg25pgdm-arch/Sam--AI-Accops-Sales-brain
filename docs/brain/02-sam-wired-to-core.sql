@@ -1,9 +1,10 @@
 -- SAM wired to the brain's reference lists (01-core-reference-lists.sql).
 -- APPLIED 6 Oct 2026 as migration brain_sam_wired_to_core: functions, both triggers, core_unmapped.
 -- The 317 cards were normalised by a normal load_cards.py run through the new trigger (0 rejected,
--- 0 carded_at moved, 0 change-log rows). STILL TO RUN in the SQL Editor (the MCP tool auto-declines
--- bulk updates from VS Code): the two UPDATE blocks at the bottom - binding the 4 cards, and
--- re-saving sam_sharepoint_files (43 rows still say Competitive / Solution Brief). Safe to run twice.
+-- 0 carded_at moved, 0 change-log rows). The two UPDATE blocks at the bottom were run the same day
+-- through SAM's REST path (the MCP tool auto-declines bulk updates from VS Code): 4 cards bound,
+-- 43 file rows re-saved. Verified: core_unmapped empty, no change-log rows, answerable unchanged.
+-- Safe to run twice.
 --
 -- Every write to SAM's two tag-carrying tables now goes through core.canon(), so whatever spelling a
 -- carding agent or the rule tagger produces, the table stores the master label.
