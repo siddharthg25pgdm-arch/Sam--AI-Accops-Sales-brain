@@ -173,7 +173,13 @@ export function familyOf(a: Asset): Asset[] {
 }
 
 function mergedAssets(reg: Asset[]): Asset[] {
-  const usable = data.assets.filter(a => a.asset_type !== "Data File" && a.asset_type !== "Content Calendar");
+  // The 77 bundled hand-written cards are merged ONLY when no Supabase card is loaded (the first request
+  // of a cold start) or a check suite asks for them as its fixed sample library (SAM_BUNDLED_CARDS=1).
+  // Since 6 Oct 2026, 64 of them are re-carded from the real documents as inventory/* cards in Supabase
+  // (batch-14), so with the database up it is the one card source; their laptop-copy dates had been
+  // letting them past the pre-2024 rule.
+  const bundled = !cardAssets().length || process.env.SAM_BUNDLED_CARDS === "1";
+  const usable = bundled ? data.assets.filter(a => a.asset_type !== "Data File" && a.asset_type !== "Content Calendar") : [];
   const best = new Map<string, Asset>();
   // A bound card merges under its registry row's CURRENT key, not its own filename. Keyed by filename
   // alone, a rename split one document into two entries: the card with the description and no link,

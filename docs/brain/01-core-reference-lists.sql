@@ -168,3 +168,9 @@ do $$ begin
     raise exception 'core.terms has aliases pointing at two labels: %', (select string_agg(facet || '/' || alias, ', ') from core.alias_conflicts());
   end if;
 end $$;
+
+-- Added 6 Oct 2026 when the 64 inventory cards were loaded (named in the cards, unknown to the list).
+insert into core.terms (facet, label, aliases, kind) values
+  ('competitor', 'AmmyAdmin', '{ammyy admin,ammyy}', 'vendor'),
+  ('competitor', 'Hysolate', '{}', 'vendor')
+on conflict (facet, label) do nothing;

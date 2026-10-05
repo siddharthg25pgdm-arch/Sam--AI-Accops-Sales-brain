@@ -21,6 +21,9 @@ Object.assign(process.env, {
   SUPABASE_URL: "https://stub.supabase.co", SUPABASE_SERVICE_KEY: "stub",
   LLM_PROVIDER: "openai-compatible", OPENAI_COMPAT_BASE_URL: "https://groq.stub/openai/v1",
   OPENAI_COMPAT_API_KEY: "stub", OPENAI_COMPAT_MODEL: "openai/gpt-oss-120b",
+  // These tests use the bundled hand-written cards as their fixed sample library, alongside the stub
+  // cards below. Production stopped merging them on 6 Oct 2026 (lib/cards.ts mergedAssets).
+  SAM_BUNDLED_CARDS: "1",
 });
 delete process.env.OPENAI_COMPAT_FALLBACK_MODEL;
 delete process.env.ANTHROPIC_API_KEY;

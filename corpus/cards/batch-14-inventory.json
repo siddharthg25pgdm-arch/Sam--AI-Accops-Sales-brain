@@ -1,0 +1,2869 @@
+{
+  "generated_by": "Claude (inventory carding, 6 Oct 2026)",
+  "cards": [
+    {
+      "source": "inventory/Accops - 3rd largest Public Bank - Case Study.pdf",
+      "title": "3rd Largest PSU Bank Adopts Accops Digital Workspace for Compliant SWIFT and CBS Access from One PC (6x Forex Productivity)",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "One of India's three largest public sector banks (est. 1906, Bengaluru HQ, 10,491 branches and 12,973 ATMs as of December 2020)",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "HyDesk",
+        "Digital Workspace",
+        "VDI",
+        "ZTNA",
+        "Thin Clients",
+        "BioAuth"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "CISO",
+        "IT head",
+        "Head of Infrastructure",
+        "Head of Compliance"
+      ],
+      "regulations": [
+        "RBI"
+      ],
+      "key_problem": "RBI requires the SWIFT network to be separate from other business apps, so treasury staff used two PCs; forex work ran at only 175 branches, staff handled 150 forex transactions daily, and endpoints risked data leakage at high cost.",
+      "key_outcomes": [
+        "Forex transactions per user rose from 150 to 1,000 a day (headline '6x'); EOD operations finish 30-60 minutes earlier",
+        "One PC now accesses both SWIFT and CBS while networks stay separate, via an RBI-compliant SWIFT jump server",
+        "TCO about 50% lower than competitive solutions; thin clients cut power consumption and device maintenance by 10x",
+        "Access restricted to bank-approved devices, with integrated biometric MFA and DLP (screen capture, share, upload/download, copy-paste blocked)",
+        "Work from home enabled during the pandemic by creating separate LAN and WAN user profiles, with no architecture change"
+      ],
+      "brief": "Three-page case study of an anonymised top-three Indian PSU bank that centralised treasury/forex processing at two locations and rolled it out to all branches. Accops Digital Workspace (HyWorks app and desktop virtualisation, HySecure ZTNA gateway, HyID with existing biometric authentication, HyDesk thin clients) lets treasury users reach SWIFT and CBS from one device while keeping the networks isolated per RBI. Includes a customer appreciation quote, business requirements, and five benefit areas with numbers.",
+      "use_for": "PSU or large bank conversations about SWIFT/CBS network separation, the two-PC problem, RBI jump-server compliance, thin-client TCO, and biometric MFA for treasury users.",
+      "publish_year": "2020",
+      "expired": false,
+      "stale_risk": "The only date in the body is the bank's customer and branch figures 'as in December 2020', and the story covers pandemic work-from-home, so it was written around late 2020/2021. It predates 2024 and the bank figures are out of date.",
+      "superseded_by": "",
+      "confidence": 0.85,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record for this edition.",
+      "needs_human": "Confirm whether a refreshed PSU-bank case study exists; this one is dated by its December 2020 figures. The bank description (est. 1906, Bengaluru) makes the anonymised customer easy to identify - confirm the customer is happy with that."
+    },
+    {
+      "source": "inventory/Accops- Private Bank MFA-ZTNA - Case Study.pdf",
+      "title": "Enhancing Security with Multi-Factor Authentication at India's Largest Private Bank (Vendor MFA on Legacy Lending Apps)",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "India's largest private sector bank",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "BioAuth",
+        "ZTNA",
+        "MFA",
+        "HySecure",
+        "Password-less"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Head of IAM",
+        "Head of Compliance"
+      ],
+      "regulations": [
+        "RBI"
+      ],
+      "key_problem": "An RBI mandate required MFA on internet-facing apps used by vendors, but the bank's decade-old customised lending apps could not do SAML, each had a local user database, and SASE-based MFA needed costly Azure AD P1 licences for vendors.",
+      "key_outcomes": [
+        "Deployed for 20,000+ users, employees and third-party vendors",
+        "MFA added to legacy lending applications with no application changes, via an on-premise application proxy gateway",
+        "Passwordless username + OTP login, a portal showing only permitted apps, and auto-filled per-app usernames to stop credential misuse",
+        "Custom APIs integrated with the bank's IDAM to automate vendor onboarding and offboarding",
+        "Compliance with the RBI vendor-access mandate; vendor devices now tracked (device binding and DLP planned next)"
+      ],
+      "brief": "Two-page case study (copyright 2025). The bank already ran a SASE solution tied to Azure AD for employees on corporate laptops, but vendors using publicly reachable lending apps were exposed to brute-force and identity theft. Accops ZTNA was deployed on-premise as an application proxy gateway with passwordless OTP, role-based app portal, identity continuity and IDAM integration. Ends with future scope: device binding, copy-paste/print-screen blocking and stronger identity controls.",
+      "use_for": "Bank or NBFC deals where RBI requires MFA for vendors on legacy apps that cannot do SAML, or where a SASE/Azure AD P1 cost objection comes up.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "public/Accops - BFSI (Integrated) - Case Study V2.pdf - the 2026 public edition combines this story with the private-bank VDI/ZTNA/biometric story in one document.",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record for this standalone edition; the combined public BFSI V2 case study is the sendable version.",
+      "needs_human": "Confirm reps should send the public BFSI (Integrated) V2 case study instead of this standalone file."
+    },
+    {
+      "source": "inventory/Accops - Private Bank VDI-ZTNA-MFA - Case Study.pdf",
+      "title": "Leading Private Sector Bank's Digital Transformation with the Accops Platform (ZTNA, VDI and Biometric Authentication)",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "A leading Indian private sector bank",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HyWorks",
+        "VDI",
+        "HySecure",
+        "Turbo",
+        "Remote Browser Isolation",
+        "BioAuth",
+        "HyID"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "CISO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "The bank's VPN and VDI served about 500 users; remote work required secure, scalable access for business users, IT admins and vendors, and its proprietary-scanner biometric system was costly to integrate into more applications.",
+      "key_outcomes": [
+        "Secure remote access scaled from about 500 to 30,000 users at peak during Covid",
+        "VDI later right-sized to 10,000 users (IT admins, InfoSec, developers, vendors on critical servers); SWIFT isolated in VDI for compliance",
+        "Turbo protocol gives mobile app developers Layer 3 access to test environments without office visits",
+        "Biometric authentication for 90,000 users integrated with Active Directory, avoiding proprietary scanners and API work for 15 more applications",
+        "Dedicated on-site managed services support"
+      ],
+      "brief": "Three-page case study (copyright 2025) of an anonymised private bank that moved from VPN/VDI for 500 users to Accops ZTNA, VDI and remote browser for 30,000 users during Covid. Lists VDI use cases (core IT/dev users, SWIFT isolation, interns on BYOD, IT helpdesk and call centres with VoIP over ZTNA, outsourced developers) and an AD-integrated biometric rollout to 90,000 users with a centralised biometric database.",
+      "use_for": "Large bank deals needing proof of ZTNA + VDI scale (30,000 users), SWIFT isolation, developer/vendor BYOD access, or AD-integrated biometric MFA replacing proprietary scanners.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "public/Accops - BFSI (Integrated) - Case Study V2.pdf - the 2026 public edition combines this story with the largest-private-bank vendor-MFA story.",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record for this standalone edition; the combined public BFSI V2 case study is the sendable version.",
+      "needs_human": "Confirm reps should send the public BFSI (Integrated) V2 case study instead of this standalone file."
+    },
+    {
+      "source": "inventory/Accops - Deutsche Bank-CaseStudy.pdf",
+      "title": "Deutsche Bank Fortifies Vendor Access to Internal Applications with Accops HySecure and HyWorks",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "The India operation of a global German-headquartered bank",
+      "client_actual": "Deutsche Bank AG, India",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "HyWorks",
+        "VDI"
+      ],
+      "competitors": [],
+      "personas": [
+        "CTO",
+        "CIO",
+        "CISO",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "Third-party vendors collecting cheques from ATMs across India needed access to bank applications from unmanaged machines and untrusted networks, creating data-theft and compliance risk.",
+      "key_outcomes": [
+        "Secure access to bank applications from unmanaged vendor devices without endpoint management",
+        "HyWorks application and desktop virtualisation plus HySecure SSL VPN gateway with 2048-bit encryption",
+        "Device authorisation, device ID tracking and audit controls for security compliance",
+        "Simplified desktop administration; customer quote cites cost-effectiveness, speed, simplicity and support"
+      ],
+      "brief": "Three-page case study (copyright 2024) naming Deutsche Bank AG, India. Vendors collecting cheques from ATMs use unmanaged machines; Accops HyWorks delivers apps and desktops from the data centre and HySecure provides secure remote access for remote locations. Includes a named quote from the bank's CTO saying Accops VDI was chosen over competitive options for cost-effectiveness, speed and simplicity, and praising support.",
+      "use_for": "Global or foreign bank prospects, vendor/third-party access from unmanaged devices, and as a named international banking reference with a CTO quote.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "https://www.accops.com/case-studies/deutsche-bank",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops - Mirae Asset - Case Study.pdf",
+      "title": "Mirae Asset Rises Above Crisis, Boosts Productivity with Seamless Remote Work (ZTNA + IAM)",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "Indian subsidiary of a Korean global asset management group (AMC, established 2007)",
+      "client_actual": "Mirae Asset India (subsidiary of Mirae Asset Global Investments, Korea)",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "HyID",
+        "ZTNA",
+        "MFA"
+      ],
+      "competitors": [],
+      "personas": [
+        "IT head",
+        "CISO",
+        "CIO",
+        "Head of Compliance"
+      ],
+      "regulations": [
+        "SEBI"
+      ],
+      "key_problem": "When Covid forced remote work, the AMC's mobile workforce (sales, claims, MIS, finance, operations, risk, compliance) accessed systems from any device and untrusted networks, with no endpoint visibility, slow IT support and high maintenance costs.",
+      "key_outcomes": [
+        "Business continuity through a seamless move to remote work during Covid-19",
+        "ZTNA gateway with device posture checks, user-to-device binding and segmented app access",
+        "2FA with integrated facial authentication, DLP and comprehensive audit logs",
+        "SEBI requirements fulfilled; remote helpdesk shortened IT support turnaround",
+        "POC met all technical requirements; low bandwidth consumption"
+      ],
+      "brief": "Three-page case study naming Mirae Asset India with a quote from its Head of IT. Covers the pandemic shift to remote work, the zero-trust requirements (posture checks, device binding, 2FA, DLP, auditing, remote helpdesk), and the HySecure ZTNA plus HyID IAM rollout. Outcomes are qualitative - there are no percentages or user counts.",
+      "use_for": "Asset management, mutual fund and capital-markets prospects; SEBI-regulated firms needing ZTNA, MFA with facial authentication and DLP for a mobile workforce.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "The body has no publication date; the story is set during the Covid-19 shift to remote work (2020-2021), so it is probably a pre-2024 document.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "No date in the document; confirm the publication year and whether Mirae Asset still approves use as a named reference."
+    },
+    {
+      "source": "inventory/Accops - IndiaFirst - Case Study 2024.pdf",
+      "title": "IndiaFirst Life Enables Seamless Productivity Amid Crisis with Accops VDI and Gateway Solutions",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "A Mumbai-based Indian life insurer, a joint venture of two public sector banks and a UK insurer",
+      "client_actual": "IndiaFirst Life Insurance (JV of Bank of Baroda, Andhra Bank and Legal & General)",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "HyWorks",
+        "HyDesk",
+        "VDI",
+        "ZTNA",
+        "Thin Clients",
+        "MFA"
+      ],
+      "competitors": [
+        "VMware"
+      ],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "Covid-19 work from home overwhelmed a slow multi-hop remote access setup; BPO users struggled to reach central systems securely and staff on unsecured personal devices raised data-breach risk.",
+      "key_outcomes": [
+        "Secure remote access (L7 SSL VPN with SMS OTP) deployed in 24 hours at the outbreak of Covid-19",
+        "HyWorks VDI integrated with the customer's HCI for BPO users, chosen over alternatives such as VMware",
+        "Energy-efficient HyDesk thin clients",
+        "No data traces on endpoints; corporate network not exposed beyond firewalls; detailed audits and logs"
+      ],
+      "brief": "Three-page case study naming IndiaFirst Life Insurance, with a quote from its CISO. A long-standing Accops customer used HySecure ZTNA gateway, HyWorks VDI on its HCI for BPO users, HyDesk thin clients and SMS gateway OTP to keep business running during the Covid lockdown. Explicitly says Accops was chosen over alternatives like VMware for features, integrations and support.",
+      "use_for": "Insurance and BFSI prospects, BPO/back-office VDI on HCI, rapid business-continuity rollouts, and VMware displacement conversations.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "The body states no publication year (the '2024' is only in the filename). The story is the 2020 Covid-19 rollout.",
+      "superseded_by": "",
+      "confidence": 0.82,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Filename says 2024 but the document carries no date; confirm the year before SAM treats it as current."
+    },
+    {
+      "source": "inventory/Accops - Kalupur Bank - Case Study.pdf",
+      "title": "Kalupur Bank Switches to ZTNA-Based Remote Access, Cuts Support Resolution Time 45x",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "A Gujarat urban co-operative bank (est. 1970, Ahmedabad)",
+      "client_actual": "Kalupur Commercial Co-operative Bank",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "ZTNA"
+      ],
+      "competitors": [],
+      "personas": [
+        "IT head",
+        "CISO",
+        "CIO"
+      ],
+      "regulations": [],
+      "key_problem": "During Covid, staff accessed CBS from home over a VPN that allowed unpatched BYOD devices and local data downloads; IT had to travel to the data centre for critical issues, and vendor support consumed about ten days a month.",
+      "key_outcomes": [
+        "Time to start support resolution cut from 90 minutes to about 2 minutes (45x)",
+        "VPN replaced with HySecure ZTNA gateway: device posture and geolocation checks, local-system access and file transfer blocked",
+        "EOD reconciliation done faster from home as part of daily operations",
+        "One jump server with four separate logins serves all four critical vendors, who now support remotely"
+      ],
+      "brief": "Three-page case study naming Kalupur Commercial Co-operative Bank (FY 2019-20 gross income cited) with a quote from its AGM-IT. Covers the Covid move to work from home, the VPN's security gaps, slow IT and vendor support, and the VPN replacement with HySecure zero-trust application access gateway plus DLP and device entry controls.",
+      "use_for": "Co-operative and urban co-operative bank prospects; VPN replacement, CBS remote access, vendor jump-server access and IT support productivity stories.",
+      "publish_year": "2020",
+      "expired": false,
+      "stale_risk": "Latest date in the body is the bank's FY 2019-20 income and the story is the 2020 Covid lockdown, so it was written around 2020-2021. Pre-2024.",
+      "superseded_by": "",
+      "confidence": 0.85,
+      "public_url": "https://www.accops.com/case-studies/kalupur-bank",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops - South India Bank - Case Study.pdf",
+      "title": "One VDI Solution That Saved a Large Bank's CRM Investment in a Limited-Bandwidth Environment (South Indian Bank)",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "A major Kerala-headquartered Indian private sector bank with around 600 branches",
+      "client_actual": "South Indian Bank Ltd. (SIB); Microsoft partner CCentric; also names Mahindra Finance Ltd. and Birla Sunlife Ltd. as later customers",
+      "client_named": true,
+      "products": [
+        "VDI",
+        "Virtual Browser",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "IT head",
+        "Head of Infrastructure",
+        "Partner"
+      ],
+      "regulations": [],
+      "key_problem": "Microsoft Dynamics CRM stalled in about 300 rural branches on 96-128 Kbps links; logins and form steps took over five minutes, WAN acceleration failed, and upgrading 600 branches to 1 Mbps would have quadrupled bandwidth costs.",
+      "key_outcomes": [
+        "CRM rolled out to all 600 branches, working even on 64-96 Kbps links",
+        "Login time cut from five minutes to under 10 seconds; login data entry from 8 minutes to one minute",
+        "Bandwidth upgrade costs avoided and the CRM investment saved",
+        "Accops engineered a new module and single sign-on for CRM via virtual browser"
+      ],
+      "brief": "Two-page story of how Accops' virtual browser (VDI-hosted browser) delivered on-premise Microsoft Dynamics CRM to South Indian Bank's rural branches after two years of failed attempts by the bank, Microsoft partner CCentric and Microsoft. Includes quotes from CCentric and Accops' Chief Architect, and says the same solution went to Mahindra Finance and Birla Sunlife. Product names (HyWorks etc.) are not used.",
+      "use_for": "Low-bandwidth branch networks, delivering heavy web apps (CRM) via virtual browser, and partner co-selling stories with Microsoft/CRM partners.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "No date in the body. The pattern (on-prem Dynamics CRM, 64-128 Kbps branch links, 'Accops Systems' and Birla Sunlife naming) suggests an older document, probably well before 2024.",
+      "superseded_by": "",
+      "confidence": 0.78,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record; likely an old story.",
+      "needs_human": "Undated and likely old; confirm year and whether South Indian Bank is still a referenceable customer."
+    },
+    {
+      "source": "inventory/Accops - Shrira Capital - Case Study.pdf",
+      "title": "Enhancing Productivity and Security at Shriram Capital with Accops HySecure and HyWorks",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "Holding company of a large Indian lending and insurance conglomerate whose flagship is India's largest retail finance company",
+      "client_actual": "Shriram Capital (Shriram Group; flagship Shriram Finance Limited)",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "HyWorks",
+        "ZTNA",
+        "VDI",
+        "MFA"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "IT head",
+        "CISO",
+        "Head of Infrastructure",
+        "HR head"
+      ],
+      "regulations": [],
+      "key_problem": "A closed, premises-only IT environment had to support hybrid work with controlled, compliant access, productivity visibility and reporting; cloud and on-premise providers tried first were inefficient or cost-prohibitive and lacked API integration.",
+      "key_outcomes": [
+        "Conservatively estimated 30-35% improvement in productivity and resource utilisation",
+        "OTP-based MFA and device-wise whitelisting; no data copied or stored on personal devices",
+        "Modular scale-in/scale-out architecture let IT reallocate under-used server resources",
+        "Integration with HR systems for productivity and performance reports",
+        "Phased rollout from POC to more departments and group companies; Accops hardware being explored next"
+      ],
+      "brief": "Three-page case study (copyright 2024) naming Shriram Capital. Covers the hybrid-work challenges (secure access, productivity monitoring, resource use, reporting), the failed earlier attempts with cloud and on-premise providers, and the phased HySecure ZTNA plus HyWorks VDI rollout with HR-system integration and role-based access. Gives one quantified result (30-35% productivity/resource gain).",
+      "use_for": "NBFC, lending and financial-conglomerate prospects; hybrid work with productivity reporting; phased POC-to-group-wide rollouts.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Filename misspells the client as 'Shrira'; the document says Shriram Capital."
+    },
+    {
+      "source": "inventory/Accops - Alphasure Accountants -Case Study.pdf",
+      "title": "Alphasure Adopts DaaS to Enable Work from Anywhere, Records 70% Drop in Attrition and Saves 50% on Office Rent",
+      "asset_type": "Case Study",
+      "industry": "",
+      "client": "A Pune-based outsourced accounting, statutory-filing and CFO-services firm",
+      "client_actual": "Alphasure Accountants",
+      "client_named": true,
+      "products": [
+        "DaaS",
+        "HyWorks",
+        "VDI",
+        "Digital Workspace"
+      ],
+      "competitors": [],
+      "personas": [
+        "CEO",
+        "CFO",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "Until early 2020 all staff worked on office desktops with server-shared Tally/Winman; the pandemic closed the Pune office and the firm needed remote work overnight, with no CapEx, while protecting clients' financial data on BYOD devices.",
+      "key_outcomes": [
+        "Attrition reduced by 70%",
+        "Real-estate (office rent) costs cut by about 50%",
+        "Accops Managed Desktop (fully managed DaaS) rolled out within days with no CapEx",
+        "No data on user devices; DLP blocks screenshots, print screen and screen sharing; folder-level access architecture",
+        "Access to talent in Tier-III cities and villages near Pune, Nashik and Kolhapur"
+      ],
+      "brief": "Three-page case study naming Alphasure Accountants, with a quote from its CEO. The firm moved from an office-only LAN model to Accops Managed Desktop (AMD), a turnkey DaaS, so staff could work from home on personal devices. Accops handles all IT administration. Headline results: 70% lower attrition and about 50% real-estate savings.",
+      "use_for": "SMB and professional-services DaaS pitches (accounting, CA firms, BPO-style back offices) where the hook is no CapEx, managed service, BYOD security and hiring outside metros.",
+      "publish_year": "2020",
+      "expired": false,
+      "stale_risk": "The only year in the body is 'till early 2020' and the story is the 2020 pandemic move to work from home, so it was written around 2020-2021. 'Accops Managed Desktop' may no longer be the offer name.",
+      "superseded_by": "",
+      "confidence": 0.82,
+      "public_url": "https://www.accops.com/case-studies/alphasure-accountants",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": "Accounting/professional services has no matching industry value, so industry is left blank. Confirm 'Accops Managed Desktop' is still sold under that name."
+    },
+    {
+      "source": "inventory/Leading Bank_Accops-Nutanix.V3.pdf",
+      "title": "Accops and Nutanix Help a Leading Bank Modernise Access and Meet Regulatory Compliance",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "A leading Indian financial institution that finances and promotes cross-border trade and investment",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyID",
+        "MFA",
+        "SSO",
+        "HySecure",
+        "ZTNA",
+        "HyWorks",
+        "VDI",
+        "Nutanix"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "IT head",
+        "CISO",
+        "Head of Infrastructure",
+        "Nutanix sellers",
+        "Partner"
+      ],
+      "regulations": [
+        "RBI"
+      ],
+      "key_problem": "The bank's on-premise servers lacked flexible, secure access for external and mobile users amid identity-security and compliance concerns, and IT doubted whether VDI could run on its existing Nutanix HCI.",
+      "key_outcomes": [
+        "HyID MFA and SSO across internal applications with role-based access, OTP and device validation",
+        "HySecure ZTNA gateway reduced reliance on VPN for remote access",
+        "HyWorks VDI pilot for 25 IT and administration users on existing Nutanix HCI, with minimal customisation",
+        "No end-user complaints or downtime reported; no new hardware or procurement needed",
+        "A concrete step toward RBI expectations on remote-access cybersecurity controls"
+      ],
+      "brief": "Three-page joint Accops-Nutanix case study (copyright 2025). An anonymised trade-finance bank already on Nutanix HCI deployed HyID (MFA/SSO), HySecure ZTNA and a 25-user HyWorks VDI pilot. Accops provided architecture validation to reassure IT that VDI runs on Nutanix. Outcomes are qualitative (stability, adoption, compatibility, policy enforcement, confidence to scale).",
+      "use_for": "Nutanix co-selling into banks; proving Accops VDI/MFA runs on existing Nutanix HCI without new hardware; RBI remote-access control conversations.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record; joint Nutanix collateral.",
+      "needs_human": "The VDI part is a 25-user pilot - make sure reps do not present it as a large VDI deployment."
+    },
+    {
+      "source": "inventory/NBFC Vendor Access_Accops-Nutanix.V3.pdf",
+      "title": "A Leading Financial Company Secures Third-Party Access Using Accops VDI and Nutanix",
+      "asset_type": "Case Study",
+      "industry": "BFSI",
+      "client": "A prominent Indian NBFC, part of an established business group (founded 1991, ~2,000 retail financing touchpoints, 2,000+ corporate clients)",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "VDI",
+        "HySecure",
+        "ZTNA",
+        "Reporting Server",
+        "Nutanix"
+      ],
+      "competitors": [],
+      "personas": [
+        "IT head",
+        "CIO",
+        "CISO",
+        "procurement",
+        "Nutanix sellers"
+      ],
+      "regulations": [],
+      "key_problem": "Vendor access ran on legacy RDP over three-tier infrastructure: no per-user CPU/memory control, vendors on unmanaged devices, heavy manual support, and global vendors quoted far higher, complex licensing in the RFP.",
+      "key_outcomes": [
+        "Secure virtual desktops for 200+ vendors on Nutanix HCI, replacing open RDP with ZTNA policy controls",
+        "Per-user CPU and RAM clamping prevents system overload",
+        "Azure AD MFA via NPS with no extra identity platform; session-level tracking through Accops Reporting Server",
+        "Perpetual concurrent-user licensing proved cheaper than subscription or named-user models",
+        "Faster vendor onboarding and fewer access-related helpdesk tickets"
+      ],
+      "brief": "Three-page joint Accops-Nutanix case study (copyright 2025). An anonymised NBFC replaced a legacy RDP vendor-access setup with HyWorks VDI, HySecure ZTNA and Accops Reporting Server on Nutanix HCI, integrated with Azure AD MFA. Vendors were migrated in phases without disruption. Highlights the licensing-cost argument (perpetual concurrent users vs subscription/named-user from global vendors).",
+      "use_for": "NBFC or BFSI third-party/vendor access deals, RDP replacement, Nutanix co-sell, and licensing-cost objections against global VDI vendors.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record; joint Nutanix collateral.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops - Large SI - Case Study.pdf",
+      "title": "Securing Internal Access for a Global IT Services Provider with Accops Remote Browser Isolation",
+      "asset_type": "Case Study",
+      "industry": "IT / ITeS",
+      "client": "One of the world's largest IT services providers (~600,000 employees, ~400,000 on customer-provided laptops)",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "Remote Browser Isolation",
+        "HyLabs"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "CISO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "About 400,000 staff on customer-provided laptops could not install VPN or ZTNA agents yet needed HRMS and intranet apps; an existing VDI-hosted browser from a multinational vendor was too costly and blocked a public-cloud move.",
+      "key_outcomes": [
+        "Accops Remote Browser Isolation on Azure (RHEL, Chrome and an open-source office suite) replaced the VDI-based browsing platform",
+        "No agent on third-party devices; customers only whitelist a single URL",
+        "Azure AD login with MFA through one secure URL to internal portals",
+        "Substantially lower licensing costs; sensitive data never resides on unmanaged devices"
+      ],
+      "brief": "Three-page case study (copyright 2025) of an anonymised global IT services/SI giant. Employees deployed on customer laptops were treated as external users; some internal apps (forms, report downloads) could not be exposed to the internet. The company moved from a costly VDI-hosted browser to Accops RBI hosted on Azure. Benefits are described qualitatively; no cost figures are given.",
+      "use_for": "IT services, SI and BPO prospects with staff on client-owned devices; agentless access to internal web apps; replacing expensive VDI-based browsing with RBI.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "The cover lists 'Accops HyLabs' as the product deployed while the body describes Remote Browser Isolation; confirm the product naming."
+    },
+    {
+      "source": "inventory/Accops - A Leading ITServicesProvider - Case Study.pdf",
+      "title": "A Leading IT Services Provider Uses Accops DaaS on Azure to Reduce OpEx by 25% and Ensure BAU During Covid-19",
+      "asset_type": "Case Study",
+      "industry": "IT / ITeS",
+      "client": "A global IT services provider with 60+ offices and delivery centres in India, China, Australia, Japan, North America and Europe",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "Nano",
+        "DaaS",
+        "VDI",
+        "ZTNA"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "IT head",
+        "Head of Infrastructure",
+        "CISO"
+      ],
+      "regulations": [],
+      "key_problem": "The company had adopted Microsoft Windows Virtual Desktop on Azure but could not control per-user cost (VMs billed by usage) or secure work-from-home users on home networks and personal devices during Covid-19.",
+      "key_outcomes": [
+        "OpEx reduced by about 25%",
+        "Accops automation creates and manages dedicated VDIs on Azure, powering VMs on and off as needed",
+        "Zero-trust application access gateway with no network bridging or intranet exposure",
+        "Accops Nano hardened read-only Live OS on USB for BYOD users",
+        "DLP (copy-paste, screenshot blocking), MFA, audits and logs"
+      ],
+      "brief": "Three-page case study of an anonymised global IT services firm that layered Accops HyWorks, HySecure and Nano on top of its Azure Windows Virtual Desktop environment to manage VM costs and secure remote users during Covid-19. Includes an unattributed customer quote and a single quantified result: about 25% OpEx reduction.",
+      "use_for": "Prospects already on Azure/AVD who struggle with VM cost and security; DaaS on Azure; BYOD access via USB Live OS.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "Undated. It refers to 'Windows Virtual Desktop (WVD)', the name Microsoft used before renaming it Azure Virtual Desktop in 2021, and to the Covid-19 shift, so it was written around 2020-2021.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Undated, probably 2020-2021; confirm the year."
+    },
+    {
+      "source": "inventory/Accops - A Renowned BPO - Case Study.pdf",
+      "title": "A Leading BPO Delivers Seamless Customer Service with Wire-Speed VoIP for Work-from-Home Users",
+      "asset_type": "Case Study",
+      "industry": "IT / ITeS",
+      "client": "A renowned global technology-enabled BPO and customer-engagement services provider",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "Digital Workspace",
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "Nano",
+        "VDI",
+        "ZTNA"
+      ],
+      "competitors": [
+        "Citrix",
+        "Inuvika",
+        "Hysolate"
+      ],
+      "personas": [
+        "CIO",
+        "IT head",
+        "CISO",
+        "Head of Operations"
+      ],
+      "regulations": [],
+      "key_problem": "The Covid-19 lockdown pushed BPO agents home unprepared; live voice over low, fluctuating bandwidth hurt customer experience, and client data on home endpoints raised compliance and privacy concerns.",
+      "key_outcomes": [
+        "TCO reduced by about 50%",
+        "Wire-speed, high-quality VoIP traffic through the access gateway, even on low-bandwidth internet",
+        "Productivity kept at pre-Covid levels during lockdowns",
+        "Integrated with Cisco Duo for MFA; device health checks, device binding, role-based app access and limited internet",
+        "Chosen after evaluating Citrix, Inuvika and Hysolate; Accops Nano USB Live OS for BYOD users"
+      ],
+      "brief": "Three-page case study of an anonymised global BPO with an unattributed customer quote. Accops Digital Workspace (VDI, zero-trust access gateway, IAM) plus Accops Nano let agents in India and abroad serve customers from home with good voice quality and client data kept off endpoints. Notes the competitive evaluation against Citrix, Inuvika and Hysolate and integration with the customer's Cisco Duo MFA.",
+      "use_for": "BPO and contact-centre prospects: work-from-home voice quality, BYOD compliance, Citrix displacement, and TCO savings.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "Undated; the story is the 2020 Covid-19 lockdown, so it was most likely written in 2020-2021.",
+      "superseded_by": "",
+      "confidence": 0.82,
+      "public_url": "https://www.accops.com/case-studies/a-renowned-bpo",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": "Undated, probably 2020-2021; confirm the year."
+    },
+    {
+      "source": "inventory/Accops - Tech Mahindra - Case Study(R).pdf",
+      "title": "Tech M Chooses Accops Over Other VDI Providers for Enhanced Data Security and Experience",
+      "asset_type": "Case Study",
+      "industry": "IT / ITeS",
+      "client": "A large Indian multinational IT, networking-technology and BPO services company, part of a major Indian business group (est. 1986)",
+      "client_actual": "Tech Mahindra Limited (Mahindra Group)",
+      "client_named": true,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "VDI",
+        "ZTNA",
+        "MFA"
+      ],
+      "competitors": [
+        "VMware"
+      ],
+      "personas": [
+        "CIO",
+        "IT head",
+        "CISO",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "Tech M needed simpler desktop management, secure application access inside third-party (client) environments, data integrity, and fast secure remote access from any device to support work from home.",
+      "key_outcomes": [
+        "HyWorks VDI with HySecure ZTNA gateway (SSL VPN) chosen over alternatives including VMware",
+        "HyID MFA with device fingerprinting for device and user registration security",
+        "Regulatory compliance helped by visibility into support transactions",
+        "High availability for critical applications; remote workspaces with minimal IT administration",
+        "Single-vendor stack simplified audits and centralised BPO support"
+      ],
+      "brief": "Three-page case study naming Tech Mahindra. Covers challenges (desktop management, third-party environment access, remote work), the solution (HyWorks VDI, HySecure SSL VPN gateway, HyID MFA) and benefits. States twice that Accops was selected over VMware for features, integrations and support. All outcomes are qualitative - no numbers.",
+      "use_for": "IT services and BPO prospects, VMware displacement, and as a named large Indian IT services reference.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "No date in the body. The PDF's internal title says 'Revised 2023' and it was produced in January 2024, so the content is probably 2023 or earlier.",
+      "superseded_by": "",
+      "confidence": 0.5,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "No usable text layer (the extracted text is garbled font encoding), so this card was written by reading images of the three pages - the content is verified against the pages, not taken from the old hand-written note.Confirm the year (file metadata suggests a 2023 revision)."
+    },
+    {
+      "source": "inventory/Accops - Maveric-Systems - Case Study.pdf",
+      "title": "Maveric Wins New Customers and Optimises OpEx by 20% Using Accops Secure Remote Access",
+      "asset_type": "Case Study",
+      "industry": "IT / ITeS",
+      "client": "A banking-technology services specialist (est. 2000, 2,200+ specialists, 15 countries) serving global banks",
+      "client_actual": "Maveric Systems",
+      "client_named": true,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyDesk",
+        "VDI",
+        "ZTNA",
+        "Thin Clients"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "During Covid, associates working on banking-client engagements from home suffered connection drops on the existing VDI, poor bandwidth and latency, unpatched endpoints and data-leakage risk, while bank clients demanded proof their data stayed secure.",
+      "key_outcomes": [
+        "OpEx optimised by about 20%",
+        "Rolled out in about 48 hours; around 95% of the workforce on Accops, with no data breach (per CISO quote)",
+        "Cleared client security scrutiny and VAPT tests from clients in Europe and the Middle East",
+        "Won new projects from existing customers and new customers by reference",
+        "DLP blocks download, copy-paste, clipboard and internet access; fewer support calls over home networks"
+      ],
+      "brief": "Three-page case study naming Maveric Systems, with a quote from its CISO. Maveric replaced an unreliable existing VDI with Accops HyWorks VDI, HySecure zero-trust gateway and HyDesk thin clients so staff could reach banking clients' core systems from home. Strong angle: security posture helped an IT services firm win more business from bank clients.",
+      "use_for": "IT services and banking-tech vendors serving regulated clients; VDI replacement after poor home-network performance; 'security that wins client trust' and VAPT stories.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "Undated; the story is the Covid-19 move to work from home (2020-2021), so it is almost certainly a pre-2024 document.",
+      "superseded_by": "",
+      "confidence": 0.84,
+      "public_url": "https://www.accops.com/case-studies/maveric-systems",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": "Undated; confirm the year."
+    },
+    {
+      "source": "inventory/Global Data Company__Accops-Nutanix.V3.pdf",
+      "title": "How a Global Data Company Achieved Scalable Security with Accops and Nutanix (VMware Exit, 700-User VDI)",
+      "asset_type": "Case Study",
+      "industry": "IT / ITeS",
+      "client": "A global data-intelligence services company with 1,500+ professionals in Chennai, Mumbai and London",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "VDI",
+        "ZTNA",
+        "Digital Workspace",
+        "Nutanix"
+      ],
+      "competitors": [
+        "VMware",
+        "Broadcom",
+        "Omnissa"
+      ],
+      "personas": [
+        "CIO",
+        "IT head",
+        "Head of Infrastructure",
+        "CFO",
+        "Nutanix sellers"
+      ],
+      "regulations": [],
+      "key_problem": "A 9-year-old server estate on VMware had reached end of life, sensitive project data sat on local devices, device management sprawled, and the Broadcom acquisition and Omnissa spin-off raised licensing uncertainty and costs.",
+      "key_outcomes": [
+        "Plan to move about 700 desktops to Accops HyWorks VDI with HySecure ZTNA instead of buying new hardware per user",
+        "Nutanix HCI for both primary DC and DR, with a Dell server refresh",
+        "TCO/ROI study showed lower cost over 7 years for Accops on Nutanix, counting device refresh, licensing and support",
+        "Centralised data residency and role-based access via the Accops policy engine and device controls"
+      ],
+      "brief": "Three-page joint Accops-Nutanix case study (copyright 2025). An anonymised data-intelligence firm left an ageing VMware server stack for Nutanix HCI and Dell hardware and is rolling out Accops VDI and ZTNA to about 700 users, with expansion planned. Explicitly cites Broadcom's VMware acquisition and Omnissa as triggers. Note the rollout is described as planned/staged; no realised outcome metrics are given.",
+      "use_for": "VMware/Broadcom/Omnissa displacement conversations, Nutanix co-sell, desktop-refresh-vs-VDI TCO arguments, and data/analytics or KPO firms.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.86,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record; joint Nutanix collateral.",
+      "needs_human": "Outcomes are mostly planned (700-user rollout, 7-year TCO study) rather than measured results; reps should not quote it as a completed deployment."
+    },
+    {
+      "source": "inventory/Accops - A Leading Textile Manufacturer - Case Study.pdf",
+      "title": "Textile Maker Switches to Rugged Thin Clients to Boost Shop-Floor Efficiency and Cut Endpoint Costs",
+      "asset_type": "Case Study",
+      "industry": "Manufacturing",
+      "client": "The textile/fibre arm of a large Indian listed conglomerate (24,000+ employees), at a 24x7 viscose staple fibre plant in Madhya Pradesh",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HyDesk",
+        "VDI",
+        "Thin Clients"
+      ],
+      "competitors": [],
+      "personas": [
+        "IT head",
+        "Plant IT manager",
+        "Head of Infrastructure",
+        "CIO"
+      ],
+      "regulations": [],
+      "key_problem": "PCs on the shop floor of a 24x7 fibre plant broke down frequently from dust, heat and vibration; resolution was slow, connectivity unstable, hardware lifecycles short, and IT had to attend a vast number of endpoints physically.",
+      "key_outcomes": [
+        "Thin clients use 70% less power and last longer in harsh, corrosive conditions",
+        "Replacing a thin client takes about 10 minutes versus 3-4 hours to provision a desktop",
+        "Upgrades, OS patches and installs done centrally from the HyWorks console without local IT presence",
+        "Lower downtime, quicker data recovery and higher shop-floor productivity"
+      ],
+      "brief": "Two-page case study of an anonymised Indian textile and viscose-fibre manufacturer (plant producing 430 tonnes of fibre a day). Rugged HyDesk thin clients replaced failure-prone PCs on the shop floor, and HyWorks VDI centralised applications and administration. Includes an unattributed customer quote on thin-client downtime.",
+      "use_for": "Manufacturing and process-industry plants with harsh shop-floor conditions; thin-client and VDI pitches focused on uptime, power savings and central IT management.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "No date anywhere in the document; its age is unknown.",
+      "superseded_by": "",
+      "confidence": 0.82,
+      "public_url": "https://www.accops.com/case-studies/leading-textile-manufacturer",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": "Undated; confirm the year. The company description (1940s textile origin, VSF, chlor-alkali, Nagda plant) identifies the customer even though it is unnamed - confirm that is acceptable."
+    },
+    {
+      "source": "inventory/Accops - Polycab Case Study.pdf",
+      "title": "Polycab Transforms Its Digital Journey with a Unified VDI Solution from Accops",
+      "asset_type": "Case Study",
+      "industry": "Manufacturing",
+      "client": "A leading Indian manufacturer of wires, cables and electrical goods (est. 1996) with an EPC business",
+      "client_actual": "Polycab",
+      "client_named": true,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyDesk",
+        "VDI",
+        "Thin Clients"
+      ],
+      "competitors": [],
+      "personas": [
+        "IT head",
+        "CIO",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "An early VDI adopter, Polycab's existing infrastructure hurt user experience, added management complexity and limited scale just as its remote workforce and business grew.",
+      "key_outcomes": [
+        "Unified Accops stack: HyWorks VDI, HySecure secure remote access and HyDesk",
+        "TCO lower than a multi-vendor setup",
+        "Fewer security incidents and unauthorised access; continuity through reliable remote access",
+        "GM-IT quote cites significant user-experience improvement and IT operations cost reduction"
+      ],
+      "brief": "Three-page case study (copyright 2024) naming Polycab, with a quote from its GM - Information Technology. Polycab replaced a complex VDI estate with the integrated Accops stack to simplify management, improve performance and cut cost. Benefits are qualitative - no figures.",
+      "use_for": "Manufacturing prospects modernising an existing VDI; single-vendor VDI + access + endpoint pitch; named Indian manufacturing reference.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops - Food Processing Company - Case Study.pdf",
+      "title": "Food Processing Firm Adopts Accops Digital Workspace for Secure Work from Home (50% Lower TCO)",
+      "asset_type": "Case Study",
+      "industry": "Manufacturing",
+      "client": "One of India's fastest-growing processed-food manufacturers (est. 1962) with offices and factories across India",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "Digital Workspace",
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "Nano",
+        "VDI",
+        "ZTNA"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "IT head",
+        "CISO",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "When Covid hit, office and factory staff using a centrally hosted Microsoft Dynamics ERP over MPLS had to work from home on low-bandwidth networks, raising data-leakage and compliance concerns and high remote-infrastructure costs.",
+      "key_outcomes": [
+        "TCO about 50% lower than competitive solutions",
+        "Seamless move to work from home with Microsoft Dynamics ERP delivered securely",
+        "Device health checks, user-device binding, role-based app access, limited internet and DLP",
+        "Accops Nano read-only USB OS for secure BYOD access; faster new-user onboarding"
+      ],
+      "brief": "Three-page case study of an anonymised Indian processed-food company, with an unattributed customer quote. After evaluating multiple competitors it chose Accops Digital Workspace (HyWorks, HySecure, HyID) plus Accops Nano to give remote users secure, bandwidth-optimised access to Microsoft Dynamics ERP during Covid.",
+      "use_for": "Food, FMCG and manufacturing prospects with ERP users across plants and offices; low-bandwidth remote access and BYOD security.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "Undated; the story is the Covid-19 move to work from home (2020-2021), so it is almost certainly pre-2024.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "https://www.accops.com/case-studies/food-processing-company",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": "Undated; confirm the year. The customer quote is word-for-word the same as the quote in the 'Renowned BPO' case study - check which customer actually said it."
+    },
+    {
+      "source": "inventory/Defence R&D_Accops-Nutanix.V3.pdf",
+      "title": "Secure Computing for a Defence R&D Establishment: Accops + Nutanix for Graphics VDI and Internet Isolation",
+      "asset_type": "Case Study",
+      "industry": "Government",
+      "client": "A Hyderabad-based government defence R&D establishment",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "VDI",
+        "ZTNA",
+        "Browser Isolation",
+        "Nutanix"
+      ],
+      "competitors": [
+        "VMware",
+        "Dell"
+      ],
+      "personas": [
+        "Government IT officer",
+        "Head of Infrastructure",
+        "CISO",
+        "procurement",
+        "Nutanix sellers"
+      ],
+      "regulations": [
+        "Make in India",
+        "MeitY"
+      ],
+      "key_problem": "A Dell + VMware three-tier stack was costly to expand and misaligned with procurement; scientists needed GPU desktops for MATLAB/Ansys and officials needed controlled internet access without exposing the R&D network.",
+      "key_outcomes": [
+        "200 users, split evenly between GPU graphics VDI and an isolated internet zone",
+        "Internet isolation via client-side containerisation blocking download, screen capture, peripherals and cross-network bridging",
+        "Nutanix HCI replaced the three-tier setup; lower recurring OEM licensing charges after leaving VMware",
+        "Aligned with Make in India and MeitY procurement preferences, aiding approvals",
+        "Linux endpoint compatibility workstreams started"
+      ],
+      "brief": "Three-page joint Accops-Nutanix case study (copyright 2025). An anonymised defence R&D unit replaced Dell + VMware three-tier infrastructure with Nutanix HCI and deployed Accops HyWorks for GPU graphics desktops and HySecure plus an internet isolation layer so researchers can read external material safely. One platform and policy framework covers both workloads.",
+      "use_for": "Defence, DRDO-type labs and government R&D: graphics/GPU VDI, internet isolation, VMware exit and Make in India procurement arguments.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Defence customer story; no public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops - Ecommerce - Case Study.pdf",
+      "title": "Securing and Streamlining Operations for India's Largest E-Commerce Company with Accops ZTNA",
+      "asset_type": "Case Study",
+      "industry": "E-commerce / Retail",
+      "client": "India's largest e-commerce company, with a nationwide warehouse network (many outsourced or franchised)",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HySecure",
+        "Enterprise Browser"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "IT head",
+        "CIO",
+        "Head of Operations"
+      ],
+      "regulations": [],
+      "key_problem": "Warehouses needed always-on, device-bound connectivity on Linux (and Chrome OS) beyond basic VPN, and 15,000-25,000 seasonal work-from-home agents on personal devices had to be secured without costly VDI.",
+      "key_outcomes": [
+        "Linux-compatible ZTNA agent with device binding and copy restrictions; secure browser plugin for Chrome OS",
+        "Secure broadband backup to leased lines for uninterrupted warehouse operations",
+        "15,000-25,000 seasonal agents secured on personal devices via kiosk-mode ZTNA container active only in working hours",
+        "Significantly lower cost than VDI for the seasonal workforce",
+        "Mix of perpetual and pay-as-you-go licensing to match seasonal demand"
+      ],
+      "brief": "Two-page case study (copyright 2025) of an anonymised top Indian e-commerce company. Accops ZTNA secures franchise/outsourced warehouse machines (device binding, Linux and Chrome OS support, broadband backup) and turns seasonal agents' personal devices into locked-down kiosk workspaces with approved-site-only browsing.",
+      "use_for": "E-commerce, retail and logistics prospects: warehouse/branch device binding, seasonal or gig workforce on BYOD, ZTNA as a cheaper alternative to VDI, Linux endpoints.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record for this edition.",
+      "needs_human": "Check against 'Accops - An e-commerce major - Case Study.pdf' (also in this batch) - they may be two editions of the same customer story."
+    },
+    {
+      "source": "inventory/Accops - EcomExpress - Case Study.pdf",
+      "title": "Accops Empowers Ecom Express to Enable Seamless WFH and Secure Endpoint Connectivity (Dataquest, Nov 2022)",
+      "asset_type": "Case Study",
+      "industry": "E-commerce / Retail",
+      "client": "A leading Indian technology-enabled e-commerce logistics provider (Gurugram HQ, 50,000+ staff, 2,750+ towns, 27,000+ PIN codes)",
+      "client_actual": "Ecom Express Limited",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "ZTNA",
+        "Turbo",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "Head of Infrastructure",
+        "IT head",
+        "CISO",
+        "CIO"
+      ],
+      "regulations": [
+        "PCI DSS"
+      ],
+      "key_problem": "A fast-growing logistics firm adding up to 200+ sites at peak needed software-only secure access for every employee on any device, unpatched home laptops included, while meeting PCI and marketplace customers' cybersecurity mandates.",
+      "key_outcomes": [
+        "New business sites onboarded in a day",
+        "Software-based solution saved almost 20%+ in direct costs",
+        "Grew from a handful of licences to about 2,300 concurrent licences by 2022",
+        "HySecure ZTNA in the customer's cloud with Active Directory SSO; Turbo gives priority access from any machine including Android",
+        "Supports PCI compliance and periodic customer/auditor VA/PT checks"
+      ],
+      "brief": "Two-page Dataquest 'Industry Case Study' article (November 2022) naming Ecom Express, built around quotes from its IT Infrastructure Head. Explains why the company rejected hardware-based security, its compliance drivers (PCI, Amazon and Flipkart requirements), and how cloud-hosted HySecure ZTNA scaled with its site growth.",
+      "use_for": "Logistics and e-commerce prospects; software-only ZTNA that scales with rapid site growth; PCI and marketplace-customer compliance; a named third-party-published reference.",
+      "publish_year": "2022",
+      "expired": false,
+      "stale_risk": "Published in Dataquest in November 2022 (licence count is 'by 2022'). Pre-2024.",
+      "superseded_by": "",
+      "confidence": 0.5,
+      "public_url": "https://www.accops.com/case-studies/Ecom%20Express",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": "No text layer (image-only PDF); carded by reading the two page images, not from the old hand-written note, so the content above is verified against the pages. It is the same article as sharepoint/DQ Nov 2022 _Ecom Express.pdf (the full magazine issue) - this two-page extract is the cleaner one to share."
+    },
+    {
+      "source": "inventory/Accops - VLCC - Case Study.pdf",
+      "title": "VLCC: Virtual Browser Speeds Up Microsoft Dynamics CRM for Low-Bandwidth Remote Branches (2018)",
+      "asset_type": "Case Study",
+      "industry": "E-commerce / Retail",
+      "client": "A Delhi-based beauty and wellness retail brand with about 300 stores in 121 cities across 16 countries (4,000 staff)",
+      "client_actual": "VLCC",
+      "client_named": true,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "Virtual Browser",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "IT head",
+        "CIO",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "Branch users on low bandwidth found Microsoft Dynamics CRM so slow that a lead entry took 25-30 minutes instead of under 5, and rolling the app out across browsers and platforms with device-based security was hard.",
+      "key_outcomes": [
+        "CRM delivered through an Accops virtual browser hosted next to the CRM web server, needing only 10-128 Kbps per user (cappable at 64 Kbps)",
+        "Body says branch users access the CRM '20 times faster'; the customer quote says '70 times faster' and the benefit box says '20% faster'",
+        "Single sign-on, access from managed devices only, and no work lost during network failures",
+        "CRM no longer published on the internet; only the Linux-based Accops gateway is exposed"
+      ],
+      "brief": "Three-page 2018 case study naming VLCC. Accops published a virtual browser (HyWorks with HySecure gateway) pre-loaded with the Dynamics CRM link, so remote branches render the CRM in the data centre and receive only the display. The document's own speed-up figures disagree (20%, 20x and 70x).",
+      "use_for": "Background only for retail or multi-branch customers struggling with heavy web apps (CRM) over thin branch links; use a newer reference where possible.",
+      "publish_year": "2018",
+      "expired": false,
+      "stale_risk": "Copyright 2018. Product positioning and screenshots-era details are eight years old; the inconsistent speed figures make it risky to quote.",
+      "superseded_by": "",
+      "confidence": 0.85,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "2018 document with inconsistent figures; no public URL on record.",
+      "needs_human": "Speed claim is inconsistent within the document (20% vs 20x vs 70x faster) - do not quote a number until confirmed. Contains Accops sales and support phone numbers in the footer."
+    },
+    {
+      "source": "inventory/Accops - Govt Case Studies.pdf",
+      "title": "Accops Government Case Studies: Eight One-Page Stories (NIC, Paramilitary, Defence, Nuclear Research, PSU Bank, State Insurer, Oil & Energy, Agricultural Research)",
+      "asset_type": "Case Study",
+      "industry": "Government",
+      "client": "Eight Indian government and public-sector organisations: the national government IT agency, a paramilitary force, a defence research organisation, an atomic research centre, a top-three PSU bank, a state-owned insurer, an oil and energy major and an agricultural research body",
+      "client_actual": "NIC (named in the first story title); 'Atomic Research Centre' also named; others anonymised",
+      "client_named": true,
+      "products": [
+        "HySecure",
+        "ZTNA",
+        "Virtual Browser",
+        "HyWorks",
+        "HyDesk",
+        "HyID",
+        "MFA",
+        "SSO",
+        "FIDO",
+        "Reporting Server",
+        "VDI",
+        "Thin Clients"
+      ],
+      "competitors": [],
+      "personas": [
+        "Government IT officer",
+        "Government CIO",
+        "CISO",
+        "IT head",
+        "procurement"
+      ],
+      "regulations": [
+        "CERT-In",
+        "MoD guidelines",
+        "Make in India",
+        "RBI"
+      ],
+      "key_problem": "Government and PSU bodies need secure, scalable remote access, isolated internet browsing, air-gapped centralised desktops and strong authentication while meeting CERT-In, MoD and RBI rules - often for very large or dispersed workforces.",
+      "key_outcomes": [
+        "NIC: clientless HySecure for 100,000 officials, with VMs for 65,000 users rolled out within 24 hours; browser access to eOffice and Sparrow",
+        "Paramilitary force: remote virtual browser for 300 personnel with MFA, geo-velocity/impossible-travel reports and full session recording, per CERT-In guidelines",
+        "Atomic research centre: Hyper-V VDI and 1,000 desktops replaced by thin clients for 10,000+ scientists, with internet isolation",
+        "PSU bank: 6x forex transactions and 50% lower TCO; oil and energy major: VDI cut IT costs by 25 (unit cut off in the text)",
+        "Defence org: HyID MFA/SSO for 500 users and FIDO keys for 40 travelling staff; state insurer: HySecure for 2,000+ branches; agri research: HySecure Gold 1,000 CCU with DSC-based MFA"
+      ],
+      "brief": "A compiled set of eight one-page government/PSU case studies in a common introduction-problem-requirement-solution-benefits format, each ending with a Make-in-India call to action. Covers clientless ZTNA at national scale, virtual browsers and internet isolation, air-gapped VDI with thin clients, MFA/FIDO for defence, and branch access for a state insurer. No dates are given.",
+      "use_for": "Government, defence, PSU and public-sector prospects needing several quick proof points in one document; Make in India positioning; tender reference lists.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "No date in the document. Several stories are pandemic-era (NIC work from home, PSU bank) and the PSU bank page repeats the 2020-era case study, so the compilation may mix old and newer stories.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Government and defence references; no public URL on record.",
+      "needs_human": "Undated; confirm the year. The NIC numbers here (100,000 users, 65,000 in 24 hours) differ from the separate Govt Web ZTNA case study (pilot of 1,000 scaled to 5,00,000 users) - confirm which is right. The oil and energy page says 'Reduced IT costs by 25' with the unit cut off. Contains the Accops office address."
+    },
+    {
+      "source": "inventory/Accops - Govt Web ZTNA - Case Study.pdf",
+      "title": "Enabling Secure and Scalable Remote Access for a Government IT Service Provider (Agentless ZTNA, 5 Lakh Users)",
+      "asset_type": "Case Study",
+      "industry": "Government",
+      "client": "A government-owned, not-for-profit Indian IT service provider that runs data centres and the nationwide government network for many departments",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HySecure",
+        "MFA"
+      ],
+      "competitors": [],
+      "personas": [
+        "Government IT officer",
+        "Government CIO",
+        "CISO",
+        "Network architect"
+      ],
+      "regulations": [],
+      "key_problem": "Remote access relied on VPN and agent-based tools on government-issued laptops only, with manual agent and certificate installs; when Covid hit, nearly 300,000 employees needed access and the open VPN network lacked posture checks.",
+      "key_outcomes": [
+        "Scaled from a 1,000-user pilot to nearly 5,00,000 (500,000) users",
+        "700+ critical government applications accessed remotely, including eOffice",
+        "Agentless browser-based access from any device, including personal laptops, with MFA and role-based access",
+        "Device compliance checks and full visibility; no manual installs by IT"
+      ],
+      "brief": "Two-page case study (copyright 2025) of an anonymised national government IT service provider. Before Covid, remote access was restricted and cumbersome; a pre-pandemic pilot of Accops agentless ZTNA for about 1,000 users was scaled to lakhs of users during the lockdown so officials could keep using eOffice and other applications from any device.",
+      "use_for": "Government and large public-sector prospects: VPN replacement with agentless/browser ZTNA, eOffice remote access, and proof of scale (500,000 users).",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "Copyright 2025, but the deployment itself dates from the 2020 Covid lockdown.",
+      "superseded_by": "",
+      "confidence": 0.86,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Government reference; no public URL on record.",
+      "needs_human": "User numbers conflict with the NIC page of 'Accops - Govt Case Studies.pdf' (100,000 users / 65,000 in 24 hours vs 5,00,000 here) - confirm before quoting."
+    },
+    {
+      "source": "inventory/Accops - Govt Huddle - Case Study.pdf",
+      "title": "Securing IT Helpdesk Support for Government Organisations with Accops Huddle (TeamViewer/AnyDesk Replacement)",
+      "asset_type": "Case Study",
+      "industry": "Government",
+      "client": "A large government organisation managing critical infrastructure services, with thousands of distributed endpoints",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "Huddle"
+      ],
+      "competitors": [
+        "TeamViewer",
+        "AnyDesk",
+        "AmmyAdmin"
+      ],
+      "personas": [
+        "Government IT officer",
+        "IT head",
+        "CISO",
+        "IT helpdesk manager"
+      ],
+      "regulations": [
+        "CERT-In"
+      ],
+      "key_problem": "CERT-In directed critical government agencies to block remote-desktop tools such as TeamViewer, AnyDesk and AmmyAdmin after they were exploited in attacks, leaving IT teams unable to support thousands of distributed endpoints.",
+      "key_outcomes": [
+        "Helpdesk support restored without high-risk third-party remote-desktop tools",
+        "Only IT admins can initiate sessions; users join via browser link or a lightweight agent",
+        "Session recording, audit logs, file transfer and text/audio/video chat for troubleshooting",
+        "Works in air-gapped and isolated networks without internet",
+        "Compliance with government cybersecurity directives"
+      ],
+      "brief": "Two-page case study (copyright 2025). Explains why remote-desktop tools became an attack vector (advisories in Sweden and the UK; CERT-In blocking directive in India) and how a government department deployed Accops Huddle as a secure, auditable, admin-initiated remote support tool that also works in air-gapped networks. Outcomes are qualitative.",
+      "use_for": "Government, PSU and critical-infrastructure IT teams that have had to block TeamViewer/AnyDesk; air-gapped remote support; CERT-In compliance conversations.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Government reference; no public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops - Govt Virtual Browser - Case Study.pdf",
+      "title": "Securing Critical IT Infrastructure at a Government Power Generation Company with Accops Virtual Browser and AirBridge",
+      "asset_type": "Case Study",
+      "industry": "Government",
+      "client": "A Government of India-owned power generation company (critical infrastructure)",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "Virtual Browser",
+        "AirBridge",
+        "HyDesk",
+        "Thin Clients",
+        "Browser Isolation"
+      ],
+      "competitors": [],
+      "personas": [
+        "Government IT officer",
+        "CISO",
+        "IT head",
+        "Head of Infrastructure"
+      ],
+      "regulations": [
+        "Government of India statutory guidelines"
+      ],
+      "key_problem": "A national mandate to isolate internet access from IT networks at critical-infrastructure organisations meant two PCs per user, doubling patching, security and refresh costs, with risky file transfers between networks and poor user experience.",
+      "key_outcomes": [
+        "Dual-PC setup replaced by a kiosk-mode Accops thin client giving a hardened Linux virtual browser in a separate data-centre network",
+        "Nightly refresh wipes malware and tracking cookies; every session starts clean; URLs logged for audit",
+        "AirBridge file transfer scans files with 8 or 16 engines plus CDR; outbound uploads only to whitelisted sites",
+        "Lower hardware, support and licensing costs; web conferencing supported in the virtual browser",
+        "Next step planned: one thin client accessing two VDI environments (internet and internal)"
+      ],
+      "brief": "Three-page case study (copyright 2025) of a government-owned power producer that had to air-gap internet access. Accops Virtual Browser on thin clients replaced the second internet PC per user, and AirBridge moves files safely between internet and office networks. The client is called 'ABC Power Corporation' throughout - a placeholder name.",
+      "use_for": "Power, utilities, PSU and critical-infrastructure prospects under internet-isolation or air-gap mandates; replacing dual-PC setups; safe cross-network file transfer.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.84,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Government/critical-infrastructure reference; no public URL on record.",
+      "needs_human": "The customer is called 'ABC Power Corporation' throughout - a template placeholder that reads oddly if sent. The cover lists 'Accops HyDesk' as the only product deployed while the body is about Virtual Browser and AirBridge."
+    },
+    {
+      "source": "inventory/Accops - Atomic Research Center - Case Study.pdf",
+      "title": "Atomic Research Centre Adopts a Multi-Layer Security Approach with VDI and Internet Isolation",
+      "asset_type": "Case Study",
+      "industry": "Government",
+      "client": "An Indian nuclear-energy research centre with 10,000+ scientists and engineers across multiple locations",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HyDesk",
+        "VDI",
+        "Thin Clients"
+      ],
+      "competitors": [],
+      "personas": [
+        "Government IT officer",
+        "IT head",
+        "CISO",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "Legacy thick-PC infrastructure for 10,000+ scientists and engineers was costly to maintain, slow to support, and exposed to browser and internet threats at a high-profile national-security research establishment.",
+      "key_outcomes": [
+        "Hyper-V based VDI deployed and 1,000 thick PCs replaced with HyDesk thin clients",
+        "Internet traffic isolated from the internal network; virtual desktops have no direct internet access",
+        "Single application hub instead of per-endpoint installs; fewer support issues and faster turnaround",
+        "Role-based access, full audit trails, automatic session reconnect; longer hardware replacement cycle"
+      ],
+      "brief": "Three-page case study of an anonymised Indian atomic research centre, with an unattributed customer quote. HyWorks VDI on Hyper-V centralised applications across the campus, 1,000 PCs became thin clients, and internet traffic was routed through a separate network so users can reach both internal apps and the internet from one device. Outcomes are qualitative.",
+      "use_for": "Government research labs, defence and nuclear/space-type establishments: VDI with internet isolation, thin-client refresh, centralised endpoint management.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "No date in the document; its age is unknown. A one-page summary of the same story appears in the Govt Case Studies compilation.",
+      "superseded_by": "",
+      "confidence": 0.82,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Nuclear research/defence reference; no public URL on record.",
+      "needs_human": "Undated; confirm the year."
+    },
+    {
+      "source": "inventory/Accops - Zulekha Hospital - Case Study.pdf",
+      "title": "Zulekha Hospital Empowers Doctors with ZTNA-Based Remote Access to Deliver Better Patient Care",
+      "asset_type": "Case Study",
+      "industry": "Pharma / Healthcare",
+      "client": "A large private healthcare group in the UAE (hospitals in Dubai and Sharjah, medical centres and pharmacies; 3,000+ staff)",
+      "client_actual": "Zulekha Hospital / Zulekha Healthcare Group",
+      "client_named": true,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "Digital Workspace",
+        "ZTNA",
+        "VDI",
+        "MFA"
+      ],
+      "competitors": [],
+      "personas": [
+        "IT head",
+        "CIO",
+        "CISO",
+        "Hospital administrator"
+      ],
+      "regulations": [],
+      "key_problem": "Off-duty doctors had to reach patient records in the hospital information system from personal devices and home networks; the existing VPN was slow on fluctuating bandwidth and had no endpoint, device-entry or data-leakage controls.",
+      "key_outcomes": [
+        "Doctors access medical records and HIMS from anywhere, on any device, improving patient care",
+        "Rolled out first to selected doctors, then to the whole workforce; IT staff support late nights and holidays",
+        "With the platform already in place before Covid, several hundred staff moved to work from anywhere within days",
+        "Device posture checks, MFA, contextual access, DLP and a dashboard with 360-degree visibility",
+        "Usage reports help plan future IT investment"
+      ],
+      "brief": "Three-page case study naming Zulekha Hospital (UAE), with a quote from its Senior Director-IT. Accops Digital Workspace (HyWorks, HySecure, HyID) was deployed four years before Covid so doctors could access records remotely; it later carried the whole workforce through the pandemic. Outcomes are qualitative.",
+      "use_for": "Hospitals and healthcare groups, especially in the Middle East: remote clinician access to HIMS/EMR, BYOD security, and VPN replacement.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "Undated. It says the solution was deployed four years before Covid and describes the pandemic response, so it was written around 2020-2022.",
+      "superseded_by": "",
+      "confidence": 0.84,
+      "public_url": "https://www.accops.com/case-studies/zulekha-hospital",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": "Undated; confirm the year."
+    },
+    {
+      "source": "inventory/Accops - City Pharmacy - Case Study .pdf",
+      "title": "City Pharmacy Replaces Citrix XenApp with Accops HyWorks for ERP Virtualisation",
+      "asset_type": "Case Study",
+      "industry": "Pharma / Healthcare",
+      "client": "A leading UAE pharmaceutical, consumer-products and medical-equipment distributor (est. 1967), with offices in Sharjah and Abu Dhabi",
+      "client_actual": "City Pharmacy",
+      "client_named": true,
+      "products": [
+        "HyWorks",
+        "VDI"
+      ],
+      "competitors": [
+        "Citrix"
+      ],
+      "personas": [
+        "IT head",
+        "CIO",
+        "CFO",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "Citrix XenApp failed to deliver the Orion ERP client reliably to 200+ remote users: it lacked flexibility, could not fix dot-matrix invoice printing, no longer supported the Windows Server 2008 the ERP needed, and renewals were expensive.",
+      "key_outcomes": [
+        "Citrix XenApp replaced with Accops HyWorks; Orion ERP client rolled out swiftly to 200+ users",
+        "Universal printer drivers resolved intermittent dot-matrix invoice printing for finance",
+        "Continued support for Windows Server 2008 avoided an immediate ERP upgrade",
+        "Lower cost and fewer IT resources than Citrix; quicker ROI"
+      ],
+      "brief": "Four-page case study naming City Pharmacy (UAE), with a quote from its IT Director. A detailed Citrix displacement story: why XenApp failed (customisation, printing, OS support, renewal cost) and how HyWorks application virtualisation fixed each problem for finance, procurement and store users.",
+      "use_for": "Citrix XenApp/Virtual Apps displacement, especially in the Middle East; legacy ERP or old-OS application delivery; remote printing problems.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "Undated; mentions the Covid period and Windows Server 2008 support, so it was likely written around 2021-2022. Pre-2024 probably.",
+      "superseded_by": "",
+      "confidence": 0.85,
+      "public_url": "https://www.accops.com/case-studies/city-pharmacy",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": "Undated; confirm the year. The Windows Server 2008 support claim should be checked against current HyWorks support before reuse."
+    },
+    {
+      "source": "inventory/Accops - ABP Pvt- Case Study.pdf",
+      "title": "ABP Group Delivers Digital Workspace for Graphics-Intense, Data-Heavy Applications to Enable Secure Work from Home",
+      "asset_type": "Case Study",
+      "industry": "Media",
+      "client": "A large Kolkata-based Indian media conglomerate (est. 1922) with publications, national TV news channels and publishing",
+      "client_actual": "Ananda Bazar Patrika (ABP) Group",
+      "client_named": true,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "HyID",
+        "Digital Workspace",
+        "VDI",
+        "ZTNA",
+        "MFA"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "IT head",
+        "Head of Infrastructure",
+        "CIO"
+      ],
+      "regulations": [],
+      "key_problem": "In March 2020 the whole workforce, including editors, page designers and photographers using InDesign, Photoshop and QuarkXpress, had to work from home; the VPN used by 15-20 IT staff could not scale and had no endpoint or DLP controls.",
+      "key_outcomes": [
+        "Rolled out to the entire workforce within two weeks after a pilot with the IT team",
+        "Productivity back to pre-Covid levels during the Covid peak; 24x7 news operations kept running",
+        "Graphics-heavy and data-intensive apps (Adobe InDesign, Photoshop, QuarkXpress, ERP, BI) delivered over low-bandwidth home WiFi",
+        "MFA, device-entry and contextual access control and endpoint DLP for old personal devices",
+        "Chosen after evaluating six solutions; dashboard gives 360-degree visibility for IT planning"
+      ],
+      "brief": "Three-page case study naming ABP Group, with quotes from its CISO & Head of IT Infrastructure and its Head of IT. In mid-March 2020 ABP moved several hundred staff, a couple of hundred of them editorial and design users, to work from home using on-premise Accops Digital Workspace (HyWorks, HySecure, HyID), including sandboxed access to office PCs.",
+      "use_for": "Media, publishing and broadcast prospects; remote access to graphics-heavy creative applications over low bandwidth; fast business-continuity rollouts.",
+      "publish_year": "2020",
+      "expired": false,
+      "stale_risk": "The story is dated mid-March 2020 and covers the first Covid rollout; it was written around 2020-2021. Pre-2024.",
+      "superseded_by": "",
+      "confidence": 0.85,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "The CISO quote is almost word-for-word the same as the Zulekha Hospital quote (only 'IT team' vs 'specific doctors' differs) - check which customer actually said it before reuse."
+    },
+    {
+      "source": "inventory/Accops - IIT-Bombay - Case Study.pdf",
+      "title": "Enabling Uninterrupted Hands-On Learning via On-Demand Access to Labs at IIT Bombay",
+      "asset_type": "Case Study",
+      "industry": "Education",
+      "client": "One of India's foremost engineering institutes (est. 1958), offering postgraduate and doctoral programmes",
+      "client_actual": "IIT Bombay",
+      "client_named": true,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "VDI",
+        "ZTNA"
+      ],
+      "competitors": [],
+      "personas": [
+        "University IT head",
+        "Lab administrator",
+        "Dean / Faculty"
+      ],
+      "regulations": [],
+      "key_problem": "Research scholars and faculty needed continuous remote access to lab sessions, while a lean, budget-constrained IT team struggled to install software on many endpoints and handle OS compatibility issues.",
+      "key_outcomes": [
+        "Students access lab sessions from anywhere with no data left on their devices",
+        "Multiple users served from a single VDI server, with access limited to entitled applications",
+        "Time and cost saved on client software installation; OS compatibility issues handled centrally",
+        "Digital transformation without additional CapEx; TCO significantly lower than a multi-vendor setup"
+      ],
+      "brief": "Three-page case study naming IIT Bombay, with a quote from its System Administrator. The institute chose Accops HyWorks VDI and HySecure zero-trust gateway after evaluating competitors, so students and faculty can reach lab software remotely from BYOD devices. Outcomes are qualitative; no user counts or figures.",
+      "use_for": "Universities and engineering colleges: remote/virtual lab access, BYOD students, lean IT teams; a named premier Indian institute reference.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "No date in the document; its age is unknown. The footer email is a work-from-home address, which suggests the pandemic era.",
+      "superseded_by": "",
+      "confidence": 0.82,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Undated; confirm the year. HyLabs is now the education product - check whether this story should be repositioned as HyLabs."
+    },
+    {
+      "source": "inventory/Accops - Education Japan - Case Study.V2.pdf",
+      "title": "Kyoto University Implements VDI (Accops HyLabs) to Optimise ICT Labs",
+      "asset_type": "Case Study",
+      "industry": "Education",
+      "client": "Japan's second-largest university, with 25,000+ students across 200+ departments",
+      "client_actual": "Kyoto University",
+      "client_named": true,
+      "products": [
+        "HyLabs",
+        "VDI"
+      ],
+      "competitors": [],
+      "personas": [
+        "University IT head",
+        "Lab administrator",
+        "Dean / Faculty",
+        "procurement"
+      ],
+      "regulations": [],
+      "key_problem": "Each department ran its own ICT lab, heavily used only in the first month of a semester; students could not reach licensed software from personal devices, labs were costly to run, and corporate VDI needed too much IT effort.",
+      "key_outcomes": [
+        "HyLabs, a self-service virtual lab platform, was built with the university by customising Accops VDI for education",
+        "LMS integration schedules virtual labs automatically from course enrolments",
+        "Faculty create and manage lab VM images without IT; students reserve and use labs remotely, beyond university hours",
+        "Redundant ICT labs eliminated and software licences shared across departments, cutting costs",
+        "Smart troubleshooting button reduces IT support requests"
+      ],
+      "brief": "Three-page case study (copyright 2025) naming Kyoto University. Describes the origin of Accops HyLabs: the university and Accops turned VDI into a self-service ICT lab platform consolidating departmental labs into a shared service, with LMS-driven scheduling, faculty-controlled images and remote student access. Outcomes are qualitative.",
+      "use_for": "Universities, especially in Japan and APAC: virtual ICT labs, lab consolidation, licence sharing, LMS integration; the flagship HyLabs reference.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops - UAE Case Study V4 2026.pdf",
+      "title": "A Leading University in the UAE Modernises Learning with Virtual ICT Labs (Accops HyLabs + HyID)",
+      "asset_type": "Case Study",
+      "industry": "Education",
+      "client": "A leading international university in the UAE operating as a UK university's regional campus",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyLabs",
+        "HyID",
+        "MFA",
+        "VDI"
+      ],
+      "competitors": [],
+      "personas": [
+        "University IT head",
+        "Lab administrator",
+        "Dean / Faculty"
+      ],
+      "regulations": [],
+      "key_problem": "Physical ICT labs with fixed schedules became congested as enrolment grew; there was no remote access, new courses needed new hardware, and faculty had to walk between student PCs to help.",
+      "key_outcomes": [
+        "Course-specific virtual lab environments delivered through a browser to any device, on campus or remote",
+        "Faculty schedule instructor-led sessions or self-study access through a self-service portal without IT involvement",
+        "New courses launched without waiting for hardware procurement or lab setup",
+        "HyID MFA enforces identity-based access for secure BYOD use",
+        "Instructors manage multiple lab sessions remotely and assist students in real time"
+      ],
+      "brief": "Three-page case study (copyright 2026) of an anonymised UK-university campus in the UAE that replaced physical ICT labs with Accops HyLabs and secured access with HyID MFA. Covers curriculum-based provisioning, multi-course scheduling and self-study. Outcomes are qualitative; no student numbers or savings are given.",
+      "use_for": "Universities in the Middle East and international branch campuses: virtual ICT labs, BYOD learning, faster course rollout; a current (2026) HyLabs reference.",
+      "publish_year": "2026",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops_Role Of ZTNA.pdf",
+      "title": "Navigating the Cybersecurity Landscape: The Role of ZTNA Access Solutions in Thwarting Modern Threats",
+      "asset_type": "Whitepaper",
+      "industry": "Cross-industry",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HySecure",
+        "MFA",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Network architect"
+      ],
+      "regulations": [
+        "PCI DSS",
+        "DPDP",
+        "GDPR",
+        "HIPAA",
+        "FedRAMP"
+      ],
+      "key_problem": "Zero-trust is easy to grasp but hard to implement enterprise-wide: point solutions, poor on-prem/cloud interoperability, admin overhead, user friction, latency and policy complexity leave gaps attackers exploit.",
+      "key_outcomes": [
+        "Explains three zero-trust principles and why distributed work, regulation and attack vectors make ZTNA essential",
+        "Cites third-party stats: 80% of IT leaders find enterprise-wide zero trust hard; 33% of ZTNA deployments not integrated across on-prem and cloud; 31% report latency issues",
+        "Six gaps with fixes: BYOD access, user experience, restricting remote user actions, no access to end-user machines, sparse session logs, complex administration",
+        "A 12-point checklist for selecting a unified ZTNA product"
+      ],
+      "brief": "Seven-page vendor-neutral-style Accops whitepaper (copyright 2024) on ZTNA. Walks through zero-trust principles, adoption drivers, implementation challenges, six common gaps and how to close them, then a ZTNA selection checklist (interoperability, BYOD delivery, IdP integration, cloud deployment, session monitoring, endpoint controls, native session recording). Statistics come from 2022-2023 articles in Virtualization Review, CIO.com and TechWire Asia.",
+      "use_for": "Top-of-funnel education for CISOs and IT heads starting or upgrading a zero-trust programme; nurture emails; a buyer checklist for ZTNA evaluations.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Supporting statistics are from 2022-2023 sources.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops ZTNA_Securing Digital Transactions in Financial Services.pdf",
+      "title": "Fortifying the Foundations of Digital Transactions with ZTNA in Financial Services",
+      "asset_type": "Whitepaper",
+      "industry": "BFSI",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HySecure",
+        "MFA",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Head of Compliance"
+      ],
+      "regulations": [
+        "DPDP",
+        "PCI DSS",
+        "GDPR",
+        "HIPAA",
+        "FedRAMP"
+      ],
+      "key_problem": "Financial institutions moving to hybrid work must secure digital transactions and sensitive customer data with zero trust, but enterprise-wide ZTNA is hard: point solutions, legacy/cloud gaps, user friction and audit demands.",
+      "key_outcomes": [
+        "Same zero-trust primer, challenges and six-gap analysis as the generic 'Role of ZTNA' whitepaper",
+        "BFSI selection criteria: interoperability across legacy and cloud, contextual access and encryption for DPDP/PCI-DSS/GDPR, granular access, secure vendor access",
+        "Real-time session monitoring, recording and anomaly detection; audit trails for compliance",
+        "Low-latency access over low bandwidth for remote geographies",
+        "Cites 2022-2023 third-party stats (80% of IT leaders struggle with enterprise-wide zero trust; 31% report latency)"
+      ],
+      "brief": "Seven-page whitepaper (copyright 2024), the financial-services edition of Accops' ZTNA whitepaper series. Pages 1-4 and 6-7 are the generic 'Role of ZTNA' text with a BFSI title and intro; page 5 adds a financial-services checklist for choosing a ZTNA product (interoperability, regulatory controls, vendor access, real-time monitoring, compliance trails, low-latency UX). No customer stories or Accops-specific figures.",
+      "use_for": "Nurture and thought-leadership content for bank, NBFC, insurance and fintech CISOs evaluating zero trust; pair with a BFSI case study for proof.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Supporting statistics come from 2022-2023 articles.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "About 80% of the text is identical to 'Accops_Role Of ZTNA.pdf'; only the title, intro paragraph and page 5 are BFSI-specific. An editable .docx of this paper is also in the inventory."
+    },
+    {
+      "source": "inventory/Accops ZTNA_To Secure Modern ITeS Ops.pdf",
+      "title": "Securing Modern ITeS Operations with Zero-Trust Network Access Solutions",
+      "asset_type": "Whitepaper",
+      "industry": "IT / ITeS",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HySecure",
+        "MFA",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Network architect"
+      ],
+      "regulations": [
+        "PCI DSS",
+        "DPDP",
+        "GDPR",
+        "HIPAA",
+        "FedRAMP"
+      ],
+      "key_problem": "ITeS and BPO firms serve global clients with remote, BYOD-heavy workforces that need both on-prem systems and virtual desktops, so traditional VPN/SSL tunnels fall short and social-engineering and intrusion risk is high.",
+      "key_outcomes": [
+        "Same zero-trust primer, challenges and six-gap analysis as the generic 'Role of ZTNA' whitepaper",
+        "ITeS selection criteria: secure access for remote and global delivery teams and BPO operations",
+        "Deliver apps to BYOD devices without configuring the device; low-latency cloud deployment for scale",
+        "Interoperability with clients' legacy and modern estates; identity-management integration for frequent role changes",
+        "Post-authentication monitoring, session recording and adaptive contextual access"
+      ],
+      "brief": "Seven-page whitepaper (copyright 2024), the IT/ITeS edition of Accops' ZTNA whitepaper series. Generic zero-trust content shared with 'Role of ZTNA', plus an ITeS-specific page on choosing a ZTNA product for distributed, BYOD-heavy service-delivery teams. No customer stories or Accops figures.",
+      "use_for": "Nurture content for IT services, BPO and KPO security and IT leaders; pair with the Tech Mahindra, Maveric, Large SI or BPO case studies.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Supporting statistics come from 2022-2023 articles.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "About 80% of the text is identical to 'Accops_Role Of ZTNA.pdf'. An editable .docx of this paper is also in the inventory."
+    },
+    {
+      "source": "inventory/Accops ZTNA_Defending Your Industry 4.0.pdf",
+      "title": "Defending Your Industry 4.0 Estate with Modern Zero-Trust Network Access Solutions",
+      "asset_type": "Whitepaper",
+      "industry": "Manufacturing",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HySecure",
+        "MFA",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Plant IT manager",
+        "OT security head"
+      ],
+      "regulations": [
+        "NIST",
+        "IEC 62443",
+        "PCI DSS",
+        "DPDP",
+        "GDPR"
+      ],
+      "key_problem": "Smart factories and IIoT blur IT and OT boundaries, so the old perimeter no longer works; engineering, shop-floor and supply-chain teams each need secure, often low-latency access with different requirements.",
+      "key_outcomes": [
+        "Same zero-trust primer, challenges and six-gap analysis as the generic 'Role of ZTNA' whitepaper",
+        "Manufacturing criteria: integrate with cloud and on-prem industrial control systems; secure access to IIoT devices",
+        "Secure remote monitoring and control of OT; low-latency access to avoid production-line disruption",
+        "Access to legacy and modern apps; continuous, contextual access to curb insider risk",
+        "Native session/access logging and recording for NIST and IEC 62443 compliance"
+      ],
+      "brief": "Seven-page whitepaper (copyright 2024), the manufacturing / Industry 4.0 edition of Accops' ZTNA whitepaper series. Generic zero-trust content shared with 'Role of ZTNA', plus a page on choosing an Industry 4.0-compatible ZTNA (ICS integration, IIoT device security, OT remote access, low latency, NIST and IEC 62443 logging). No customer stories or Accops figures.",
+      "use_for": "Nurture content for manufacturing CIOs/CISOs and plant IT heads exploring zero trust for IT-OT convergence; pair with the Polycab or textile case studies.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Supporting statistics come from 2022-2023 articles.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "About 80% of the text is identical to 'Accops_Role Of ZTNA.pdf'. An editable .docx of this paper is also in the inventory."
+    },
+    {
+      "source": "inventory/Accops ZTNA_Protecting Data and Digital Systems in Life Sciences.pdf",
+      "title": "Protecting Vital Data and Digital Systems in Life Sciences with Zero-Trust Network Access",
+      "asset_type": "Whitepaper",
+      "industry": "Pharma / Healthcare",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HySecure",
+        "MFA",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "IT head",
+        "Head of Compliance"
+      ],
+      "regulations": [
+        "HIPAA",
+        "GDPR",
+        "FDA guidelines",
+        "PCI DSS",
+        "DPDP"
+      ],
+      "key_problem": "As life-sciences and healthcare organisations adopt cloud and AI, sensitive patient, R&D and operational data flows across networks to care delivery and outsourced back offices, needing zero-trust access that meets strict compliance.",
+      "key_outcomes": [
+        "Same zero-trust primer, challenges and six-gap analysis as the generic 'Role of ZTNA' whitepaper",
+        "Life-sciences criteria: interoperability with legacy medical systems, HMS and cloud apps",
+        "Compliance and auditing for HIPAA, GDPR and FDA guidelines; encryption and strict policies for drug-research and patient data",
+        "Secure BYOD access for outsourced back offices; identity-provider integration for nurses, physicians, R&D and third parties",
+        "Low-latency access for time-sensitive apps such as ICU monitoring; continuous contextual verification"
+      ],
+      "brief": "Seven-page whitepaper (copyright 2024), the pharma and healthcare edition of Accops' ZTNA whitepaper series. Generic zero-trust content shared with 'Role of ZTNA', plus a page on choosing a ZTNA product for healthcare and life sciences. No customer stories or Accops figures.",
+      "use_for": "Nurture content for pharma, hospital and life-sciences CISOs/CIOs; pair with Zulekha Hospital or City Pharmacy case studies.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Supporting statistics come from 2022-2023 articles.",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "About 80% of the text is identical to 'Accops_Role Of ZTNA.pdf'. An editable .docx of this paper is also in the inventory."
+    },
+    {
+      "source": "inventory/Accops ZTNA_Securing Digital Transactions in Financial Services.docx",
+      "title": "Fortifying the Foundations of Digital Transactions with ZTNA in Financial Services (editable Word source)",
+      "asset_type": "Whitepaper",
+      "industry": "BFSI",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HySecure",
+        "MFA",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "Marketing",
+        "CISO",
+        "CIO"
+      ],
+      "regulations": [
+        "DPDP",
+        "PCI DSS",
+        "GDPR",
+        "HIPAA",
+        "FedRAMP"
+      ],
+      "key_problem": "Same content as the PDF: financial institutions need enterprise-wide zero trust to secure digital transactions and customer data under strict regulation.",
+      "key_outcomes": [
+        "Word source of the BFSI ZTNA whitepaper; body text is identical to the PDF edition",
+        "Text boxes, page headers and the copyright line are laid out in the PDF, not in the Word body",
+        "Useful for editing, translation or re-branding the paper"
+      ],
+      "brief": "Editable Word version of the financial-services ZTNA whitepaper. A word-level comparison shows every word of the Word body also appears in the PDF; the PDF adds only layout elements (running header, copyright line, diagram labels, footnote links). Use the PDF for sharing.",
+      "use_for": "Internal editing or localisation of the BFSI ZTNA whitepaper; send the PDF to customers, not this file.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "The Word body shows no date; the year is taken from the identical PDF edition, which is copyright 2024.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Editable source file of a published PDF; not for sending.",
+      "needs_human": "Duplicate of inventory/Accops ZTNA_Securing Digital Transactions in Financial Services.pdf. Consider hiding it from SAM answers so reps get the PDF."
+    },
+    {
+      "source": "inventory/Accops ZTNA_To Secure Modern ITeS Ops.docx",
+      "title": "Securing Modern ITeS Operations with Zero-Trust Network Access Solutions (editable Word source)",
+      "asset_type": "Whitepaper",
+      "industry": "IT / ITeS",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HySecure",
+        "MFA",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "Marketing",
+        "CISO",
+        "CIO"
+      ],
+      "regulations": [
+        "PCI DSS",
+        "DPDP",
+        "GDPR",
+        "HIPAA",
+        "FedRAMP"
+      ],
+      "key_problem": "Same content as the PDF: ITeS and BPO firms with distributed, BYOD-heavy teams need zero-trust access beyond VPN.",
+      "key_outcomes": [
+        "Word source of the ITeS ZTNA whitepaper; body text is identical to the PDF edition",
+        "Text boxes, page headers and the copyright line are laid out in the PDF, not in the Word body",
+        "Useful for editing, translation or re-branding the paper"
+      ],
+      "brief": "Editable Word version of the IT/ITeS ZTNA whitepaper. A word-level comparison shows the Word body is fully contained in the PDF; the PDF adds only layout elements. Use the PDF for sharing.",
+      "use_for": "Internal editing or localisation of the ITeS ZTNA whitepaper; send the PDF to customers, not this file.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "The Word body shows no date; the year is taken from the identical PDF edition, which is copyright 2024.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Editable source file of a published PDF; not for sending.",
+      "needs_human": "Duplicate of inventory/Accops ZTNA_To Secure Modern ITeS Ops.pdf. Consider hiding it from SAM answers so reps get the PDF."
+    },
+    {
+      "source": "inventory/Accops ZTNA_Defending Your Industry 4.0.docx",
+      "title": "Defending Your Industry 4.0 Estate with Modern Zero-Trust Network Access Solutions (editable Word source)",
+      "asset_type": "Whitepaper",
+      "industry": "Manufacturing",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HySecure",
+        "MFA",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "Marketing",
+        "CISO",
+        "CIO"
+      ],
+      "regulations": [
+        "NIST",
+        "IEC 62443",
+        "PCI DSS",
+        "DPDP",
+        "GDPR"
+      ],
+      "key_problem": "Same content as the PDF: Industry 4.0 IT-OT convergence needs zero-trust access for ICS, IIoT and OT systems.",
+      "key_outcomes": [
+        "Word source of the manufacturing ZTNA whitepaper; body text is identical to the PDF edition",
+        "Text boxes, page headers and the copyright line are laid out in the PDF, not in the Word body",
+        "Useful for editing, translation or re-branding the paper"
+      ],
+      "brief": "Editable Word version of the Industry 4.0 ZTNA whitepaper. A word-level comparison shows the Word body is fully contained in the PDF; the PDF adds only layout elements. Use the PDF for sharing.",
+      "use_for": "Internal editing or localisation of the manufacturing ZTNA whitepaper; send the PDF to customers, not this file.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "The Word body shows no date; the year is taken from the identical PDF edition, which is copyright 2024.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Editable source file of a published PDF; not for sending.",
+      "needs_human": "Duplicate of inventory/Accops ZTNA_Defending Your Industry 4.0.pdf. Consider hiding it from SAM answers so reps get the PDF."
+    },
+    {
+      "source": "inventory/Accops ZTNA_Protecting Data and Digital Systems in Life Sciences.docx",
+      "title": "Protecting Vital Data and Digital Systems in Life Sciences with Zero-Trust Network Access (editable Word source)",
+      "asset_type": "Whitepaper",
+      "industry": "Pharma / Healthcare",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "ZTNA",
+        "HySecure",
+        "MFA",
+        "SSO"
+      ],
+      "competitors": [],
+      "personas": [
+        "Marketing",
+        "CISO",
+        "CIO"
+      ],
+      "regulations": [
+        "HIPAA",
+        "GDPR",
+        "FDA guidelines",
+        "PCI DSS",
+        "DPDP"
+      ],
+      "key_problem": "Same content as the PDF: life-sciences and healthcare organisations need zero-trust access to protect patient, R&D and operational data.",
+      "key_outcomes": [
+        "Word source of the life-sciences ZTNA whitepaper; body text is identical to the PDF edition",
+        "Text boxes, page headers and the copyright line are laid out in the PDF, not in the Word body",
+        "Useful for editing, translation or re-branding the paper"
+      ],
+      "brief": "Editable Word version of the pharma and healthcare ZTNA whitepaper. A word-level comparison shows the Word body is fully contained in the PDF; the PDF adds only layout elements. Use the PDF for sharing.",
+      "use_for": "Internal editing or localisation of the life-sciences ZTNA whitepaper; send the PDF to customers, not this file.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "The Word body shows no date; the year is taken from the identical PDF edition, which is copyright 2024.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Editable source file of a published PDF; not for sending.",
+      "needs_human": "Duplicate of inventory/Accops ZTNA_Protecting Data and Digital Systems in Life Sciences.pdf. Consider hiding it from SAM answers so reps get the PDF."
+    },
+    {
+      "source": "inventory/Accops_Beyond MFA.pdf",
+      "title": "Beyond MFA: A Unified Approach to Securing Legacy, Cloud and On-Premise Applications (2024 edition)",
+      "asset_type": "Whitepaper",
+      "industry": "Cross-industry",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyID",
+        "MFA",
+        "SSO",
+        "FIDO",
+        "BioAuth"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "Head of IAM",
+        "IT head"
+      ],
+      "regulations": [
+        "RBI",
+        "NIST"
+      ],
+      "key_problem": "Heterogeneous estates mix legacy password apps, SAML/SaaS and several MFA tools, so policies are hard to enforce, SMS OTP is increasingly unreliable (RBI pushing alternatives), stale AD accounts linger, and credential attacks bypass traditional controls.",
+      "key_outcomes": [
+        "Lists authentication gaps: multiple coexisting tools, unenforceable policies, weak OTP, credential attacks, missing context, stale AD profiles, proprietary protocols",
+        "Five pillars for unified access security: trust level, coverage, user-friendliness, auditability, tool sprawl",
+        "Maps methods to NIST assurance levels AAL1-AAL3 (e.g. FIDO with biometrics at AAL3)",
+        "Best practices: one interoperable authenticator, adaptive authentication, user-centric UX, central identity with RADIUS/LDAP/FIDO, tamper-proof audit of power users",
+        "Cites the IAM market growing from USD 15.7B (2023) to USD 32.6B by 2028 (MarketsandMarkets)"
+      ],
+      "brief": "Seven-page Accops whitepaper (copyright 2024, 'a 2024 perspective') arguing that MFA alone is not enough and enterprises need a unified authentication strategy across legacy, cloud and on-prem apps. Ends with a pitch for Accops HyID (push, OTP, biometrics, hardware keys, FIDO; Windows/Linux, servers, SAML apps; logging of user actions).",
+      "use_for": "Do not send - use the April 2025 edition, which is the same paper copy-edited. Background for IAM/MFA consolidation conversations.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Superseded by the April 2025 edition; this one has a numbering error in its gaps list (jumps from #4 to #6) and typos ('string authentication').",
+      "superseded_by": "inventory/Accops_Beyond MFA_24 April 2025.pdf - same paper, copy-edited (UK spelling, '2025 perspective', corrected numbering and typos, new closing call to action).",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Superseded edition; no public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops_Beyond MFA_24 April 2025.pdf",
+      "title": "Beyond MFA: A Unified Approach to Securing Legacy, Cloud and On-Premise Applications (April 2025 edition)",
+      "asset_type": "Whitepaper",
+      "industry": "Cross-industry",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyID",
+        "MFA",
+        "SSO",
+        "FIDO",
+        "BioAuth"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "Head of IAM",
+        "IT head"
+      ],
+      "regulations": [
+        "RBI",
+        "NIST"
+      ],
+      "key_problem": "Heterogeneous estates mix legacy password apps, SAML/SaaS and several MFA tools, so policies are hard to enforce, SMS OTP is increasingly unreliable (RBI pushing alternatives), stale AD accounts linger, and credential attacks bypass traditional controls.",
+      "key_outcomes": [
+        "Seven authentication gaps: coexisting tools, unenforceable policies, weak OTP second factor, credential attacks, missing context, stale AD profiles, proprietary protocols",
+        "Five pillars for unified access security: trust level, coverage, user-friendliness, auditability, tool sprawl",
+        "Maps methods to NIST assurance levels AAL1-AAL3 (e.g. FIDO with biometrics at AAL3)",
+        "Best practices: one interoperable authenticator, adaptive authentication, user-centric UX, central identity with RADIUS/LDAP/FIDO, tamper-proof audit of power users",
+        "Cites the IAM market growing from USD 15.7B (2023) to USD 32.6B by 2028 (MarketsandMarkets)"
+      ],
+      "brief": "Seven-page Accops whitepaper (copyright 2025, 'a 2025 perspective') arguing that MFA alone is not enough and enterprises need a unified authentication strategy across legacy, cloud and on-prem apps. A copy-edited version of the 2024 paper: same structure, UK spelling, corrected gap numbering and typos. Closes with Accops HyID (push, OTP, biometrics, hardware keys, FIDO; Windows/Linux, servers, SAML apps; audit logging).",
+      "use_for": "Send to CISOs and IAM owners consolidating MFA tools or moving off SMS OTP; nurture content for HyID; RBI OTP-replacement conversations in banks.",
+      "publish_year": "2025",
+      "expired": false,
+      "stale_risk": "Market statistic dates from 2023 research.",
+      "superseded_by": "",
+      "confidence": 0.92,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops_Simplified_Authentication_For_BFSI.pdf",
+      "title": "Building Unfailing Trust in BFSI: Simplified Authentication with Context-Aware MFA and SSO",
+      "asset_type": "Whitepaper",
+      "industry": "BFSI",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyID",
+        "MFA",
+        "SSO",
+        "BioAuth",
+        "Password-less"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "Head of IAM",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "Banks and financial firms need stronger authentication for sensitive data and transactions, but legacy techniques inside zero-trust frameworks degrade user experience, drive password reuse and bypassing, and multiply tools and reset tickets.",
+      "key_outcomes": [
+        "Shared 'Future of Authentication' content: risk factors, the security-vs-UX trade-off, gaps in traditional authentication design",
+        "Six levers: contextual (adaptive) authentication, SSO, passwordless (biometric, QR), continuous authentication, user-friendly 2FA, robust ID management",
+        "BFSI checklist: integration with financial apps (SAML, REST, Windows/Linux), MFA beyond SMS/email OTP, high availability, TACACS+/RADIUS with privileged-user audit, passwordless for contractors and staff",
+        "Cites IAM market USD 15.7B (2023) to USD 32.8B by 2028, APAC fastest growing"
+      ],
+      "brief": "Eight-page whitepaper (copyright 2024), the BFSI edition of Accops' 'Future of Authentication' series. Most text is shared with the generic 'Future of Authentication' paper; the BFSI-specific parts are the intro and a 'how to pick an authentication solution for banking and financial services' checklist. Closes with an Accops HyID pitch. No customer stories.",
+      "use_for": "Nurture content for bank, NBFC and insurance CISOs/IAM owners balancing strong MFA with employee experience; pair with a BFSI biometric/MFA case study.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Supporting statistics are from 2023 sources.",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Mostly identical to 'Accops_Future of Auth.pdf'; only the title, intro and selection checklist are BFSI-specific."
+    },
+    {
+      "source": "inventory/Accops_UserCentric_Authentication_For_ITES.pdf",
+      "title": "Adopting User-Centric Authentication for Enhanced Security Outcomes in ITeS",
+      "asset_type": "Whitepaper",
+      "industry": "IT / ITeS",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyID",
+        "MFA",
+        "SSO",
+        "BioAuth",
+        "Password-less"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "Head of IAM",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "IT/ITeS firms secure client data across global operations and client environments; strong but clumsy authentication hurts productivity and SLAs, while basic SMS/email MFA may not satisfy clients' industry regulations.",
+      "key_outcomes": [
+        "Shared 'Future of Authentication' content: risk factors, security-vs-UX trade-off, six levers (contextual, SSO, passwordless, continuous, user-friendly 2FA, ID management)",
+        "ITeS checklist: integrate with SAML, REST and Microsoft/Linux and client environments",
+        "MFA beyond SMS/email (biometrics, hardware tokens, push) to meet client compliance",
+        "High availability to protect SLAs; TACACS+/RADIUS 2FA for network logins and privileged-user tracing",
+        "Near-universal SSO coverage and expiring biometric/QR logins for temporary third-party users"
+      ],
+      "brief": "Eight-page whitepaper (copyright 2024), the IT/ITeS edition of Accops' 'Future of Authentication' series. Shared body plus an ITeS-specific intro and solution checklist; closes with an Accops HyID pitch. No customer stories.",
+      "use_for": "Nurture content for IT services, BPO and KPO security leaders rolling out MFA/SSO across employees working in client environments.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Supporting statistics are from 2023 sources.",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Mostly identical to 'Accops_Future of Auth.pdf'; only the title, intro and selection checklist are ITeS-specific."
+    },
+    {
+      "source": "inventory/Accops_Authentication_For_Pharma.pdf",
+      "title": "Securing Healthcare and Pharma: Advanced Authentication with Contextual MFA and SSO",
+      "asset_type": "Whitepaper",
+      "industry": "Pharma / Healthcare",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyID",
+        "MFA",
+        "SSO",
+        "BioAuth",
+        "Password-less"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "Head of IAM",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "Healthcare and pharma organisations must protect patient and R&D data and meet strict regulation while clinicians need fast access in urgent settings, so heavy authentication harms both care and productivity.",
+      "key_outcomes": [
+        "Shared 'Future of Authentication' content: risk factors, security-vs-UX trade-off, six authentication levers",
+        "Healthcare checklist: integrate with EHR, HMS and medical-device/R&D systems via SAML and REST",
+        "Quick passwordless verification for ER, cath lab and ICU; QR logins for visiting professionals",
+        "High availability and failover; TACACS/RADIUS for network logins with activity logging",
+        "Unified SSO with biometric login across legacy and modern systems"
+      ],
+      "brief": "Eight-page whitepaper (copyright 2024), the healthcare and pharma edition of Accops' 'Future of Authentication' series. Shared body plus a healthcare-specific intro and solution checklist; closes with an Accops HyID pitch. No customer stories.",
+      "use_for": "Nurture content for hospital, pharma and life-sciences IT/security leaders evaluating MFA, SSO and biometric login for clinical and R&D staff.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Supporting statistics are from 2023 sources.",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Mostly identical to 'Accops_Future of Auth.pdf'; only the title, intro and selection checklist are healthcare-specific."
+    },
+    {
+      "source": "inventory/Accops_Authentication_For_Industry 4.0.pdf",
+      "title": "Elevating Authentication Design for Industry 4.0 with Advanced Context-Aware MFA and SSO",
+      "asset_type": "Whitepaper",
+      "industry": "Manufacturing",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyID",
+        "MFA",
+        "SSO",
+        "BioAuth",
+        "Password-less"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "Plant IT manager",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "Manufacturers must secure IT and OT systems, IP and supply-chain data across many third parties, while plant operators need fast, never-locked-out access to mission-critical control applications.",
+      "key_outcomes": [
+        "Shared 'Future of Authentication' content: risk factors, security-vs-UX trade-off, six authentication levers",
+        "Industry 4.0 checklist: integrate with IT and OT, legacy and modern apps via SAML/REST on Windows and Linux",
+        "Secure MFA for vendors, suppliers and contractors; QR and biometric passwordless login for internal users",
+        "High availability and failover so operators are not locked out of control systems",
+        "Protect and monitor network logins on increasingly virtualised plant networks"
+      ],
+      "brief": "Eight-page whitepaper (copyright 2024), the manufacturing / Industry 4.0 edition of Accops' 'Future of Authentication' series. Shared body plus a manufacturing-specific intro and solution checklist; closes with an Accops HyID pitch. No customer stories.",
+      "use_for": "Nurture content for manufacturing CIOs/CISOs and plant IT heads rolling out MFA and SSO across IT, OT and third-party users.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Supporting statistics are from 2023 sources.",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Mostly identical to 'Accops_Future of Auth.pdf'; only the title, intro and selection checklist are manufacturing-specific."
+    },
+    {
+      "source": "inventory/Accops_Future of Auth.pdf",
+      "title": "The Future of Authentication: Simplifying Security with Contextual MFA and SSO",
+      "asset_type": "Whitepaper",
+      "industry": "Cross-industry",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyID",
+        "MFA",
+        "SSO",
+        "BioAuth",
+        "Password-less"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "Head of IAM",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "Strong authentication usually degrades user experience, causing lost productivity, bypassing, platform fatigue and reset backlogs; complex hybrid estates with multiple authentication tools make traditional design ineffective.",
+      "key_outcomes": [
+        "Risk factors: human element, browser-based SaaS access, weak credential policies; over 4/5 of hacking breaches involve lost or stolen credentials",
+        "Six gaps in traditional design (multiple tools, weak policy enforcement, legacy protocols blocking MFA, complex logins, implicit trust, poor device support)",
+        "Six levers: contextual authentication, SSO, passwordless (biometric, rotating QR), continuous authentication, user-friendly 2FA, robust ID management",
+        "Generic checklist: SAML/REST/Windows/Linux integration, MFA beyond OTP, high availability, TACACS/RADIUS, passwordless options"
+      ],
+      "brief": "Generic edition (copyright 2024) of Accops' 'Future of Authentication' whitepaper series, on balancing security and user experience in authentication design. The BFSI, ITeS, Pharma and Industry 4.0 papers reuse this body with industry intros and checklists. Closes with an Accops HyID pitch (MFA, bio-authentication, QR passwordless, contextual authentication, privileged-user audit).",
+      "use_for": "Cross-industry nurture content for CISOs and IAM owners on MFA/SSO user experience; use an industry edition when one matches the prospect.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Supporting statistics are from 2023 sources.",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops_BioAuth_For_Financial_Services.pdf",
+      "title": "Bio-Authentication for the Bionic Financial Services Organisation (Accops BioAuth)",
+      "asset_type": "Whitepaper",
+      "industry": "BFSI",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "BioAuth",
+        "MFA",
+        "Password-less"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "CIO",
+        "Head of IAM",
+        "Head of Compliance"
+      ],
+      "regulations": [
+        "RBI",
+        "SEBI",
+        "NSE"
+      ],
+      "key_problem": "Identity attacks on financial firms are rising and OTP-based MFA is easily compromised; regulators (RBI, SEBI, NSE) push stronger methods, but many biometric products miss legacy apps, accept static images, onboard slowly or need code changes.",
+      "key_outcomes": [
+        "Cites credentials as the entry point in 49% of attacks and 90% of organisations reporting an identity incident (RSA 2024)",
+        "Cites banking as second for breach cost, USD 5.9M per incident (IBM)",
+        "Accops BioAuth facial authentication works with legacy, SaaS and modern apps with no code changes and minute-long onboarding",
+        "Liveness checks defeat static-image spoofing; audit logs of accepted and rejected attempts",
+        "Positioned as meeting the RBI mandate to replace insecure OTP-based MFA"
+      ],
+      "brief": "Four-page Accops whitepaper (copyright 2024) on why financial services should move from OTP-based MFA to biometric authentication, the shortcomings of typical biometric products, and how Accops BioAuth (facial authentication with liveness checks) addresses them. Statistics come from BlackBerry (2024), RSA (2024) and IBM sources.",
+      "use_for": "Bank, NBFC, broker and insurer conversations about replacing SMS OTP, RBI/SEBI authentication guidance, and BioAuth facial authentication; pairs with the private-bank biometric case study.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops_Compliance & Access Control.pdf",
+      "title": "Revolutionizing Compliance: Leveraging Next-Gen Access Control to Meet Regulatory Demands",
+      "asset_type": "Whitepaper",
+      "industry": "Cross-industry",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HySecure",
+        "ZTNA",
+        "MFA"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "Head of Compliance",
+        "CIO",
+        "IT head"
+      ],
+      "regulations": [
+        "GDPR",
+        "SOX",
+        "HIPAA",
+        "FERPA",
+        "RBI",
+        "DPDP",
+        "NIST",
+        "PCI DSS"
+      ],
+      "key_problem": "Data-privacy and security regulations are tightening and fines rising, while 74% of breaches involve human factors such as privilege misuse and stolen credentials, so organisations need strict, auditable access control to stay compliant.",
+      "key_outcomes": [
+        "Summarises regulatory drivers: GDPR, Sarbanes-Oxley, HIPAA, FERPA, RBI's call to replace SMS 2FA, India's DPDP Act, NIST and PCI-DSS",
+        "Risk factors: data leakage, remote/BYOD users, insider threats, audit-trail demands, stolen credentials, third parties (48% of organisations lack a vendor-access inventory)",
+        "Access-control components: centralised identity, contextual and role-based access, 2FA/MFA, endpoint monitoring and control, logging",
+        "Positions Accops HySecure as a unified access-control solution with MFA beyond SMS OTP and real-time endpoint control"
+      ],
+      "brief": "Four-page Accops whitepaper (copyright 2024) linking regulatory compliance to access control. Reviews major regulations across markets, explains why access control is central to compliance, outlines its components, and pitches HySecure for '100% compliance'. Human-factor statistic cites Verizon DBIR 2023.",
+      "use_for": "Compliance-led conversations with CISOs and compliance heads (DPDP, RBI, GDPR, HIPAA); nurture content positioning HySecure ZTNA as an access-control and audit foundation.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Supporting statistics are from 2023 sources.",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Claims '100% compliance' - a strong absolute claim; marketing/legal may want to soften it before external use."
+    },
+    {
+      "source": "inventory/Accops_Network Isolation for SWIFT and CBS.pdf",
+      "title": "The Banes, Boons and Enablement of Application Network Isolation in Banking (SWIFT and CBS)",
+      "asset_type": "Whitepaper",
+      "industry": "BFSI",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "BioAuth",
+        "VDI",
+        "ZTNA",
+        "Thin Clients"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "CISO",
+        "Head of Compliance",
+        "IT head",
+        "CFO"
+      ],
+      "regulations": [
+        "RBI",
+        "SWIFT CSP"
+      ],
+      "key_problem": "RBI requires core banking to be isolated from non-core apps and SWIFT to run in a secure framework; air gaps and two devices per user raise IT costs (hard for smaller banks), hurt productivity and complicate IT management.",
+      "key_outcomes": [
+        "HyWorks VDI isolates core banking apps in the data centre so users reach core and non-core apps from one device",
+        "HySecure ZTNA blocks downloads, watermarks sessions, limits internet to specific domains, blocks snipping/screen sharing and USB, and provides a corporate browser",
+        "BioAuth biometric MFA for regulatory authentication standards",
+        "Claimed results: 6x more daily transactions, single PC for SWIFT and CBS, close to 50% lower TCO",
+        "Cites banking as second-highest breach cost, USD 5.9M (INR 49.2 crore) per incident (IBM)"
+      ],
+      "brief": "Four-page Accops whitepaper (copyright 2024) on RBI-driven network isolation of SWIFT and CBS in Indian banks: why it is required, its cost and user-experience burden, and how Accops VDI, ZTNA and biometric MFA let banks isolate critical apps on a single device. The benefit figures (6x transactions, ~50% TCO) match the PSU-bank case study.",
+      "use_for": "Indian bank and co-operative bank conversations on RBI isolation of SWIFT/CBS, the two-PC problem, and TCO; pair with the 3rd largest PSU bank case study.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops_Selecting Robust VDI.pdf",
+      "title": "The Executive Imperative: Selecting a Robust VDI Solution in Uncertain Times (POV Paper)",
+      "asset_type": "Whitepaper",
+      "industry": "Cross-industry",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "VDI",
+        "ZTNA",
+        "MFA",
+        "SSO",
+        "Thin Clients",
+        "Digital Workspace"
+      ],
+      "competitors": [
+        "VMware",
+        "Broadcom",
+        "Citrix"
+      ],
+      "personas": [
+        "CIO",
+        "IT head",
+        "Head of Infrastructure",
+        "CFO"
+      ],
+      "regulations": [],
+      "key_problem": "Broadcom's VMware acquisition and Citrix's takeover by Vista Equity and Evergreen Coast Capital leave VDI customers facing licensing hikes, support cuts for smaller accounts and heightened security threats.",
+      "key_outcomes": [
+        "Cites VDI market reaching USD 16.66B by 2030 at 14.6% CAGR (Coherent)",
+        "Cites Broadcom's earlier Symantec/CA repricing raising some customer costs by up to 400%",
+        "Accops claims: 10x shorter time to value, up to 40% lower TCO and 4x faster support turnaround",
+        "One integrated offering (ZTNA, VDI, MFA, SSO, thin clients) with perpetual or subscription licensing",
+        "Anonymised example: a leading IT and consulting MNC replaced its VDI vendor with Accops"
+      ],
+      "brief": "Four-page Accops point-of-view paper (copyright 2024) for executives reconsidering VDI amid vendor M&A. Covers why VDI matters, the risks from Broadcom-VMware and the Citrix buyout, and why Accops' unified, flexibly licensed stack is a stable alternative. Includes headline Accops claims (10x time to value, 40% lower TCO, 4x faster support) and a short anonymised customer example.",
+      "use_for": "VMware/Citrix displacement conversations with CIOs and IT heads; executive-level leave-behind on VDI vendor risk.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Written in early 2024 when the VMware/Citrix ownership changes were new; VMware EUC has since become Omnissa, so parts of the market narrative are dated.",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Competitive positioning against named vendors; no public URL on record.",
+      "needs_human": "The 10x / 40% / 4x claims have no source in the paper - confirm they are approved figures before quoting. The anonymised 'IT and consulting MNC' example reads like the Tech Mahindra case study."
+    },
+    {
+      "source": "inventory/Accops_Post VMWare VDI Landscape.pdf",
+      "title": "Navigating the VDI Landscape: A Strategic Guide Post-VMware Acquisition",
+      "asset_type": "Whitepaper",
+      "industry": "Cross-industry",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "VDI",
+        "HyWorks"
+      ],
+      "competitors": [
+        "VMware",
+        "Broadcom"
+      ],
+      "personas": [
+        "CIO",
+        "IT head",
+        "Head of Infrastructure",
+        "procurement"
+      ],
+      "regulations": [],
+      "key_problem": "After Broadcom acquired VMware it ended perpetual licences, planned to divest EUC (Horizon) and Carbon Black, and targets USD 3.8B extra profit, so VMware VDI customers - especially mid-sized - face cost rises, weaker support and roadmap uncertainty.",
+      "key_outcomes": [
+        "Lessons from Broadcom's Symantec and CA deals: R&D investment cut 3%, sales and marketing cut 22%, focus on largest accounts",
+        "Notes 40% of VMware customers were not optimistic about the deal and a user reporting a 4x cost increase on subscription pricing",
+        "Tactic 1: dual-vendor strategy - pilot a second VDI for a subset of users and shift incrementally",
+        "Tactic 2: switch EUC provider",
+        "Checklist for a new EUC vendor: perpetual licensing option, interoperability with existing hardware/hypervisor/OS, use-case coverage, stack consolidation, comparable clientele"
+      ],
+      "brief": "Six-page Accops whitepaper (copyright 2024) for IT leaders on VMware VDI after the Broadcom acquisition. Uses Forrester, CRN, Tracxn and Reddit sources to describe licensing and support changes, then recommends a dual-vendor or switch strategy and lists what to look for in a new EUC provider. Mostly vendor-neutral; Accops is implied rather than pitched.",
+      "use_for": "VMware Horizon displacement and 'plan B' conversations; nurture content for VMware customers worried about licensing and support.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Written in early 2024, weeks after the acquisition closed: it says EUC 'has yet to find a new buyer'. EUC has since been sold and operates as Omnissa, so that section is outdated.",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Competitive content about a named vendor; no public URL on record.",
+      "needs_human": "Update or retire the EUC-divestiture section now that VMware EUC is Omnissa."
+    },
+    {
+      "source": "inventory/Accops_Flexible and Adaptable VDI.pdf",
+      "title": "Solving the Vendor Lock-In Dilemma: A Flexible VDI That Adapts to Your Needs",
+      "asset_type": "Whitepaper",
+      "industry": "Cross-industry",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "VDI",
+        "Digital Workspace",
+        "MFA",
+        "ZTNA",
+        "Thin Clients",
+        "SSO"
+      ],
+      "competitors": [
+        "VMware",
+        "Citrix",
+        "Broadcom"
+      ],
+      "personas": [
+        "CIO",
+        "IT head",
+        "Head of Infrastructure",
+        "CFO"
+      ],
+      "regulations": [],
+      "key_problem": "In 2023 Citrix cut its APAC presence and Broadcom bought VMware, ended perpetual licences and planned to divest EUC, leaving VDI customers uncertain about prices, roadmaps and support even as VDI demand grows about 10% a year.",
+      "key_outcomes": [
+        "HyWorks runs on-prem or on Azure, AWS, Jio Cloud or Google Cloud, on Hyper-V, Nutanix AHV or VMware vCenter, with Windows and Linux desktops",
+        "Perpetual or pay-as-you-go licensing (Capex or Opex)",
+        "Data controls: file transfer, upload/download and copy-paste blocking, watermarking, session recording; scheduled or self-service provisioning",
+        "Digital Workspace bundle replaces separate VPN, MFA, connection broker and thin-client vendors",
+        "Migration roadmap: pilot HyWorks, or move a user subset to the full Digital Workspace and scale"
+      ],
+      "brief": "Seven-page Accops whitepaper (copyright 2024) aimed at VMware EUC and Citrix customers. Explains why VDI remains essential, then presents HyWorks' interoperability (clouds, hypervisors, OS), flexible licensing, security and monitoring features, and the bundled Accops Digital Workspace, ending with a two-path migration roadmap. Includes one unnamed customer anecdote without figures.",
+      "use_for": "VMware/Citrix displacement deals; answering 'will Accops run on our existing hypervisor/cloud?'; CIO-level case for consolidating the VDI stack.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "The market narrative is anchored in 2023 events (Broadcom's planned EUC divestiture, now completed as Omnissa).",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Competitive content about named vendors; no public URL on record.",
+      "needs_human": ""
+    },
+    {
+      "source": "inventory/Accops_VDI_for_Pharma_Breakthroughs.pdf",
+      "title": "VDI: The Answer to Safeguarding the Economic Value of R&D Breakthroughs in Pharmaceuticals",
+      "asset_type": "Whitepaper",
+      "industry": "Pharma / Healthcare",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "VDI",
+        "HyWorks",
+        "ZTNA",
+        "SSO",
+        "MFA"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "CISO",
+        "Head of R&D IT",
+        "IT head"
+      ],
+      "regulations": [],
+      "key_problem": "Pharma R&D data is extremely valuable and increasingly spread across remote trials, multi-party collaboration, AI and cloud tools, distributed teams and third parties, making it a prime target while security must not slow research.",
+      "key_outcomes": [
+        "Cites drug R&D costs averaging USD 2.3B (2023), 90% clinical failure, average pharma breach cost USD 4.82M (IBM) and 78% of Fortune 500 pharma executives targeted",
+        "Five R&D risk factors: unprotected apps/data, distributed teams, M&A, third parties, non-compliance",
+        "Four mitigation levers: ZTNA for critical R&D apps, endpoint monitoring and control, access logs, up-to-date identities",
+        "VDI benefits: remote desktop farms for HPC bioinformatics/cheminformatics without waste; SSO and central identity"
+      ],
+      "brief": "Six-page Accops whitepaper (copyright 2024) on protecting pharmaceutical R&D with VDI, zero-trust access and authentication. Describes how R&D has changed (remote trials, collaboration, AI), cites attacks on Pfizer, AstraZeneca and Dr. Reddy's, lists risk factors and mitigation levers, and closes with a short Accops pitch. No customer stories.",
+      "use_for": "Pharma and biotech R&D/IT leaders: securing research data and collaboration, sharing HPC desktops, ZTNA for lab and clinical systems.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Statistics are from 2023 sources.",
+      "superseded_by": "",
+      "confidence": 0.86,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Page 5 contains a stray paragraph pasted from the ZTNA whitepaper ('In this white paper, learn how you can plug the gaps in your zero-trust strategy...') after the closing pitch - fix before sending."
+    },
+    {
+      "source": "inventory/Accops_VDI_for_Transforming_eGovernance.pdf",
+      "title": "Transforming eGovernance for Tomorrow: Building Mission-Critical Digital Capabilities for Public Sector Transformations with VDI",
+      "asset_type": "Whitepaper",
+      "industry": "Government",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "VDI",
+        "HyWorks",
+        "MFA",
+        "SSO",
+        "Thin Clients"
+      ],
+      "competitors": [],
+      "personas": [
+        "Government CIO",
+        "Government IT officer",
+        "policy maker",
+        "procurement"
+      ],
+      "regulations": [
+        "RBI",
+        "Make in India"
+      ],
+      "key_problem": "Governments digitising services must get it right first time on tight budgets while facing insider and credential attacks, scaling needs, employee friction and a sprawling IT estate; India saw 593 breach/ransomware cases in H1 2024 with government a primary target.",
+      "key_outcomes": [
+        "Five eGovernance challenges: security, limited budgets, future-proofing, employee-friendly processes, complex IT estates",
+        "Cites in-person transactions costing governments 40x more than online, and 9 in 10 citizens preferring online interaction",
+        "Five VDI use cases: centralised secure access, cost and resource efficiency, avoiding lock-in, employee experience (SSO, passwordless MFA, fast onboarding), simplified management and DR",
+        "Sustainability angle: fewer device refreshes, lower power use and reduced commuting (Scope 3)",
+        "Positions Accops as a homegrown VDI with near-universal compatibility and faster payback"
+      ],
+      "brief": "Seven-page Accops whitepaper (copyright 2024) on why VDI and virtual cloud desktops suit government digital-transformation programmes. Covers public-sector challenges, how infrastructure choices matter, five VDI benefits including sustainability, a Gartner digital-identity sidebar, and a closing pitch for Accops VDI as an Indian, compliance-friendly option. No customer stories.",
+      "use_for": "Government, PSU and public-sector CIO conversations about eGovernance infrastructure, VDI on tight budgets, and homegrown (Make in India) VDI.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Statistics from 2024 and earlier; the Gartner digital-wallet prediction targets 2026.",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Cites RBI MFA guidelines as a government-VDI compliance example, which is a banking rule - may confuse a government reader."
+    },
+    {
+      "source": "inventory/Accops_Transforming IT for Industry 4.0.pdf",
+      "title": "Transforming IT and OT Environments for Industry 4.0 with VDI, Thin Clients and Zero Trust",
+      "asset_type": "Whitepaper",
+      "industry": "Manufacturing",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HyWorks",
+        "HySecure",
+        "VDI",
+        "ZTNA",
+        "Thin Clients"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "Plant IT manager",
+        "CISO",
+        "Head of Infrastructure"
+      ],
+      "regulations": [],
+      "key_problem": "Manufacturers face IT-OT interoperability problems, exposed industrial control systems, expensive workstations for engineers, mobile shop-floor workers on poor networks and silos, while being the most-attacked sector (25.7% of attacks, ransomware in 71%).",
+      "key_outcomes": [
+        "Cites Gartner 2024: 54% of manufacturers raising digital spend, 47% struggle to pick tools, 48% suffer buyer's regret",
+        "VDI and thin-client use cases: mobile workers on ERP/MES/SCADA, HPC for engineers, central management of shop-floor devices, compliance",
+        "Zero-trust use cases: secure access to control systems, real-time monitoring of security events, time-bound vendor and contractor access",
+        "Claims integrated Accops VDI offerings can cut VDI stack TCO by up to 50% versus traditional solutions"
+      ],
+      "brief": "Seven-page Accops whitepaper (copyright 2024) arguing that VDI, thin/zero clients and zero-trust access together modernise manufacturing IT and OT. Lists sector challenges with Gartner, WEF and Business Standard statistics, use cases, the benefits of buying them as one integrated stack, and closes with HyWorks and HySecure.",
+      "use_for": "Manufacturing CIOs and plant IT heads: shop-floor thin clients, engineering VDI, secure vendor access to ERP/OT, and single-vendor TCO arguments; pair with the textile or Polycab case studies.",
+      "publish_year": "2024",
+      "expired": false,
+      "stale_risk": "Statistics are from 2024 sources.",
+      "superseded_by": "",
+      "confidence": 0.85,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "Copy-paste errors from the eGovernance paper: the introduction opens with a paragraph about governments and e-Government Development Indices, and page 2 is headed 'Public sector digital transformations: key challenges'. Fix before sending."
+    },
+    {
+      "source": "inventory/CIOs_Digital_Trust.pdf",
+      "title": "The CIO's Digital Trust Playbook: Strategic Imperatives for Hybrid Enterprise Security in 2026-2027 (duplicate file)",
+      "asset_type": "Whitepaper",
+      "industry": "Cross-industry",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HySecure",
+        "ZTNA",
+        "HyID",
+        "MFA",
+        "SSO",
+        "Digital Workspace",
+        "VDI",
+        "HyLite",
+        "Virtual Browser",
+        "NanoOS"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "CISO",
+        "CXO",
+        "IT head"
+      ],
+      "regulations": [
+        "DPDP Act 2023",
+        "RBI",
+        "HIPAA",
+        "ISO 27001"
+      ],
+      "key_problem": "Perimeter security has failed in a hybrid, perimeter-less enterprise: trust is granted once at login and never re-checked, and over 60% of 2024 incidents involved authenticated users with compromised credentials, unmanaged endpoints or lateral movement.",
+      "key_outcomes": [
+        "Five-layer 'Digital Trust Stack': unified access fabric (ZTNA), strong identity, secure workspace, endpoint and browser hardening, visibility and compliance",
+        "Trust gaps: access fragmentation, unmanaged/BYOD endpoints, MFA fatigue and bypass, DPDP/RBI compliance pressure, vendor lock-in",
+        "Five-stage maturity model: Discover, Defend, Define, Deliver, Demonstrate",
+        "Seven-step CIO action plan from a trust-gap audit to board-level trust KPIs",
+        "Anonymised proof points: co-operative bank, pharma major, NIC-approved e-Gov access, ERP access from OT zones"
+      ],
+      "brief": "Byte-for-byte the same file as 'The CIO's Digital Trust V4 2026.pdf': a nine-page thought-leadership playbook (copyright 2026) with a foreword by Accops' CEO, mapping the Digital Trust Stack to HySecure, HyID, Digital Workspace and HyLite/Virtual Browser/Nano OS, with a trust-readiness assessment call to action.",
+      "use_for": "Same as the V4 2026 file - prefer that copy, whose filename carries the version.",
+      "publish_year": "2026",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "inventory/The CIO’s Digital Trust V4 2026.pdf - byte-identical copy of this file under its current name",
+      "confidence": 0.9,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Duplicate copy; no public URL on record.",
+      "needs_human": "Identical file (same SHA-256 hash) to inventory/The CIO's Digital Trust V4 2026.pdf - keep one card active to avoid duplicate answers."
+    },
+    {
+      "source": "inventory/Accops - An e-commerce major - Case Study.pdf",
+      "title": "A Major Indian E-commerce Firm Eliminates Data Security Concerns Using Accops Application Access Gateway",
+      "asset_type": "Case Study",
+      "industry": "E-commerce / Retail",
+      "client": "One of India's most successful e-commerce marketplaces (also owns e-wallet, fashion brands and a video streaming platform), dispatching about a million shipments a day",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HySecure",
+        "ZTNA"
+      ],
+      "competitors": [],
+      "personas": [
+        "CISO",
+        "IT head",
+        "CIO",
+        "Head of Operations"
+      ],
+      "regulations": [],
+      "key_problem": "Vendors and delivery executives accessed business apps remotely from any device and untrusted network, risking data leakage, with no visibility or control over endpoints, slow IT support and high maintenance costs.",
+      "key_outcomes": [
+        "HySecure Advanced zero-trust application access gateway with strong authentication at every entry point",
+        "Contextual access for vendors and delivery executives; copy-paste and screenshot blocking; restricted local file access",
+        "Auto-failover between MPLS and internet for business continuity",
+        "Accurate records of users, locations and devices; fewer support calls on low-bandwidth networks; lower IT costs and TCO"
+      ],
+      "brief": "Three-page case study of an anonymised Indian e-commerce major, with an unattributed customer quote. HySecure Advanced secures remote access for third-party vendors and delivery executives across warehouses and distribution centres, with DLP, device entry control and MPLS/internet failover. Outcomes are qualitative.",
+      "use_for": "E-commerce, logistics and retail prospects securing vendor and delivery-staff access; ZTNA with DLP and network failover.",
+      "publish_year": null,
+      "expired": false,
+      "stale_risk": "No date in the document; references to WFH/BYOD suggest about 2020-2022. A 2025 case study about India's largest e-commerce company exists in this batch.",
+      "superseded_by": "",
+      "confidence": 0.8,
+      "public_url": "https://www.accops.com/case-studies/an-e-commerce-major",
+      "visibility": "both",
+      "internal_reason": "",
+      "needs_human": "Undated; confirm the year. Possibly the same customer as 'Accops - Ecommerce - Case Study.pdf' (2025, warehouse and seasonal-agent angle) - decide whether to keep both."
+    },
+    {
+      "source": "inventory/The CIO’s Digital Trust V4 2026.pdf",
+      "title": "The CIO's Digital Trust Playbook: Strategic Imperatives for Hybrid Enterprise Security in 2026-2027 (V4)",
+      "asset_type": "Whitepaper",
+      "industry": "Cross-industry",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": [
+        "HySecure",
+        "ZTNA",
+        "HyID",
+        "MFA",
+        "SSO",
+        "Digital Workspace",
+        "VDI",
+        "HyLite",
+        "Virtual Browser",
+        "NanoOS"
+      ],
+      "competitors": [],
+      "personas": [
+        "CIO",
+        "CISO",
+        "CXO",
+        "IT head"
+      ],
+      "regulations": [
+        "DPDP Act 2023",
+        "RBI",
+        "HIPAA",
+        "ISO 27001"
+      ],
+      "key_problem": "Perimeter security has failed in a hybrid, perimeter-less enterprise: trust is granted once at login and never re-checked, and over 60% of 2024 incidents involved authenticated users with compromised credentials, unmanaged endpoints or lateral movement.",
+      "key_outcomes": [
+        "Five-layer 'Digital Trust Stack': unified access fabric (ZTNA), strong identity, secure workspace, endpoint and browser hardening, visibility and compliance",
+        "Trust gaps: access fragmentation, unmanaged/BYOD endpoints, MFA fatigue and bypass, DPDP/RBI compliance pressure, vendor lock-in",
+        "Five-stage maturity model: Discover, Defend, Define, Deliver, Demonstrate",
+        "Seven-step CIO action plan from a trust-gap audit to board-level trust KPIs (Trust Index Scores, policy adherence)",
+        "Anonymised proof points: co-operative bank (HySecure + HyID), pharma major (R&D VDI), NIC-approved e-Gov access, ERP access from OT zones via thin clients"
+      ],
+      "brief": "Nine-page thought-leadership playbook (copyright 2026) with a foreword by Accops' CEO and Co-founder. Reframes zero trust as 'digital trust' for CIOs, introduces a five-layer Digital Trust Stack and maturity model, maps it to HySecure, HyID, Accops Digital Workspace and HyLite/Virtual Browser/Nano OS, and closes with a checklist and a QR-code trust-readiness assessment offer.",
+      "use_for": "CIO and CXO-level conversations and events: zero-trust strategy, vendor consolidation, DPDP/RBI compliance; a current executive leave-behind that spans the whole Accops portfolio.",
+      "publish_year": "2026",
+      "expired": false,
+      "stale_risk": "",
+      "superseded_by": "",
+      "confidence": 0.92,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "No public URL on record.",
+      "needs_human": "The text still says 'In 2025, CIOs will...' and 'the CIO's trust mandate in 2025-26' while the cover says 2026-2027 - minor date inconsistency to fix. The 'over 60% of 2024 incidents' statistic has no source. Same file also exists as inventory/CIOs_Digital_Trust.pdf."
+    }
+  ]
+}
