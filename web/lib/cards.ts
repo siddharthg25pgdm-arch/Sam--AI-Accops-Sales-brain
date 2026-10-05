@@ -538,8 +538,15 @@ export function mentions(text: string, entity: string): boolean {
   return entityRe.get(entity)?.test(text.toLowerCase()) ?? false;
 }
 
+const ROLE_WORD = /^(cio|ciso|cto|cxo|ceo|cfo|coo|cios|cisos|cxos)$/;
+const EVENT_WORD = /^(event|events|conclave|forum|summit|roundtable|klub|club|meetup|keynote|session|webinar)s?$/;
 export function searchAssets(args: SearchArgs): { results: SearchHit[]; considered: number } {
-  const tokens = queryTokens(args.query ?? "");
+  // A job title says who the rep is meeting, not what they want: "first meeting with a CIO, latest
+  // corporate deck" ranked five CIO event decks over the corporate deck on "cio" (6 Oct #43). It scores
+  // only when the ask is about an event for that audience ("cio event deck", "ciso roundtable").
+  const raw = queryTokens(args.query ?? "");
+  const eventAsk = raw.some(t => EVENT_WORD.test(t));
+  const tokens = raw.length > 1 && !eventAsk ? raw.filter(t => !ROLE_WORD.test(t)) : raw;
   const res = tokens.map(matcher);
   const content = tokens.map(t => !TYPE_WORDS.test(t));
   const onlyTypes = !content.some(Boolean);

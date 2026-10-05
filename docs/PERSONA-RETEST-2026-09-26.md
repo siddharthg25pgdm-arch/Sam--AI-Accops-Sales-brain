@@ -11,9 +11,9 @@ master-list tags. Every gap was checked against `sam_v1_assets`.
 | | 28 Sep #3 (35) | 6 Oct core 35 | 6 Oct new 15 |
 |---|---|---|---|
 | **Happy** | 19 | **14** | **6** |
-| Acceptable gap (honest, request button) | 12 | **19** | **6** |
-| Unsatisfying | 4 | **2** | **3** |
-| False gaps (the right document was answerable) | 0 | **0** | **1** (#47) |
+| Acceptable gap (honest, request button) | 12 | **19** | **8** |
+| Unsatisfying | 4 | **2** | **1** |
+| False gaps (the right document was answerable) | 0 | **0** | **0** |
 
 **Why "happy" fell from 19 to 14: almost entirely the pre-2024 rule.** Five answers lost a document
 that is now excluded as published before 2024:
@@ -48,19 +48,19 @@ right industry filter (#36 to #40, #46, #49).
 | 44 | ok to send that after the meeting? | H | Correctly: not published, ask marketing first. |
 | 45 | telecom zero trust reference | A | Honest gap. Public Govt zero-trust architecture as the substitute. |
 | 46 | retail 200 stores thin clients | A | Public HyDesk brochure + VLCC. Good substitutes. |
-| 47 | on-prem fingerprint MFA datasheet | **U** | **False gap.** *Accops BioAuth: Biometric Authentication for the Workforce - Fingerprint, Face and FIDO* (2024) is answerable. The model filtered to Brochure + MFA and dropped it. |
+| 47 | on-prem fingerprint MFA datasheet | A | Corrected on review: not a false gap. Every BioAuth document (deck, deployment guide, Finacle note) is internal and none is a datasheet, so "no sendable datasheet" is true. Weak spot: the substitutes are the HySecure and HyID datasheets, not the BioAuth fingerprint deck. |
 | 48 | AVD vs Accops DaaS talking points | A | *vs the Field* (2022) is excluded by the pre-2024 rule. |
 | 49 | logistics DaaS similar customer | H | Ecom Express (public). |
-| 50 | training deck for a new SI partner | **U** | It shows the Partner Bootcamp 2026 (right), but says "No exact match". It reads "give them" as sending to a customer. It also shows *Selling Accops to Government (c. 2021)*: that card has no publish_year, so it slips past the pre-2024 rule. |
+| 50 | training deck for a new SI partner | A | Corrected on review: the Partner Bootcamp 2026 is the right deck, and "ask marketing first" is right too: a new SI partner is external, and the card flags the deck as not cleared to share. Only the lead "No exact match in the library." was wrong. **Fixed in `eefc629`** (now: "The library has matching documents, but only internal ones."). It also shows *Selling Accops to Government (c. 2021)*: that card has no publish_year, so it slips past the pre-2024 rule. |
 
 ### What to fix, ranked
 1. **Decision for you: the pre-2024 rule and battlecards.** Five of the six drops come from it. One
    option is to pin the few battlecards reps still need (Cisco AnyConnect 2021, *vs the Field* 2022,
    HySecure ZTNA Gateway 2021). They would come back with the existing "over two years old" warning.
    The other is to exempt Battlecards like certificates.
-2. **Retrieval bugs (mine):** #47 (a filter too narrow drops the BioAuth deck), #43 ("latest"
-   does not prefer the newest edition), #50 ("give them" read as customer-sending, and "No exact
-   match" shown over the exact document).
+2. **Answer bugs (mine), fixed in `eefc629`:** #43 (a South-East Asia deck led a region-less ask;
+   the region was missing from the region rule) and #44/#50 ("No exact match" over documents that
+   match but are internal). Open: #47's substitutes should lead with the BioAuth deck.
 3. **A third card source outside the brain:** the web app still loads 77 hand-inventory cards from
    `web/data/asset_cards.json` (IIT Bombay, Polycab, City Pharmacy, Ecom Express, VLCC...). Their
    industries are free text ("NBFC (Non-Banking Financial Company)", "Health & Wellness / Retail") and never
