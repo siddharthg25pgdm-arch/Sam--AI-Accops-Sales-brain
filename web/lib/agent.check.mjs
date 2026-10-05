@@ -528,6 +528,10 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   ok(!relevant("hyworks sizing for 500 concurrent users", tokyo) && relevant("hyworks deck for a japanese customer", tokyo), "a Japanese-language deck only when Japan is asked about");
   const mea = { ...tokyo, title: "Partner Bootcamp 2026 - MEA Edition for the Dubai Partner Summit: Middle East Sovereignty", products: ["HySecure"], brief: "Middle East partner programme", file: { path: "x/MEA Bootcamp.pptx" } };
   ok(relevant("middle east event deck, gitex", mea) && !relevant("hysecure event deck for a kerala partner meet", mea), "a regional event deck only for its own region");
+  // 6 Oct #43: "latest corporate deck" led with the South-East Asia edition - the region was not in REGIONS.
+  const seaEd = { ...tokyo, title: "Accops Customer Deck for South-East Asia, Compressed V2.0 (Sep 2026): 13-Slide Corporate Presentation", products: [], brief: "Corporate presentation for SEA", file: { path: "x/SEA Customer Deck.pptx" } };
+  ok(!relevant("first meeting with a CIO tomorrow, latest corporate deck please", seaEd), "a South-East Asia deck does not lead a region-less ask");
+  ok(relevant("corporate deck for a malaysia prospect", seaEd) && relevant("corporate deck for south east asia", seaEd), "a country in the region (or the region itself) keeps the regional deck");
   // 7. Both editions picked, old one first (#17): the old one is an older version of the newer one's
   // family, so no search returns it and only the newer edition is shown (30 Sep: families).
   run([pickSay("The library has two Citrix comparisons.", "Accops vs Citrix Feature Table 2018", "Accops Powered VDI vs Citrix VDI")]);
@@ -550,6 +554,11 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   const dth = h("Major Indian DTH and OTT Platform: Secure Remote Access for 300+ Vendors", { industry: "Media", pub: 1, use_for: "A customer reference for partner and vendor access asks in Malaysia or Indonesia" });
   r = fin("any malaysia or indonesia customer reference i can share with a partner?", "The library has the closest matches.\nPICKS: 1, 2", [sea, dth]);
   ok(r.missing && /^No exact match for Malaysia or Indonesia: none of the closest documents mentions them\./.test(r.text) && /sent to a partner/.test(r.text), `audience-only region is a gap: ${r.text}`);
+  // 6 Oct #50: the partner bootcamp IS the answer, but it is internal and the rep is giving it out.
+  // Not "No exact match in the library." - the document exists; what is missing is a sendable copy.
+  const camp = h("Accops Partner Sales Bootcamp 2026 - 4-Hour Deck (30 Jun 2026)", { type: "Deck", pub: 0, use_for: "Partner onboarding and sales enablement" });
+  r = fin("new SI partner joining next week, what training deck do we give them", "Closest options below.\nPICKS: none", [camp]);
+  ok(r.missing && /^The library has matching documents, but only internal ones\./.test(r.text) && /ask marketing first/.test(r.text) && !/No exact match/.test(r.text), `internal-only match is not called missing: ${r.text}`);
   // #10: GCC on no shown title is a gap, and the answer states both readings.
   const gcc = h("Accops Digital Workspace for Outsourced Service Providers (2020)", { type: "Solution Document", products: ["HySecure"], use_for: "GCC and BPO prospects needing ZTNA" });
   const conclave = h("Sovereign CIO Conclave (2026) - ZTNA and Isolation", { type: "Deck", products: ["HySecure"] });

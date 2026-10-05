@@ -55,7 +55,8 @@ READERS = {".pdf": from_pdf, ".docx": from_docx, ".pptx": from_pptx}
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     done = skipped = empty = failed = 0
-    for src in sorted([*(ROOT / "public").glob("*"), *(ROOT / "sharepoint").glob("*")]):
+    # inventory/: the hand-inventory documents (Downloads\Assets) that exist nowhere else - see corpus/README.md
+    for src in sorted([*(ROOT / "public").glob("*"), *(ROOT / "sharepoint").glob("*"), *(ROOT / "inventory").glob("*")]):
         if src.suffix.lower() not in READERS:
             continue
         dest = OUT / (src.stem + ".txt")

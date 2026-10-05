@@ -311,7 +311,11 @@ export function substituteFits(question: string, a: Asset): boolean {
 }
 
 const REGIONS = ["Japan", "Middle East", "UAE", "Saudi", "Qatar", "Oman", "Kuwait", "Bahrain", "Malaysia", "Indonesia", "Thailand", "Philippines",
-  "Singapore", "Vietnam", "Sri Lanka", "Africa", "Australia", "New Zealand", "Arabic", "Bahasa"];
+  "Singapore", "Vietnam", "Sri Lanka", "Africa", "Australia", "New Zealand", "Arabic", "Bahasa", "South-East Asia", "Europe"];
+/** A country the rep names also names its region: "malaysia reference" still wants the South-East Asia deck. */
+const REGION_OF: Record<string, string> = { Malaysia: "South-East Asia", Indonesia: "South-East Asia", Thailand: "South-East Asia",
+  Philippines: "South-East Asia", Singapore: "South-East Asia", Vietnam: "South-East Asia", Bahasa: "South-East Asia",
+  UAE: "Middle East", Saudi: "Middle East", Qatar: "Middle East", Oman: "Middle East", Kuwait: "Middle East", Bahrain: "Middle East", Arabic: "Middle East" };
 /** The floor for ANY document SAM shows, not only substitutes: about 1 in 5 answers on 27 Sep had an
  *  off-topic slot 2 or 3 - a private-bank bootcamp for pharma, a Japanese Nutanix Tokyo deck in sizing,
  *  GITEX and demo-video answers. Fewer cards beat irrelevant ones. On top of substituteFits():
@@ -336,7 +340,8 @@ export function relevant(question: string, a: Asset): boolean {
 
 /** The Japanese-language and regional-deck rules of relevant(), on their own (nearFirst uses them too). */
 function regionOk(question: string, a: Asset): boolean {
-  const named = namedEntities(question), title = `${a.title} ${(a.file?.path ?? "").split("/").pop()}`;
+  const asked = namedEntities(question), title = `${a.title} ${(a.file?.path ?? "").split("/").pop()}`;
+  const named = [...asked, ...asked.map(e => REGION_OF[e]).filter(Boolean)];
   if (/\bjapanese\b|(?:^|[-_ ])jp(?:[-_ ]|$)/i.test(title) && !named.includes("Japan")) return false;
   const regions = namedEntities(title).filter(e => REGIONS.includes(e));
   return !(regions.length && typeGroup(a) !== "Case Study" && !regions.some(e => named.includes(e)));
@@ -810,6 +815,7 @@ export function finish(p: {
     const missingHere = asksAbout(own).filter(e => !subs.some(h => hasEntity(h, e, own))), led = namedFirst(subs, fits, own, p.trace);
     subs = nearFirst(led, missingHere, own, p.trace);
     subs = shortFirst(ensurePublished(withSuccessors(subs, p.trace).filter(h => h.why === NEAR_WHY || relevant(p.question, h.asset)), fits, p.question, p.trace), fits, own, p.trace).slice(0, 2);
+    if (!denial && internalOnly(p.question, subs)) return done(INTERNAL_ONLY, [], subs, true);
     return done(denial ? denialClause(reply.verdict, p.question) : "No exact match in the library.", ["Closest in the library:"], subs, true);
   }
 
@@ -866,7 +872,16 @@ export function finish(p: {
   const unsendable = sending(p.question) && !shown.some(h => h.asset.public_url);
   if (unsendable) p.trace.push({ step: "verdict: nothing sendable", detail: "the rep is sending outside Accops and every shown document is internal" });
   if (partial) p.trace.push({ step: "verdict: partial denial", detail: g });
-  return done(final, notes, shown, unsendable || partial);
+  return done(final === "No exact match in the library." && internalOnly(p.question, shown) ? INTERNAL_ONLY : final, notes, shown, unsendable || partial);
+}
+
+/** "No exact match in the library." over documents that DO match but are internal reads as "we don't have
+ *  it" (6 Oct #44, #50: the corporate deck and the partner bootcamp were right there). When the rep is
+ *  sending and nothing shown is published, what is missing is a sendable copy, so say that; sendLine then
+ *  adds "ask marketing first" and the request button stays. */
+const INTERNAL_ONLY = "The library has matching documents, but only internal ones.";
+function internalOnly(question: string, shown: SearchHit[]): boolean {
+  return sending(question) && shown.length > 0 && !shown.some(h => h.asset.public_url);
 }
 
 /** "hysecure demo video" / "product video hysecure" (28 Sep #12, #34). Demo videos are registry-only files
