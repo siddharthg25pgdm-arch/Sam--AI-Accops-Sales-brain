@@ -42,7 +42,7 @@ right industry filter (#36 to #40, #46, #49).
 | 38 | BPO, 3000 WFH agents, opening deck | A | Honest gap. The IT-services workshop deck is a fair substitute. |
 | 39 | defence PSU VDI case study | H | Defence R&D, Atomic Research Centre, Govt compilation. |
 | 40 | university virtual labs | H | IIT Bombay HyLabs, Education Japan. |
-| 41 | position against Zscaler ZPA | H | *HySecure vs Zscaler Private Access* (2023, battlecard exemption?). |
+| 41 | position against Zscaler ZPA | H | *HySecure vs Zscaler Private Access*. The deck carries no date, so the pre-2024 rule falls back to the file's modified date and lets it through. |
 | 42 | Okta vs HyID | A | No such comparison exists. Honest. |
 | 43 | latest corporate deck for a CIO | **U** | Leads with the SEA compressed deck. The *Corporate Presentation, 25 Aug 2026* is answerable and is the right answer. |
 | 44 | ok to send that after the meeting? | H | Correctly: not published, ask marketing first. |
