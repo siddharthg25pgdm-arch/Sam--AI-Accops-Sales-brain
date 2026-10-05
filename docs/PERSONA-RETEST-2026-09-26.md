@@ -1,3 +1,72 @@
+## 6 October run #4: first run with unseen questions
+
+**For Siddharth.** The same 35 questions, plus 15 new ones SAM was never tuned on. Run with
+`node prototype/persona.mjs` (the questions now live in that file, so any future run is identical).
+50 calls to production, 20 s apart, all `x-sam-test: 1`. **All 50 answered by gpt-6-luna**: p50 2.7 s,
+max 7.3 s, no fallbacks. This was the first run after the 30 Sep pre-2024 rule and the 6 Oct
+master-list tags. Every gap was checked against `sam_v1_assets`.
+
+### Headline
+
+| | 28 Sep #3 (35) | 6 Oct core 35 | 6 Oct new 15 |
+|---|---|---|---|
+| **Happy** | 19 | **14** | **6** |
+| Acceptable gap (honest, request button) | 12 | **19** | **6** |
+| Unsatisfying | 4 | **2** | **3** |
+| False gaps (the right document was answerable) | 0 | **0** | **1** (#47) |
+
+**Why "happy" fell from 19 to 14: almost entirely the pre-2024 rule.** Five answers lost a document
+that is now excluded as published before 2024:
+- #35 Cisco AnyConnect: *HySecure vs Cisco AnyConnect and Other VPNs* (2021).
+- #28 Fortinet: the *HySecure ZTNA Gateway* decks (2021).
+- #29 AWS WorkSpaces and #48 (new) AVD: *Accops Powered VDI vs the Field* (2022) and the AWS sheet (2017).
+- #21 Nutanix AHV: the AHV integration guides (2018, 2020).
+- #31 Kerala hospital: the AVD prep doc (*vs the Field*, 2022).
+SAM handles these honestly (a gap with the request button). But #28 and #35 then offer irrelevant
+substitutes, so they grade U. #2 ("anything newer?") is no longer H only because the 2021 deck it
+used to compare against is now excluded.
+
+**Better than 28 Sep:** #12 and #14 (no button before, now an honest gap with the button), #13 (the
+ISO certificate cleanly), #34 (HySecure demo videos). The run had 0 invented claims.
+
+**The new tags work.** Insurance and NBFC map to BFSI, BPO to IT / ITeS, defence to Government,
+university to Education, and logistics and retail to E-commerce / Retail. Every alias landed on the
+right industry filter (#36 to #40, #46, #49).
+
+### The 15 unseen questions
+
+| # | Question | Grade | Why |
+|---|---|---|---|
+| 36 | insurance MFA customer proof | A | Nothing insurance-specific is answerable (the 2022 life-insurer MFA proposal is excluded as pre-2024). Honest, with the button. |
+| 37 | NBFC, RBI remote access | H | The NBFC vendor-access case study, the public two-banks case study, and the BFSI 2026 deck. |
+| 38 | BPO, 3000 WFH agents, opening deck | A | Honest gap. The IT-services workshop deck is a fair substitute. |
+| 39 | defence PSU VDI case study | H | Defence R&D, Atomic Research Centre, Govt compilation. |
+| 40 | university virtual labs | H | IIT Bombay HyLabs, Education Japan. |
+| 41 | position against Zscaler ZPA | H | *HySecure vs Zscaler Private Access* (2023, battlecard exemption?). |
+| 42 | Okta vs HyID | A | No such comparison exists. Honest. |
+| 43 | latest corporate deck for a CIO | **U** | Leads with the SEA compressed deck. The *Corporate Presentation, 25 Aug 2026* is answerable and is the right answer. |
+| 44 | ok to send that after the meeting? | H | Correctly: not published, ask marketing first. |
+| 45 | telecom zero trust reference | A | Honest gap. Public Govt zero-trust architecture as the substitute. |
+| 46 | retail 200 stores thin clients | A | Public HyDesk brochure + VLCC. Good substitutes. |
+| 47 | on-prem fingerprint MFA datasheet | **U** | **False gap.** *Accops BioAuth: Biometric Authentication for the Workforce - Fingerprint, Face and FIDO* (2024) is answerable. The model filtered to Brochure + MFA and dropped it. |
+| 48 | AVD vs Accops DaaS talking points | A | *vs the Field* (2022) is excluded by the pre-2024 rule. |
+| 49 | logistics DaaS similar customer | H | Ecom Express (public). |
+| 50 | training deck for a new SI partner | **U** | It shows the Partner Bootcamp 2026 (right), but says "No exact match". It reads "give them" as sending to a customer. It also shows *Selling Accops to Government (c. 2021)*: that card has no publish_year, so it slips past the pre-2024 rule. |
+
+### What to fix, ranked
+1. **Decision for you: the pre-2024 rule and battlecards.** Five of the six drops come from it. One
+   option is to pin the few battlecards reps still need (Cisco AnyConnect 2021, *vs the Field* 2022,
+   HySecure ZTNA Gateway 2021). They would come back with the existing "over two years old" warning.
+   The other is to exempt Battlecards like certificates.
+2. **Retrieval bugs (mine):** #47 (a filter too narrow drops the BioAuth deck), #43 ("latest"
+   does not prefer the newest edition), #50 ("give them" read as customer-sending, and "No exact
+   match" shown over the exact document).
+3. **A third card source outside the brain:** the web app still loads 77 hand-inventory cards from
+   `web/data/asset_cards.json` (IIT Bombay, Polycab, City Pharmacy, Ecom Express, VLCC...). Their
+   industries are free text ("NBFC (Non-Banking Financial Company)", "Health & Wellness / Retail") and never
+   pass through `core.terms`. They should be folded into `sam_asset_cards`.
+4. **Data:** the *Selling Accops to Government (c. 2021)* card needs `publish_year: 2021`.
+
 ## 28 September re-run #3
 
 **For Siddharth.** This is the fourth run of the same 35 questions, with the same follow-up history
