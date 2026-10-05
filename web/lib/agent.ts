@@ -1010,7 +1010,9 @@ const NEAR_WHY = "near the missing topic";
 /** A denial verdict cut to its denial: "No exact Proxmox integration doc, but the Nutanix guide covers
  *  AHV" keeps only what is missing. Then checked like any verdict; a failing one becomes plain. */
 function denialClause(verdict: string, question: string): string {
-  const head = verdict.split(/\s*(?:[;:–—(]|\s-\s|,\s*(?:but|however|though|so|instead)\b|\bbut\b|\bhowever\b)/i)[0].replace(/[.\s]+$/, "");
+  // An en dash between digits is a range, not a clause break: "No exact 1–2 page case study" was cut to
+  // "No exact 1." (6 Oct #3). Only a spaced dash or an em dash ends the clause.
+  const head = verdict.split(/\s*(?:[;:—(]|\s[–-]\s|,\s*(?:but|however|though|so|instead)\b|\bbut\b|\bhowever\b)/i)[0].replace(/[.\s]+$/, "");
   if (!head || verdictProblem(head, [], question, true)) return "No exact match in the library.";
   // The acronym reading the prompt asks for survives the cut: "No exact GCC ZTNA pitch (assumed GCC
   // means a global capability centre)." (27 Sep #10 lost it.)

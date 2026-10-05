@@ -557,6 +557,10 @@ ok(seedSaw("Zulekha Hospital"), "the long hospital paragraph still finds the pub
   const dth = h("Major Indian DTH and OTT Platform: Secure Remote Access for 300+ Vendors", { industry: "Media", pub: 1, use_for: "A customer reference for partner and vendor access asks in Malaysia or Indonesia" });
   r = fin("any malaysia or indonesia customer reference i can share with a partner?", "The library has the closest matches.\nPICKS: 1, 2", [sea, dth]);
   ok(r.missing && /^No exact match for Malaysia or Indonesia: none of the closest documents mentions them\./.test(r.text) && /sent to a partner/.test(r.text), `audience-only region is a gap: ${r.text}`);
+  // 6 Oct #3: "1–2 pages" with an en dash is a range; the denial clause must not be cut to "No exact 1."
+  const bankCs = h("Two Leading Indian Private Banks: Secure Access, MFA and Biometrics", { type: "Case Study", industry: "BFSI", pub: 1 });
+  r = fin("bfsi case study i can send, shorter one? something 1-2 pages", "No exact 1–2 page BFSI case study – closest below.\nPICKS: 1", [bankCs]);
+  ok(/^No exact 1–2 page BFSI case study\./.test(r.text) && !/^No exact 1\./.test(r.text), `en-dash range survives the clause cut: ${r.text}`);
   // 6 Oct #50: the partner bootcamp IS the answer, but it is internal and the rep is giving it out.
   // Not "No exact match in the library." - the document exists; what is missing is a sendable copy.
   const camp = h("Accops Partner Sales Bootcamp 2026 - 4-Hour Deck (30 Jun 2026)", { type: "Deck", pub: 0, use_for: "Partner onboarding and sales enablement" });

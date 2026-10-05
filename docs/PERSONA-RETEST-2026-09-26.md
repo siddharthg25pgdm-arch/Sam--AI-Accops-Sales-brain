@@ -1,3 +1,30 @@
+## 6 October run #5: after the inventory re-carding and the answer fixes
+
+Same 50 questions (`node prototype/persona.mjs`), on production after `10b6722`. All 50 answered by
+gpt-6-luna: p50 2.7 s, max 6.6 s. (The run-#4 raw file was overwritten by this run; its grades are
+below.)
+
+| | Run #4 core 35 | **Run #5 core 35** | Run #4 new 15 | **Run #5 new 15** |
+|---|---|---|---|---|
+| Happy | 14 | **13** | 6 | **6** |
+| Acceptable gap | 19 | **20** | 8 | **9** |
+| Unsatisfying | 2 | **2** (#3, #35) | 1 | **0** |
+
+- **Fixed and confirmed:** #43 "latest corporate deck" now leads with the *Corporate Presentation,
+  25 Aug 2026* (U to H). #50 says "The library has matching documents, but only internal ones." #28
+  now offers a ZTNA pitch deck instead of a bank case study (U to A).
+- **Better documents from the re-carding:** #1 adds the public Deutsche Bank vendor-access study;
+  #9 leads with the public textile thin-client study (properly titled); #39 a defence R&D case study;
+  #40 the UAE university and Kyoto University HyLabs studies. Each now carries a year from its text.
+- **#3 fell to U on a text bug:** the model wrote "1–2 pages" with an en dash and the denial clause
+  was cut to "No exact 1.". **Fixed after the run** (an en dash between digits is a range, not a
+  clause break; regression test added). It grades A with the fix.
+- **#16 H to A:** the same three documents; the model added "no exact Omnissa migration pitch".
+- **#49 H to A:** the pinned public Ecom Express study was available; the model chose the
+  e-commerce major case study instead. A judgement call, not a defect.
+- **Still U:** #35 Cisco AnyConnect (the only battlecard is 2021 and excluded; substitutes are VDI
+  decks). Decided by the old-assets review.
+
 ## 6 October run #4: first run with unseen questions
 
 **For Siddharth.** The same 35 questions, plus 15 new ones SAM was never tuned on. Run with
