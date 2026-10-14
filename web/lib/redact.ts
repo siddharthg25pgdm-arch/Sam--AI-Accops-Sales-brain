@@ -17,7 +17,9 @@ const PATTERNS: RegExp[] = [
 ];
 
 const SECRET_ENV = ["OPENAI_API_KEY", "OPENAI_COMPAT_API_KEY", "ANTHROPIC_API_KEY", "SUPABASE_SERVICE_KEY",
-  "SP_WEBHOOK_SECRET", "SAM_SESSION_SECRET", "WHATSAPP_ACCESS_TOKEN", "WHATSAPP_APP_SECRET", "CRON_SECRET"];
+  "SP_WEBHOOK_SECRET", "SAM_SESSION_SECRET", "WHATSAPP_ACCESS_TOKEN", "WHATSAPP_APP_SECRET", "CRON_SECRET",
+  // SAM Live: its own OpenAI key, and the Power Automate trigger URL, which carries a signature (sig=...).
+  "LIVE_OPENAI_API_KEY", "LIVE_FLOW_URL"];
 
 export function redact(text: unknown): string {
   let s = typeof text === "string" ? text : text instanceof Error ? text.message : (() => { try { return JSON.stringify(text); } catch { return String(text); } })();

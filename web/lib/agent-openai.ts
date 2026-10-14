@@ -94,6 +94,12 @@ export function compatModels(): string[] {
 export function openAIEffort(model: string): string | null {
   const env = process.env.OPENAI_REASONING_EFFORT;
   if (env !== undefined) return env || null;
+  return defaultEffort(model);
+}
+
+/** The family rule alone, without SAM chat's OPENAI_REASONING_EFFORT: SAM Live has its own OpenAI key and
+ *  must not change speed because SAM chat's tier was tuned. */
+export function defaultEffort(model: string): string | null {
   if (/^(gpt-4|gpt-3\.5|chatgpt-)/.test(model)) return null;
   if (/^o\d/.test(model)) return "low";
   if (/^gpt-5(-mini|-nano)?(-\d{4}-\d{2}-\d{2})?$/.test(model)) return "minimal";

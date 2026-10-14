@@ -1,8 +1,9 @@
-import { currentUser, type User } from "./auth";
+import { currentUser, verifyToken, type User } from "./auth";
 
 /** Machine callers (Dwight extension, scripts, MCP clients) authenticate with a bearer token.
  *  SAM_API_TOKENS="dwight-siddharth:tok_abc...,dwight-rahul:tok_def..."  → user_id is the label before the colon.
- *  Browser callers keep using the session cookie. Either works on every /api/v1 route. */
+ *  Browser callers keep using the session cookie. Either works on every /api/v1 route.
+ *  A SAM session JWT sent as a bearer (the SAM Live desktop app) is the cookie in another header. */
 export type Caller = { id: string; admin: boolean; via: "token" | "cookie" };
 
 function tokens(): Map<string, string> {
@@ -22,8 +23,14 @@ export function callerFromToken(header: string | null): Caller | null {
 }
 
 export async function resolveCaller(req: Request): Promise<Caller | null> {
-  const fromToken = callerFromToken(req.headers.get("authorization"));
+  const header = req.headers.get("authorization");
+  const fromToken = callerFromToken(header);
   if (fromToken) return fromToken;
+  // via "cookie" on purpose: a rep's desktop token gets exactly the cookie's rights, so every
+  // `via === "cookie" && !admin` gate still holds and it never gains machine-token privileges.
+  const jwt = header?.match(/^Bearer\s+(.+)$/i)?.[1]?.trim();
+  const fromJwt = jwt ? await verifyToken(jwt) : null;
+  if (fromJwt) return { ...fromJwt, via: "cookie" };
   const u: User | null = await currentUser();
   return u ? { id: u.id, admin: u.admin, via: "cookie" } : null;
 }
