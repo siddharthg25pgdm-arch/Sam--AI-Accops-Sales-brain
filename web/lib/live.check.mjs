@@ -10,7 +10,14 @@
  *    8. models: OpenAI (LIVE_OPENAI_API_KEY) first, Groq behind it, Groq alone without the key, and a failure falls through
  *    9. mock mode cannot run in production
  *   10. a SAM session JWT as a bearer is the cookie: a rep's desktop token is refused on admin-only routes
- *       and cannot use API-token privileges; API tokens and bad tokens behave as before */
+ *       and cannot use API-token privileges; API tokens and bad tokens behave as before
+ *   11. echo: a rep utterance that is the customer's speech heard by the mic is matched (contained, or Jaccard
+ *       >= 0.6, within 4 s); short, unrelated or late ones are not; the audio route drops a rep echo and
+ *       removes a stored one when the customer's copy arrives
+ *   12. assist: "next" reads one line (intent, why <= 15 words) and falls back to the framework when no model
+ *       answers; "search" returns SAM cards and adds the web only without a good match, labelled unverified,
+ *       citations stripped, <= 3 sources; nothing from the web without the OpenAI key; 409 once ended
+ *   13. delete: owner or admin only (404 for anyone else, nothing deleted); the deal goes only when no other call is on it */
 import assert from "node:assert";
 import { createJiti } from "jiti";
 import { fileURLToPath } from "node:url";
@@ -36,10 +43,15 @@ const CARDS = [
   card("Case studies/Bank moves off Citrix.pdf", "A private bank moves off Citrix", "Case Study", "A bank replaced Citrix with HyWorks in six weeks.", "https://downloads.accops.com/bank-citrix.pdf"),
   card("Events/Gulf roadshow deck.pdf", "Gulf roadshow deck, Fortinet partner session", "Deck", "Event slides from a partner session with Fortinet.", "https://downloads.accops.com/gulf-deck.pdf"),
 ];
-let calls = [], script = {};
+let calls = [], script = {}, rows = () => undefined, dbCalls = [];
 globalThis.fetch = async (url, init = {}) => {
   const u = String(url);
-  if (u.includes("stub.supabase.co")) return Response.json(u.includes("sam_asset_cards") ? CARDS : []);
+  if (u.includes("stub.supabase.co")) {
+    if (u.includes("sam_asset_cards")) return Response.json(CARDS);
+    const du = decodeURIComponent(u), method = init.method ?? "GET";
+    dbCalls.push({ u: du, method });
+    return Response.json(rows(du, method) ?? []);
+  }
   if (u.endsWith("/models")) return Response.json({ data: [{ id: "gpt-transcribe" }, { id: "gpt-5.4-mini" }, { id: "openai/gpt-oss-20b" }] });
   const host = u.includes("api.openai.com") ? "openai" : u.includes("api.groq.com") ? "groq" : u.includes("flow.example") ? "flow" : "other";
   calls.push({ host, u, init, body: typeof init.body === "string" ? JSON.parse(init.body) : init.body });
@@ -240,5 +252,128 @@ const lj = await li.json();
 ok(li.status === 200 && lj.user.id === "rep" && lj.user.admin === false && (await verifyToken(lj.token))?.id === "rep", "desktop login returns a session token");
 eq((await login(new Request("https://sam/api/live/login", { method: "POST", body: JSON.stringify({ id: "rep", password: "nope" }) }))).status, 401, "wrong password: 401");
 eq((await login(new Request("https://sam/api/live/login", { method: "POST", body: "{}" }))).status, 400, "nothing sent: 400");
+
+const FRAMEWORK_Q0 = "What's prompting you to look at this now?";
+const SB = "https://stub.supabase.co/rest/v1/";
+// ---- 11. echo de-duplication
+const { sameWords, isEcho, gapMs } = await jiti.import("./live/echo.ts");
+ok(sameWords("we need it before the March renewal", "Honestly, we need it before the March renewal, so January."), "rep text inside the customer's: echo");
+ok(sameWords("about twelve hundred users mostly branch staff", "About twelve hundred users, mostly the branch staff."), "not contained but Jaccard 7/8: echo");
+ok(sameWords("Yes, that works.", "yes that works"), "exactly three tokens is long enough");
+ok(!sameWords("yes okay", "yes okay"), "under three tokens: never judged an echo");
+ok(!sameWords("Thanks so much for that", "ok"), "a customer text under three tokens: not an echo either");
+ok(!sameWords("How many users do you have?", "About 1,200 users."), "a question and its answer are not the same speech");
+ok(!sameWords("what do you use for remote access today", "we use citrix for remote access"), "Jaccard 4/10 = 0.4: kept");
+ok(!sameWords("on citrix virtual", "we run non citrix virtualisation"), "containment is by whole tokens");
+ok(!sameWords("Right, so about 1,200 users mostly branch staff, got it, thanks for that", "About 1,200 users mostly branch staff"),
+  "the rep talking over an echo (the customer's words inside the rep's) is kept: Jaccard 0.5");
+const at = (t_ms, duration_ms, text) => ({ t_ms, duration_ms, text });
+const said = "We're on Citrix Virtual Apps with NetScaler today";
+ok(isEcho(at(1000, 3000, said), at(1200, 3500, said)), "overlapping in time: echo");
+eq([gapMs(at(0, 2000, ""), at(6000, 1000, "")), gapMs(at(6000, 1000, ""), at(0, 2000, "")), gapMs(at(0, null, ""), at(0, 500, ""))], [4000, 4000, 0], "gap is symmetric, 0 on overlap");
+ok(isEcho(at(0, 2000, said), at(6000, 2000, said)) && !isEcho(at(0, 2000, said), at(6001, 2000, said)), "4 s apart: echo; 4.001 s: not");
+ok(!isEcho(at(0, null, said), at(4500, null, said)), "unknown durations count as instants");
+
+const MID = "11111111-1111-4111-8111-111111111111", DID = "22222222-2222-4222-8222-222222222222", BOSS_MID = "33333333-3333-4333-8333-333333333333";
+const mrow = (o = {}) => ({ id: MID, deal_id: DID, owner: "rep", title: null, status: "live", started_at: "2026-10-14T10:00:00Z", ended_at: null, qualification: {}, suggestions: [],
+  battlecards: [], summary: null, flow_status: null, last_insight_at: null, is_test: true, ...o });
+const meetingRows = (u, method = "GET") => method !== "GET" ? undefined : u.includes(`live_meetings?id=eq.${MID}`) ? [mrow()] : u.includes(`live_meetings?id=eq.${BOSS_MID}`) ? [mrow({ id: BOSS_MID, owner: "boss" })] : undefined;
+const ctx = id => ({ params: Promise.resolve({ id }) });
+const { POST: audio } = await jiti.import("../app/api/live/meetings/[id]/audio/route.ts");
+const wavBody = () => { const b = new Uint8Array(1000); b.set(new TextEncoder().encode("RIFF"), 0); b.set(new TextEncoder().encode("WAVE"), 8); return b; };
+const up = (channel, t_ms, duration_ms) => audio(new Request(`https://sam/api/live/meetings/${MID}/audio?channel=${channel}&t_ms=${t_ms}&duration_ms=${duration_ms}`,
+  { method: "POST", body: wavBody(), headers: { Authorization: `Bearer ${repJwt}` } }), ctx(MID));
+process.env.LIVE_OPENAI_API_KEY = "sk-live-stub-KEY1";
+const custSeg = { id: 7, channel: "customer", t_ms: 1000, duration_ms: 3500, text: said };
+rows = (u, method) => meetingRows(u, method) ?? (method === "POST" && u.includes("live_segments") ? [{ id: 8, channel: "rep", t_ms: 1200, duration_ms: 3000, text: said }]
+  : u.includes("channel=eq.customer&t_ms=gte") ? [custSeg] : undefined);
+run({ openai: [() => Response.json({ text: said })] }); dbCalls = [];
+eq(await (await up("rep", 1200, 3000)).json(), { segment: null, dropped: "echo" }, "a rep upload matching a stored customer segment: dropped as an echo");
+ok(dbCalls.some(c => c.method === "DELETE" && c.u.includes("live_segments") && c.u.includes("id=in.(8)")), "...and its row is gone");
+const repSeg = { id: 5, channel: "rep", t_ms: 900, duration_ms: 3000, text: "Citrix Virtual Apps with NetScaler" };
+rows = (u, method) => meetingRows(u, method) ?? (method === "POST" && u.includes("live_segments") ? [{ ...custSeg, id: 9 }]
+  : u.includes("channel=eq.rep&t_ms=gte") ? [repSeg, { id: 6, channel: "rep", t_ms: 0, duration_ms: 800, text: "What are you running today?" }] : undefined);
+run({ openai: [() => Response.json({ text: said })] }); dbCalls = [];
+const aj = await (await up("customer", 1000, 3500)).json();
+ok(aj.segment?.id === 9 && aj.segment.text === said, "the customer's copy is stored");
+eq(aj.removed_segment_ids, [5], "the rep's echo of it is removed; the rep's own question is not");
+ok(dbCalls.some(c => c.method === "DELETE" && c.u.includes("id=in.(5)")), "...deleted in the database");
+rows = (u, method) => meetingRows(u, method) ?? (method === "POST" && u.includes("live_segments") ? [{ id: 10, channel: "rep", t_ms: 20000, duration_ms: 2000, text: said }] : undefined);
+run({ openai: [() => Response.json({ text: said })] });
+const kept = await (await up("rep", 20000, 2000)).json();
+ok(kept.segment?.id === 10 && !("dropped" in kept) && !("removed_segment_ids" in kept), "nothing near on the other channel: stored as usual");
+
+// ---- 12. assist
+const { readNext, readWeb, needsWeb, fallbackLine } = await jiti.import("./live/assist.ts");
+eq(readNext('{"say":{"line":"  So what made the RBI flag it now?  ","intent":"discovery","why":"Need is still partial."},"competitors":["Citrix"]}'),
+  { say: { line: "So what made the RBI flag it now?", intent: "discovery", why: "Need is still partial." }, customer_questions: [], competitors: ["Citrix"], objections: [] }, "a reply read");
+eq(readNext('{"say":{"line":"Fair point.","intent":"pitch","why":"one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen"}}').say,
+  { line: "Fair point.", intent: "discovery", why: "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen" }, "unknown intent -> discovery; why cut to 15 words");
+eq([readNext('{"say":{"line":""}}'), readNext("Say hello."), readNext('{"line":"x"}')], [null, null, null], "no line: unusable, so the next model gets a turn");
+eq(fallbackLine(merge(null, { need: done })).line, "What are you using today for remote access and virtual desktops?", "no model: the first open field's question");
+eq(fallbackLine(Object.fromEntries(KEYS.map(k => [k, done]))).intent, "advance", "everything done: advance");
+
+const { POST: assist } = await jiti.import("../app/api/live/meetings/[id]/assist/route.ts");
+const ask2 = (body, tok = repJwt, id = MID) => assist(new Request(`https://sam/api/live/meetings/${id}/assist`, { method: "POST", body: JSON.stringify(body), headers: { Authorization: `Bearer ${tok}` } }), ctx(id));
+const tx = [{ id: 1, channel: "rep", t_ms: 0, duration_ms: 2000, text: "What are you running today?" }, { id: 2, channel: "customer", t_ms: 3000, duration_ms: 4000, text: "We're on Citrix and the renewal price doubled." }];
+rows = u => meetingRows(u) ?? (u.includes("live_segments") ? [...tx].reverse() : undefined);
+run({ openai: [reply('{"say":{"line":"Many banks moved off Citrix for that reason. How many users are on it today?","intent":"objection","why":"Price pain opens the door; users still open."},'
+  + '"competitors":["Citrix Virtual Apps"],"objections":["renewal price"],"customer_questions":[]}')] });
+let aw = await (await ask2({})).json();
+eq(Object.keys(aw).sort(), ["cards", "mode", "model", "say", "web"], "next: exactly mode, say, cards, web, model");
+ok(aw.mode === "next" && aw.say.intent === "objection" && aw.model === "openai:gpt-5.4-mini" && aw.web === null, `next answered: ${JSON.stringify(aw.say)}`);
+ok(calls[0].body.messages[1].content.includes("Customer: We're on Citrix") && calls[0].body.messages[1].content.includes("need (Need): OPEN"), "the prompt has the transcript tail and the open fields");
+ok(aw.cards.length >= 1 && aw.cards.length <= 2 && aw.cards[0].title === "Accops vs Citrix battlecard" && Object.keys(aw.cards[0]).sort().join() === "brief,link,shareable,title,trigger",
+  `up to 2 cards, battlecard shape: ${JSON.stringify(aw.cards)}`);
+run({ openai: [fail(500)], groq: [fail(503)] });
+aw = await (await ask2({})).json();
+ok(aw.model === "none" && aw.say.line === FRAMEWORK_Q0, `every model down: the framework's question (${JSON.stringify(aw.say)})`);
+
+const respJSON = (text, cites) => () => Response.json({ output: [{ type: "web_search_call", status: "completed" }, { type: "message", content: [{ type: "output_text", text, annotations: cites }] }] });
+const cite = (url, title) => ({ type: "url_citation", url, title, start_index: 0, end_index: 1 });
+run({ openai: [respJSON("This year Omnissa named a new CEO and launched Omnissa ONE. ([omnissa.com](https://www.omnissa.com/news/a?utm_source=openai)) More in [the release](https://x.example/r).",
+  [cite("https://www.omnissa.com/news/a?utm_source=openai", "Omnissa appoints a new CEO"), cite("https://www.omnissa.com/news/a?utm_source=openai", "dup"), cite("https://b.example/2", "B"), cite("https://c.example/3", ""), cite("https://d.example/4", "D")])] });
+aw = await (await ask2({ question: "What did Omnissa announce this year?" })).json();
+const wb = calls[0]?.body;
+ok(calls[0]?.u.endsWith("/v1/responses") && wb.model === "gpt-5.4-mini" && JSON.stringify(wb.tools) === '[{"type":"web_search"}]' && wb.store === false && wb.reasoning?.effort === "none"
+  && wb.input === "What did Omnissa announce this year?", `Responses API request: ${JSON.stringify({ ...wb, instructions: undefined })}`);
+eq(aw.web, { answer: "This year Omnissa named a new CEO and launched Omnissa ONE. More in the release.", unverified: true,
+  sources: [{ title: "Omnissa appoints a new CEO", url: "https://www.omnissa.com/news/a" }, { title: "B", url: "https://b.example/2" }, { title: "c.example", url: "https://c.example/3" }] },
+  "web: citations stripped, utm dropped, distinct sources, at most 3, labelled unverified");
+ok(aw.mode === "search" && aw.model === "openai:gpt-5.4-mini" && Array.isArray(aw.cards) && !("say" in aw), "search shape");
+run({});
+aw = await (await ask2({ question: "How do we compare to Citrix?" })).json();
+ok(aw.cards[0]?.title === "Accops vs Citrix battlecard" && aw.web === null && aw.model === "sam" && !calls.length, `a good SAM match: no web call (${JSON.stringify(aw)})`);
+ok(needsWeb("Citrix pricing", []) && needsWeb("What did Citrix announce?", [CARDS[0]]) && !needsWeb("Citrix pricing", [CARDS[2], CARDS[0]]), "no card, or fresh facts: the web; any good card among those shown: SAM only");
+eq(readWeb({ output: [{ type: "message", content: [{ type: "output_text", text: Array.from({ length: 95 }, (_, i) => `w${i}`).join(" "), annotations: [] }] }] }).answer.split(" ").length, 80, "web answer cut to 80 words");
+eq(readWeb({ output: [{ type: "web_search_call" }] }), null, "no message: no web answer");
+run({ openai: [fail(500)] });
+aw = await (await ask2({ question: "What did Omnissa announce this year?" })).json();
+ok(aw.web === null && aw.model === "sam", "the web failing leaves SAM's answer");
+delete process.env.LIVE_OPENAI_API_KEY;
+run({});
+aw = await (await ask2({ question: "What did Omnissa announce this year?" })).json();
+ok(aw.web === null && !calls.length, "no OpenAI key: SAM only, nothing sent anywhere");
+rows = u => (u.includes(`live_meetings?id=eq.${MID}`) ? [mrow({ status: "ended" })] : undefined);
+eq((await ask2({})).status, 409, "assist after the call ended: 409");
+rows = meetingRows;
+eq((await ask2({}, repJwt, BOSS_MID)).status, 404, "assist on someone else's call: 404");
+
+// ---- 13. delete
+const { DELETE: del } = await jiti.import("../app/api/live/meetings/[id]/route.ts");
+const rm = (id, tok) => del(new Request(`https://sam/api/live/meetings/${id}`, { method: "DELETE", headers: tok ? { Authorization: `Bearer ${tok}` } : {} }), ctx(id));
+const deletes = () => dbCalls.filter(c => c.method === "DELETE").map(c => c.u.split("?")[0].replace(SB, ""));
+rows = meetingRows; dbCalls = [];
+// No login (401) needs a request scope for cookies(): scripts/live-smoke.mjs checks it against a server.
+eq((await rm(BOSS_MID, repJwt)).status, 404, "a rep deleting someone else's call: 404");
+eq(deletes(), [], "...and nothing was deleted");
+dbCalls = [];
+const dr = await rm(MID, repJwt);
+eq([dr.status, await dr.json()], [200, { deleted: MID, deal_deleted: true }], "the owner deletes their call");
+eq(deletes(), ["live_meetings", "live_deals"], "meeting, then its deal (no other call on it)");
+rows = u => meetingRows(u) ?? (u.includes(`deal_id=eq.${DID}`) ? [{ id: "44444444-4444-4444-8444-444444444444" }] : undefined); dbCalls = [];
+eq(await (await rm(MID, bossJwt)).json(), { deleted: MID, deal_deleted: false }, "an admin deletes a rep's call; the deal stays while another call is on it");
+eq(deletes(), ["live_meetings"], "...only the meeting row");
+rows = () => undefined;
 
 console.log(`live.check: ${n} assertions passed`);

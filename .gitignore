@@ -15,3 +15,7 @@ corpus/*
 # so it must be reviewable in a diff. Ignoring it lost 7 cards to one untracked directory.
 !corpus/cards/
 .claude/
+
+# Confidential third-party design notes: local only, never pushed
+docs/live/architecture-review.md
+docs/live/convverse-desktop-breakdown.md

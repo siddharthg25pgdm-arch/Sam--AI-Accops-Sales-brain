@@ -10,7 +10,7 @@ import { cleanKey, redact } from "../redact";
 
 export type Provider = { name: string; base: string; key: string; openai: boolean };
 export type Leg = { p: Provider; model: string; cap: number };
-export type Job = "stt" | "insight" | "summary";
+export type Job = "stt" | "insight" | "summary" | "assist" | "web";
 
 const isOpenAIHost = (base: string) => /^https:\/\/([a-z0-9-]+\.)*api\.openai\.com(\/|$)/i.test(base);
 /** "groq" for api.groq.com, "openai" for api.openai.com: what a stored model label says. */
@@ -35,6 +35,9 @@ export function legs(job: Job): Leg[] {
   const plan: [Provider | null, string, number][] = {
     stt: [[o, e.LIVE_STT_MODEL || "gpt-transcribe", 12_000], [c, e.LIVE_STT_FALLBACK_MODEL || "whisper-large-v3-turbo", 15_000]],
     insight: [[o, e.LIVE_INSIGHT_MODEL || "gpt-5.4-mini", 6_000], [c, "openai/gpt-oss-20b", 8_000]],
+    // "What do I say next?": the insight's models. Web answers: OpenAI's Responses API only (web_search tool).
+    assist: [[o, e.LIVE_INSIGHT_MODEL || "gpt-5.4-mini", 6_000], [c, "openai/gpt-oss-20b", 8_000]],
+    web: [[o, e.LIVE_ASSIST_WEB_MODEL || "gpt-5.4-mini", 22_000]],
     // Groq's 120b has a daily token cap, hence 20b behind it.
     summary: [[o, e.LIVE_SUMMARY_MODEL || "gpt-5.5", 22_000], [c, "openai/gpt-oss-120b", 16_000], [c, "openai/gpt-oss-20b", 20_000]],
   }[job] as [Provider | null, string, number][];

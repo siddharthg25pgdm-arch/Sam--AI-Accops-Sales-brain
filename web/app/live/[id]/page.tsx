@@ -6,7 +6,7 @@ import { vendor } from "@/lib/live/insight";
 import { getDeal, getMeeting, segments, type Card, type Meeting, type Segment, type Summary } from "@/lib/live/store";
 import { TopBar } from "@/components/TopBar";
 import { CallPills, Dot, QualBar, STATUS_LABEL, abandoned, clock, day, length, time } from "@/components/LiveBits";
-import { CopyButton, EndCall } from "@/components/LiveActions";
+import { CopyButton, DeleteCall, EndCall } from "@/components/LiveActions";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +62,11 @@ export default async function Call({ params }: { params: Promise<{ id: string }>
             <QualCard q={m.qualification} />
             <Cards cards={m.battlecards ?? []} />
             <After m={m} />
+            <section className="card lv-delete">
+              <h2>Delete</h2>
+              <p className="lv-note">Removes the call and its transcript{deal ? `, and the ${deal.company} deal if it has no other calls` : ""}.</p>
+              <DeleteCall id={m.id} />
+            </section>
           </aside>
           <Transcript segs={segs} live={m.status === "live"} />
         </div>

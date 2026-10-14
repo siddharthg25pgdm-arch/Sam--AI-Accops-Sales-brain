@@ -533,6 +533,8 @@ tr.muted td { color: var(--ink-3); }
 .lv-end { display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .lv-end .btn-accent { margin-top: 0; }
 .lv-err { color: var(--bad-ink); font-size: 13px; }
+.btn-line.lv-danger { color: var(--bad-ink) !important; }
+.lv-delete .lv-end { font-size: 13px; }
 
 .lv-cols { display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-rows: auto 1fr; grid-template-areas: "main side" "tx side"; gap: 0 20px; align-items: start; }
 .lv-main { grid-area: main; min-width: 0; } .lv-side { grid-area: side; min-width: 0; } .lv-tx { grid-area: tx; min-width: 0; }

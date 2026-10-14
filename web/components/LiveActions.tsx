@@ -31,3 +31,24 @@ export function EndCall({ id }: { id: string }) {
     </span>
   );
 }
+
+/** Deletes the call, its transcript and, when no other call is on it, its deal. Asks once, then goes to /live. */
+export function DeleteCall({ id }: { id: string }) {
+  const [asking, setAsking] = useState(false), [busy, setBusy] = useState(false), [err, setErr] = useState<string | null>(null);
+  const router = useRouter();
+  if (!asking) return <button type="button" className="btn-line lv-danger" onClick={() => setAsking(true)}>Delete call</button>;
+  return (
+    <span className="lv-end" role="group" aria-label="Confirm delete">
+      <span>Delete this call and its transcript? This cannot be undone.</span>
+      <button type="button" className="btn-line lv-danger" disabled={busy} autoFocus onClick={async () => {
+        setBusy(true); setErr(null);
+        const r = await fetch(`/api/live/meetings/${id}`, { method: "DELETE" });
+        if (!r.ok) { setBusy(false); setErr((await r.json().catch(() => ({}))).error ?? "That did not work. Try again."); return; }
+        router.push("/live");
+        router.refresh();
+      }}>{busy ? "Deleting…" : "Delete"}</button>
+      <button type="button" className="btn-line" disabled={busy} onClick={() => setAsking(false)}>Cancel</button>
+      {err && <span className="lv-err" role="alert">{err}</span>}
+    </span>
+  );
+}

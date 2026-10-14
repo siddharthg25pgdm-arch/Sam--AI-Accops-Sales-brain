@@ -40,7 +40,7 @@ async function checkLive() {
     const got = await ids(l.p);
     return { model: label(l), base_url: l.p.base, key: `...${l.p.key.slice(-4)}`, ...(typeof got === "string" ? { models_error: got } : { available: got.has(l.model) }) };
   }));
-  return { mock: mockOn(), stt: await job("stt"), insight: await job("insight"), summary: await job("summary") };
+  return { mock: mockOn(), stt: await job("stt"), insight: await job("insight"), summary: await job("summary"), assist: await job("assist"), web: await job("web") };
 }
 
 async function check(t: Tier) {

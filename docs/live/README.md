@@ -19,6 +19,7 @@ each falls back to SAM's Groq tier. `GET /api/v1/provider` (admin) shows the `li
 
 From `web/`: `node scripts/checks.mjs` (includes `live.check`), `node scripts/live-smoke.mjs` (whole HTTP contract
 against a running server, cleans up after itself; `LIVE_MOCK=1` on `next dev` needs no model keys).
+`node scripts/live-assist-smoke.mjs` (assist, echo de-duplication and delete; real providers, cleans up after itself).
 
 From `desktop/` (unset `ELECTRON_RUN_AS_NODE` first if your terminal sets it):
 - `npm run check`: VAD/WAV, upload queue, meeting watcher
@@ -43,7 +44,7 @@ summary reaches them; until then it goes to `LIVE_FALLBACK_EMAIL`.
 
 ## Known limits
 
-- Use a headset: on speakers the laptop mic also hears the customer, so their words appear twice.
+- Use a headset: on speakers the laptop mic also hears the customer. The server drops a rep line that repeats a customer line within 4 s, but a clipped echo can still slip through.
 - Everything the PC plays counts as the customer (notifications, videos).
 - Answers shorter than ~0.6 s of speech are not sent ("yes" alone won't appear).
 - Not built yet: CRM write-back (Zoho/GHL), calendar auto-start, macOS, code signing, a question-template editor.

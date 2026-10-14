@@ -7,12 +7,11 @@ raises a competitor, objection or question. After the call: summary + follow-up 
 to the rep and a lead row added to a sheet (Power Automate), everything stored in the Accops brain
 (Supabase) and visible on a `/live` dashboard inside SAM.
 
-**Why build it (Siddharth, 14 Oct):** convverse.ai does live call guidance but does not run on
-Windows (Accops reps are on Windows), knows nothing about Accops products, does not feed SAM or our
+**Why build it (Siddharth, 14 Oct):** convverse.ai does live call guidance but doesn't work reliably on
+Accops' Windows laptops, knows nothing about Accops products, does not feed SAM or our
 Supabase, and has no dashboard/tracking or post-call automation we control. Internal tool only.
 
-**Clean-room note:** built from Siddharth's requirements and convverse's *public* feature list. The
-confidential security-review deck convverse shared with Accops IT and their installer were NOT used.
+**Sources:** v1 was built from Siddharth's requirements and public information.
 
 ## Decisions (made by Claude under the build-it-end-to-end instruction; change any of them)
 
@@ -32,8 +31,8 @@ confidential security-review deck convverse shared with Accops IT and their inst
 | 12 | Qualification framework = Accops-tuned list in code (`lib/live/framework.ts`) | No template editor until someone needs to change it |
 
 **Not in v1 (add when asked):** template editor UI, CRM (Zoho/GHL) write-back, auto meeting join/calendar, macOS build,
-code signing (installer shows a SmartScreen "unknown publisher" warning), mic/loopback echo de-duplication when the rep
-uses speakers instead of a headset.
+code signing (installer shows a SmartScreen "unknown publisher" warning). When the rep uses speakers, the server also
+drops the rep-channel copy of the customer's words (echo de-duplication, see the audio route below).
 
 ## Qualification framework (v1)
 
@@ -58,9 +57,11 @@ Each field: `{ status: "open" | "partial" | "done", value: string, evidence: str
 | `POST /api/live/login` | `{id, password}` | `{token, user:{id,admin}}` · 401 wrong password · 400 missing field |
 | `GET /api/live/deals?q=` | | `{deals:[{id,company,contact_name,contact_email,last_meeting_at}]}` — the caller's own deals |
 | `POST /api/live/meetings` | `{deal_id?} \| {company, contact_name?, contact_email?, contact_title?}`, `title?` | `{meeting:{id,deal_id,title,started_at,qualification}, framework:[{key,label,hint}]}` (qualification is carried over from the deal's previous meeting; a company name lands on the rep's existing deal of that name, any case) · 404 a `deal_id` that is not yours |
-| `POST /api/live/meetings/:id/audio?channel=rep\|customer&t_ms=&duration_ms=` | raw `audio/wav` body (≤ 4 MB) | `{segment:{id,channel,t_ms,text,model} \| null, insight?: Insight}` — `insight` only when one ran; `segment: null` = nothing worth keeping (silence hallucination). The same `channel` + `t_ms` again returns the stored segment (safe to retry) · 400 bad `channel`/`t_ms` · 409 call ended · 413 too big · 415 not a WAV · 502 STT failed, retry · 503 STT not configured |
+| `POST /api/live/meetings/:id/audio?channel=rep\|customer&t_ms=&duration_ms=` | raw `audio/wav` body (≤ 4 MB) | `{segment:{id,channel,t_ms,text,model} \| null, dropped?: "echo", removed_segment_ids?: number[], insight?: Insight}` — `insight` only when one ran; `segment: null` = nothing worth keeping (silence hallucination), and with `dropped: "echo"` = a rep utterance that was the customer's speech picked up by the mic (rep text within the customer's, or token Jaccard ≥ 0.6, within ±4 s; texts under 3 tokens never match); `removed_segment_ids` (customer uploads, only when non-empty) = rep segments this customer utterance showed to be such echoes, now deleted: drop them from the screen. The same `channel` + `t_ms` again returns the stored segment (safe to retry) · 400 bad `channel`/`t_ms` · 409 call ended · 413 too big · 415 not a WAV · 502 STT failed, retry · 503 STT not configured |
 | `GET /api/live/meetings/:id` | | `{meeting:{...every live_meetings column, deal:{...live_deals row} \| null}, segments:[{id,channel,t_ms,duration_ms,text}], framework}` (dashboard and desktop reconnect) |
 | `POST /api/live/meetings/:id/end` | | `{summary: Summary, flow_status}` · a second End returns the first summary (the flow runs once) · 502 summarising failed: the call stays live, press End again · 503 no model configured |
+| `POST /api/live/meetings/:id/assist` | `{question?}` (≤ 300 chars) | No question, `mode:"next"` ("What do I say next?", ≤ ~11 s): `{mode, say:{line, intent:"discovery"\|"objection"\|"advance"\|"clarify"\|"rapport", why /* ≤ 15 words */}, cards:[Card] /* ≤ 2, for the customer's last utterance */, web:null, model}`. With a question, `mode:"search"` (≤ ~24 s): `{mode, cards:[Card] /* ≤ 3, SAM collateral */, web:{answer /* ≤ 80 words */, sources:[{title,url}] /* ≤ 3 */, unverified:true} \| null, model}` — `web` only when SAM has no good match (a card naming every vendor/product/regulation asked about and at least half the question's topic words) or the question is about fresh outside facts (news, announcements, this year…), and only with `LIVE_OPENAI_API_KEY`; show it as unverified web content. `model`: `provider:model` of the line or web answer, `"sam"` = collateral only, `"none"` = no model answered and `say` is the framework's question for the first open field, `"mock"` · 409 call ended · 502 failed |
+| `DELETE /api/live/meetings/:id` | | `{deleted: id, deal_deleted: boolean}` — the call and its transcript; its deal too when no other call is on it. Dashboard: "Delete call" on `/live/[id]`, confirm, back to `/live` |
 
 Every meeting route answers 404 unless the caller owns the meeting or is an admin. `model` values read
 `provider:model`, e.g. `openai:gpt-transcribe`, `groq:openai/gpt-oss-20b`, or `mock`.
@@ -68,6 +69,12 @@ Every meeting route answers 404 unless the caller owns the meeting or is an admi
 `Insight = { qualification: Record<key, Field>, ask_next: [{key, question, why}] (≤3), battlecards: [{trigger, title, brief, link, shareable}] (≤3), alerts: string[], model }`
 
 `Summary = { overview, pains[], qualification: Record<key, Field>, objections[], competitors[], next_steps[], follow_up_email:{subject, body}, deal_score 0-100, risks[], model }`
+
+`Card = { trigger, title, brief, link, shareable }` (the battlecard shape, also used by assist).
+
+Assist models: "next" uses the insight chain (`LIVE_INSIGHT_MODEL`, default `gpt-5.4-mini`, then Groq `gpt-oss-20b`);
+"search" calls `POST {LIVE_OPENAI_BASE_URL}/responses` with `tools:[{type:"web_search"}]`, model `LIVE_ASSIST_WEB_MODEL`
+(default `gpt-5.4-mini`), no fallback. `GET /api/v1/provider` reports both chains (`assist`, `web`).
 
 Battlecards: the insight model names `customer_questions[]`, `competitors[]`, `objections[]`; the server runs SAM's
 `searchAssets` for each and returns battlecards, datasheets, case studies or whitepapers only (decks are too long to
@@ -104,10 +111,11 @@ Server URL default `https://sam-accops.vercel.app`, overridable in settings. Pac
 
 - `web/lib/live.check.mjs` (SAM convention, run with node; `node scripts/checks.mjs` runs it with the rest): framework
   merge, hallucination filter, insight JSON parsing and repair, ask-next, cards, placeholders, flow payload, provider
-  order and fallback, mock gating, bearer tokens. The desktop's VAD/WAV encoder checks live with the desktop app.
+  order and fallback, mock gating, bearer tokens, echo matching, assist shaping, delete authorisation. The desktop's VAD/WAV encoder checks live with the desktop app.
 - `LIVE_MOCK=1` makes STT and LLM deterministic so the whole desktop → API → Supabase → dashboard path runs locally
   with no model key; a scripted test plays a WAV fixture through the client pipeline. `web/scripts/live-smoke.mjs`
   drives the whole HTTP contract against a running server (mock, or real speech with `--wavs`), screenshots with
-  `--shots`, and deletes what it created.
+  `--shots`, and deletes what it created. `web/scripts/live-assist-smoke.mjs` (real providers, Windows speech synthesis)
+  covers assist next and search, echo drop and removal, and delete.
 - Real-provider check after deploy: `GET /api/v1/provider` reports `live`: each job's models in the order tried and
   whether each exists for its key (`/models`, no audio sent).

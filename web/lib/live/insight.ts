@@ -1,7 +1,7 @@
 /** The live insight: after a stored utterance, at most once per 12 s per meeting, read the transcript tail,
  *  move the qualification forward, suggest what to ask next, and pull collateral for what the customer
  *  raised. Fails quietly: an insight is a bonus on top of the transcript, never a reason to lose it. */
-import { searchAssets, assetLink, describe, typeGroup, trustNote, namedEntities, mentions, ENTITIES } from "../cards";
+import { searchAssets, assetLink, describe, typeGroup, trustNote, namedEntities, mentions, ENTITIES, type Asset } from "../cards";
 import { ready } from "../registry-cache";
 import { redact } from "../redact";
 import { FRAMEWORK, KEYS, COMPETITORS, field, merge, cueOf, type Qualification } from "./framework";
@@ -96,6 +96,16 @@ export function triggers(r: { competitors: string[]; customer_questions: string[
   ];
 }
 
+/** SAM's collateral search for `query`, keeping only what is usable mid-call: one of the PREFER types,
+ *  with a link, not expired. In search order. Call after ready(). */
+export function usableHits(query: string, limit = 8): Asset[] {
+  return searchAssets({ query, limit }).results.map(h => h.asset)
+    .filter(a => assetLink(a) && PREFER.competitor.includes(typeGroup(a)) && !/^EXPIRED/.test(trustNote(a) ?? ""));
+}
+
+/** An asset as the card the desktop shows: public link when one exists (shareable), else the internal one. */
+export const toCard = (trigger: string, a: Asset): Card => ({ trigger, title: a.title, brief: describe(a), link: assetLink(a), shareable: Boolean(a.public_url) });
+
 /** Up to three cards for what the customer raised, from SAM's own collateral search (in process): the
  *  preferred type among the matches (PREFER), public link when one exists, else the internal one. Never
  *  a card, or a trigger, already shown in this meeting; never an expired document; no card for a
@@ -109,11 +119,11 @@ export async function cardsFor(ts: Trigger[], shown: Card[]): Promise<Card[]> {
     if (out.length >= 3) break;
     if (seen.has(`t:${t.text.toLowerCase()}`)) continue;
     if (t.kind === "competitor" && [...shown, ...out].some(c => mentions(c.title, t.text))) continue;
-    const hits = searchAssets({ query: t.kind === "competitor" ? `${t.text} battlecard` : t.text, limit: 8 }).results.map(h => h.asset)
-      .filter(a => assetLink(a) && !seen.has(a.title.toLowerCase()) && !seen.has(assetLink(a)!.toLowerCase()) && !/^EXPIRED/.test(trustNote(a) ?? ""));
+    const hits = usableHits(t.kind === "competitor" ? `${t.text} battlecard` : t.text)
+      .filter(a => !seen.has(a.title.toLowerCase()) && !seen.has(assetLink(a)!.toLowerCase()));
     const a = PREFER[t.kind].map(type => hits.find(h => typeGroup(h) === type)).find(Boolean);
     if (!a) continue;
-    const card: Card = { trigger: t.text, title: a.title, brief: describe(a), link: assetLink(a), shareable: Boolean(a.public_url) };
+    const card = toCard(t.text, a);
     out.push(card);
     for (const s of [card.title, card.link ?? "", `t:${card.trigger}`]) if (s) seen.add(s.toLowerCase());
   }

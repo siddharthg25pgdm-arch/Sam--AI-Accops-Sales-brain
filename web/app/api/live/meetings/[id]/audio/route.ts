@@ -1,7 +1,8 @@
 import { ownMeeting } from "@/lib/live/access";
 import { maybeInsight } from "@/lib/live/insight";
 import { NoModel } from "@/lib/live/llm";
-import { addSegment, findSegment } from "@/lib/live/store";
+import { ECHO_WINDOW_MS, isEcho } from "@/lib/live/echo";
+import { addSegment, deleteSegments, findSegment, segmentsBetween } from "@/lib/live/store";
 import { clean, transcribe } from "@/lib/live/stt";
 import { redact } from "@/lib/redact";
 
@@ -13,9 +14,12 @@ const int = (v: string | null) => (v !== null && /^\d{1,9}$/.test(v) ? Number(v)
 const isWav = (b: Uint8Array) => b.byteLength > 44 && new TextDecoder().decode(b.subarray(0, 4)) === "RIFF" && new TextDecoder().decode(b.subarray(8, 12)) === "WAVE";
 
 /** POST /api/live/meetings/:id/audio?channel=rep|customer&t_ms=&duration_ms=   body: one utterance, raw audio/wav
- *  -> {segment:{id, channel, t_ms, text, model} | null, insight?}. segment is null when nothing worth keeping
- *  was said; insight is present only when one ran. A failed insight never fails the upload. A retried
- *  upload (same channel and t_ms) gets the stored segment back without a second transcription. */
+ *  -> {segment:{id, channel, t_ms, text, model} | null, dropped?: "echo", removed_segment_ids?: number[], insight?}.
+ *  segment is null when nothing worth keeping was said; dropped:"echo" when a rep utterance is the customer's
+ *  speech picked up by the mic (lib/live/echo.ts); removed_segment_ids = rep segments a customer utterance
+ *  showed to be such echoes, now deleted. insight is present only when one ran. A failed insight never fails
+ *  the upload. A retried upload (same channel and t_ms) gets the stored segment back without a second
+ *  transcription. */
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const got = await ownMeeting(req, params);
   if (got instanceof Response) return got;
@@ -42,7 +46,19 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
   const text = clean(heard.text);
   if (!text) return Response.json({ segment: null });
+  // Store first, then look for echoes on the other channel: of a rep and a customer upload racing each
+  // other, whichever stores second sees the first.
   const seg = await addSegment({ meeting_id: m.id, channel, t_ms, duration_ms, text });
+  const other = channel === "rep" ? "customer" : "rep";
+  const near = (await segmentsBetween(m.id, other, t_ms - ECHO_WINDOW_MS - 16_000, t_ms + (duration_ms ?? 0) + ECHO_WINDOW_MS))
+    .filter(o => channel === "rep" ? isEcho(seg, o) : isEcho(o, seg));
+  if (channel === "rep" && near.length) {
+    await deleteSegments(m.id, [seg.id]);
+    return Response.json({ segment: null, dropped: "echo" });
+  }
+  const removed = near.map(o => o.id);
+  await deleteSegments(m.id, removed);
   const insight = await maybeInsight(m.id);
-  return Response.json({ segment: { id: seg.id, channel: seg.channel, t_ms: seg.t_ms, text: seg.text, model: heard.model }, ...(insight ? { insight } : {}) });
+  return Response.json({ segment: { id: seg.id, channel: seg.channel, t_ms: seg.t_ms, text: seg.text, model: heard.model },
+    ...(removed.length ? { removed_segment_ids: removed } : {}), ...(insight ? { insight } : {}) });
 }

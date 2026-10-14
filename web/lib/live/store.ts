@@ -145,6 +145,27 @@ export async function addSegment(s: { meeting_id: string; channel: Channel; t_ms
   return one(await db<Segment[]>("live_segments?select=id,channel,t_ms,duration_ms,text", { method: "POST", body: JSON.stringify(s) }))!;
 }
 
+/** One channel's segments starting between `from` and `to` ms (the echo check's neighbours). */
+export async function segmentsBetween(meetingId: string, channel: Channel, from: number, to: number): Promise<Segment[]> {
+  return db<Segment[]>(`live_segments?meeting_id=eq.${meetingId}&channel=eq.${channel}&t_ms=gte.${Math.max(0, Math.floor(from))}&t_ms=lte.${Math.ceil(to)}`
+    + `&select=id,channel,t_ms,duration_ms,text&order=t_ms.asc&limit=50`);
+}
+
+export async function deleteSegments(meetingId: string, ids: number[]): Promise<void> {
+  const list = ids.filter(Number.isInteger);
+  if (list.length) await db(`live_segments?meeting_id=eq.${meetingId}&id=in.(${list.join(",")})`, { method: "DELETE" });
+}
+
+/** Delete a meeting (its segments cascade), then its deal if no other meeting is on it. True when the deal went too. */
+export async function deleteMeeting(m: Pick<Meeting, "id" | "deal_id">): Promise<boolean> {
+  await db(`live_meetings?id=eq.${m.id}`, { method: "DELETE" });
+  if (!m.deal_id) return false;
+  const others = await db<{ id: string }[]>(`live_meetings?deal_id=eq.${m.deal_id}&select=id&limit=1`);
+  if (others.length) return false;
+  await db(`live_deals?id=eq.${m.deal_id}`, { method: "DELETE" });
+  return true;
+}
+
 /** A meeting's transcript in call order. `tail` = only the last n segments. Pages past PostgREST's
  *  1000-row cap, so a two-hour call is not silently cut short. */
 export async function segments(meetingId: string, tail = 0): Promise<Segment[]> {
