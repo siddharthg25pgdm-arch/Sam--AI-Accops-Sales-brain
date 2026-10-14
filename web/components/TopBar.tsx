@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
 
-export function TopBar({ user, current }: { user: { id: string; admin: boolean }; current: "home" | "admin" | "requests" | "live" }) {
+export function TopBar({ user, current }: { user: { id: string; admin: boolean }; current: "home" | "admin" | "requests" }) {
   return (
     <header className="topbar">
       <Link href="/" className="brand"><span className="mark" aria-hidden="true"><Logo /></span>SAM <span>Accops collateral</span></Link>
       <nav className="nav" aria-label="Main">
         <Link href="/" aria-current={current === "home" ? "page" : undefined}>Ask & browse</Link>
         <Link href="/requests" aria-current={current === "requests" ? "page" : undefined}><span className="long">Your requests</span><span className="short">Requests</span></Link>
-        <Link href="/live" aria-current={current === "live" ? "page" : undefined}>Live</Link>
+        <a href="https://sam-live-nine.vercel.app/live" title="SAM Live, the call copilot (separate app)">Live</a>
         {user.admin && <Link href="/admin" aria-current={current === "admin" ? "page" : undefined}>Dashboard</Link>}
         <form action="/api/logout" method="post"><button type="submit" title={`Signed in as ${user.id}`}>Sign out</button></form>
       </nav>
