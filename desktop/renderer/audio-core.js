@@ -36,12 +36,13 @@ export class Vad {
     this.level = -180;
   }
 
-  push(samples) {
+  // allow=false (the echo gate says "that is the call audio, not the rep") makes these frames count as silence.
+  push(samples, allow = true) {
     const out = [];
     for (let i = 0; i < samples.length;) {
       const n = Math.min(FRAME - this.fill, samples.length - i);
       this.buf.set(samples.subarray(i, i + n), this.fill); this.fill += n; i += n;
-      if (this.fill === FRAME) { const u = this.#frame(this.buf.slice()); this.fill = 0; if (u) out.push(u); }
+      if (this.fill === FRAME) { const u = this.#frame(this.buf.slice(), allow); this.fill = 0; if (u) out.push(u); }
     }
     return out;
   }
@@ -52,14 +53,15 @@ export class Vad {
     return u ? [u] : [];
   }
 
-  #frame(f) {
+  #frame(f, allow) {
     const k = this.k, db = rmsDb(f);
     let done = null;
     this.level = db;
     if (this.floor === null) this.floor = db;
-    const speech = db > Math.max(this.floor + k.marginDb, k.minDb);
-    // Floor falls fast, rises slowly, and barely moves mid-utterance so a long sentence can't raise it.
-    this.floor += (db - this.floor) * (db < this.floor ? 0.5 : this.cur ? 0.0005 : 0.02);
+    const speech = allow && db > Math.max(this.floor + k.marginDb, k.minDb);
+    // Floor falls fast, rises slowly, and barely moves mid-utterance so a long sentence can't raise it. Gated (echo)
+    // frames don't move it at all, so a long customer monologue can't push it up to the echo level.
+    if (allow) this.floor += (db - this.floor) * (db < this.floor ? 0.5 : this.cur ? 0.0005 : 0.02);
 
     if (!this.cur) {
       if (speech) this.cur = { frames: [...this.pre, f], start: this.pos - this.pre.length * FRAME, speech: 1, silence: 0 };
@@ -83,6 +85,89 @@ export class Vad {
     const samples = new Float32Array(keep * FRAME);
     for (let i = 0; i < keep; i++) samples.set(frames[i], i * FRAME);
     return { samples, startMs: start / RATE * 1000, durationMs: keep * 20, speechMs: speech * 20 };
+  }
+}
+
+// Echo gate calibration. Units are linear RMS ratios; the channel levels are per 20 ms frame.
+export const ECHO_GATE = {
+  ratio: 2.5,        // the rep counts only when the mic is this many times louder than the echo the call audio explains...
+  proveMs: 240,      // ...for this long (gaps up to gapMs between syllables allowed) while the call audio is playing
+  gapMs: 100,
+  hangMs: 300,       // once open, dips between words shorter than this don't close it
+  windowMs: 600,     // echo trails the call audio by up to this (speaker, room, device buffers)
+  loopDb: -50,       // call audio louder than this counts as playing
+  micDb: -50,        // mic quieter than this is room noise, never the rep
+  coupling: 1,       // speaker -> mic ratio assumed until it is learned
+  learnMin: 60,      // frames of customer-only audio before the learned coupling is used (1.2 s)
+  learnKeep: 250,    // the estimate follows the last 5 s of customer-only audio (volume changes, device swaps)
+  learnPct: 0.75,    // percentile of mic/call ratios taken as the coupling
+  minCoupling: 0.01, maxCoupling: 4,
+};
+
+const rms = x => { let s = 0; for (let i = 0; i < x.length; i++) s += x[i] * x[i]; return Math.sqrt(s / (x.length || 1)); };
+const dB = v => 20 * Math.log10(v + 1e-9);
+
+/** Decides, frame by frame, whether mic energy is the rep or just the call audio coming back through the speakers.
+ *  It learns how loud the speakers are in the mic while only the customer talks, and lets the rep VAD hear speech
+ *  only when the mic is clearly louder than that. With nothing playing it always says yes (the VAD decides). */
+export class EchoGate {
+  constructor(opts = {}) {
+    const k = this.k = { ...ECHO_GATE, ...opts };
+    this.ring = new Float32Array(Math.max(1, Math.round(k.windowMs / 20)));
+    this.prove = Math.round(k.proveMs / 20); this.hang = Math.round(k.hangMs / 20); this.gap = Math.round(k.gapMs / 20);
+    this.reset();
+  }
+  reset() {
+    this.ring.fill(0); this.i = 0; this.t = 0; this.run = 0; this.miss = 0; this.lastOpen = -Infinity;
+    this.ratios = []; this.coupling = this.k.coupling;
+  }
+  /** One 20 ms frame of (echo-cancelled) mic and call audio -> may the rep VAD count this frame as speech? */
+  push(mic, loop) {
+    const k = this.k, m = rms(mic);
+    this.ring[this.i++ % this.ring.length] = rms(loop);
+    const ref = Math.max(...this.ring), wasOpen = this.t - this.lastOpen <= this.hang;
+    this.t++;
+    const loud = dB(m) > k.micDb;
+    if (dB(ref) <= k.loopDb) { // nothing playing: no echo to explain
+      this.run = 0;
+      if (loud) this.lastOpen = this.t;
+      return true;
+    }
+    const above = loud && m > k.ratio * this.coupling * ref;
+    if (above) { this.run++; this.miss = 0; } else if (++this.miss > this.gap) this.run = 0;
+    if (above && (wasOpen || this.run >= this.prove)) this.lastOpen = this.t;
+    const open = this.t - this.lastOpen <= this.hang;
+    if (!open && m > 1e-5) this.#learn(m / ref); // muted mic (exact zeros) must not teach "the speakers are silent"
+    return open;
+  }
+  #learn(r) {
+    const k = this.k;
+    this.ratios.push(r);
+    if (this.ratios.length > k.learnKeep) this.ratios.shift();
+    if (this.ratios.length < k.learnMin) return;
+    const sorted = [...this.ratios].sort((a, b) => a - b);
+    this.coupling = Math.min(k.maxCoupling, Math.max(k.minCoupling, sorted[Math.floor(k.learnPct * (sorted.length - 1))]));
+  }
+}
+
+// "The call is silent but you are talking": the call app is probably playing to another device than Windows' default.
+export const HEALTH = { afterMs: 20000, loopDb: -60, micDb: -45, micSpeechMs: 2000 };
+// Phone Link: no call audio 10 s in means the phone is probably playing the call itself (or on speaker).
+export const HEALTH_PHONE_LINK = { afterMs: 10000, micSpeechMs: 0 };
+
+export class CallHealth {
+  constructor(opts = {}) { this.k = { ...HEALTH, ...opts }; this.silent = false; this.reset(); }
+  reset() { this.ms = 0; this.heard = false; this.micMs = 0; }
+  /** One 20 ms frame's levels (dBFS). Returns true/false when the warning should show/hide, null when nothing changed. */
+  push(micDb, loopDb) {
+    const k = this.k;
+    this.ms += 20;
+    if (loopDb > k.loopDb) this.heard = true;
+    if (micDb > k.micDb) this.micMs += 20;
+    const s = !this.heard && this.ms >= k.afterMs && this.micMs >= k.micSpeechMs;
+    if (s === this.silent) return null;
+    this.silent = s;
+    return s;
   }
 }
 

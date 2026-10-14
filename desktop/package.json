@@ -11,9 +11,10 @@
     "start": "electron .",
     "stub": "node scripts/stub-server.mjs",
     "icon": "node scripts/make-icon.mjs",
-    "check": "node test/audio-core.check.mjs && node test/uploader.check.mjs && node test/watcher.check.mjs",
+    "check": "node test/audio-core.check.mjs && node test/echo.check.mjs && node test/uploader.check.mjs && node test/watcher.check.mjs && node test/log.check.mjs",
     "test:ui": "node test/ui.check.mjs",
     "test:loopback": "node test/loopback.check.mjs",
+    "test:aec": "node test/aec.check.mjs",
     "test:notify": "node test/notify.check.mjs",
     "dist": "npm run icon && electron-builder --win nsis"
   },
@@ -23,6 +24,7 @@
     "files": [
       "main.js",
       "preload.cjs",
+      "capture-preload.cjs",
       "lib/**",
       "renderer/**",
       "assets/**",
@@ -51,5 +53,8 @@
     "electron": "^44.7.1",
     "electron-builder": "^26.15.3",
     "playwright-core": "^1.64.0"
+  },
+  "dependencies": {
+    "@ennuicastr/webrtcaec3.js": "0.3.0"
   }
 }

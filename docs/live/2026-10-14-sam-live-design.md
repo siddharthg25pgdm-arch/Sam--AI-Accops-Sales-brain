@@ -111,14 +111,23 @@ Phase 2 (14 Oct):
   `SAM_LIVE_ECHO=aec3|browser+gate|browser` forces a mode for tests.
 - **Invisible mode** (default on, Settings): `setContentProtection(true)` keeps the overlay out of screen shares and
   recordings. In a remote session (VDI/RDP) it is left capturable so the rep can still see it.
-- **"Can't hear the call"** banner: no call audio at all 20 s into a call while the mic hears ≥ 2 s of speech.
+- **"Can't hear the call"** banner: no call audio at all 20 s into a call while the mic hears ≥ 2 s of speech. On a
+  Phone Link call: no call audio 10 s in → points the rep at Phone Link's "Use your PC for call audio".
 - **Mic hot-swap**: on `devicechange`, a track ending, or a new Windows default mic, the mic is re-acquired (5 tries,
   500 ms apart) into the same worklet input; the call carries on.
 - **Call detection** (`lib/watcher.js`) replaces the `tasklist` watcher: one `reg query /s` of the microphone
   consent store every 3 s; an entry with `LastUsedTimeStop == 0` is on the mic now (SAM Live's own exe excluded).
-  A meeting app (Teams classic/new, Zoom, Webex, WhatsApp, Slack, browsers) taking the mic with no call running →
-  notification "Call started in <app>. Start SAM Live?". During a call, all meeting apps off the mic for 15 s → "Call
-  ended?" (End & summarise / Keep listening); unanswered, still off the mic and silent for 5 min → ends itself.
+  Platforms: `phone-link` (Microsoft Phone Link, MSIX family `Microsoft.YourPhone_8wekyb3d8bbwe`, for cold calls from
+  the rep's phone), `teams` (classic + new), `zoom`, `webex`, `whatsapp`, `slack`, and browsers (`meet` when a window
+  title says Meet, else `browser`).
+- **Auto mode** (Settings, default on): a meeting or Phone Link call taking the mic with no call running starts a call
+  at once (`POST /meetings {platform, auto_started: true}`, no form) and shows the overlay without stealing focus; a
+  "Who's this?" chip saves company/contact with `PATCH /meetings/:id`. When the app lets go of the mic a 15 s "Ending
+  in N s · Keep listening" countdown runs, then the call ends and is summarised; the Ended screen shows the company the
+  summary detected when nobody named it. A plain browser on the mic (not Meet) only gets the notification.
+- **Manual mode**: notification "Call started in <app>. Start SAM Live?"; during a call, all meeting apps off the mic
+  for 15 s → "Call ended?" (End & summarise / Keep listening); unanswered, still off the mic and silent for 5 min →
+  ends itself.
 - **Connection pill** (green/yellow/red) from upload round trip and queue depth (`QUALITY`); worse shows at once,
   green only after 30 s of calm.
 - **Assist**: "What do I say next?" (3 s cooldown, disabled when red) and "Ask SAM…" search (SAM cards, then the web

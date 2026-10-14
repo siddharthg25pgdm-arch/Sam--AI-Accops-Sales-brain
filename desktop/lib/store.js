@@ -3,7 +3,7 @@ import { app, safeStorage } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const DEFAULTS = { server: 'https://sam-accops.vercel.app', opacity: 1, bounds: null, user: null };
+const DEFAULTS = { server: 'https://sam-accops.vercel.app', opacity: 1, bounds: null, user: null, invisible: true, auto: true };
 const file = name => path.join(app.getPath('userData'), name);
 
 export function settings() {

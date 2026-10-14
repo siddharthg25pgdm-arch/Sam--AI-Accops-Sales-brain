@@ -24,11 +24,14 @@ against a running server, cleans up after itself; `LIVE_MOCK=1` on `next dev` ne
 From `desktop/` (unset `ELECTRON_RUN_AS_NODE` first if your terminal sets it):
 - `npm run check`: VAD/WAV, AEC3 + echo gate + call-audio health, upload queue + connection pill, mic-registry call
   detection, log rotation
-- `node test/ui.check.mjs`: every screen against the stub server (60 assertions)
+- `node test/ui.check.mjs`: every screen against the stub server (70 assertions), incl. auto mode (Phone Link
+  auto start, "Who's this?" PATCH, auto end)
 - `node test/loopback.check.mjs`: real Windows system-audio capture, plays speech out loud
 - `node test/aec.check.mjs`: real echo test. Plays a customer out loud with the mic ON and counts rep-channel echo
   uploads per echo mode (Chromium only / gate only / AEC3 + gate). Keep the room quiet; speakers on, no headset.
-- `node test/notify.check.mjs`: call detection through main with a fake registry file (`SAM_LIVE_FAKE_REG`)
+- `node test/notify.check.mjs`: call detection through main with a fake registry file (`SAM_LIVE_FAKE_REG`): manual
+  notification + "Call ended?", then auto mode start/end on a Phone Link call. The other tests point
+  `SAM_LIVE_FAKE_REG` at an empty file so a real call on the test PC can't start calls in them.
 - `node test/e2e-real.check.mjs`: the packaged app against a real SAM server and real models (needs
   `SAM_LIVE_E2E_ID`/`SAM_LIVE_E2E_PW`). It creates a test call ("E2E Northwind Co-op Bank …"). Delete it afterwards
   (`is_test` rows), and remove the flow's sheet row with `clean_live_calls.py`.

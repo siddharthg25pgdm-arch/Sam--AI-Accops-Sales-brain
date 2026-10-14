@@ -3,11 +3,12 @@
 const PERMANENT = new Set([400, 403, 404, 409, 410, 413, 415, 422]);
 const MAX_QUEUE = 200; // ponytail: memory only (~100 MB worst case per channel); persist to disk if reps lose whole calls offline
 
-export function createUploader({ send, onResult, onStatus = () => {}, sleep = ms => new Promise(r => setTimeout(r, ms)) }) {
+export function createUploader({ send, onResult, onStatus = () => {}, sleep = ms => new Promise(r => setTimeout(r, ms)), now = Date.now }) {
   const q = { rep: [], customer: [] }, busy = { rep: false, customer: false }, fails = { rep: 0, customer: 0 };
   let auth = false, dropped = 0;
   const pending = () => q.rep.length + q.customer.length;
-  const report = () => onStatus({ pending: pending(), failing: fails.rep + fails.customer > 0, auth, dropped });
+  // rttMs: only on the report right after an upload succeeded, so a slow one counts once and then ages out.
+  const report = rttMs => onStatus({ pending: pending(), failing: fails.rep + fails.customer > 0, auth, dropped, rttMs });
 
   async function pump(ch) {
     if (busy[ch]) return;
@@ -15,11 +16,12 @@ export function createUploader({ send, onResult, onStatus = () => {}, sleep = ms
     while (q[ch].length) {
       const item = q[ch][0];
       let r;
+      const t0 = now();
       try { r = await send(item); } catch { r = { ok: false, status: 0 }; }
       if (r.ok || PERMANENT.has(r.status)) {
         q[ch].shift(); fails[ch] = 0;
         if (r.ok) { auth = false; onResult(r.data, item); } else dropped++;
-        report(); continue;
+        report(r.ok ? now() - t0 : undefined); continue;
       }
       auth = r.status === 401;
       fails[ch]++; report();
@@ -42,5 +44,26 @@ export function createUploader({ send, onResult, onStatus = () => {}, sleep = ms
       while (pending() && Date.now() < end) await new Promise(r => setTimeout(r, 100));
       return pending();
     },
+  };
+}
+
+// Connection quality for the header pill. An upload's round trip includes speech-to-text (and sometimes the live
+// insight) on the server, so a healthy one already takes a few seconds.
+export const QUALITY = {
+  yellowRttMs: 8000, redRttMs: 20000,  // round trip of one clip
+  yellowQueue: 3, redQueue: 8,         // clips waiting
+  calmMs: 30000,                       // after any trouble, stay yellow this long before going green again
+};
+
+/** Worse shows at once; red drops to yellow as soon as the cause clears, yellow to green only after calmMs of calm. */
+export function createQuality(k = QUALITY) {
+  let red = false, lastBad = -Infinity;
+  return {
+    note({ pending = 0, failing = false, auth = false, rttMs } = {}, t = Date.now()) {
+      red = failing || auth || pending >= k.redQueue || rttMs >= k.redRttMs;
+      if (red || pending >= k.yellowQueue || rttMs >= k.yellowRttMs) lastBad = t;
+      return this.level(t);
+    },
+    level(t = Date.now()) { return red ? 'red' : t - lastBad < k.calmMs ? 'yellow' : 'green'; },
   };
 }
