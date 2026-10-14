@@ -1,7 +1,7 @@
 /** Server-rendered pieces shared by the /live pages. No client JS. */
 import Link from "next/link";
 import { FRAMEWORK, field, progress, type Qualification, type Status } from "@/lib/live/framework";
-import type { MeetingRow } from "@/lib/live/store";
+import { PLATFORM_LABEL, type MeetingRow } from "@/lib/live/store";
 
 const IST = "Asia/Kolkata";
 export const when = (iso: string) => new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: IST });
@@ -41,9 +41,14 @@ export function Dot({ s, title }: { s: Status; title?: string }) {
   return <span className="lv-dot" data-s={s} role="img" aria-label={STATUS_LABEL[s]} title={title} />;
 }
 
-export function CallPills({ m }: { m: Pick<MeetingRow, "status" | "started_at" | "is_test"> }) {
+/** What a call with no deal yet is called: the desktop app started it on its own and nobody named the company. */
+export const UNKNOWN_CALLER = "Unknown caller";
+
+export function CallPills({ m }: { m: Pick<MeetingRow, "status" | "started_at" | "is_test" | "platform" | "auto_started"> }) {
   return (
     <>
+      {m.platform && <span className="lv-plat">{PLATFORM_LABEL[m.platform] ?? m.platform}</span>}
+      {m.auto_started && <span className="pill" title="Started by SAM Live when a call app took the microphone">Auto</span>}
       {m.status === "live" && (abandoned(m) ? <span className="pill warn">Not ended</span> : <span className="pill good">Live</span>)}
       {m.is_test && <span className="pill">Test</span>}
     </>
@@ -62,7 +67,7 @@ export function CallList({ rows, owner, me }: { rows: MeetingRow[]; owner?: bool
         const body = (
           <>
             <div className="lv-call-main">
-              <div className="lv-call-title"><b>{m.deal?.company ?? m.title ?? "Untitled call"}</b><CallPills m={m} /></div>
+              <div className="lv-call-title"><b>{m.deal?.company ?? m.title ?? UNKNOWN_CALLER}</b><CallPills m={m} /></div>
               <p className="subline">
                 {[who, m.title && m.deal ? m.title : "", when(m.started_at), length(m), owner ? m.owner : ""].filter(Boolean).join(" · ")}
               </p>

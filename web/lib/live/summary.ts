@@ -4,12 +4,13 @@ import { FRAMEWORK, KEYS, field, merge, progress, type Qualification } from "./f
 import { verbatim } from "./insight";
 import { chatJSON, firstAnswer, legs, parseJSON, strings } from "./llm";
 import { mockOn, mockSummaryReply } from "./mock";
-import { transcript, type Deal, type Meeting, type Segment, type Summary } from "./store";
+import { transcript, type Deal, type Detected, type Meeting, type Segment, type Summary } from "./store";
 
 const SYSTEM = `You write the after-call summary for an Accops sales rep. Accops sells HySecure (ZTNA, secure remote access), HyWorks (VDI and DaaS), HyID (MFA and SSO), HyLabs (virtual labs), HyDesk thin clients and Browser Isolation.
 In the transcript "Accops" is the rep and "Customer" is the customer. Use only what was said. Never invent facts, numbers, prices, dates, product capabilities or commitments.
 Return JSON only, with exactly these keys:
-{"overview":"","pains":[],"qualification":{"<key>":{"status":"open|partial|done","value":"","evidence":""}},"objections":[],"competitors":[],"next_steps":[],"follow_up_email":{"subject":"","body":""},"deal_score":0,"risks":[]}
+{"overview":"","detected":{"company":"","contact_name":"","contact_title":""},"pains":[],"qualification":{"<key>":{"status":"open|partial|done","value":"","evidence":""}},"objections":[],"competitors":[],"next_steps":[],"follow_up_email":{"subject":"","body":""},"deal_score":0,"risks":[]}
+- detected: the customer's organisation, and the name and job title of the person the rep spoke with, exactly as said in the call (e.g. "this is Priya from Sunrise Cooperative Bank" -> company "Sunrise Cooperative Bank", contact_name "Priya"). "" for anything not said. Never guess from context, an email domain or the Company line below.
 - overview: two or three sentences: who they are, what they need, where it stands.
 - pains, objections, risks: short plain sentences. competitors: every vendor the customer runs today or is evaluating, names only.
 - next_steps: the actions agreed, with owner and date only where they were said.
@@ -49,6 +50,19 @@ export function fillPlaceholders(s: string, who: Who): string {
 /** "siddharth.gupta" -> "Siddharth": how the follow-up email signs off. */
 export const firstName = (id: string) => (id.split(/[.\-_ @]/)[0] || id).replace(/^./, c => c.toUpperCase());
 
+/** Letters and digits only, lowercased: "Co-operative" and "cooperative" compare equal. */
+const squash = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
+const NONE: Detected = { company: "", contact_name: "", contact_title: "" };
+
+/** Who the customer said they are. A company or name that is not in the transcript (punctuation and case
+ *  aside) is a guess and comes back "". The title is kept as read: people state it loosely ("I run IT"). */
+export function readDetected(v: unknown, text: string): Detected {
+  const o = (v && typeof v === "object" ? v : {}) as Record<string, unknown>;
+  const said = (x: string) => (x && squash(text).includes(squash(x)) ? x : "");
+  const company = said(line(o.company, 160)), contact_name = said(line(o.contact_name, 120));
+  return { company, contact_name, contact_title: contact_name || company ? line(o.contact_title, 120) : "" };
+}
+
 /** A model reply -> a Summary, or null when it is not usable (no overview or no email body), so the next
  *  model gets a turn. The qualification never goes backwards from what the call already had. */
 export function readSummary(raw: string, prev: Qualification, text: string, who: Who): Summary | null {
@@ -66,6 +80,7 @@ export function readSummary(raw: string, prev: Qualification, text: string, who:
     overview, pains: strings(o.pains, 6, 300), qualification, objections: strings(o.objections, 6, 300), competitors: strings(o.competitors, 6, 80),
     next_steps: strings(o.next_steps, 6, 300), follow_up_email: { subject: fillPlaceholders(line(mail.subject, 160), who), body },
     deal_score: Number.isFinite(score) ? Math.min(100, Math.max(0, score)) : progress(qualification).pct, risks: strings(o.risks, 5, 300),
+    detected: readDetected(o.detected, text),
   };
 }
 
@@ -85,7 +100,7 @@ export async function summarise(m: Meeting, deal: Deal | null, segs: Segment[], 
   if (!text.trim()) {
     return { overview: "Nothing was transcribed on this call, so there is nothing to summarise. Check that SAM Live could hear both sides.",
       pains: [], qualification: merge(m.qualification, null), objections: [], competitors: [], next_steps: [],
-      follow_up_email: { subject: "", body: "" }, deal_score: progress(m.qualification).pct, risks: [], model: "none" };
+      follow_up_email: { subject: "", body: "" }, deal_score: progress(m.qualification).pct, risks: [], detected: NONE, model: "none" };
   }
   const who: Who = { contact: deal?.contact_name?.trim() || null, rep: firstName(m.owner), company: deal?.company ?? null };
   if (mockOn()) {

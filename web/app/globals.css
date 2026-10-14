@@ -533,6 +533,10 @@ tr.muted td { color: var(--ink-3); }
 .lv-end { display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .lv-end .btn-accent { margin-top: 0; }
 .lv-err { color: var(--bad-ink); font-size: 13px; }
+.lv-plat { font-size: 12px; font-weight: 600; color: var(--ink-3); margin-left: 6px; }
+.dash-sub .lv-plat { margin-left: 0; }
+.lv-edit { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; font-size: 13px; }
+.lv-edit input { font: inherit; font-size: 13px; padding: 5px 8px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface); color: var(--ink); min-width: 0; width: 180px; }
 .btn-line.lv-danger { color: var(--bad-ink) !important; }
 .lv-delete .lv-end { font-size: 13px; }
 

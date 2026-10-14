@@ -3,7 +3,7 @@ import Link from "next/link";
 import { currentUser } from "@/lib/auth";
 import { progress } from "@/lib/live/framework";
 import { vendor } from "@/lib/live/insight";
-import { listMeetings, teamMeetings, type TeamRow } from "@/lib/live/store";
+import { listMeetings, teamMeetings, PLATFORM_LABEL, type TeamRow } from "@/lib/live/store";
 import { TopBar } from "@/components/TopBar";
 import { CallList } from "@/components/LiveBits";
 
@@ -47,6 +47,7 @@ export default async function Live({ searchParams }: { searchParams: Promise<Rec
   const avg = ended.length ? Math.round(ended.reduce((n, r) => n + progress(r.qualification).pct, 0) / ended.length) : null;
   const rivals = top(ended, r => (r.competitors ?? []).map(c => vendor(c).trim()));
   const worries = top(ended, r => (r.objections ?? []).map(bucket));
+  const platforms = top(team, r => [r.platform ? PLATFORM_LABEL[r.platform] ?? r.platform : "Not recorded"], 4);
   const download = process.env.LIVE_DOWNLOAD_URL?.trim();
 
   return (
@@ -65,7 +66,7 @@ export default async function Live({ searchParams }: { searchParams: Promise<Rec
           </div>
         </header>
 
-        <section className="kpis four lv-team" aria-label="Team, last 30 days">
+        <section className="kpis five lv-team" aria-label="Team, last 30 days">
           <div className="kpi">
             <span className="kl">Calls this week</span>
             <b className="kv tnum">{week}</b>
@@ -83,6 +84,10 @@ export default async function Live({ searchParams }: { searchParams: Promise<Rec
           <div className="kpi">
             <span className="kl">Top objections</span>
             {worries.length ? <Ranked items={worries} /> : <b className="kv small muted">None raised yet</b>}
+          </div>
+          <div className="kpi">
+            <span className="kl">Calls by platform</span>
+            {platforms.length ? <Ranked items={platforms} /> : <b className="kv small muted">No calls yet</b>}
           </div>
         </section>
         <p className="note">Team figures cover the last 30 days{withTest ? " and include test calls." : " and leave out test calls."}</p>

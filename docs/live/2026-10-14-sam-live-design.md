@@ -45,8 +45,11 @@ Each field: `{ status: "open" | "partial" | "done", value: string, evidence: str
 ## Data model (`docs/live/supabase-live.sql`)
 
 - `live_deals` — id uuid, owner, company, contact_name, contact_email, contact_title, notes, created_at, updated_at.
-- `live_meetings` — id uuid, deal_id → live_deals, owner, title, status (`live`|`ended`), started_at, ended_at,
-  qualification jsonb, suggestions jsonb, battlecards jsonb, summary jsonb, flow_status text, last_insight_at, is_test.
+- `live_meetings` — id uuid, deal_id → live_deals (null until the company is known), owner, title, status (`live`|`ended`),
+  started_at, ended_at, qualification jsonb, suggestions jsonb, battlecards jsonb, summary jsonb, flow_status text,
+  last_insight_at, is_test, platform text (`phone-link`|`teams`|`zoom`|`meet`|`whatsapp`|`webex`|`slack`|`browser`|`manual`,
+  null when unknown), auto_started boolean not null default false (the desktop app started the call itself when a call
+  app took the microphone).
 - `live_segments` — id bigserial, meeting_id → live_meetings (cascade), channel (`rep`|`customer`), t_ms (offset from
   start), duration_ms, text, created_at.
 
@@ -56,10 +59,11 @@ Each field: `{ status: "open" | "partial" | "done", value: string, evidence: str
 |---|---|---|
 | `POST /api/live/login` | `{id, password}` | `{token, user:{id,admin}}` · 401 wrong password · 400 missing field |
 | `GET /api/live/deals?q=` | | `{deals:[{id,company,contact_name,contact_email,last_meeting_at}]}` — the caller's own deals |
-| `POST /api/live/meetings` | `{deal_id?} \| {company, contact_name?, contact_email?, contact_title?}`, `title?` | `{meeting:{id,deal_id,title,started_at,qualification}, framework:[{key,label,hint}]}` (qualification is carried over from the deal's previous meeting; a company name lands on the rep's existing deal of that name, any case) · 404 a `deal_id` that is not yours |
+| `POST /api/live/meetings` | `{deal_id?} \| {company, contact_name?, contact_email?, contact_title?} \| {}`, `title?`, `platform?`, `auto_started?` | `{meeting:{id,deal_id,title,started_at,qualification,platform,auto_started}, framework:[{key,label,hint}]}` (qualification is carried over from the deal's previous meeting; a company name lands on the rep's existing deal of that name, any case; neither `deal_id` nor company = no deal yet, `deal_id: null`, no placeholder deal; an unknown `platform` is stored as null; `auto_started` only when `true`) · 404 a `deal_id` that is not yours |
+| `PATCH /api/live/meetings/:id` | `{company?, contact_name?, contact_title?, contact_email?, title?}` | `{meeting, deal}` — live or ended calls. `company` puts the call on the meeting owner's deal of that name (any case), created when there is none, contact fields applied; a deal the call leaves is deleted when no other call is on it. Contact fields alone update the call's current deal · 400 nothing to change, or contact fields on a call with no deal |
 | `POST /api/live/meetings/:id/audio?channel=rep\|customer&t_ms=&duration_ms=` | raw `audio/wav` body (≤ 4 MB) | `{segment:{id,channel,t_ms,text,model} \| null, dropped?: "echo", removed_segment_ids?: number[], insight?: Insight}` — `insight` only when one ran; `segment: null` = nothing worth keeping (silence hallucination), and with `dropped: "echo"` = a rep utterance that was the customer's speech picked up by the mic (rep text within the customer's, or token Jaccard ≥ 0.6, within ±4 s; texts under 3 tokens never match); `removed_segment_ids` (customer uploads, only when non-empty) = rep segments this customer utterance showed to be such echoes, now deleted: drop them from the screen. The same `channel` + `t_ms` again returns the stored segment (safe to retry) · 400 bad `channel`/`t_ms` · 409 call ended · 413 too big · 415 not a WAV · 502 STT failed, retry · 503 STT not configured |
 | `GET /api/live/meetings/:id` | | `{meeting:{...every live_meetings column, deal:{...live_deals row} \| null}, segments:[{id,channel,t_ms,duration_ms,text}], framework}` (dashboard and desktop reconnect) |
-| `POST /api/live/meetings/:id/end` | | `{summary: Summary, flow_status}` · a second End returns the first summary (the flow runs once) · 502 summarising failed: the call stays live, press End again · 503 no model configured |
+| `POST /api/live/meetings/:id/end` | | `{summary: Summary, flow_status}` · a call with no deal is put on the deal for `summary.detected.company` (attached or created) before the flow runs; none said = stays without a deal, flow `company: ""` · a second End returns the first summary (the flow runs once) · 502 summarising failed: the call stays live, press End again · 503 no model configured |
 | `POST /api/live/meetings/:id/assist` | `{question?}` (≤ 300 chars) | No question, `mode:"next"` ("What do I say next?", ≤ ~11 s): `{mode, say:{line, intent:"discovery"\|"objection"\|"advance"\|"clarify"\|"rapport", why /* ≤ 15 words */}, cards:[Card] /* ≤ 2, for the customer's last utterance */, web:null, model}`. With a question, `mode:"search"` (≤ ~24 s): `{mode, cards:[Card] /* ≤ 3, SAM collateral */, web:{answer /* ≤ 80 words */, sources:[{title,url}] /* ≤ 3 */, unverified:true} \| null, model}` — `web` only when SAM has no good match (a card naming every vendor/product/regulation asked about and at least half the question's topic words) or the question is about fresh outside facts (news, announcements, this year…), and only with `LIVE_OPENAI_API_KEY`; show it as unverified web content. `model`: `provider:model` of the line or web answer, `"sam"` = collateral only, `"none"` = no model answered and `say` is the framework's question for the first open field, `"mock"` · 409 call ended · 502 failed |
 | `DELETE /api/live/meetings/:id` | | `{deleted: id, deal_deleted: boolean}` — the call and its transcript; its deal too when no other call is on it. Dashboard: "Delete call" on `/live/[id]`, confirm, back to `/live` |
 
@@ -68,7 +72,7 @@ Every meeting route answers 404 unless the caller owns the meeting or is an admi
 
 `Insight = { qualification: Record<key, Field>, ask_next: [{key, question, why}] (≤3), battlecards: [{trigger, title, brief, link, shareable}] (≤3), alerts: string[], model }`
 
-`Summary = { overview, pains[], qualification: Record<key, Field>, objections[], competitors[], next_steps[], follow_up_email:{subject, body}, deal_score 0-100, risks[], model }`
+`Summary = { overview, pains[], qualification: Record<key, Field>, objections[], competitors[], next_steps[], follow_up_email:{subject, body}, deal_score 0-100, risks[], detected:{company, contact_name, contact_title}, model }` — `detected` = who the customer said they are; "" for anything not said, and a company or name that is not in the transcript is dropped as a guess
 
 `Card = { trigger, title, brief, link, shareable }` (the battlecard shape, also used by assist).
 
@@ -86,32 +90,57 @@ trigger or competitor already covered in the meeting is not shown again.
 `{ meeting_id, rep, rep_email, company, contact_name, contact_email, contact_title, started_at, ended_at,
 duration_min, deal_score, overview, next_steps (text), follow_up_subject, follow_up_body, qualification_text,
 dashboard_url }` — flow: send the rep an Outlook email; add a row to the Excel table `LiveCalls` in
-`SAM Live Calls.xlsx` (OneDrive). `rep_email` comes from `LIVE_REP_EMAILS="siddharth:siddharth.gupta@accops.com,..."`.
+`SAM Live Calls.xlsx` (OneDrive). Without a deal (no company named) `company` and the contact fields are "". `rep_email` comes from `LIVE_REP_EMAILS="siddharth:siddharth.gupta@accops.com,..."`.
 
 ## Desktop app (`desktop/`)
 
 Electron + plain HTML/JS (no framework). Windows: tray icon; compact always-on-top overlay (≈380×640, draggable,
 opacity); screens: Sign in → Start call (company autocomplete from deals, contact, title) → Live (checklist with
 ✓/◐/○, "Ask next", battlecards, transcript tail, mic/system level meters, End) → Ended (summary, "Open in SAM").
-Meeting-app watcher: every 20 s `tasklist` for Teams/Zoom/Webex → tray notification "Meeting app running — start SAM
-Live?" (once per app session). Uploads are queued and retried (offline-tolerant); live keeps working if an upload fails.
-Server URL default `https://sam-accops.vercel.app`, overridable in settings. Packaged with electron-builder → NSIS
-`SAM-Live-Setup-<ver>.exe`.
+Uploads are queued and retried (offline-tolerant); live keeps working if an upload fails. Server URL default
+`https://sam-accops.vercel.app`, overridable in settings. Packaged with electron-builder → NSIS `SAM-Live-Setup-<ver>.exe`.
+
+Phase 2 (14 Oct):
+- **Audio in a hidden capture window** (`renderer/capture.js`), so hiding or reloading the overlay never stops a call. Mic
+  and system loopback go into one AudioContext and one AudioWorklet with two inputs, so both arrive in the same render
+  quantum (time-aligned without sequence pairing). Every 20 ms: **AEC3** (`@ennuicastr/webrtcaec3.js`, WebAssembly,
+  BSD-3) with the loopback as far end, 10 ms analyze-then-process steps at 32 kHz internally → **echo gate** (learns
+  speaker→mic coupling while only the customer talks; the rep VAD counts a frame as speech only when the mic is ≥ 2.5×
+  what the loopback explains for ≥ 240 ms; constants in `ECHO_GATE`) → rep VAD. Mic DSP (Chromium AEC/NS/AGC) is off
+  with AEC3; if the WebAssembly fails the mic falls back to Chromium's DSP and the gate stays on (logged).
+  `SAM_LIVE_ECHO=aec3|browser+gate|browser` forces a mode for tests.
+- **Invisible mode** (default on, Settings): `setContentProtection(true)` keeps the overlay out of screen shares and
+  recordings. In a remote session (VDI/RDP) it is left capturable so the rep can still see it.
+- **"Can't hear the call"** banner: no call audio at all 20 s into a call while the mic hears ≥ 2 s of speech.
+- **Mic hot-swap**: on `devicechange`, a track ending, or a new Windows default mic, the mic is re-acquired (5 tries,
+  500 ms apart) into the same worklet input; the call carries on.
+- **Call detection** (`lib/watcher.js`) replaces the `tasklist` watcher: one `reg query /s` of the microphone
+  consent store every 3 s; an entry with `LastUsedTimeStop == 0` is on the mic now (SAM Live's own exe excluded).
+  A meeting app (Teams classic/new, Zoom, Webex, WhatsApp, Slack, browsers) taking the mic with no call running →
+  notification "Call started in <app>. Start SAM Live?". During a call, all meeting apps off the mic for 15 s → "Call
+  ended?" (End & summarise / Keep listening); unanswered, still off the mic and silent for 5 min → ends itself.
+- **Connection pill** (green/yellow/red) from upload round trip and queue depth (`QUALITY`); worse shows at once,
+  green only after 30 s of calm.
+- **Assist**: "What do I say next?" (3 s cooldown, disabled when red) and "Ask SAM…" search (SAM cards, then the web
+  answer labelled "From the web — check before sharing", http(s) source links open in the browser).
+- **Log**: `%APPDATA%\SAM Live\main.log`, 5 MB × 2, main + capture + overlay lines; never tokens or transcript text.
 
 ## Dashboard (`/live` in SAM)
 
 - `/live` — my calls (admin: everyone's), team strip: calls this week, average qualification %, top competitors and
-  objections, desktop download link (`LIVE_DOWNLOAD_URL`). Test calls are listed with a badge but left out of the
+  objections, calls by platform, desktop download link (`LIVE_DOWNLOAD_URL`). Rows show the platform ("Phone Link",
+  "Teams"…) and an "Auto" badge for calls the app started itself; a call with no deal reads "Unknown caller". Test calls are listed with a badge but left out of the
   strip; admins can switch them in (`?test=1`, as on /admin).
 - `/live/[id]` — transcript (Accops vs Customer), qualification card with evidence quotes, summary, follow-up email
-  (copy button), battlecards shown during the call, flow status.
+  (copy button), battlecards shown during the call, flow status, platform and "Auto" badge, "Add/Edit company & contact"
+  (PATCH), "Delete call".
 - `/live/deals/[id]` — deal timeline: meetings, qualification progress across meetings (tracking).
 
 ## Testing
 
 - `web/lib/live.check.mjs` (SAM convention, run with node; `node scripts/checks.mjs` runs it with the rest): framework
   merge, hallucination filter, insight JSON parsing and repair, ask-next, cards, placeholders, flow payload, provider
-  order and fallback, mock gating, bearer tokens, echo matching, assist shaping, delete authorisation. The desktop's VAD/WAV encoder checks live with the desktop app.
+  order and fallback, mock gating, bearer tokens, echo matching, assist shaping, delete authorisation, no-company calls (PATCH auth and deal move, detected company -> deal, flow payload without a deal). The desktop's VAD/WAV encoder checks live with the desktop app.
 - `LIVE_MOCK=1` makes STT and LLM deterministic so the whole desktop → API → Supabase → dashboard path runs locally
   with no model key; a scripted test plays a WAV fixture through the client pipeline. `web/scripts/live-smoke.mjs`
   drives the whole HTTP contract against a running server (mock, or real speech with `--wavs`), screenshots with

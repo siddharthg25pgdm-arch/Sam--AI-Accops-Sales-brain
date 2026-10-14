@@ -30,6 +30,9 @@ create table if not exists live_meetings (
   last_insight_at timestamptz,
   is_test         boolean not null default false
 );
+-- Added 14 Oct 2026 (applied in production): what the call ran on, and whether the desktop app started it itself.
+alter table live_meetings add column if not exists platform text;      -- phone-link | teams | zoom | meet | whatsapp | webex | slack | browser | manual
+alter table live_meetings add column if not exists auto_started boolean not null default false;
 create index if not exists live_meetings_owner_idx on live_meetings (owner, started_at desc);
 create index if not exists live_meetings_deal_idx on live_meetings (deal_id, started_at desc);
 

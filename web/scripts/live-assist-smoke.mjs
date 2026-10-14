@@ -1,4 +1,5 @@
-// SAM Live assist, echo de-duplication and delete, against a running server with REAL providers (not LIVE_MOCK):
+// SAM Live assist, echo de-duplication, delete, and an auto-started call with no company (PATCH, End attaching
+// the company the customer named, dashboard labels), against a running server with REAL providers (not LIVE_MOCK):
 // speech is synthesised offline with Windows SAPI, so the same WAV on both channels is a true echo.
 //   node scripts/live-assist-smoke.mjs http://localhost:3311 [--keep]
 // Signs in with SAM_USERS from .env.local (an admin and a non-admin); passwords are never printed. Deletes every
@@ -141,6 +142,54 @@ try {
   const D3 = expect(await call("DELETE", `/api/live/meetings/${other.id}`, { token: adminTok }), 200, "admin deletes own");
   assert.equal(D3.json.deal_deleted, true);
   log(`DELETE ok (${D1.ms} ms): 401 without login, 404 for another rep, deal kept while a call remains, removed with the last; assist after end 409`);
+
+  // ---- an auto-started Phone Link call with no company: the customer names it, End puts the call on that deal
+  const A = expect(await call("POST", "/api/live/meetings", { token: repTok, body: { platform: "phone-link", auto_started: true } }), 200, "auto call");
+  const auto = A.json.meeting;
+  created.meetings.push(auto.id);
+  assert.deepEqual([auto.deal_id, auto.platform, auto.auto_started], [null, "phone-link", true], "no company: no deal, platform and auto recorded");
+  const cookie = (await fetch(`${base}/api/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: rep[0], password: rep[1] }) }))
+    .headers.getSetCookie().map(c => c.split(";")[0]).join("; ");
+  const page = async p => (await fetch(`${base}${p}`, { headers: { Cookie: cookie } })).text();
+  const html = await page(`/live/${auto.id}`);
+  for (const want of ["Unknown caller", "Phone Link", ">Auto<", "Add company &amp; contact", "Delete call"]) assert.ok(html.includes(want), `call page shows ${want}`);
+  const list = await page("/live");
+  assert.ok(list.includes("Calls by platform") && list.includes("Unknown caller"), "the list shows the platform strip and the unknown caller");
+  log(`auto call ${auto.id}: page shows Unknown caller, Phone Link, Auto, the edit control; /live shows Calls by platform`);
+  const [p1, p2, p3] = speak([
+    "Hi, this is Priya from Sunrise Cooperative Bank. I had a missed call from this number about remote access.",
+    "Thanks for calling back, Priya. What are you using for remote access today?",
+    "We use Citrix for about four hundred branch users, and the renewal is due in March.",
+  ]);
+  t = 0;
+  for (const [channel, wav] of [["customer", p1], ["rep", p2], ["customer", p3]]) {
+    const r = expect(await upload(auto.id, repTok, channel, t, wav), 200, `auto audio ${channel}`);
+    log(`  ${channel.padEnd(8)} ${String(r.ms).padStart(5)} ms  "${r.json.segment?.text ?? "(nothing kept)"}"`);
+    t += wavMs(wav) + 600;
+  }
+  const AE = expect(await call("POST", `/api/live/meetings/${auto.id}/end`, { token: repTok }), 200, "end auto call");
+  timings.end_auto = AE.ms;
+  const AG = expect(await call("GET", `/api/live/meetings/${auto.id}`, { token: repTok }), 200, "get auto call");
+  if (AG.json.meeting.deal_id) created.deals.push(AG.json.meeting.deal_id);
+  log(`END auto call (${AE.ms} ms, ${AE.json.summary.model}, flow ${AE.json.flow_status}): detected ${JSON.stringify(AE.json.summary.detected)} -> deal ${JSON.stringify(AG.json.meeting.deal && { company: AG.json.meeting.deal.company, contact_name: AG.json.meeting.deal.contact_name, contact_title: AG.json.meeting.deal.contact_title })}`);
+  assert.match(AG.json.meeting.deal?.company ?? "", /^sunrise co-?operative bank$/i, "the call is now on the Sunrise Cooperative Bank deal");
+  assert.match(AG.json.meeting.deal.contact_name ?? "", /priya/i, "with Priya as the contact");
+  // PATCH: name the company of a second auto call, then correct it: the first deal it was put on goes
+  const B = expect(await call("POST", "/api/live/meetings", { token: repTok, body: { platform: "teams", auto_started: true } }), 200, "auto call 2").json.meeting;
+  created.meetings.push(B.id);
+  expect(await call("PATCH", `/api/live/meetings/${B.id}`, { token: adminTok, body: {} }), 400, "PATCH with nothing");
+  expect(await call("PATCH", `/api/live/meetings/${B.id}`, { body: { company: "x" } }), 401, "PATCH without a login");
+  expect(await call("PATCH", `/api/live/meetings/${other.id}`, { token: repTok, body: { company: "x" } }), 404, "PATCH someone else's call");
+  const P1 = expect(await call("PATCH", `/api/live/meetings/${B.id}`, { token: repTok, body: { company: `${company} typo`, contact_name: "Arun" } }), 200, "PATCH company");
+  created.deals.push(P1.json.deal.id);
+  const P2 = expect(await call("PATCH", `/api/live/meetings/${B.id}`, { token: adminTok, body: { company: `${company} fixed`, contact_title: "CISO", title: "Inbound cold call" } }), 200, "PATCH again");
+  created.deals.push(P2.json.deal.id);
+  timings.patch = P2.ms;
+  assert.ok(P2.json.meeting.deal_id === P2.json.deal.id && P2.json.deal.id !== P1.json.deal.id && P2.json.meeting.title === "Inbound cold call", "moved to the corrected deal");
+  const left = expect(await call("GET", `/api/live/deals?q=${encodeURIComponent(`${company} typo`)}`, { token: repTok }), 200, "deals").json.deals;
+  assert.equal(left.length, 0, "the mistyped deal, now empty, is gone");
+  assert.ok((await page(`/live/${B.id}`)).includes(`${company} fixed`) && (await page(`/live/${B.id}`)).includes("Teams"), "the page shows the company and Teams");
+  log(`PATCH ok (${P1.ms} / ${P2.ms} ms): 400 empty, 401 no login, 404 another's call; deal moved, empty old deal deleted, admin's edit lands on the rep's deal`);
   log(`timings ms: ${JSON.stringify(timings)}`);
   log("ASSIST SMOKE PASSED");
 } finally {

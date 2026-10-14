@@ -17,7 +17,10 @@
  *   12. assist: "next" reads one line (intent, why <= 15 words) and falls back to the framework when no model
  *       answers; "search" returns SAM cards and adds the web only without a good match, labelled unverified,
  *       citations stripped, <= 3 sources; nothing from the web without the OpenAI key; 409 once ended
- *   13. delete: owner or admin only (404 for anyone else, nothing deleted); the deal goes only when no other call is on it */
+ *   13. delete: owner or admin only (404 for anyone else, nothing deleted); the deal goes only when no other call is on it
+ *   14. calls with no company: created without a deal (platform checked, auto_started); PATCH is owner/admin, moves
+ *       the call to the owner's deal (any case) and deletes an emptied old one; End turns the company the customer
+ *       named (never a guess) into the deal before the flow runs; the flow payload copes with no deal */
 import assert from "node:assert";
 import { createJiti } from "jiti";
 import { fileURLToPath } from "node:url";
@@ -49,8 +52,9 @@ globalThis.fetch = async (url, init = {}) => {
   if (u.includes("stub.supabase.co")) {
     if (u.includes("sam_asset_cards")) return Response.json(CARDS);
     const du = decodeURIComponent(u), method = init.method ?? "GET";
-    dbCalls.push({ u: du, method });
-    return Response.json(rows(du, method) ?? []);
+    const body = typeof init.body === "string" ? JSON.parse(init.body) : undefined;
+    dbCalls.push({ u: du, method, body });
+    return Response.json(rows(du, method, body) ?? []);
   }
   if (u.endsWith("/models")) return Response.json({ data: [{ id: "gpt-transcribe" }, { id: "gpt-5.4-mini" }, { id: "openai/gpt-oss-20b" }] });
   const host = u.includes("api.openai.com") ? "openai" : u.includes("api.groq.com") ? "groq" : u.includes("flow.example") ? "flow" : "other";
@@ -374,6 +378,92 @@ eq(deletes(), ["live_meetings", "live_deals"], "meeting, then its deal (no other
 rows = u => meetingRows(u) ?? (u.includes(`deal_id=eq.${DID}`) ? [{ id: "44444444-4444-4444-8444-444444444444" }] : undefined); dbCalls = [];
 eq(await (await rm(MID, bossJwt)).json(), { deleted: MID, deal_deleted: false }, "an admin deletes a rep's call; the deal stays while another call is on it");
 eq(deletes(), ["live_meetings"], "...only the meeting row");
+rows = () => undefined;
+
+// ---- 14. calls with no company: create without a deal, PATCH who it was, End attaches the company the customer named
+const { POST: createCall } = await jiti.import("../app/api/live/meetings/route.ts");
+const { PATCH: patchCall } = await jiti.import("../app/api/live/meetings/[id]/route.ts");
+const { POST: endCall } = await jiti.import("../app/api/live/meetings/[id]/end/route.ts");
+const { readDetected } = await jiti.import("./live/summary.ts");
+const posted = t => dbCalls.filter(c => c.method === "POST" && c.u.replace(SB, "").startsWith(t));
+const echoRow = (body, extra = {}) => [{ id: MID, started_at: "2026-10-14T10:00:00Z", status: "live", ...body, ...extra }];
+rows = (u, method, body) => method === "POST" && u.startsWith(`${SB}live_meetings`) ? echoRow(body) : undefined; dbCalls = [];
+const cr = await createCall(new Request("https://sam/api/live/meetings", { method: "POST", headers: { Authorization: `Bearer ${repJwt}` },
+  body: JSON.stringify({ platform: "phone-link", auto_started: true }) }));
+const cj = await cr.json();
+ok(cr.status === 200 && cj.meeting.deal_id === null && cj.meeting.platform === "phone-link" && cj.meeting.auto_started === true, `no company: a call without a deal (${JSON.stringify(cj.meeting)})`);
+ok(!posted("live_deals").length && posted("live_meetings")[0].body.deal_id === null, "...and no placeholder deal");
+dbCalls = [];
+const cj2 = await (await createCall(new Request("https://sam/api/live/meetings", { method: "POST", headers: { Authorization: `Bearer ${repJwt}` },
+  body: JSON.stringify({ platform: "skype", auto_started: "yes" }) }))).json();
+eq([cj2.meeting.platform, cj2.meeting.auto_started], [null, false], "an unknown platform is null; auto_started only when true");
+
+const OLD = DID, NEW = "55555555-5555-4555-8555-555555555555";
+const dealRow = (id, company, extra = {}) => ({ id, owner: "rep", company, contact_name: null, contact_email: null, contact_title: null, notes: null, created_at: "", updated_at: "", ...extra });
+const patchReq = (body, tok = repJwt, id = MID) => patchCall(new Request(`https://sam/api/live/meetings/${id}`, { method: "PATCH", headers: { Authorization: `Bearer ${tok}` }, body: JSON.stringify(body) }), ctx(id));
+let others = [];
+rows = (u, method, body) => {
+  if (u.includes(`live_meetings?id=eq.${MID}`)) return method === "GET" ? [mrow()] : [mrow(body)];
+  if (u.includes(`live_meetings?id=eq.${BOSS_MID}`)) return [mrow({ id: BOSS_MID, owner: "boss" })];
+  if (u.includes(`live_deals?id=eq.${OLD}`) && method === "GET") return [dealRow(OLD, "Old Co")];
+  if (u.includes("live_deals?owner=eq.rep&company=ilike")) return [];
+  if (method === "POST" && u.startsWith(`${SB}live_deals`)) return [dealRow(NEW, body.company, body)];
+  if (u.includes(`live_meetings?deal_id=eq.${OLD}`)) return others;
+};
+dbCalls = [];
+eq((await patchReq({ company: "Sunrise" }, repJwt, BOSS_MID)).status, 404, "PATCH someone else's call: 404");
+ok(!dbCalls.some(c => c.method !== "GET"), "...and nothing written");
+eq((await patchReq({})).status, 400, "PATCH with nothing to change: 400");
+let pr14 = await patchReq({ company: " Sunrise Cooperative Bank ", contact_name: "Priya", contact_title: "CIO" });
+let pj2 = await pr14.json();
+ok(pr14.status === 200 && pj2.meeting.deal_id === NEW && pj2.deal.company === "Sunrise Cooperative Bank" && pj2.deal.contact_name === "Priya", `PATCH moves the call to the new deal: ${JSON.stringify(pj2.deal)}`);
+ok(dbCalls.some(c => c.method === "DELETE" && c.u.includes(`live_deals?id=eq.${OLD}`)), "the old deal, now empty, is deleted");
+others = [{ id: "66666666-6666-4666-8666-666666666666" }]; dbCalls = [];
+await patchReq({ company: "Sunrise Cooperative Bank" }, bossJwt);
+ok(!dbCalls.some(c => c.method === "DELETE"), "an admin's PATCH works, and an old deal with another call stays");
+ok(dbCalls.some(c => c.u.includes("live_deals?owner=eq.rep&")), "the deal is the meeting owner's, not the admin's");
+const base14 = rows;
+rows = (u, method, body) => u.includes("live_deals?owner=eq.rep&company=ilike") ? [dealRow("77777777-7777-4777-8777-777777777777", "sunrise cooperative bank")]
+  : u.includes("live_deals?id=eq.77777777") && method === "PATCH" ? [dealRow("77777777-7777-4777-8777-777777777777", "sunrise cooperative bank", body)] : base14(u, method, body);
+dbCalls = [];
+pj2 = await (await patchReq({ company: "SUNRISE Cooperative Bank" })).json();
+ok(pj2.meeting.deal_id === "77777777-7777-4777-8777-777777777777" && !posted("live_deals").length, "an existing deal of that name, any case, is reused");
+rows = (u, method, body) => u.includes(`live_meetings?id=eq.${MID}`) ? [mrow({ deal_id: null, ...(method === "GET" ? {} : body) })] : undefined;
+eq((await patchReq({ contact_name: "Priya" })).status, 400, "a contact without a company on a call with no deal: 400");
+eq((await (await patchReq({ title: "Cold call" })).json()).meeting.title, "Cold call", "the title alone can be set");
+
+eq(readDetected({ company: "Sunrise Cooperative Bank", contact_name: "Priya", contact_title: "IT head" }, "Customer: Hi, this is Priya from Sunrise Co-operative Bank."),
+  { company: "Sunrise Cooperative Bank", contact_name: "Priya", contact_title: "IT head" }, "detected: kept when said (hyphen and case aside)");
+eq(readDetected({ company: "Sunrise Bank Ltd", contact_name: "Priya Sharma", contact_title: "CIO" }, "Customer: Hi, this is Priya from Sunrise."),
+  { company: "", contact_name: "", contact_title: "" }, "a company or name not in the transcript is a guess: dropped, and the title with them");
+eq(readDetected(null, "x"), { company: "", contact_name: "", contact_title: "" }, "nothing detected: empty strings");
+
+const flowNoDeal = flowPayload(meeting, null, summary, "https://sam.example");
+eq([flowNoDeal.company, flowNoDeal.contact_name, flowNoDeal.contact_email, flowNoDeal.contact_title], ["", "", "", ""], "flow payload without a deal: empty strings");
+
+const said14 = [{ id: 1, channel: "customer", t_ms: 0, duration_ms: 4000, text: "Hi, this is Priya from Sunrise Co-operative Bank, we got your number from a colleague." },
+  { id: 2, channel: "rep", t_ms: 5000, duration_ms: 3000, text: "Thanks Priya. What are you using for remote access today?" }];
+const sumJSON = det => JSON.stringify({ overview: "A cooperative bank called about remote access.", detected: det, follow_up_email: { subject: "Remote access", body: "Hi Priya,\nThanks.\nRep" }, deal_score: 30 });
+const endRows = (u, method, body) => {
+  if (u.includes(`live_meetings?id=eq.${MID}`)) return [mrow({ deal_id: null, platform: "phone-link", auto_started: true, ...(method === "GET" ? {} : body) })];
+  if (u.includes("live_segments")) return said14;
+  if (u.includes("live_deals?owner=eq.rep&company=ilike")) return [];
+  if (method === "POST" && u.startsWith(`${SB}live_deals`)) return [dealRow(NEW, body.company, body)];
+};
+process.env.LIVE_OPENAI_API_KEY = "sk-live-stub-KEY1"; process.env.LIVE_FLOW_URL = "https://prod.flow.example/x?sig=S";
+rows = endRows; dbCalls = [];
+run({ openai: [reply(sumJSON({ company: "Sunrise Cooperative Bank", contact_name: "Priya", contact_title: "" }))], flow: [() => new Response("", { status: 202 })] });
+let er14 = await endCall(new Request(`https://sam/api/live/meetings/${MID}/end`, { method: "POST", headers: { Authorization: `Bearer ${repJwt}` } }), ctx(MID));
+let ej = await er14.json();
+const flowCall = calls.find(c => c.host === "flow");
+ok(er14.status === 200 && ej.summary.detected.company === "Sunrise Cooperative Bank" && ej.flow_status === "sent", `End reads who called: ${JSON.stringify(ej.summary.detected)}`);
+ok(posted("live_deals")[0]?.body.company === "Sunrise Cooperative Bank" && dbCalls.some(c => c.method === "PATCH" && c.body?.deal_id === NEW), "the detected company becomes the call's deal");
+eq([flowCall.body.company, flowCall.body.contact_name], ["Sunrise Cooperative Bank", "Priya"], "...before the flow runs: the email and sheet row carry it");
+dbCalls = [];
+run({ openai: [reply(sumJSON({ company: "", contact_name: "", contact_title: "" }))], flow: [() => new Response("", { status: 202 })] });
+ej = await (await endCall(new Request(`https://sam/api/live/meetings/${MID}/end`, { method: "POST", headers: { Authorization: `Bearer ${repJwt}` } }), ctx(MID))).json();
+ok(!posted("live_deals").length && calls.find(c => c.host === "flow").body.company === "", "no company said: no deal, company \"\" in the flow");
+delete process.env.LIVE_OPENAI_API_KEY; delete process.env.LIVE_FLOW_URL;
 rows = () => undefined;
 
 console.log(`live.check: ${n} assertions passed`);

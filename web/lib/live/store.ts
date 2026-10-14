@@ -10,12 +10,22 @@ export type Deal = { id: string; owner: string; company: string; contact_name: s
   contact_title: string | null; notes: string | null; created_at: string; updated_at: string };
 export type Ask = { key: string; question: string; why: string };
 export type Card = { trigger: string; title: string; brief: string; link: string | null; shareable: boolean };
-/** `model` = which provider:model wrote it ("openai:gpt-5.5", "groq:openai/gpt-oss-120b", "mock", "none"). */
+/** `model` = which provider:model wrote it ("openai:gpt-5.5", "groq:openai/gpt-oss-120b", "mock", "none").
+ *  `detected` = who the customer said they are, "" for anything not said (an auto-started call has no deal yet). */
+export type Detected = { company: string; contact_name: string; contact_title: string };
 export type Summary = { overview: string; pains: string[]; qualification: Qualification; objections: string[]; competitors: string[];
-  next_steps: string[]; follow_up_email: { subject: string; body: string }; deal_score: number; risks: string[]; model?: string };
+  next_steps: string[]; follow_up_email: { subject: string; body: string }; deal_score: number; risks: string[]; detected?: Detected; model?: string };
 export type Meeting = { id: string; deal_id: string | null; owner: string; title: string | null; status: "live" | "ended";
   started_at: string; ended_at: string | null; qualification: Qualification; suggestions: Ask[]; battlecards: Card[];
-  summary: Summary | null; flow_status: string | null; last_insight_at: string | null; is_test: boolean };
+  summary: Summary | null; flow_status: string | null; last_insight_at: string | null; is_test: boolean;
+  platform: Platform | null; auto_started: boolean };
+
+/** What the call ran on, as the desktop app reports it; anything else is stored as null. */
+export const PLATFORMS = ["phone-link", "teams", "zoom", "meet", "whatsapp", "webex", "slack", "browser", "manual"] as const;
+export type Platform = (typeof PLATFORMS)[number];
+export const PLATFORM_LABEL: Record<Platform, string> = { "phone-link": "Phone Link", teams: "Teams", zoom: "Zoom", meet: "Meet", whatsapp: "WhatsApp",
+  webex: "Webex", slack: "Slack", browser: "Browser", manual: "Manual" };
+export const platformOf = (v: unknown): Platform | null => (PLATFORMS as readonly unknown[]).includes(v) ? v as Platform : null;
 export type Segment = { id: number; channel: Channel; t_ms: number; duration_ms: number | null; text: string; created_at?: string };
 
 function cfg() {
@@ -57,7 +67,7 @@ export async function getDeal(id: string): Promise<Deal | null> {
   return isId(id) ? one(await db<Deal[]>(`live_deals?id=eq.${id}&select=*`)) : null;
 }
 
-type Contact = { contact_name?: string | null; contact_email?: string | null; contact_title?: string | null };
+export type Contact = { contact_name?: string | null; contact_email?: string | null; contact_title?: string | null };
 
 /** The rep's deal for this company (same name, any case), created when there is none, so a second call
  *  with the same customer lands on the same timeline. Contact details given now replace the old ones:
@@ -83,7 +93,8 @@ const given = (c: Contact) => Object.fromEntries(Object.entries(c)
 
 // ---------------------------------------------------------------- meetings
 
-export async function createMeeting(p: { owner: string; deal_id: string; title: string | null; qualification: Qualification }): Promise<Meeting> {
+export async function createMeeting(p: { owner: string; deal_id: string | null; title: string | null; qualification: Qualification;
+  platform: Platform | null; auto_started: boolean }): Promise<Meeting> {
   // Same rule as every SAM event: local dev, a test identity or x-sam-test: 1 makes it test traffic.
   const row = { ...p, is_test: await testTraffic(p.owner) };
   return one(await db<Meeting[]>("live_meetings", { method: "POST", body: JSON.stringify(row) }))!;
@@ -111,9 +122,9 @@ export async function claimInsight(id: string, everyMs: number): Promise<Meeting
   return patchMeeting(id, { last_insight_at: new Date(now).toISOString() }, `status=eq.live&or=${due}`);
 }
 
-export type MeetingRow = Pick<Meeting, "id" | "deal_id" | "owner" | "title" | "status" | "started_at" | "ended_at" | "is_test" | "qualification" | "flow_status">
+export type MeetingRow = Pick<Meeting, "id" | "deal_id" | "owner" | "title" | "status" | "started_at" | "ended_at" | "is_test" | "qualification" | "flow_status" | "platform" | "auto_started">
   & { deal_score: number | null; deal: Pick<Deal, "company" | "contact_name" | "contact_title"> | null };
-const ROW = "id,deal_id,owner,title,status,started_at,ended_at,is_test,qualification,flow_status,deal_score:summary->deal_score,deal:live_deals(company,contact_name,contact_title)";
+const ROW = "id,deal_id,owner,title,status,started_at,ended_at,is_test,qualification,flow_status,platform,auto_started,deal_score:summary->deal_score,deal:live_deals(company,contact_name,contact_title)";
 
 /** Newest first; one owner's, or everyone's when owner is null. */
 export async function listMeetings(owner: string | null, limit = 100): Promise<MeetingRow[]> {
@@ -125,11 +136,11 @@ export async function dealMeetings(dealId: string): Promise<MeetingRow[]> {
   return db<MeetingRow[]>(`live_meetings?select=${ROW}&deal_id=eq.${dealId}&order=started_at.asc&limit=200`);
 }
 
-export type TeamRow = { started_at: string; status: string; qualification: Qualification; competitors: string[] | null; objections: string[] | null };
+export type TeamRow = { started_at: string; status: string; platform: Platform | null; qualification: Qualification; competitors: string[] | null; objections: string[] | null };
 
 /** Everyone's meetings since `since`, real ones only unless `withTest`, with only what the team strip counts. */
 export async function teamMeetings(since: string, withTest = false): Promise<TeamRow[]> {
-  return db<TeamRow[]>(`live_meetings?select=started_at,status,qualification,competitors:summary->competitors,objections:summary->objections`
+  return db<TeamRow[]>(`live_meetings?select=started_at,status,platform,qualification,competitors:summary->competitors,objections:summary->objections`
     + `${withTest ? "" : "&is_test=is.false"}&started_at=gte.${enc(since)}&order=started_at.desc&limit=1000`);
 }
 
@@ -156,14 +167,29 @@ export async function deleteSegments(meetingId: string, ids: number[]): Promise<
   if (list.length) await db(`live_segments?meeting_id=eq.${meetingId}&id=in.(${list.join(",")})`, { method: "DELETE" });
 }
 
+/** Delete a deal no meeting is on any more. True when it went. ponytail: check then delete; a call started
+ *  on that deal in between is left without a deal (deal_id set null), which PATCH can fix. */
+async function dropDealIfEmpty(dealId: string): Promise<boolean> {
+  const others = await db<{ id: string }[]>(`live_meetings?deal_id=eq.${dealId}&select=id&limit=1`);
+  if (others.length) return false;
+  await db(`live_deals?id=eq.${dealId}`, { method: "DELETE" });
+  return true;
+}
+
 /** Delete a meeting (its segments cascade), then its deal if no other meeting is on it. True when the deal went too. */
 export async function deleteMeeting(m: Pick<Meeting, "id" | "deal_id">): Promise<boolean> {
   await db(`live_meetings?id=eq.${m.id}`, { method: "DELETE" });
-  if (!m.deal_id) return false;
-  const others = await db<{ id: string }[]>(`live_meetings?deal_id=eq.${m.deal_id}&select=id&limit=1`);
-  if (others.length) return false;
-  await db(`live_deals?id=eq.${m.deal_id}`, { method: "DELETE" });
-  return true;
+  return m.deal_id ? dropDealIfEmpty(m.deal_id) : false;
+}
+
+/** Put a meeting on the meeting owner's deal for `company` (found any case, or created; contact details given
+ *  replace the old ones). A deal the meeting leaves is deleted when no other meeting is on it. */
+export async function attachDeal(m: Meeting, company: string, contact: Contact = {}): Promise<{ meeting: Meeting; deal: Deal }> {
+  const deal = await dealFor(m.owner, company, contact);
+  if (deal.id === m.deal_id) return { meeting: m, deal };
+  const meeting = (await patchMeeting(m.id, { deal_id: deal.id })) ?? { ...m, deal_id: deal.id };
+  if (m.deal_id) await dropDealIfEmpty(m.deal_id);
+  return { meeting, deal };
 }
 
 /** A meeting's transcript in call order. `tail` = only the last n segments. Pages past PostgREST's

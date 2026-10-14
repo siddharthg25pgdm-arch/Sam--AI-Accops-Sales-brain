@@ -5,8 +5,8 @@ import { FRAMEWORK, field, progress, type Qualification } from "@/lib/live/frame
 import { vendor } from "@/lib/live/insight";
 import { getDeal, getMeeting, segments, type Card, type Meeting, type Segment, type Summary } from "@/lib/live/store";
 import { TopBar } from "@/components/TopBar";
-import { CallPills, Dot, QualBar, STATUS_LABEL, abandoned, clock, day, length, time } from "@/components/LiveBits";
-import { CopyButton, DeleteCall, EndCall } from "@/components/LiveActions";
+import { CallPills, Dot, QualBar, STATUS_LABEL, UNKNOWN_CALLER, abandoned, clock, day, length, time } from "@/components/LiveBits";
+import { CopyButton, DeleteCall, EditCaller, EndCall } from "@/components/LiveActions";
 
 export const dynamic = "force-dynamic";
 
@@ -31,12 +31,13 @@ export default async function Call({ params }: { params: Promise<{ id: string }>
         </nav>
         <header className="lv-head">
           <div>
-            <h1>{deal?.company ?? m.title ?? "Untitled call"}</h1>
+            <h1>{deal?.company ?? m.title ?? UNKNOWN_CALLER}</h1>
             <p className="dash-sub">
               {[who, `${day(m.started_at)}, ${time(m.started_at)}`, length(m), user.admin && m.owner !== user.id ? `by ${m.owner}` : ""].filter(Boolean).join(" · ")}
               <CallPills m={m} />
             </p>
             {m.title && deal && <p className="lv-title">{m.title}</p>}
+            <EditCaller id={m.id} deal={deal && { company: deal.company, contact_name: deal.contact_name ?? "", contact_title: deal.contact_title ?? "", contact_email: deal.contact_email ?? "" }} />
           </div>
           {s && <div className="lv-score" title="How qualified the deal is and how likely it is to progress, judged from this call"><b className="tnum">{s.deal_score}</b><span>Deal score</span></div>}
         </header>
