@@ -42,7 +42,10 @@
       "createStartMenuShortcut": true,
       "shortcutName": "SAM Live",
       "artifactName": "SAM-Live-Setup-${version}.${ext}"
-    }
+    },
+    "electronLanguages": [
+      "en-US"
+    ]
   },
   "devDependencies": {
     "electron": "^44.7.1",
