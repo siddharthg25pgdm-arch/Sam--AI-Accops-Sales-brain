@@ -6,12 +6,14 @@ re-reading the PDFs, and a scanned document is caught here rather than silently 
 card.
 
   python extract_text.py
+  python extract_text.py --force   # re-read every document (after an extractor change)
 """
 from __future__ import annotations
-import sys
+import os, sys
 from pathlib import Path
 
-ROOT = Path(__file__).parent.parent / "corpus"
+# SAM_CORPUS: run this checkout's extractor over another checkout's corpus (a git worktree has none).
+ROOT = Path(os.environ.get("SAM_CORPUS") or Path(__file__).parent.parent / "corpus")
 OUT = ROOT / "text"
 # Below this, a document almost certainly has no text layer: it is scanned pages or pure imagery.
 # prototype/build_cards.py already hit this with a 208 MB image-only government PDF.
@@ -20,16 +22,24 @@ MIN_CHARS = 200
 
 def from_pdf(p: Path) -> str:
     from pypdf import PdfReader
-    return "".join((pg.extract_text() or "") for pg in PdfReader(str(p)).pages)
+    # Page numbers travel with the text, as slide numbers do for decks, so a passage can cite "page 3"
+    # (build_passages.py). Blank pages are left out but keep their numbering.
+    pages = [(pg.extract_text() or "").strip() for pg in PdfReader(str(p)).pages]
+    return "\n\n".join(f"--- page {i} ---\n{t}" for i, t in enumerate(pages, 1) if t)
 
 
 def from_docx(p: Path) -> str:
     import zipfile, re
     with zipfile.ZipFile(p) as z:
         xml = z.read("word/document.xml").decode("utf-8", "ignore")
-    # Paragraph breaks first, then strip tags - otherwise every paragraph runs together.
-    xml = re.sub(r"</w:p>", "\n", xml)
-    return re.sub(r"<[^>]+>", "", xml)
+    # One line per paragraph (otherwise every paragraph runs together); headings marked "## " so a
+    # passage can cite its section.
+    out = []
+    for para in xml.split("</w:p>"):
+        text = re.sub(r"<[^>]+>", "", para).strip()
+        if text:
+            out.append(f"## {text}" if re.search(r'<w:pStyle w:val="(?:Heading\d|Title)"', para) else text)
+    return "\n".join(out)
 
 
 def from_pptx(p: Path) -> str:
@@ -60,7 +70,9 @@ def main() -> None:
         if src.suffix.lower() not in READERS:
             continue
         dest = OUT / (src.stem + ".txt")
-        if dest.exists() and dest.stat().st_mtime > src.stat().st_mtime:
+        # A PDF extracted before page markers existed is re-read once, so its passages can cite pages.
+        old_pdf = src.suffix.lower() == ".pdf" and dest.exists() and "--- page " not in dest.read_text(encoding="utf-8", errors="ignore")[:4000]
+        if dest.exists() and dest.stat().st_mtime > src.stat().st_mtime and not old_pdf and "--force" not in sys.argv:
             skipped += 1
             continue
         try:
