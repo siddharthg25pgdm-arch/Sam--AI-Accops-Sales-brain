@@ -39,9 +39,12 @@ something), **feedback** (ratings under answers in `sam_events`, learned "wrong 
 
 ## 2. Boundaries (non-negotiable)
 
-1. **The carding boundary.** Only Claude (Enterprise, on the laptop) reads document bodies. Supabase holds
-   cards, never file contents. No tool may fetch a private file's bytes, and nothing under `web/` reads
-   `corpus/`. A tool that needs "what the document says" reads the card (`brief`, `key_outcomes`, ...).
+1. **The carding boundary.** Only Claude (Enterprise, on the laptop) reads document bodies to write cards.
+   Supabase holds cards and, since 17 Oct 2026, **passages** (scrubbed page/slide/section text, service
+   role only; Siddharth's decision, which supersedes "a private file body never leaves SharePoint" for
+   passage text - corpus/README.md). Never file contents: no tool may fetch a private file's bytes, and
+   nothing under `web/` reads `corpus/`. A tool that needs "what the document says" reads the card, or
+   the passages API with the right scope.
 2. **Real customer names never leave Postgres.** `client_actual` is not in any v1 view or API response.
    `client` is the anonymised description and is safe anywhere.
 3. **The public surface is a view, not a prompt.** Anything customer-facing (the website bot) reads
@@ -83,10 +86,34 @@ First sync: page through `/assets` (or `/assets?since=`) once, then follow `/cha
 80-100 ms, `/changes` 50-115 ms, `/public-assets` 130 ms. `node web/scripts/brain-smoke.mjs [base]`
 re-measures every route with a real token.
 
+### Passages: `/api/v1/passages`
+
+What a document says, page by page, for tools that must ground a claim (SAM Live's grounded assist).
+Table and functions: `docs/supabase-sam-passages.sql`; built nightly by `prototype/build_passages.py`.
+
+| Route | Returns |
+|---|---|
+| `POST /api/v1/passages/search` (also `POST /api/v1/passages`) `{query, k (1-20, default 8), audience: internal\|external, filters: {products[], asset_types[], min_year, include_expired (false), current_editions_only (true)}}` | `{passages[], index: {built_at, documents, passages}, took_ms, audience, policy}` |
+| `GET /api/v1/passages?q=&k=&audience=&product=a,b&type=a,b&min_year=&include_expired=&current_editions_only=` | the same |
+| `GET /api/v1/passages/{id}` (`<source>#<ordinal>`, URL-encoded) | `{passage, neighbours[]}` (ordinal +/- 1); 404 when missing or not visible to the caller |
+
+Each passage: `passage_id, text, doc {source, asset_id, item_id, title, asset_type, type, doc_version (hash of
+the extracted text), version, modified_at, family {key, is_current, superseded_by}}, locator {page | slide |
+section}, links {internal (SharePoint, never forward), public}, audience (internal | public, from the library
+at serve time), sharing {external_approved, basis: public_url | publish_request | none, approved_at,
+approved_by}, freshness {year, stale, expired, superseded, eligible, excluded, trust_note, indexed_at}, score`.
+
+Rules: internal passages need the `passages:internal` token scope and `SAM_PASSAGES_INTERNAL` not `0`;
+`audience=external` returns `external_approved` passages only (a public URL on accops.com, or a decided
+publish request; a third-party URL is not approval); expired and superseded passages only when asked for;
+at most 3 passages per document. `x-sam-on-behalf-of: <user>` is logged (no query text). Before the
+migration is applied every route answers 404 with `passages_api: false`.
+
 ### Auth
 
 - **Internal tools:** `Authorization: Bearer <token>`, where the server's `SAM_API_TOKENS` holds
-  `label:token` pairs (comma-separated). The label identifies the tool (`dwight-rahul`, `content-engine`).
+  `label:token` pairs (comma-separated), optionally with scopes: `label:token:scope+scope`. The only scope
+  today is `passages:internal` (internal passages; SAM Live's token). The label identifies the tool (`dwight-rahul`, `content-engine`).
   Adding a tool = add a pair in Vercel's environment and redeploy. A signed-in browser session also works.
 - **The website bot:** Postgres role `sam_web_reader` (NOLOGIN, reached through PostgREST with a JWT whose
   `role` claim is `sam_web_reader`). SELECT on `sam_v1_public_assets` and nothing else; proven by
@@ -289,5 +316,8 @@ identities, publish and unregistered messages excluded, catalogue searches out o
   call on `/rest/v1/sam_asset_cards` returns 401/403. If the project has moved to asymmetric signing keys,
   use the dashboard's equivalent; the role and grants do not change.
 - **A token per new tool** in `SAM_API_TOKENS`.
+- **Passages go live:** apply `docs/supabase-sam-passages.sql` (SAM Live's W1 stream applies DDL), run
+  `prototype/build_passages.py` once, append `:passages:internal` to the `sam-live` entry of
+  `SAM_API_TOKENS` in Vercel and redeploy, then copy `ops/nightly-carding/SKILL.md` to its live location.
 - **Brand exemption, Tokyo exclusion:** applied 30 Sep (owner's decisions). Any further hand exclusion is
   a row in `sam_asset_family_overrides` with `exclude = true` and a reason.

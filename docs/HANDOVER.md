@@ -316,6 +316,13 @@ Downloading private documents for carding is a **build-time exception** granted 
 runtime rule is unchanged: SAM never serves a private file body to a user, and nothing under `web/`
 reads `corpus/`. If that ever changes, the InfoSec argument for the WhatsApp channel goes with it.
 
+**Passages, 17 October 2026 (Siddharth's decision).** Extracted passage text of public and internal
+carded collateral now goes to Supabase (`sam_passages`), so "a private file body never leaves
+SharePoint" is superseded for that text. It is served only through `/api/v1/passages`: internal
+passages to tokens with the `passages:internal` scope (SAM Live), public ones to everyone else, and
+`SAM_PASSAGES_INTERNAL=0` switches internal passages off. SAM still never sends a file to a user, and
+SAM Live's model reads passage text to ground answers. Details: corpus/README.md, docs/SALES-BRAIN-PLATFORM.md.
+
 Two refinements to apply **while** carding, not after - they are cheap now and painful to retrofit:
 split the card so the model sees a leaner projection than the browser, and write `client_actual`
 separately from the descriptive `client`. See ROADMAP section 4.
