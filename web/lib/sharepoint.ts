@@ -422,8 +422,9 @@ export async function syncStatus(scope = "sales"): Promise<SyncRow | null> {
  *
  * The delete trigger never fires without site-collection-admin, and sp_reconcile.py's Graph walk is
  * blocked by Conditional Access. What still works is Siddharth's own SharePoint connection in Power
- * Automate, so a daily flow lists every file under the scope root ("Get files (properties only)",
- * nested, paginated) and POSTs the list here. Rows whose list item id is missing from it are gone.
+ * Automate, so a daily flow lists every file under the scope root (SharePoint REST list items, paged
+ * by ID - "Get files (properties only)" silently dropped the oldest 283 files from 1 Oct 2026) and
+ * POSTs the list here. Rows whose list item id is missing from it are gone.
  *
  * The danger is the one sp_reconcile.py already walked into on 8 September: a listing that FAILED
  * looks exactly like "everything was deleted", and it reported 874 of 874 rows to tombstone. So a
@@ -435,7 +436,7 @@ export async function syncStatus(scope = "sales"): Promise<SyncRow | null> {
 export type SnapshotFile = { id?: number | string; name?: string; path?: string; isFolder?: boolean | string };
 export type Snapshot = {
   scope?: string; mode?: "report" | "write";
-  /** Set by the flow only when "Get files" ran with pagination on. Absent or false = refuse. */
+  /** The flow sends empty(next): true only when paging reached the last page. Absent or false = refuse. */
   complete?: boolean;
   /** length() of the raw listing inside the flow, before it was serialised. A mismatch means the
    *  body was truncated on the way here. */
