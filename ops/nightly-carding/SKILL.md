@@ -12,8 +12,10 @@ Runs unattended before Siddharth's 08:30 morning digest. The digest reports what
 
 ## Rules (non-negotiable)
 
-- **The carding boundary.** Only you (Claude) read document bodies. Only the card goes to Supabase,
-  via `prototype/load_cards.py`. Never send document text anywhere else.
+- **The carding boundary.** Only you (Claude) read document bodies to write cards. The card goes to
+  Supabase via `prototype/load_cards.py`; since 17 Oct 2026 (Siddharth's decision) the document's
+  passages go there too, via `prototype/build_passages.py` (scrubbed text, service role only; see
+  corpus/README.md). Never send document text anywhere else.
 - **No sensitive values in cards**: passwords/credentials, phone numbers, bank details, personal
   emails, customer IDs, employee usernames/hours, IP/MAC addresses. Describe their presence instead
   ("contains staff phone numbers").
@@ -48,6 +50,9 @@ Runs unattended before Siddharth's 08:30 morning digest. The digest reports what
    batch file is valid JSON, scan tonight's cards for the sensitive patterns above, then
    `load_cards.py --dry-run`, `load_cards.py`, `load_cards.py --check` (must show 0 missing, 0 extra,
    0 title differences).
+   Then passages (needs `docs/supabase-sam-passages.sql` applied; skip with a `warn` if it is not):
+   `prototype/build_passages.py --dry-run`, then `prototype/build_passages.py` (uploads only documents
+   whose text, audience or extractor changed; honours `SAM_PASSAGES_INTERNAL=0`).
 6. `git add corpus/cards/*.json && git commit -m "carding (nightly): N new, M updated - <short list>"`
    then `git push`.
 7. Record the outcome, both places, always (also for "nothing to card" and for a failure):
