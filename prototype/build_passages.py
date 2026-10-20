@@ -119,6 +119,7 @@ def pack(text: str) -> list[str]:
 
 def passages(body: str, audience: str) -> list[dict]:
     """A document's text (after the "# source:" header) -> sam_passages_replace rows."""
+    body = body.replace("\x00", "")  # PDF glyphs the extractor lost ("Pro\x00ile"); Postgres text rejects NUL
     version = hashlib.sha256(body.encode("utf-8")).hexdigest()[:16]
     rows, seen = [], set()
     for loc, text in units(body):
@@ -207,6 +208,7 @@ def self_check() -> None:
           "## Architecture\nThe gateway sits in the DMZ and brokers every session to the data centre."
     assert [r["locator"] for r in passages(doc, "internal")] == [{"section": "Overview"}, {"section": "Architecture"}]
     assert passages("x" * 30, "public") == [], "nothing under MIN"
+    assert "\x00" not in passages("--- page 1 ---\n" + "Reviewer Pro\x00ile. " * 10, "public")[0]["text"], "Postgres rejects NUL"
     # Policy: the kill switch and the card gate.
     global TEXT, CARDS
     import tempfile
