@@ -23,6 +23,13 @@ Runs unattended before Siddharth's 08:30 morning digest. The digest reports what
   `confidence` ≤ 0.5 and say so in `needs_human`. If the FILE itself is empty or blank (a deck with one
   blank slide, a placeholder), set `confidence` ≤ 0.5 and put the word "empty" or "blank" in
   `needs_human`: that takes it out of answers (sam_card_says_empty / cardSaysEmpty).
+- **Tags come from the brain's master lists** (Supabase `core.terms`, readable as `public.core_terms`).
+  `industry` and `asset_type` MUST be a listed label or alias - the database rejects anything else and
+  the whole load fails. Leave `industry` empty when the document names no industry (it is stored as
+  Cross-industry). Industries: BFSI, Government, Pharma / Healthcare, Manufacturing, IT / ITeS,
+  Education, E-commerce / Retail, Media, Telecom, Cross-industry. A genuinely new product or competitor
+  is fine (stored as written, listed in `public.core_unmapped` for review); a new industry or asset type
+  needs a row in core.terms first - log it for a human instead of inventing one.
 - Commits are authored as siddharth.g25pgdm@gmail.com (check `git config user.email`). Messages end
   with the Co-Authored-By line from your session's attribution instructions. Only commit
   `corpus/cards/*.json`. Never commit anything else under `corpus/`.
