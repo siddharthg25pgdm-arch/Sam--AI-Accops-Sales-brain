@@ -85,7 +85,7 @@ export function CompareTable({ title, columns, rows, filters, footnote, source, 
                       ) : r.label}
                     </th>
                     {Array.from({ length: n - 1 }, (_, c) => (
-                      <td key={c} className={c === 0 && (r.accent === 1 || r.accent === 2) ? `sb-acc-${r.accent}` : undefined}>
+                      <td key={c} data-col={columns[c + 1]} className={c === 0 && (r.accent === 1 || r.accent === 2) ? `sb-acc-${r.accent}` : undefined}>
                         {c === 0 && r.accent === 1 && <Icon d={ICON.check} label="Accops advantage" className="sb-mark" />}
                         {c === 0 && r.accent === 2 && <Icon d={ICON.caution} label="Worth checking" className="sb-mark" />}
                         {r.cells[c] ?? "–"}

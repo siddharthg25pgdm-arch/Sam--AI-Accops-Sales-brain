@@ -108,6 +108,26 @@
 .sb-legend { display: flex; flex-wrap: wrap; gap: 12px; font-weight: 500; }
 .sb-legend > span { display: inline-flex; align-items: center; gap: 4px; }
 .sb-legend .sb-ic { width: 13px; height: 13px; }
+/* narrow (the 400 px widget, phones): a 3-column table becomes stacked cards, label first, then each value under its
+   column header (data-col), side by side; no sideways scroll. The real <table> stays at 480 px and wider. */
+@container (max-width: 479px) {
+  .sb-table table.sb-cols-3 { display: block; min-width: 0; }
+  .sb-cols-3 thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .sb-cols-3 tbody { display: block; }
+  .sb-cols-3 tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; padding: 12px 14px; border-bottom: 1px solid var(--sb-line); }
+  .sb-cols-3 tbody tr:last-child, .sb-cols-3 tbody tr.sb-open { border-bottom-color: transparent; }
+  .sb-cols-3 tbody tr.sb-open { padding-bottom: 6px; }
+  .sb-table .sb-cols-3 tbody th, .sb-table .sb-cols-3 tbody td { position: static; width: auto; min-width: 0; max-width: none; padding: 0; border: 0; box-shadow: none; }
+  .sb-cols-3 tbody th { grid-column: 1 / -1; }
+  .sb-cols-3 tbody td::before { content: attr(data-col); display: block; margin-bottom: 1px; font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--sb-ink-3); }
+  .sb-cols-3 tbody td:nth-of-type(1)::before { color: var(--sb-navy); }
+  .sb-cols-3 tbody tr.sb-detail:not([hidden]) { display: block; padding: 0 14px 12px; border-bottom: 1px solid var(--sb-line); }
+  .sb-cols-3 tbody tr.sb-detail:last-child { border-bottom: 0; }
+  .sb-cols-3 tbody tr.sb-detail td::before, .sb-cols-3 td.sb-empty::before { content: none; }
+  .sb-cols-3 .sb-detail td > div { position: static; width: auto; padding: 0; }
+  .sb-table .sb-cols-3 td.sb-empty { grid-column: 1 / -1; padding: 4px 0; }
+}
 
 /* steps + stepper (Meetup segmented progress, Klaviyo checklist, Perplexity Back/Next) */
 .sb-steps { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
