@@ -24,7 +24,7 @@ from pathlib import Path
 from urllib.parse import urljoin
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "corpus" / "web"
@@ -97,13 +97,27 @@ CHROME = {"The case study has been sent to your mail ID.", "Your details have be
           "copy", "URL copied!", "email", "Share", "Talk to an Expert", "Let us contact you", "Find a local partner"}
 
 
+BLOCKS = ["p", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6", "section", "td", "th", "tr", "ul", "ol", "table",
+          "details", "summary", "blockquote", "figcaption", "article", "dt", "dd"]
+
+
 def clean_lines(root) -> list[str]:
+    """One line per block element; inline markup and source line-wraps are joined, so a sentence stays whole."""
+    for c in root.find_all(string=lambda x: isinstance(x, Comment)):
+        c.extract()  # the LP's build notes ("ANGLE A", "Step 1: low-threat questions first") live in comments
+    for t in root.find_all(string=True):
+        t.replace_with(re.sub(r"\s+", " ", t))
+    for br in root.find_all("br"):
+        br.replace_with("\n")
+    for el in root.find_all(BLOCKS):
+        el.insert_before("\n")
+        el.insert_after("\n")
     lines, prev = [], None
-    for ln in root.get_text("\n").split("\n"):
-        ln = re.sub(r"\s+", " ", ln).strip()
+    for ln in root.get_text(" ").split("\n"):
+        ln = re.sub(r"\s+([,.;:!?])", r"\1", re.sub(r"\s+", " ", ln)).strip()
         if ln in STOP_AT:
             break
-        if len(ln) > 1 and ln != prev and ln not in CHROME:
+        if (len(ln) > 1 or ln.isalnum()) and ln != prev and ln not in CHROME:  # keep a lone "0" stat
             lines.append(ln)
         prev = ln
     return lines
@@ -204,8 +218,9 @@ def tag(text: str, entries) -> list[str]:
 
 
 def norm(s: str) -> str:
-    return re.sub(r"\s+", " ", s.replace("’", "'").replace("‘", "'").replace("“", '"')
-                  .replace("”", '"').replace("–", "-").replace("—", "-")).strip().lower()
+    """Comparison form for quote checks. A " | " in a quote marks a line break on the page."""
+    return re.sub(r"\s+", " ", s.replace("|", " ").replace("’", "'").replace("‘", "'").replace("“", '"')
+                  .replace("”", '"').replace("–", "-").replace("—", "-")).strip().lower().replace(" ,", ",").replace(" .", ".")
 
 
 def auto_facts(lines: list[str], limit: int = 6) -> list[dict]:
@@ -254,7 +269,7 @@ def build_card(rec: dict, ptype: str, terms, old: dict | None, log: list) -> dic
             "content_hash": chash, "words": len(text.split()), "carded_by": "auto", "needs_recard": True}
     slug = url.rstrip("/").rsplit("/", 1)[-1]
     if old and old.get("carded_by") == "claude" and old.get("content_hash") == chash:
-        for k in ("summary", "facts", "questions_answered", "page_type", "products", "industries", "carded_by"):
+        for k in ("title", "summary", "facts", "questions_answered", "page_type", "products", "industries", "carded_by"):
             card[k] = old[k]
         card["needs_recard"] = False
     elif not (slug in NO_FACTS or ptype == "legal"):
