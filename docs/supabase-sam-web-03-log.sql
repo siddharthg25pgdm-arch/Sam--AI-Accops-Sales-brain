@@ -1,3 +1,4 @@
+-- APPLIED to production (iwqhayuoxnrhqzozznes) 26 Oct 2026 with Siddharth's OK; proof 185/186 (only search timing 106 ms vs 100).
 -- SAM website chatbot, stage 1: conversation log, limits, model ceiling, answer cache. Migration name sam_web_03_log.
 -- Needs 01 (settings). The cache checks sam_v1_public_asset_rows (v1, applied 30 Sep) directly.
 -- NOT APPLIED. Awaiting Siddharth's approval (docs/plans/web-s1-a-APPROVAL.md). Record the date here when applied.

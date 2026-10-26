@@ -1,3 +1,4 @@
+-- APPLIED to production (iwqhayuoxnrhqzozznes) 26 Oct 2026 with Siddharth's OK; proof 185/186 (only search timing 106 ms vs 100).
 -- SAM website chatbot, stage 1: the knowledge tables. Migration name sam_web_01_knowledge.
 -- NOT APPLIED. Awaiting Siddharth's approval (docs/plans/web-s1-a-APPROVAL.md). Record the date here when applied.
 -- Plan: docs/plans/2026-10-26-website-chatbot-stage1.md section 5. Apply order: 01 -> 02 -> 03.
