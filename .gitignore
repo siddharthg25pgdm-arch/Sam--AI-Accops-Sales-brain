@@ -14,6 +14,9 @@ corpus/*
 # boundary object the design rests on (Claude Enterprise writes it, Groq only ever reads it),
 # so it must be reviewable in a diff. Ignoring it lost 7 cards to one untracked directory.
 !corpus/cards/
+# Website page cards and the chatbot Q&A bank: cards of PUBLIC pages only (no page bodies; those stay in
+# corpus/web-raw/, still ignored). Reviewable in a diff for the same reason as the asset cards.
+!corpus/web/
 .claude/
 
 # Confidential third-party design notes: local only, never pushed
