@@ -94,10 +94,11 @@
 .wt-actions .btn-line { padding: 6px 12px; }
 .wt-actions .btn-line.danger { color: var(--bad-ink) !important; }
 .wt-actions .disabled { font-size: 12.5px; color: var(--ink-3); padding: 7px 0; }
-.wt-edit { flex-basis: 100%; order: 3; }
+.wt-edit { order: 2; }                                  /* Approve, Edit, Retire on one row; the open editor takes its own */
+.wt-actions form:has(.danger) { order: 3; }
+.wt-edit[open] { flex-basis: 100%; order: 4; }
 .wt-edit > summary { list-style: none; display: inline-block; }
 .wt-edit > summary::-webkit-details-marker { display: none; }
-.wt-actions:has(.wt-edit[open]) .wt-edit { order: 3; }
 .wt-edit[open] > summary { margin-bottom: 10px; }
 .wt-edit form { display: flex; flex-direction: column; gap: 8px; background: var(--paper); border-radius: 12px; padding: 12px; }
 .wt-edit textarea { font: inherit; font-size: 14px; line-height: 1.5; color: var(--ink); background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; padding: 9px 11px; min-height: 120px; resize: vertical; width: 100%; box-sizing: border-box; }
