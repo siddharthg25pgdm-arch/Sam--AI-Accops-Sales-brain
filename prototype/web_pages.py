@@ -333,6 +333,70 @@ def write(name: str, cards: list[dict]):
     (OUT / name).write_text(json.dumps(cards, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 
+def qa_check(qa_file: Path, review_md: Path) -> int:
+    """Every evidence quote in the Q&A bank must be on its source page (or in the public asset's card);
+    answers stay <= 60 words. Writes the line-by-line approval table. Returns the number of errors."""
+    lp = {r["url"]: r for r in json.loads(raw_path(LP).read_text(encoding="utf-8"))}
+    assets_f = RAW.parent / "public-assets.json"  # cached read-only from Supabase view sam_v1_public_assets
+    assets = {a["public_url"]: a for a in json.loads(assets_f.read_text(encoding="utf-8"))} if assets_f.exists() else {}
+
+    def source_text(url):
+        if url in lp:
+            return " ".join(lp[url]["lines"])
+        p = raw_path(url)  # a public page beats an asset card when a case study is both
+        if p.exists():
+            return " ".join(json.loads(p.read_text(encoding="utf-8"))[0]["lines"])
+        if url in assets:
+            a = assets[url]
+            return " ".join([a["title"], a["brief"] or ""] + (a["key_outcomes"] or []))
+        return None
+
+    qa, errors = json.loads(qa_file.read_text(encoding="utf-8")), []
+    ids = {q["id"] for q in qa}
+    for q in qa:
+        words = len(q["short_answer"].split())
+        if words > 60:
+            errors.append(f"{q['id']}: answer is {words} words")
+        if q["parent_id"] and q["parent_id"] not in ids:
+            errors.append(f"{q['id']}: orphan (parent {q['parent_id']})")
+        if not q["evidence"]:
+            errors.append(f"{q['id']}: no evidence")
+        for ev in q["evidence"]:
+            text = source_text(ev["url"])
+            if text is None:
+                errors.append(f"{q['id']}: source not carded or cached: {ev['url']}")
+            elif norm(ev["quote"]) not in norm(text):
+                errors.append(f"{q['id']}: quote not found on {ev['url']}: {ev['quote'][:70]}")
+            if ev["url"] not in q["sources"]:
+                errors.append(f"{q['id']}: evidence url missing from sources: {ev['url']}")
+        if not q["needs_approval"] and re.search(r"ISO|certif|Gartner|HDX|NetScaler|\d+%", q["short_answer"]):
+            errors.append(f"{q['id']}: looks like a number/certification/competitor claim but needs_approval is false")
+
+    cell = lambda s: str(s).replace("|", "\\|").replace("\n", " ")
+    short = lambda u: u.replace("https://www.accops.com", "").replace("https://accops-citrix-lp.vercel.app/", "LP").replace(
+        "https://downloads.accops.com/", "PDF:") or "/"
+    rows = ["| # | Question | Answer | Visual | Sources | Needs approval | Notes | Approve? |", "|---|---|---|---|---|---|---|---|"]
+    for i, q in enumerate(qa, 1):
+        tree = f"{q['id']}" + (f" (under {q['parent_id']})" if q["parent_id"] else " (root)")
+        appr = ("**Yes**: " + ", ".join(q["approval_reasons"])) if q["needs_approval"] else "No"
+        rows.append(f"| {i} | {cell(q['question'])}<br><sub>{tree}</sub> | {cell(q['short_answer'])} | {q['visual']['type']} | "
+                    f"{'<br>'.join(cell(short(s)) for s in q['sources'])} | {appr} | {cell(q['notes'])} | ☐ |")
+    n_appr = sum(q["needs_approval"] for q in qa)
+    review_md.write_text(
+        "# Website chatbot: Citrix LP Q&A bank, review sheet\n\n"
+        f"Generated from `corpus/web/qa-citrix-lp.json` by `python prototype/web_pages.py --qa`. "
+        f"{len(qa)} draft pairs, {n_appr} need approval (they state a number, certification, customer, analyst or "
+        "competitor claim). Every answer is grounded in the quoted evidence in the JSON; the check re-verifies each "
+        "quote against the live page text on every run.\n\n"
+        "**How to approve:** tick the last column, or edit the answer in the JSON and re-run `--qa`. Only approved pairs "
+        "ever reach the `sam_web_qa` view (PRD section 6). 'Talk to sales' goes to accops.com/schedule-a-free-demo "
+        "because the LP's own form is not wired yet.\n\n" + "\n".join(rows) + "\n", encoding="utf-8")
+    for e in errors:
+        print("QA:", e)
+    print(f"qa: {len(qa)} pairs, {n_appr} need approval, {len(errors)} errors -> {review_md}")
+    return len(errors)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--refetch", action="store_true")
@@ -341,9 +405,12 @@ def main():
                     help="merge Claude-written {url: {summary, facts, questions_answered[, page_type, products, industries]}} "
                          "into the card files, then rebuild offline so every quote is re-checked")
     ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--qa", action="store_true", help="check corpus/web/qa-citrix-lp.json and write docs/web-qa-review.md")
     a = ap.parse_args()
     if a.selftest:
         return selftest()
+    if a.qa:
+        return 1 if qa_check(OUT / "qa-citrix-lp.json", ROOT / "docs" / "web-qa-review.md") else 0
     if a.apply:
         notes = json.loads(Path(a.apply).read_text(encoding="utf-8"))
         for name in ("pages-accops-com.json", "pages-citrix-lp.json"):

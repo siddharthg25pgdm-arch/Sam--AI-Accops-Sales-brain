@@ -1,0 +1,2070 @@
+[
+ {
+  "id": "lp-01",
+  "parent_id": null,
+  "nudge_weight": 100,
+  "question": "Is Accops a real alternative to Citrix?",
+  "aliases": [
+   "citrix alternative",
+   "replace citrix",
+   "accops vs citrix",
+   "what replaces citrix"
+  ],
+  "short_answer": "For most mainstream Windows app and desktop delivery, yes. Accops covers the same ground with VDI, a ZTNA gateway, MFA and SSO in one platform, on infrastructure you already own. If you depend heavily on HDX-specific optimisations for extreme-latency links or specialist graphics, evaluate carefully.",
+  "visual": {
+   "type": "compare_table",
+   "data": {
+    "columns": [
+     "You need",
+     "Accops"
+    ],
+    "rows": [
+     [
+      "Virtual apps and desktops",
+      "HyWorks"
+     ],
+     [
+      "Secure remote access gateway (ZTNA)",
+      "HySecure"
+     ],
+     [
+      "MFA and SSO",
+      "HyID"
+     ],
+     [
+      "Where it runs",
+      "On-prem, hybrid or cloud"
+     ]
+    ],
+    "footnote": "One platform, one contract."
+   }
+  },
+  "link": "https://accops-citrix-lp.vercel.app/#comparison",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#faq",
+   "https://accops-citrix-lp.vercel.app/#section-1"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-1",
+    "quote": "Accops runs your Windows apps and desktops on infrastructure you already own — VDI, ZTNA gateway, MFA and SSO in a single platform"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#faq",
+    "quote": "For most mainstream Windows app and desktop delivery workloads, Accops covers the same ground with VDI, ZTNA gateway, MFA and SSO in a single platform."
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#faq",
+    "quote": "Where you depend heavily on HDX-specific optimisations for extreme-latency links or specialist graphics workloads, evaluate carefully"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-1",
+    "quote": "HyWorks — VDI & apps HySecure — ZTNA HyID — MFA & SSO | one platform · one contract"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-1",
+    "quote": "Deploy on-prem, hybrid or cloud."
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "competitor claim"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Root question. Wording follows the LP's own FAQ answer."
+ },
+ {
+  "id": "lp-02",
+  "parent_id": "lp-01",
+  "nudge_weight": 90,
+  "question": "Which Citrix components does Accops replace?",
+  "aliases": [
+   "do we still need netscaler",
+   "citrix components",
+   "storefront director sql server",
+   "how many products"
+  ],
+  "short_answer": "A typical Citrix estate licenses NetScaler for load balancing, Director for monitoring, SQL Server for the site database and Universal Print Server for printing. Accops ships those as built-in parts of one product, plus ZTNA, MFA and SSO, with no separate SQL Server licence.",
+  "visual": {
+   "type": "compare_table",
+   "data": {
+    "columns": [
+     "Citrix estate",
+     "Accops"
+    ],
+    "rows": [
+     [
+      "NetScaler / ADC (gateway, load balancing)",
+      "Built into the platform"
+     ],
+     [
+      "Citrix Director (monitoring)",
+      "Built in"
+     ],
+     [
+      "SQL Server (site database)",
+      "Bundled; no separate SQL Server licence"
+     ],
+     [
+      "Universal Print Server",
+      "Driver-free universal printing included"
+     ],
+     [
+      "Third-party MFA / SSO",
+      "HyID, same vendor"
+     ],
+     [
+      "Products to license and patch",
+      "8 → 1"
+     ]
+    ],
+    "footnote": "Citrix statements are based on publicly available Citrix information, as stated on the comparison page."
+   }
+  },
+  "link": "https://accops-citrix-lp.vercel.app/#section-4",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#section-1",
+   "https://accops-citrix-lp.vercel.app/#comparison",
+   "https://accops-citrix-lp.vercel.app/#section-4"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-1",
+    "quote": "A Citrix estate needs NetScaler for load balancing, Director for monitoring, SQL Server for the site database and Universal Print Server for printing. Accops ships those as built-in components of one product — plus ZTNA, MFA and SSO."
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#comparison",
+    "quote": "Site database | Bundled; no separate SQL Server licence"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#comparison",
+    "quote": "Printing | Driver-free universal printing included"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#comparison",
+    "quote": "Included — HySecure ZTNA and HyID MFA/SSO, same vendor"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-4",
+    "quote": "8 → 1 | Products to license and patch"
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "competitor claim",
+   "number"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": ""
+ },
+ {
+  "id": "lp-03",
+  "parent_id": "lp-01",
+  "nudge_weight": 85,
+  "question": "How does Accops compare with Citrix feature by feature?",
+  "aliases": [
+   "feature comparison",
+   "feature parity",
+   "accops citrix comparison table"
+  ],
+  "short_answer": "On the eight criteria that usually decide it, Accops builds in the gateway, monitoring, site database, printing and ZTNA/MFA/SSO, offers perpetual or subscription licensing, and gives direct OEM support. Citrix's HDX remains the more mature protocol for extreme-latency and specialist graphics cases.",
+  "visual": {
+   "type": "compare_table",
+   "data": {
+    "columns": [
+     "Criterion",
+     "Accops",
+     "Citrix"
+    ],
+    "rows": [
+     [
+      "Gateway & load balancing",
+      "Built into the platform",
+      "Typically requires NetScaler / ADC, licensed separately"
+     ],
+     [
+      "Monitoring & session analytics",
+      "Built in",
+      "Citrix Director; advanced analytics in higher tiers"
+     ],
+     [
+      "Site database",
+      "Bundled; no separate SQL Server licence",
+      "SQL Server required, commonly clustered for HA"
+     ],
+     [
+      "Printing",
+      "Driver-free universal printing included",
+      "Universal Print Server component"
+     ],
+     [
+      "ZTNA, MFA and SSO",
+      "Included (HySecure, HyID)",
+      "Separate SKUs or third-party identity products"
+     ],
+     [
+      "Protocol maturity & WAN optimisation",
+      "Production-proven for mainstream workloads",
+      "HDX more mature for extreme-latency and specialist graphics"
+     ],
+     [
+      "Licensing model",
+      "Perpetual or subscription; concurrent or named user",
+      "Subscription; perpetual withdrawn for new purchases"
+     ],
+     [
+      "Support model",
+      "Direct OEM support; named engineers",
+      "Tiered support, frequently via partner or distributor"
+     ]
+    ],
+    "footnote": "Citrix statements are based on publicly available Citrix information. Citrix, NetScaler and HDX are trademarks of Cloud Software Group, Inc."
+   }
+  },
+  "link": "https://accops-citrix-lp.vercel.app/#comparison",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#comparison"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#comparison",
+    "quote": "Gateway & load balancing | Built into the platform | Typically requires NetScaler / ADC, licensed separately"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#comparison",
+    "quote": "Production-proven for mainstream workloads | HDX remains the more mature protocol for extreme-latency and specialist graphics cases"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#comparison",
+    "quote": "Licensing model | Perpetual or subscription; concurrent or named user | Subscription; perpetual licensing withdrawn for new purchases"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#comparison",
+    "quote": "Support model | Direct OEM support; named engineers | Tiered support, frequently delivered via partner or distributor"
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "competitor claim"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Table copies the LP's eight rows verbatim. The LP's 'Last verified' date is blank ('—'); set it before this pair goes live."
+ },
+ {
+  "id": "lp-04",
+  "parent_id": "lp-01",
+  "nudge_weight": 60,
+  "question": "When is Citrix still the better choice?",
+  "aliases": [
+   "should we stay on citrix",
+   "is accops right for us",
+   "large estate"
+  ],
+  "short_answer": "If you run a very large multi-region estate with deep HDX-specific dependencies, an established Citrix CoE, or tooling built directly on Citrix APIs, the switching cost can outweigh the licensing saving. Accops fits best when you want VDI, secure access and identity from one vendor on infrastructure you already own.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Where Citrix is still the better choice",
+      "url": "https://accops-citrix-lp.vercel.app/#section-6",
+      "blurb": "An honest-fit check before you start a POC."
+     }
+    ]
+   }
+  },
+  "link": "https://accops-citrix-lp.vercel.app/#section-6",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#section-6"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-6",
+    "quote": "If you run a very large multi-region estate with deep dependencies on HDX-specific optimisations, an established Citrix CoE, or third-party tooling built directly against the Citrix APIs, that ecosystem maturity is real and hard to replicate."
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-6",
+    "quote": "Teams with heavy investment in Citrix-specific automation and staff certification often find the switching cost outweighs the licensing saving."
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-6",
+    "quote": "Accops is the stronger fit where you want VDI, secure remote access and identity from one vendor, on infrastructure you already own, with commercial terms that hold for the life of the contract."
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "competitor claim"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Trust-building answer; keep it even though it concedes ground."
+ },
+ {
+  "id": "lp-05",
+  "parent_id": null,
+  "nudge_weight": 95,
+  "question": "Can we migrate off Citrix without downtime?",
+  "aliases": [
+   "migration downtime",
+   "move off citrix",
+   "citrix migration",
+   "rip and replace"
+  ],
+  "short_answer": "Yes. Accops runs alongside your existing Citrix environment during the pilot and phased rollout. Users move in batches while both environments stay live, and nothing is decommissioned until you choose to.",
+  "visual": {
+   "type": "steps",
+   "data": {
+    "steps": [
+     {
+      "title": "Assessment",
+      "text": "Review your Citrix environment, user profiles and application dependencies."
+     },
+     {
+      "title": "Pilot / POC",
+      "text": "A limited user group runs on Accops alongside the existing setup."
+     },
+     {
+      "title": "Phased migration",
+      "text": "Users move in planned batches; both environments coexist."
+     },
+     {
+      "title": "Go-live & support",
+      "text": "Full cutover with direct OEM support."
+     }
+    ]
+   }
+  },
+  "link": "https://accops-citrix-lp.vercel.app/#migration",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#faq",
+   "https://accops-citrix-lp.vercel.app/#migration"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#faq",
+    "quote": "Yes. Accops runs alongside your existing Citrix environment during the pilot and phased rollout. Users are moved in batches while both environments stay live, so business continuity is maintained throughout."
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#faq",
+    "quote": "Nothing is decommissioned until you choose to decommission it."
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#migration",
+    "quote": "We evaluate your current Citrix environment, user profiles and application dependencies, and design a right-fit architecture against what you actually run."
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#migration",
+    "quote": "Full cutover with direct OEM support monitoring performance, security and cost outcomes after the transition."
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Root question."
+ },
+ {
+  "id": "lp-06",
+  "parent_id": "lp-05",
+  "nudge_weight": 80,
+  "question": "How long does a Citrix to Accops migration take?",
+  "aliases": [
+   "migration timeline",
+   "how many weeks",
+   "deployment time",
+   "how fast can we move"
+  ],
+  "short_answer": "It depends on estate size and application complexity, and Accops has not published standard timelines. The team scopes it in the assessment step and moves users in batches. Share your user count and app mix and an engineer will outline a plan.",
+  "visual": {
+   "type": "cta",
+   "data": {
+    "label": "Get a migration plan",
+    "url": "https://www.accops.com/schedule-a-free-demo"
+   }
+  },
+  "link": null,
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#migration",
+   "https://accops-citrix-lp.vercel.app/#section-5"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#migration",
+    "quote": "Users move in planned batches. Both environments coexist throughout, so business operations continue uninterrupted."
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "GAP: the LP planner's week counts are marked PLACEHOLDER DURATIONS on the live page. Replace this hand-off with real ranges once professional services publishes them."
+ },
+ {
+  "id": "lp-07",
+  "parent_id": "lp-05",
+  "nudge_weight": 75,
+  "question": "Can we run a pilot or POC before committing?",
+  "aliases": [
+   "poc",
+   "proof of concept",
+   "trial",
+   "pilot"
+  ],
+  "short_answer": "Yes. A limited user group runs on Accops alongside your existing setup, so your team gets hands-on experience before any commitment to roll out.",
+  "visual": {
+   "type": "cta",
+   "data": {
+    "label": "Plan a pilot",
+    "url": "https://www.accops.com/schedule-a-free-demo"
+   }
+  },
+  "link": null,
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#migration"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#migration",
+    "quote": "A limited user group runs on Accops alongside the existing setup, so your team gets hands-on experience before any commitment to roll out."
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Whether the POC is free, and its length, is not public."
+ },
+ {
+  "id": "lp-08",
+  "parent_id": "lp-05",
+  "nudge_weight": 55,
+  "question": "Will our IT team and users need retraining?",
+  "aliases": [
+   "training",
+   "learning curve",
+   "admin training",
+   "user experience change"
+  ],
+  "short_answer": "Minimal for end users, who see little change day to day. Administrators moving from Citrix tooling face a genuine learning curve, which Accops scopes into the migration plan rather than leaving it to documentation.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Migration FAQ",
+      "url": "https://accops-citrix-lp.vercel.app/#faq",
+      "blurb": "Downtime, infrastructure, training and licensing."
+     }
+    ]
+   }
+  },
+  "link": "https://accops-citrix-lp.vercel.app/#faq",
+  "cta": "none",
+  "cta_url": null,
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#faq"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#faq",
+    "quote": "Minimal for end users, who see little change in day-to-day experience. For administrators there is a genuine learning curve moving from Citrix tooling, and we scope that into the migration plan rather than leaving it to documentation."
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": ""
+ },
+ {
+  "id": "lp-09",
+  "parent_id": "lp-05",
+  "nudge_weight": 70,
+  "question": "Do we have to replace our hypervisor, Active Directory or file servers?",
+  "aliases": [
+   "existing infrastructure",
+   "keep vmware",
+   "keep active directory",
+   "hypervisor agnostic"
+  ],
+  "short_answer": "No. Accops is hypervisor-agnostic (VMware, Nutanix, Hyper-V) and integrates with Azure, AWS, GCP and OCI. Your existing Active Directory and file servers stay in place.",
+  "visual": {
+   "type": "compare_table",
+   "data": {
+    "columns": [
+     "Your estate",
+     "With Accops"
+    ],
+    "rows": [
+     [
+      "Hypervisor (VMware, Nutanix, Hyper-V)",
+      "Keep it"
+     ],
+     [
+      "Public cloud (Azure, AWS, GCP, OCI)",
+      "Integrates"
+     ],
+     [
+      "Active Directory",
+      "Stays in place"
+     ],
+     [
+      "File servers",
+      "Stay in place"
+     ]
+    ]
+   }
+  },
+  "link": "https://accops-citrix-lp.vercel.app/#faq",
+  "cta": "none",
+  "cta_url": null,
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#faq"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#faq",
+    "quote": "Accops is hypervisor-agnostic — VMware, Nutanix and Hyper-V — and integrates with Azure, AWS, GCP and OCI."
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#faq",
+    "quote": "your existing Active Directory and file servers stay in place."
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": ""
+ },
+ {
+  "id": "lp-10",
+  "parent_id": null,
+  "nudge_weight": 70,
+  "question": "Does Accops run on Nutanix AHV?",
+  "aliases": [
+   "nutanix",
+   "ahv",
+   "prism central",
+   "nutanix support"
+  ],
+  "short_answer": "Yes. HyWorks lists Nutanix among its supported hypervisors, and recent HyWorks releases add a Nutanix Prism Central APIv4 connector and Nutanix API throttling. HyDesk thin clients also support Nutanix.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Accops HyWorks",
+      "url": "https://www.accops.com/products/hyworks",
+      "blurb": "Editions and supported hypervisors."
+     },
+     {
+      "title": "HyWorks release notes",
+      "url": "https://www.accops.com/product-software",
+      "blurb": "Nutanix Prism Central v7.3+ connector (HyWorks 4.1 HF2.1)."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/products/hyworks",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp",
+   "product:hyworks"
+  ],
+  "regions": [],
+  "sources": [
+   "https://www.accops.com/products/hyworks",
+   "https://www.accops.com/product-software",
+   "https://www.accops.com/products/hydesk"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/products/hyworks",
+    "quote": "Hypervisor Support | VMWare, Nutanix, Proxmox (non-HCI), Hyper-V, Azure"
+   },
+   {
+    "url": "https://www.accops.com/product-software",
+    "quote": "For Nutanix Prism Central v7.3 and later, deployments should use the new APIv4 + APIv4.2 connector for reliable clone-from-recovery-point operations with MAC address preservation."
+   },
+   {
+    "url": "https://www.accops.com/product-software",
+    "quote": "Ensures operational continuity in Nutanix environments by automatically fetching and enforcing optimal API rate limits, preventing failures during high-volume operations."
+   },
+   {
+    "url": "https://www.accops.com/products/hydesk",
+    "quote": "Supports VMware, Hyper-V, SCVMM, Nutanix, Proxmox, OpenShift and HPE Morpheus."
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Root for the Nutanix/Proxmox branch. No public Nutanix-specific reference architecture or validated design was found (gap)."
+ },
+ {
+  "id": "lp-11",
+  "parent_id": "lp-10",
+  "nudge_weight": 60,
+  "question": "Does Accops support Proxmox?",
+  "aliases": [
+   "proxmox",
+   "proxmox ve",
+   "open source hypervisor",
+   "leave vmware"
+  ],
+  "short_answer": "Yes. HyWorks lists Proxmox (non-HCI) among its supported hypervisors, HyDesk thin clients support Proxmox, and the HySecure gateway can run on Proxmox. Confirm your exact Proxmox setup with an engineer, since the edition table qualifies it as non-HCI.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Accops HyWorks editions",
+      "url": "https://www.accops.com/products/hyworks",
+      "blurb": "Hypervisor support by edition."
+     },
+     {
+      "title": "HySecure Gateway datasheet (PDF)",
+      "url": "https://downloads.accops.com/Accops%20Hysecure%20Datasheet%20V5%202026.pdf",
+      "blurb": "Deployment platforms for the ZTNA gateway."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/products/hyworks",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp",
+   "product:hyworks"
+  ],
+  "regions": [],
+  "sources": [
+   "https://www.accops.com/products/hyworks",
+   "https://www.accops.com/products/hydesk",
+   "https://downloads.accops.com/Accops%20Hysecure%20Datasheet%20V5%202026.pdf"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/products/hyworks",
+    "quote": "Hypervisor Support | VMWare, Nutanix, Proxmox (non-HCI), Hyper-V, Azure"
+   },
+   {
+    "url": "https://www.accops.com/products/hydesk",
+    "quote": "Supports VMware, Hyper-V, SCVMM, Nutanix, Proxmox, OpenShift and HPE Morpheus."
+   },
+   {
+    "url": "https://downloads.accops.com/Accops%20Hysecure%20Datasheet%20V5%202026.pdf",
+    "quote": "Three deployment topologies: inbound ZTNA on-premises, reverse-connect via the Accops ZTNA Cloud Plane, or reverse-connect 100% on-premises/private cloud with no inbound firewall openings; runs on bare metal, VMware ESXi, XenServer, Hyper-V, Nutanix AHV, Proxmox, Red Hat OpenShift, AWS, Azure, Oracle Cloud, Google Cloud and Kubernetes"
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "'non-HCI' is unexplained on the public page (gap)."
+ },
+ {
+  "id": "lp-12",
+  "parent_id": "lp-10",
+  "nudge_weight": 55,
+  "question": "Which hypervisors and clouds does Accops support?",
+  "aliases": [
+   "supported platforms",
+   "aws azure gcp oci",
+   "openshift",
+   "openstack",
+   "cloud support"
+  ],
+  "short_answer": "HyWorks' edition table lists VMware, Nutanix, Proxmox (non-HCI), Hyper-V and Azure, with OpenShift, Azure Stack HCI, OpenStack, AWS, OCI and GCP marked as add-ons. You can deploy on-premises, in the cloud or hybrid.",
+  "visual": {
+   "type": "compare_table",
+   "data": {
+    "columns": [
+     "Platform",
+     "HyWorks support"
+    ],
+    "rows": [
+     [
+      "VMware, Nutanix, Proxmox (non-HCI), Hyper-V, Azure",
+      "Listed"
+     ],
+     [
+      "OpenShift, Azure Stack HCI, OpenStack",
+      "Add-on"
+     ],
+     [
+      "AWS, OCI, GCP",
+      "Add-on"
+     ]
+    ],
+    "footnote": "Per the HyWorks edition table; confirm the edition for your estate."
+   }
+  },
+  "link": "https://www.accops.com/products/hyworks",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp",
+   "product:hyworks"
+  ],
+  "regions": [],
+  "sources": [
+   "https://www.accops.com/products/hyworks",
+   "https://www.accops.com/technical-solutions/virtual-desktop-infrastructure-vdi-solutions"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/products/hyworks",
+    "quote": "Hypervisor Support | VMWare, Nutanix, Proxmox (non-HCI), Hyper-V, Azure | Openshift, Azure Stack HCI, OpenStack | Add-on | AWS, OCI, GCP | Add-on"
+   },
+   {
+    "url": "https://www.accops.com/technical-solutions/virtual-desktop-infrastructure-vdi-solutions",
+    "quote": "Supporting flexible deployment models, including on-premises, Cloud VDI, and hybrid environments for an optimal security–performance balance"
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "The edition table's text extraction loses which edition column each 'Add-on' sits in; check the rendered page before approving the 'add-on' wording."
+ },
+ {
+  "id": "lp-13",
+  "parent_id": null,
+  "nudge_weight": 50,
+  "question": "Can Accops run it for us as a managed service (DaaS)?",
+  "aliases": [
+   "daas",
+   "managed desktops",
+   "desktop as a service",
+   "hosted vdi",
+   "subscription service"
+  ],
+  "short_answer": "Yes. Accops DaaS delivers fully managed virtual desktops across Windows, Windows Server and Linux on a zero-CapEx subscription, and Accops Managed Desktops covers deployment, operations, upgrades, monitoring and support.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Accops Desktop as a Service",
+      "url": "https://www.accops.com/cloud-services/accops-daas",
+      "blurb": "Managed virtual desktops, pay as you consume."
+     },
+     {
+      "title": "Accops DaaS brochure (PDF)",
+      "url": "https://downloads.accops.com/Accops%20DaaS%20Brochure%20V4%202026.pdf",
+      "blurb": "Multi-tenant or dedicated control plane."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/cloud-services/accops-daas",
+  "cta": "asset",
+  "cta_url": "https://downloads.accops.com/Accops%20DaaS%20Brochure%20V4%202026.pdf",
+  "pages": [
+   "citrix-lp",
+   "product:daas"
+  ],
+  "regions": [],
+  "sources": [
+   "https://www.accops.com/cloud-services/accops-daas",
+   "https://downloads.accops.com/Accops%20DaaS%20Brochure%20V4%202026.pdf"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/cloud-services/accops-daas",
+    "quote": "Provision shared or dedicated workspaces across Windows, Windows Server, and Linux environments."
+   },
+   {
+    "url": "https://www.accops.com/cloud-services/accops-daas",
+    "quote": "Eliminate management complexities through a predictable, zero-CapEx enterprise virtual workspace service."
+   },
+   {
+    "url": "https://www.accops.com/cloud-services/accops-daas",
+    "quote": "Accops delivers fully managed virtual desktops, reducing the complexity of VDI deployment, operations, upgrades, monitoring, and support."
+   },
+   {
+    "url": "https://downloads.accops.com/Accops%20DaaS%20Brochure%20V4%202026.pdf",
+    "quote": "Multi-tenant or dedicated control plane, customer's choice"
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Which clouds/regions host Accops DaaS, and data residency, are not public (gap)."
+ },
+ {
+  "id": "lp-14",
+  "parent_id": "lp-13",
+  "nudge_weight": 40,
+  "question": "Does Accops work with Azure Virtual Desktop?",
+  "aliases": [
+   "avd",
+   "azure virtual desktop",
+   "wvd",
+   "microsoft avd"
+  ],
+  "short_answer": "Yes. Accops extends Azure Virtual Desktop with zero trust access, MFA, data-leak controls, power management that shuts idle VMs, Microsoft Teams audio/video optimisations, and access from Linux thin clients.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Accops for Microsoft AVD",
+      "url": "https://www.accops.com/technical-solutions/avd",
+      "blurb": "Zero trust, MFA and cost controls on top of AVD."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/technical-solutions/avd",
+  "cta": "none",
+  "cta_url": null,
+  "pages": [
+   "citrix-lp",
+   "solution:avd"
+  ],
+  "regions": [],
+  "sources": [
+   "https://www.accops.com/technical-solutions/avd"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/technical-solutions/avd",
+    "quote": "Shuts idle and pooled VMs; scheduled workday, weekend, and holiday power plans reduce costs."
+   },
+   {
+    "url": "https://www.accops.com/technical-solutions/avd",
+    "quote": "The latest Microsoft Teams audio and video optimisations"
+   },
+   {
+    "url": "https://www.accops.com/technical-solutions/avd",
+    "quote": "Compliant access from Linux-based thin clients, with driver-less printing, USB redirection, data copy control, and contextual access with granular and flexible device policies"
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Deliberately omits the AVD page's 'Microsoft Gold partner' claim (Microsoft retired that designation in 2022)."
+ },
+ {
+  "id": "lp-15",
+  "parent_id": null,
+  "nudge_weight": 65,
+  "question": "Is the Accops display protocol as good as HDX?",
+  "aliases": [
+   "hdx",
+   "protocol",
+   "user experience",
+   "latency",
+   "photon"
+  ],
+  "short_answer": "For mainstream workloads the Accops protocol is production-proven; Citrix HDX remains more mature for extreme-latency links and specialist graphics. In June 2026 Accops announced Photon, its own protocol with audio/video redirection, real-time network adaptation and GPU acceleration.",
+  "visual": {
+   "type": "compare_table",
+   "data": {
+    "columns": [
+     "",
+     "Accops",
+     "Citrix"
+    ],
+    "rows": [
+     [
+      "Protocol maturity & WAN optimisation",
+      "Production-proven for mainstream workloads",
+      "HDX more mature for extreme-latency and specialist graphics"
+     ]
+    ],
+    "footnote": "Photon: announced 4 June 2026."
+   }
+  },
+  "link": "https://www.accops.com/news/accops-announces-its-own-display-protocol-photon-built-for-multimedia-first-hybrid-workforce",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#comparison",
+   "https://www.accops.com/news/accops-announces-its-own-display-protocol-photon-built-for-multimedia-first-hybrid-workforce"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#comparison",
+    "quote": "Production-proven for mainstream workloads | HDX remains the more mature protocol for extreme-latency and specialist graphics cases"
+   },
+   {
+    "url": "https://www.accops.com/news/accops-announces-its-own-display-protocol-photon-built-for-multimedia-first-hybrid-workforce",
+    "quote": "Engineered as a high-performance, OS-agnostic protocol, Photon intelligently adapts to network conditions in real time, redirects audio and video processing efficiently, leverages GPU acceleration, and delivers a secure, responsive, local-like desktop experience from anywhere."
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "competitor claim"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "The release says Photon is 'set to launch'; whether it is generally available now is not public. Confirm GA status before approving."
+ },
+ {
+  "id": "lp-16",
+  "parent_id": "lp-15",
+  "nudge_weight": 45,
+  "question": "Will Teams calls, video and graphics work well?",
+  "aliases": [
+   "teams optimisation",
+   "video conferencing",
+   "gpu",
+   "cad",
+   "graphics workstation",
+   "multimedia"
+  ],
+  "short_answer": "Accops delivers Microsoft Teams audio/video optimisations on AVD, Teams optimisation in its DaaS, multi-media offloading in HyWorks, and graphics workstations over a UDP-based transport. PCoIP support is an add-on in HyWorks editions.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Graphics Workstation",
+      "url": "https://www.accops.com/technical-solutions/graphics-workstation",
+      "blurb": "Remote graphics workloads with pixel-only streams."
+     },
+     {
+      "title": "Accops HyWorks editions",
+      "url": "https://www.accops.com/products/hyworks",
+      "blurb": "Multi-media offloading, PCoIP options."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/technical-solutions/graphics-workstation",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp",
+   "product:hyworks"
+  ],
+  "regions": [],
+  "sources": [
+   "https://www.accops.com/technical-solutions/avd",
+   "https://www.accops.com/cloud-services/accops-daas",
+   "https://www.accops.com/products/hyworks",
+   "https://www.accops.com/technical-solutions/graphics-workstation"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/technical-solutions/avd",
+    "quote": "The latest Microsoft Teams audio and video optimisations"
+   },
+   {
+    "url": "https://www.accops.com/cloud-services/accops-daas",
+    "quote": "Streamline cloud operations using built-in FSLogix container management and Teams optimisation."
+   },
+   {
+    "url": "https://www.accops.com/products/hyworks",
+    "quote": "Multi-media offloading"
+   },
+   {
+    "url": "https://www.accops.com/products/hyworks",
+    "quote": "PCoIP Standard Apps Support | Add-on"
+   },
+   {
+    "url": "https://www.accops.com/technical-solutions/graphics-workstation",
+    "quote": "UDP-based transport ensures high-fidelity graphics performance over low-bandwidth networks."
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "GAP: no public statement of Teams optimisation for on-prem HyWorks VDI, or a GPU/vGPU support matrix."
+ },
+ {
+  "id": "lp-17",
+  "parent_id": null,
+  "nudge_weight": 75,
+  "question": "Is Accops ISO 27001 certified?",
+  "aliases": [
+   "iso 27001",
+   "certifications",
+   "security certification",
+   "compliance certificate",
+   "soc 2"
+  ],
+  "short_answer": "Yes. The Citrix comparison page states Accops is ISO 27001 certified to the 27001:2022 standard. For other certifications or audit reports, ask the team directly.",
+  "visual": {
+   "type": "stat",
+   "data": {
+    "stats": [
+     {
+      "value": "ISO 27001:2022",
+      "label": "Certified",
+      "source": "https://accops-citrix-lp.vercel.app/#section-2"
+     }
+    ]
+   }
+  },
+  "link": null,
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp",
+   "home"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#section-2",
+   "https://accops-citrix-lp.vercel.app/#talk"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-2",
+    "quote": "ISO 27001 | Certified 27001:2022"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#talk",
+    "quote": "ISO 27001:2022 certified"
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "certification"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "GAP: accops.com itself does not state ISO 27001; no certificate scope, SOC 2, Common Criteria or similar is public. Confirm certificate scope and validity before approving."
+ },
+ {
+  "id": "lp-18",
+  "parent_id": "lp-17",
+  "nudge_weight": 60,
+  "question": "Does Accops help with RBI, CERT-In or DPDP compliance?",
+  "aliases": [
+   "rbi",
+   "cert-in",
+   "dpdp",
+   "meity",
+   "regulatory compliance",
+   "pci dss",
+   "hipaa"
+  ],
+  "short_answer": "Accops' BFSI solution cites support for RBI guidelines, GDPR, GLBA and PCI DSS; its government solution cites MeitY, CERT-In and DPDP Act requirements, met through contextual access, audit logs and data-leak controls.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Accops for BFSI",
+      "url": "https://www.accops.com/industry-solutions/bfsi",
+      "blurb": "Zero trust access, MFA, audit trails for banks and insurers."
+     },
+     {
+      "title": "Accops for Government",
+      "url": "https://www.accops.com/industry-solutions/government-institutions",
+      "blurb": "MeitY, CERT-In and DPDP-aligned access controls."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/industry-solutions/bfsi",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp",
+   "industry:bfsi",
+   "industry:government-institutions"
+  ],
+  "regions": [
+   "IN"
+  ],
+  "sources": [
+   "https://www.accops.com/industry-solutions/bfsi",
+   "https://www.accops.com/industry-solutions/government-institutions"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/industry-solutions/bfsi",
+    "quote": "Meet regulatory and industry mandates like GDPR, RBI guidelines, GLBA and PCI DSS"
+   },
+   {
+    "url": "https://www.accops.com/industry-solutions/government-institutions",
+    "quote": "Meet MeitY, CERT-In and DPDP Act requirements via contextual access and audit logs, blocking copy-paste, downloads and unauthorised USB use, and isolating workloads in air-gapped zones for data residency."
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "regulatory claim"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Region IN first."
+ },
+ {
+  "id": "lp-19",
+  "parent_id": "lp-17",
+  "nudge_weight": 55,
+  "question": "Can Accops replace NetScaler / Citrix Gateway for remote access?",
+  "aliases": [
+   "netscaler",
+   "citrix gateway",
+   "citrix adc",
+   "vpn replacement",
+   "ztna gateway"
+  ],
+  "short_answer": "Gateway and load balancing are built into the Accops platform. HySecure is a ZTNA gateway for web, SaaS, client-server and VDI apps, with per-application tunnels, contextual checks on device, identity, time and location, and web application protection against OWASP Top 10/20 risks.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Accops HySecure",
+      "url": "https://www.accops.com/products/hysecure",
+      "blurb": "ZTNA private-application gateway."
+     },
+     {
+      "title": "HySecure Gateway datasheet (PDF)",
+      "url": "https://downloads.accops.com/Accops%20Hysecure%20Datasheet%20V5%202026.pdf",
+      "blurb": "Protocols, security and deployment topologies."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/products/hysecure",
+  "cta": "asset",
+  "cta_url": "https://downloads.accops.com/Accops%20Hysecure%20Datasheet%20V5%202026.pdf",
+  "pages": [
+   "citrix-lp",
+   "product:hysecure"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#comparison",
+   "https://www.accops.com/products/hysecure",
+   "https://downloads.accops.com/Accops%20Hysecure%20Datasheet%20V5%202026.pdf"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#comparison",
+    "quote": "Gateway & load balancing | Built into the platform"
+   },
+   {
+    "url": "https://www.accops.com/products/hysecure",
+    "quote": "With out-of-the-box security features, organisations can provide compliant access to any corporate application—including web apps, SaaS, client-server apps, and legacy virtual desktops (VDI/DaaS)."
+   },
+   {
+    "url": "https://www.accops.com/products/hysecure",
+    "quote": "Isolated encrypted tunnels per app using Secure Private Application Network technology."
+   },
+   {
+    "url": "https://www.accops.com/products/hysecure",
+    "quote": "Access decisions based on device posture, identity, time, and location."
+   },
+   {
+    "url": "https://www.accops.com/products/hysecure",
+    "quote": "Integrated defense against OWASP Top 10/20 risks and SANS 25 errors."
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "competitor claim"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "GAP: no public mapping of NetScaler features Accops does not cover (e.g. GSLB, advanced ADC/WAF policies)."
+ },
+ {
+  "id": "lp-20",
+  "parent_id": "lp-17",
+  "nudge_weight": 50,
+  "question": "Are MFA and SSO included, or do we need another identity vendor?",
+  "aliases": [
+   "mfa included",
+   "sso included",
+   "hyid",
+   "identity provider",
+   "duo okta"
+  ],
+  "short_answer": "Included. HyID, from the same vendor, provides MFA and SSO for modern, legacy, cloud and on-premises apps, including ones without native MFA. Methods include OTP, push, biometrics, hardware tokens, FIDO keys and QR codes, and it connects to Active Directory, LDAP, Azure AD or another IdP.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Accops HyID",
+      "url": "https://www.accops.com/products/hyid",
+      "blurb": "Adaptive MFA and SSO."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/products/hyid",
+  "cta": "none",
+  "cta_url": null,
+  "pages": [
+   "citrix-lp",
+   "product:hyid"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#comparison",
+   "https://www.accops.com/products/hyid"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#comparison",
+    "quote": "Included — HySecure ZTNA and HyID MFA/SSO, same vendor"
+   },
+   {
+    "url": "https://www.accops.com/products/hyid",
+    "quote": "HyID MFA works across all modern, legacy, cloud, and on-premises applications - including those that do not natively support MFA"
+   },
+   {
+    "url": "https://www.accops.com/products/hyid",
+    "quote": "HyID MFA with OTP, push notifications, hardware tokens, FIDO keys, and passwordless options."
+   },
+   {
+    "url": "https://www.accops.com/products/hyid",
+    "quote": "Connects to local DB, Active Directory, LDAP, Azure AD, and any third-party IDP."
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Which HyID edition is bundled with a VDI deal is not public."
+ },
+ {
+  "id": "lp-21",
+  "parent_id": null,
+  "nudge_weight": 90,
+  "question": "How much does Accops cost compared with Citrix?",
+  "aliases": [
+   "price",
+   "pricing",
+   "cost",
+   "per user cost",
+   "how much cheaper",
+   "licence cost",
+   "tco"
+  ],
+  "short_answer": "Accops does not publish list prices; pricing depends on users, licensing model, term and region. The fastest way to compare is to share your Citrix renewal quote: an engineer will map what you pay today against the equivalent Accops estate and tell you plainly if switching is not worth it.",
+  "visual": {
+   "type": "cta",
+   "data": {
+    "label": "Get a renewal review",
+    "url": "https://www.accops.com/schedule-a-free-demo"
+   }
+  },
+  "link": null,
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#talk",
+   "https://accops-citrix-lp.vercel.app/#section-7"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#talk",
+    "quote": "A 20-minute call with an engineer. We will map what you are paying for today against what the equivalent Accops estate looks like, and tell you plainly if the switch is not worth it for you."
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-7",
+    "quote": "Your quoted pricing will vary by region, term and volume."
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Root question. GAP: the LP's two calculators run on figures the live page itself marks PLACEHOLDER; never quote them. A republished YourStory article on accops.com quotes historical per-user pricing; the bot must not repeat it (PRD: never pricing)."
+ },
+ {
+  "id": "lp-22",
+  "parent_id": "lp-21",
+  "nudge_weight": 70,
+  "question": "What savings have customers reported?",
+  "aliases": [
+   "roi",
+   "savings",
+   "tco reduction",
+   "cost reduction",
+   "case study savings"
+  ],
+  "short_answer": "Published Accops case studies report, for example, 50% lower TCO than competitive solutions at India's third largest public sector bank, IT costs down 25% at HPCL, and OpEx optimised by 20% at Maveric Systems. Results depend on the estate.",
+  "visual": {
+   "type": "stat",
+   "data": {
+    "stats": [
+     {
+      "value": "50%",
+      "label": "lower TCO vs competitive solutions (3rd largest PSB of India)",
+      "source": "https://www.accops.com/case-studies/third-largest-psb"
+     },
+     {
+      "value": "25%",
+      "label": "lower IT costs (HPCL)",
+      "source": "https://www.accops.com/case-studies/hpcl"
+     },
+     {
+      "value": "20%",
+      "label": "OpEx optimised (Maveric Systems)",
+      "source": "https://www.accops.com/case-studies/maveric-systems"
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/case-studies",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp",
+   "case-studies"
+  ],
+  "regions": [],
+  "sources": [
+   "https://www.accops.com/case-studies/third-largest-psb",
+   "https://www.accops.com/case-studies/hpcl",
+   "https://www.accops.com/case-studies/maveric-systems"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/case-studies/third-largest-psb",
+    "quote": "50% lesser TCO compared to competitive solutions"
+   },
+   {
+    "url": "https://www.accops.com/case-studies/hpcl",
+    "quote": "Reduced IT costs by 25%"
+   },
+   {
+    "url": "https://www.accops.com/case-studies/maveric-systems",
+    "quote": "OpEx was optimized by 20%"
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "number",
+   "customer"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Chose case-study numbers over the site's generic '40% lower TCO' tile (why-accops), which has no stated basis. None of the three pages says the prior platform was Citrix; don't imply it."
+ },
+ {
+  "id": "lp-23",
+  "parent_id": "lp-21",
+  "nudge_weight": 65,
+  "question": "What licensing models are available?",
+  "aliases": [
+   "perpetual licence",
+   "subscription",
+   "concurrent users",
+   "named users",
+   "licensing"
+  ],
+  "short_answer": "Perpetual or subscription, with concurrent or named-user options. Concurrent licensing tends to suit shift-based and branch operations, where the named-user count is much higher than peak simultaneous use.",
+  "visual": {
+   "type": "compare_table",
+   "data": {
+    "columns": [
+     "Option",
+     "Available"
+    ],
+    "rows": [
+     [
+      "Perpetual",
+      "Yes"
+     ],
+     [
+      "Subscription",
+      "Yes"
+     ],
+     [
+      "Concurrent user",
+      "Yes"
+     ],
+     [
+      "Named user",
+      "Yes"
+     ]
+    ]
+   }
+  },
+  "link": "https://accops-citrix-lp.vercel.app/#faq",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#faq",
+   "https://accops-citrix-lp.vercel.app/#comparison",
+   "https://www.accops.com/about-us"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#faq",
+    "quote": "Perpetual and subscription, with concurrent or named-user options."
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#faq",
+    "quote": "Concurrent licensing in particular tends to suit shift-based and branch operations where the named-user count is much higher than peak simultaneous usage."
+   },
+   {
+    "url": "https://www.accops.com/about-us",
+    "quote": "We offer virtualization and Zero Trust-based remote access options, allowing deployment on-premises or on the cloud with perpetual or subscription-based licensing."
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": ""
+ },
+ {
+  "id": "lp-24",
+  "parent_id": "lp-21",
+  "nudge_weight": 60,
+  "question": "How do we know Accops won't raise prices at renewal too?",
+  "aliases": [
+   "renewal price increase",
+   "price protection",
+   "price lock",
+   "reduce seats at renewal"
+  ],
+  "short_answer": "It's the fairest question to ask. Accops offers perpetual as well as subscription licences, so you are not forced into a subscription. Renewal terms are set in your contract; ask the team to put the renewal basis in writing before you sign.",
+  "visual": {
+   "type": "cta",
+   "data": {
+    "label": "Ask about renewal terms",
+    "url": "https://www.accops.com/schedule-a-free-demo"
+   }
+  },
+  "link": null,
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#faq",
+   "https://www.accops.com/about-us",
+   "https://accops-citrix-lp.vercel.app/#section-10"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#faq",
+    "quote": "Perpetual and subscription, with concurrent or named-user options."
+   },
+   {
+    "url": "https://www.accops.com/about-us",
+    "quote": "allowing deployment on-premises or on the cloud with perpetual or subscription-based licensing."
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "commercial commitment"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "The LP's four commitments (no mid-term repricing, seat reduction at renewal, perpetual stays available, renewal basis upfront) are marked NEEDS SIGN-OFF on the live page, so this answer deliberately does not state them. Once Sales leadership and Legal approve, replace with a 'steps' visual listing the approved ones."
+ },
+ {
+  "id": "lp-25",
+  "parent_id": null,
+  "nudge_weight": 80,
+  "question": "Has anyone replaced Citrix with Accops?",
+  "aliases": [
+   "citrix customer",
+   "citrix displacement",
+   "reference customer",
+   "case study citrix"
+  ],
+  "short_answer": "Yes. City Pharmacy, a UAE pharmaceutical and medical-equipment distributor, replaced Citrix XenApp with Accops HyWorks to virtualise its Orion ERP client, after its previous VDI lacked flexibility and renewal costs were high. Universal printer drivers also fixed its invoice printing.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "City Pharmacy replaces Citrix XenApp with Accops HyWorks",
+      "url": "https://www.accops.com/case-studies/city-pharmacy",
+      "blurb": "ERP virtualisation in the UAE; case study PDF available."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/case-studies/city-pharmacy",
+  "cta": "asset",
+  "cta_url": "https://downloads.accops.com/City+Pharmacy+Case+Study+.pdf",
+  "pages": [
+   "citrix-lp",
+   "case-studies"
+  ],
+  "regions": [],
+  "sources": [
+   "https://www.accops.com/case-studies/city-pharmacy",
+   "https://accops-citrix-lp.vercel.app/#proof"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/case-studies/city-pharmacy",
+    "quote": "City Pharmacy replaces Citrix XenApp by Accops HyWorks for ERP virtualization to ensure seamless access & compliance"
+   },
+   {
+    "url": "https://www.accops.com/case-studies/city-pharmacy",
+    "quote": "Productivity took a hit as remote users could not access Orion ERP since the existing VDI vendor could not achieve desired results due to lack of flexibility & customization."
+   },
+   {
+    "url": "https://www.accops.com/case-studies/city-pharmacy",
+    "quote": "High IT infrastructure and license renewal costs."
+   },
+   {
+    "url": "https://www.accops.com/case-studies/city-pharmacy",
+    "quote": "Universal printer drivers to resolve invoice printing issues."
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "customer",
+   "competitor claim"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Root question. GAP: the only public named Citrix displacement; no seat count, timeline or saving on the page."
+ },
+ {
+  "id": "lp-26",
+  "parent_id": "lp-25",
+  "nudge_weight": 65,
+  "question": "Which banks and regulated organisations use Accops?",
+  "aliases": [
+   "bank customers",
+   "bfsi references",
+   "insurance customers",
+   "government customers",
+   "who uses accops"
+  ],
+  "short_answer": "Published case studies include Deutsche Bank (India), LIC, India's third largest public sector bank, Aditya Birla Sun Life Insurance, Kalupur Bank and HPCL, covering vendor access, SWIFT and CBS access, and remote access for branches and agents.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Deutsche Bank",
+      "url": "https://www.accops.com/case-studies/deutsche-bank",
+      "blurb": "Vendor access from unmanaged devices."
+     },
+     {
+      "title": "LIC",
+      "url": "https://www.accops.com/case-studies/lic",
+      "blurb": "Secure access for branches and agents."
+     },
+     {
+      "title": "3rd largest PSB of India",
+      "url": "https://www.accops.com/case-studies/third-largest-psb",
+      "blurb": "SWIFT and CBS from one PC."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/case-studies",
+  "cta": "asset",
+  "cta_url": "https://www.accops.com/case-studies",
+  "pages": [
+   "citrix-lp",
+   "industry:bfsi",
+   "case-studies"
+  ],
+  "regions": [
+   "IN"
+  ],
+  "sources": [
+   "https://www.accops.com/case-studies/deutsche-bank",
+   "https://www.accops.com/case-studies/lic",
+   "https://www.accops.com/case-studies/third-largest-psb",
+   "https://www.accops.com/case-studies/aditya-birla",
+   "https://www.accops.com/case-studies/kalupur-bank",
+   "https://www.accops.com/case-studies/hpcl"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/case-studies/deutsche-bank",
+    "quote": "Zero endpoint management | Access from any unmanaged device without any security concerns"
+   },
+   {
+    "url": "https://www.accops.com/case-studies/lic",
+    "quote": "The Indian state-owned insurance and investment corporation, LIC, enables secure access from outside corporate network to internal business applications"
+   },
+   {
+    "url": "https://www.accops.com/case-studies/third-largest-psb",
+    "quote": "Productivity improved as users can now use one PC to access both SWIFT & CBS applications"
+   },
+   {
+    "url": "https://www.accops.com/case-studies/aditya-birla",
+    "quote": "One of India's leading life insurance companies, ABSLI, ensures security and cost optimization while providing remote access to third-party consultants"
+   },
+   {
+    "url": "https://www.accops.com/case-studies/kalupur-bank",
+    "quote": "Compliance concerns are addressed by ZTNA-based remote access to CBS & other critical apps"
+   },
+   {
+    "url": "https://www.accops.com/case-studies/hpcl",
+    "quote": "HPCL, a global Fortune 500 company, virtualizes critical business applications for enhanced security and reduced downtime"
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "customer"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "All names appear on public accops.com case-study pages. For GCC visitors, lead with City Pharmacy and Zulekha Hospital instead (stage 2 personalisation)."
+ },
+ {
+  "id": "lp-27",
+  "parent_id": "lp-25",
+  "nudge_weight": 60,
+  "question": "Is Accops in the Gartner Magic Quadrant?",
+  "aliases": [
+   "gartner",
+   "magic quadrant",
+   "analyst recognition",
+   "gartner daas"
+  ],
+  "short_answer": "Accops has been recognised in the Gartner Magic Quadrant for Desktop as a Service in 2025 and 2026, after an Honorable Mention in the 2024 edition, according to its press releases.",
+  "visual": {
+   "type": "stat",
+   "data": {
+    "stats": [
+     {
+      "value": "2025 & 2026",
+      "label": "Gartner Magic Quadrant for DaaS",
+      "source": "https://www.accops.com/news/accops-recognised-in-the-2026-gartner-magic-quadrant-for-desktop-as-a-service"
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/news/accops-recognised-in-the-2026-gartner-magic-quadrant-for-desktop-as-a-service",
+  "cta": "none",
+  "cta_url": null,
+  "pages": [
+   "citrix-lp",
+   "home"
+  ],
+  "regions": [],
+  "sources": [
+   "https://www.accops.com/news/accops-recognised-in-the-2026-gartner-magic-quadrant-for-desktop-as-a-service",
+   "https://www.accops.com/news/accops-recognised-in-the-2025-gartner-r-magic-quadrant-for-desktop-as-a-service",
+   "https://www.accops.com/"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/news/accops-recognised-in-the-2026-gartner-magic-quadrant-for-desktop-as-a-service",
+    "quote": "has once again been recognised in the 2026 Gartner ® Magic Quadrant™ for Desktop as a Service (DaaS), its second consecutive appearance in the report, following recognition in 2025 and an Honorable Mention in the 2024 edition."
+   },
+   {
+    "url": "https://www.accops.com/",
+    "quote": "Recognised for Two Consecutive Years in the | Magic Quadrant™ | for DaaS (2025 & 2026)"
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "analyst claim"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "The LP's own placeholder says Legal must confirm 'recognised in' vs 'positioned in' under Gartner's citation rules. Approve wording with Legal; Gartner's standard disclaimer may need to sit under the stat."
+ },
+ {
+  "id": "lp-28",
+  "parent_id": "lp-25",
+  "nudge_weight": 50,
+  "question": "How many organisations use Accops?",
+  "aliases": [
+   "customer count",
+   "how big is accops",
+   "number of customers",
+   "countries"
+  ],
+  "short_answer": "Accops says 1000+ organisations run its products, across 12 countries, supported by 200+ channel partners, including regulated banks and insurers in India and APAC.",
+  "visual": {
+   "type": "stat",
+   "data": {
+    "stats": [
+     {
+      "value": "1000+",
+      "label": "Organisations",
+      "source": "https://accops-citrix-lp.vercel.app/#section-2"
+     },
+     {
+      "value": "12",
+      "label": "Countries",
+      "source": "https://accops-citrix-lp.vercel.app/#section-2"
+     },
+     {
+      "value": "200+",
+      "label": "Channel partners",
+      "source": "https://accops-citrix-lp.vercel.app/#section-2"
+     }
+    ]
+   }
+  },
+  "link": null,
+  "cta": "none",
+  "cta_url": null,
+  "pages": [
+   "citrix-lp",
+   "home"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#section-2",
+   "https://www.accops.com/"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-2",
+    "quote": "1000+ | Organisations running Accops"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-2",
+    "quote": "12 | Countries"
+   },
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#section-2",
+    "quote": "200+ | Channel partners"
+   },
+   {
+    "url": "https://www.accops.com/",
+    "quote": "12 | Countries | 1000+ | Customers | 200+ | Channel Partners"
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "number"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "CONTRADICTION: /about-us says 900+ customers; a 2025 article on the site says ~1,000 organisations with ~700 active customers; why-accops implies 11 countries (India, Japan, UAE, Saudi Arabia and 7 others). Fix the site, then approve."
+ },
+ {
+  "id": "lp-29",
+  "parent_id": null,
+  "nudge_weight": 55,
+  "question": "Who supports us after go-live: Accops or a partner?",
+  "aliases": [
+   "support",
+   "who supports",
+   "oem support",
+   "support model",
+   "sla"
+  ],
+  "short_answer": "Accops offers direct OEM support with named engineers, reachable by phone, at support@accops.com or through the support.accops.com ticket portal. Local partners can deliver deployment and services in your region.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Contact and support",
+      "url": "https://www.accops.com/contact-us",
+      "blurb": "Support phone, email and ticket portal."
+     },
+     {
+      "title": "Find a local partner",
+      "url": "https://www.accops.com/partners",
+      "blurb": "Distributors and partners by region."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/contact-us",
+  "cta": "none",
+  "cta_url": null,
+  "pages": [
+   "citrix-lp",
+   "contact"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#comparison",
+   "https://www.accops.com/contact-us",
+   "https://www.accops.com/partners",
+   "https://www.accops.com/why-accops"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#comparison",
+    "quote": "Support model | Direct OEM support; named engineers"
+   },
+   {
+    "url": "https://www.accops.com/contact-us",
+    "quote": "support@accops.com | Ticket Portal | support.accops.com"
+   },
+   {
+    "url": "https://www.accops.com/why-accops",
+    "quote": "Our 200+ partner network delivers seamless deployment, localised expertise, and rapid service"
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "GAP: support hours, SLAs, response times and regional support coverage are not public."
+ },
+ {
+  "id": "lp-30",
+  "parent_id": "lp-29",
+  "nudge_weight": 50,
+  "question": "Do you support organisations outside India?",
+  "aliases": [
+   "international",
+   "middle east",
+   "uae",
+   "japan",
+   "australia",
+   "usa",
+   "europe",
+   "africa",
+   "global"
+  ],
+  "short_answer": "Yes. Accops has offices in India and Dubai, a Japan partner (Accops and Zevoke Technologies), and distributors including TD SYNNEX in North America, Bulwark and FVC in the UAE, Mart Networks in Kenya and Lithe in Mauritius for the rest of Africa.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "Find a local partner",
+      "url": "https://www.accops.com/partners",
+      "blurb": "Distributors and partners by region."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/partners",
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp",
+   "partners"
+  ],
+  "regions": [
+   "GCC",
+   "SEA",
+   "AU",
+   "ROW"
+  ],
+  "sources": [
+   "https://www.accops.com/contact-us",
+   "https://www.accops.com/partners"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/contact-us",
+    "quote": "Visit our offices across India and UAE."
+   },
+   {
+    "url": "https://www.accops.com/partners",
+    "quote": "Accops and Zevoke Technologies Inc | Japan"
+   },
+   {
+    "url": "https://www.accops.com/partners",
+    "quote": "TD Synnex | North America"
+   },
+   {
+    "url": "https://www.accops.com/partners",
+    "quote": "Bulwark Technologies | Dubai,UAE"
+   },
+   {
+    "url": "https://www.accops.com/partners",
+    "quote": "FVC MEA DMCC | UAE"
+   },
+   {
+    "url": "https://www.accops.com/partners",
+    "quote": "Mart Networks | Kenya"
+   },
+   {
+    "url": "https://www.accops.com/partners",
+    "quote": "Lithe Solutions Distributor Ltd. | Indian Ocean Commission & Rest of Africa"
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "GAP: no named ANZ, SEA or Europe partner on the public partner page although the TD SYNNEX release targets those regions."
+ },
+ {
+  "id": "lp-31",
+  "parent_id": "lp-29",
+  "nudge_weight": 45,
+  "question": "Who owns Accops, and is it an Indian company?",
+  "aliases": [
+   "reliance jio",
+   "ownership",
+   "made in india",
+   "vendor stability",
+   "indian company"
+  ],
+  "short_answer": "Accops was founded in October 2012 and is headquartered in Pune, India. It describes itself as a Reliance Jio company; Reliance Jio took a majority stake in 2023. Accops states it holds Make-in-India platform status.",
+  "visual": {
+   "type": "doc_card",
+   "data": {
+    "cards": [
+     {
+      "title": "About Accops",
+      "url": "https://www.accops.com/about-us",
+      "blurb": "Founding, leadership and values."
+     }
+    ]
+   }
+  },
+  "link": "https://www.accops.com/about-us",
+  "cta": "none",
+  "cta_url": null,
+  "pages": [
+   "citrix-lp",
+   "home"
+  ],
+  "regions": [],
+  "sources": [
+   "https://www.accops.com/about-us",
+   "https://www.accops.com/news/accops-teams-up-with-lithe-sd-to-strengthen-secure-digital-workspace-delivery-across-ioc-and-roa",
+   "https://www.accops.com/news/with-reliance-jio-by-its-side-accops-is-rewriting-indias-cybersecurity-playbook-read-more-at-https-yourstory-com-2025-09-reliance-jio-accops-rewriting-indias-cybersecurity-playbook",
+   "https://www.accops.com/industry-solutions/government-institutions"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/about-us",
+    "quote": "Founded in October 2012, Accops is headquartered in Pune, India"
+   },
+   {
+    "url": "https://www.accops.com/news/accops-teams-up-with-lithe-sd-to-strengthen-secure-digital-workspace-delivery-across-ioc-and-roa",
+    "quote": "a Reliance Jio company"
+   },
+   {
+    "url": "https://www.accops.com/news/with-reliance-jio-by-its-side-accops-is-rewriting-indias-cybersecurity-playbook-read-more-at-https-yourstory-com-2025-09-reliance-jio-accops-rewriting-indias-cybersecurity-playbook",
+    "quote": "In 2023, when Reliance Jio took a majority stake in Accops"
+   },
+   {
+    "url": "https://www.accops.com/industry-solutions/government-institutions",
+    "quote": "Accops holds Make-in-India platform status"
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "ownership claim",
+   "number"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "why-accops says 'Backed by Reliance Group (Fortune 100)'; the same YourStory article also calls Accops 'fully bootstrapped', which conflicts with the majority stake. Use only the stake fact."
+ },
+ {
+  "id": "lp-32",
+  "parent_id": null,
+  "nudge_weight": 100,
+  "question": "How do I talk to an engineer about leaving Citrix?",
+  "aliases": [
+   "talk to sales",
+   "book a demo",
+   "contact",
+   "speak to someone",
+   "renewal review",
+   "call me"
+  ],
+  "short_answer": "Book a call with the Accops team. Bring your Citrix renewal quote, your component list or your migration constraints, and an engineer will map them against the equivalent Accops estate.",
+  "visual": {
+   "type": "cta",
+   "data": {
+    "label": "Talk to an engineer",
+    "url": "https://www.accops.com/schedule-a-free-demo"
+   }
+  },
+  "link": null,
+  "cta": "talk_to_sales",
+  "cta_url": "https://www.accops.com/schedule-a-free-demo",
+  "pages": [
+   "citrix-lp",
+   "general"
+  ],
+  "regions": [],
+  "sources": [
+   "https://accops-citrix-lp.vercel.app/#talk",
+   "https://www.accops.com/schedule-a-free-demo"
+  ],
+  "evidence": [
+   {
+    "url": "https://accops-citrix-lp.vercel.app/#talk",
+    "quote": "Bring us your renewal quote. | Bring us your component list. | Bring us your migration constraints."
+   }
+  ],
+  "needs_approval": false,
+  "approval_reasons": [],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Points at accops.com/schedule-a-free-demo (PRD section 9) because the LP's own form has no endpoint wired (its PLACEHOLDER note says so). Don't promise the LP's '20-minute call' or 'one business day' until that form is live."
+ }
+]
