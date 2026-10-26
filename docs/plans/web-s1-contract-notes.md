@@ -24,7 +24,7 @@ Stream B (branch `claude/web-s1-b`) is built against these. Later streams must m
 - **Handshake (D):** `/embed` server-renders the token with `mintHs(conversation_id)` from `@/lib/web/bot`, so mint and verify share one secret and format. Never re-implement it.
 - **Turn kind:** `Ctx.kind` is the turn kind (`"typed" | "click"`), set by answer.ts. Typed sends under 2 s after render are `suspect` (`too_fast`); clicks keep the 300 ms rule.
 - **Pre-guard logging:** answer.ts logs `guard_reason` (the rule name, never the text) in `sam_web_log_message`; null when not guarded. A's `03-log.sql` already stores it.
-- **Brand:** orange `#c8431c` on white (4.9:1, passes AA for body text); do not use the lighter site orange for text.
+- **Brand:** orange `#c8431c` for fills and orange text (white on it 4.9:1, AA). Not the LP orange `#f05b30` (3.4:1) or the plan's `#d94a20` (4.2:1). Tokens in `blocks.css` (`--sb-brand`).
 - **`/embed/gallery`:** `notFound()` when `VERCEL_ENV=production` (previews and local only), proven in blocks.check. It shows proposed and blocked fixtures (e.g. the $132/$220 calculator).
 - **`@openuidev/lang-core` 1.0.1** is now a direct exact dependency (library.tsx imports `jsonToOpenUI` from it).
 - **Open item: labels are not sticky across turns.** `classify` labels one turn; a bot/suspect conversation's next clean-looking turn is `human` again. Needs a Stream A read RPC returning the conversation's highest label (TODO in `web/lib/web/bot.ts`). Not built.
