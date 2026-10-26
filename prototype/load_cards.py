@@ -79,6 +79,19 @@ def rest(url: str, key: str, path: str, method: str = "GET", body=None, prefer: 
         sys.exit(f"supabase {method} {path} -> {e.code}: {e.read().decode()[:400]}")
 
 
+def rest_all(url: str, key: str, path: str, page: int = 1000) -> list:
+    """Every row `path` selects. PostgREST caps a response at 1,000 rows (max-rows) whatever `limit` says,
+    so `limit=5000` silently returned the first 1,000: harmless at 880 registry rows, and wrong the night
+    a second ingestion root takes the registry past 1,000 - every card bound to a row after that would
+    silently lose its binding. `path` must end in an order with a unique tiebreak."""
+    out: list = []
+    while True:
+        rows = rest(url, key, f"{path}&limit={page}&offset={len(out)}") or []
+        out += rows
+        if len(rows) < page:
+            return out
+
+
 def to_row(c: dict, batch: str, generated_by: str) -> dict:
     """Card JSON -> table row. Only known columns, and nothing invented for the ones a card omits."""
     src = c["source"]
@@ -179,6 +192,18 @@ def check_binding() -> None:
     assert rows[0]["carded_at"] == "THEN", "pre-hash rows keep their backfilled carded_at"
     rows = [dict(base, carded_at="2026-09-25")]; bind_and_stamp(rows, old, live, "NOW")
     assert rows[0]["carded_at"] == "2026-09-25", "explicit carded_at wins"
+    # Paging: a 2,345-row table read through a 1,000-row cap comes back whole.
+    global rest
+    real, table = rest, [{"item_id": str(i)} for i in range(2345)]
+    def capped(url, key, path, *a, **k):
+        q = dict(x.split("=", 1) for x in path.split("?", 1)[1].split("&"))
+        off, lim = int(q["offset"]), min(int(q["limit"]), 1000)
+        return table[off:off + lim]
+    rest = capped
+    try:
+        assert len(rest_all("u", "k", "t?select=item_id&order=item_id")) == 2345, "paged past the cap"
+    finally:
+        rest = real
     print("load_cards self-check: ok")
 
 
@@ -213,7 +238,7 @@ def main() -> None:
           f" | with a year: {sum(1 for r in rows if r.get('publish_year'))}")
 
     if a.check:
-        got = rest(url, key, f"{TABLE}?select=source,title,publish_year,expired,visibility&limit=2000") or []
+        got = rest_all(url, key, f"{TABLE}?select=source,title,publish_year,expired,visibility&order=source")
         bysrc = {g["source"]: g for g in got}
         print(f"\n{len(got)} rows in Supabase")
         missing = [r["source"] for r in rows if r["source"] not in bysrc]
@@ -227,9 +252,8 @@ def main() -> None:
                 print(f"     - {i}")
         sys.exit(1 if (missing or drift) else 0)
 
-    live = rest(url, key, "sam_sharepoint_files?deleted=is.false&select=item_id,filename&limit=5000") or []
-    prior = {p["source"]: p for p in
-             rest(url, key, f"{TABLE}?select=source,item_id,card_hash,carded_at&limit=2000") or []}
+    live = rest_all(url, key, "sam_sharepoint_files?deleted=is.false&select=item_id,filename&order=item_id")
+    prior = {p["source"]: p for p in rest_all(url, key, f"{TABLE}?select=source,item_id,card_hash,carded_at&order=source")}
     bind_and_stamp(rows, prior, live, datetime.now(timezone.utc).isoformat())
     bound = sum(1 for r in rows if r["item_id"])
     moved = sum(1 for r in rows if prior.get(r["source"], {}).get("carded_at") != r["carded_at"])
@@ -249,7 +273,7 @@ def main() -> None:
     rest(url, key, f"{TABLE}?on_conflict=source", "POST", rows,
          prefer="resolution=merge-duplicates,return=minimal")
     print(f"\nupserted {len(rows)} cards")
-    got = rest(url, key, f"{TABLE}?select=source&limit=2000") or []
+    got = rest_all(url, key, f"{TABLE}?select=source&order=source")
     print(f"table now holds {len(got)} rows")
 
 

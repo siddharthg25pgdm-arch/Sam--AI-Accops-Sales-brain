@@ -157,6 +157,8 @@ function view(r: Row, allowed: string[], approved: Approval[]) {
   const d = docOf(r.source);
   if (!d) return null;
   const { a, card } = d;
+  // A deleted file's words are not quoted, whatever its card still says (cards.ts eligibility, `gone`).
+  if (a.family?.gone === "deleted") return null;
   const audience: "internal" | "public" = a.public_url ? "public" : "internal";
   if (!allowed.includes(audience) || !allowed.includes(r.audience)) return null;
   const req = a.public_url ? approved.find(x => (x.public_url && norm(x.public_url) === norm(a.public_url)) || x.asset_path === a.file?.path
