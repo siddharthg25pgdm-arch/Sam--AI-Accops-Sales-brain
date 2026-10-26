@@ -11,8 +11,8 @@
 //   type "event" params { name: "doc_opened" | "filter_used" | "step_viewed", ... }  -> analytics only
 import { useMemo } from "react";
 import { createLibrary, defineComponent, Renderer, useTriggerAction, type ActionEvent } from "@openuidev/react-lang";
-// jsonToOpenUI lives in lang-core (react-lang 1.0.1 does not re-export it); lang-core is react-lang's own dependency,
-// hoisted to web/node_modules by the lockfile. ponytail: make it a direct dependency if npm ever stops hoisting it.
+// jsonToOpenUI lives in lang-core (react-lang 1.0.1 does not re-export it): a direct, exact dependency pinned to the
+// version react-lang resolves (blocks.check asserts they match).
 import { jsonToOpenUI } from "@openuidev/lang-core";
 import { z } from "zod";
 import * as B from "@/lib/blocks";
