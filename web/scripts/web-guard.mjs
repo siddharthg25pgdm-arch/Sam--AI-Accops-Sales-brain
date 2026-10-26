@@ -24,7 +24,8 @@ const TOKENS = [
   [/\bsb_secret_/, "a Supabase secret key"],
   [/NEXT_PUBLIC_SUPABASE/, "a public Supabase env var"],
   [/\bsam_web_(dashboard|purge)\b/, "a service-role-only RPC"],
-  [/\bsam_(?!web_)[a-z0-9_]+/, "an internal sam_* relation"],
+  // (?!...) also skips the GTM/GA4 dataLayer names of plan 7.1 (sam_chat, sam_event, sam_qa_id, sam_source): analytics keys, not relations
+  [/\bsam_(?!web_|(chat|event|qa_id|source)\b)[a-z0-9_]+/, "an internal sam_* relation"],
   [/\badi_[a-z0-9_]+/, "an internal adi_* relation"],
   [/asset_cards\.json/, "the internal card file"],
 ];
