@@ -28,7 +28,7 @@ export async function POST(req: Request) {
   console.log(`sharepoint snapshot: ${r.result}`);
   await logRun({ job: "snapshot", started_at: started, status: !r.ok ? "refused" : r.mode === "write" ? "ok" : "warn", summary: r.result,
     details: { mode: r.mode, applied: r.applied, listed: r.listed, tombstoned: r.tombstone_count, restored: r.restore_count, unknown: r.unknown_count,
-      added: r.seeded, moved: r.moved, outside: r.outside,
+      added: r.seeded, moved: r.moved, missed_edits: r.behind, outside: r.outside,
       roots: r.roots.map(x => ({ root: x.root, applied: x.applied, refused: x.refused, skipped: x.skipped, listed: x.listed, tombstoned: x.tombstone, unknown: x.unknown, added: x.seeded })) } });
   // A refusal is 409, so the flow run goes RED instead of green-while-nothing-happened. Power
   // Automate's default retry policy retries 408/429/5xx only, so a 409 is not re-sent.

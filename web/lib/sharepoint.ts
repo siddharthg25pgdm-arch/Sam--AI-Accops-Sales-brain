@@ -501,7 +501,7 @@ export type Snapshot = {
   count?: number;
   files?: SnapshotFile[];
 };
-export type SnapRow = { item_id: string; list_item_id: number | null; root?: string; folder: string; filename: string; deleted: boolean };
+export type SnapRow = { item_id: string; list_item_id: number | null; root?: string; folder: string; filename: string; deleted: boolean; modified_at?: string | null };
 export type SnapshotDiff = {
   refused: string | null;
   listed: number; live: number; matched: number; unverifiable: number;
@@ -556,12 +556,18 @@ export function diffSnapshot(rows: SnapRow[], snap: Snapshot): SnapshotDiff {
   return out;
 }
 
+/** More missed edits than this in one run is a field-format problem, not a busy day: report, do not apply. */
+const MAX_BEHIND = 200;
 const brief = (r: SnapRow) => ({ item_id: r.item_id, list_item_id: r.list_item_id, root: r.root ?? DEFAULT_ROOT, folder: r.folder, filename: r.filename });
 
 type Where = { root: string; folder: string; filename: string };
 /** One root's share of a snapshot: its diff, files that moved in from another root (re-filed, not
  *  deleted), and where each unknown file sits inside the root (for seeding). */
-export type RootPlan = { root: string; diff: SnapshotDiff | null; skipped: string | null; moved: (SnapRow & { to: Where })[]; folderOf: Map<number, string> };
+export type RootPlan = { root: string; diff: SnapshotDiff | null; skipped: string | null; moved: (SnapRow & { to: Where })[]; folderOf: Map<number, string>;
+  /** Live rows the listing shows edited (or renamed in place) after the registry last heard: a change
+   *  notification the flow missed. Bringing modified_at forward is what puts the file back in the carding
+   *  queue; without it a missed edit leaves the card describing the old file for good. */
+  behind: (SnapRow & { to: { modified_at: string; folder: string; filename: string } })[] };
 export type SnapshotPlan = { refused: string | null; outside: number; roots: RootPlan[] };
 
 /** Pure: split a snapshot by ingestion root and diff each root against its own rows, so one root's
@@ -585,13 +591,20 @@ export function planSnapshot(rows: SnapRow[], snap: Snapshot, roots: IngestRoot[
   for (const root of roots.filter(r => r.enabled)) {
     const mine = rows.filter(r => (r.root ?? DEFAULT_ROOT) === root.key), files = byRoot.get(root.key) ?? [];
     const folderOf = new Map(files.map(f => [num(f.id)!, at.get(num(f.id)!)!.folder]));
-    if (!files.length && !mine.some(r => !r.deleted)) { out.push({ root: root.key, diff: null, skipped: "nothing listed and nothing registered", moved: [], folderOf }); continue; }
+    if (!files.length && !mine.some(r => !r.deleted)) { out.push({ root: root.key, diff: null, skipped: "nothing listed and nothing registered", moved: [], folderOf, behind: [] }); continue; }
     const d = diffSnapshot(mine, { complete: true, count: files.length, files });
     // Listed under another root: moved between roots, which the change flow should have recorded.
     // Re-file it rather than tombstone it here and lose it there.
     const moved = d.tombstone.filter(r => at.has(r.list_item_id!)).map(r => ({ ...r, to: at.get(r.list_item_id!)! }));
+    // Only with the flow's `modified` field, and only by more than a minute (the two sources format time differently).
+    const listed = new Map(files.map(f => [num(f.id)!, f]));
+    const behind = mine.filter(r => !r.deleted && r.list_item_id != null && listed.get(r.list_item_id)?.modified).flatMap(r => {
+      const f = listed.get(r.list_item_id!)!, w = at.get(r.list_item_id!)!;
+      const newer = Date.parse(f.modified!) - Date.parse(r.modified_at ?? "1970-01-01") > 60_000;
+      return newer || w.filename !== r.filename || w.folder !== r.folder ? [{ ...r, to: { modified_at: newer ? f.modified! : r.modified_at!, folder: w.folder, filename: w.filename } }] : [];
+    });
     // Unknown means unknown anywhere: a file another root's row holds is a move, not a new file.
-    out.push({ root: root.key, skipped: null, moved, folderOf,
+    out.push({ root: root.key, skipped: null, moved, folderOf, behind,
       diff: { ...d, tombstone: d.tombstone.filter(r => !at.has(r.list_item_id!)), unknown: d.unknown.filter(f => !known.has(num(f.id)!)) } });
   }
   return { refused: null, outside, roots: out };
@@ -631,14 +644,14 @@ export async function applySnapshot(snap: Snapshot) {
   // Every row: a registry read that stopped at 1,000 would make the diff's coverage guards judge a
   // whole listing against part of the registry.
   const rows = await restAll<SnapRow>(`sam_sharepoint_files?scope=eq.${encodeURIComponent(scope)}` +
-    `&select=item_id,list_item_id,root,folder,filename,deleted&order=item_id`);
+    `&select=item_id,list_item_id,root,folder,filename,deleted,modified_at&order=item_id`);
   const plan = planSnapshot(rows ?? [], snap, await ingestRoots());
   const now = new Date().toISOString();
   const sc = `scope=eq.${encodeURIComponent(scope)}`;
   const idList = (xs: { list_item_id: number | null }[]) => xs.map(r => r.list_item_id).join(",");
 
   type RootOutcome = { root: string; applied: boolean; seeded: number; skipped: string | null; refused: string | null; listed: number; tombstone: number;
-    restore: number; moved: number; unknown: number; tombstone_rows: ReturnType<typeof brief>[]; restore_rows: ReturnType<typeof brief>[]; unknown_files: SnapshotFile[] };
+    restore: number; moved: number; unknown: number; behind: number; tombstone_rows: ReturnType<typeof brief>[]; restore_rows: ReturnType<typeof brief>[]; unknown_files: SnapshotFile[] };
   const roots: RootOutcome[] = [];
   for (const p of plan.roots) {
     const d = p.diff;
@@ -651,6 +664,10 @@ export async function applySnapshot(snap: Snapshot) {
         method: "PATCH", body: JSON.stringify({ deleted: false, deleted_at: null }) });
       for (const m of p.moved) await rest(`sam_sharepoint_files?item_id=eq.${encodeURIComponent(m.item_id)}`, {
         method: "PATCH", body: JSON.stringify({ root: m.to.root, folder: m.to.folder, filename: m.to.filename }) });
+      // Missed edits and in-place renames. last_synced is left alone: lastFlowWrite() measures the change flow.
+      // ponytail: one PATCH per row; a capped count because hundreds at once means a date-format mismatch, not edits.
+      if (p.behind.length <= MAX_BEHIND) for (const b of p.behind) await rest(`sam_sharepoint_files?item_id=eq.${encodeURIComponent(b.item_id)}`, {
+        method: "PATCH", body: JSON.stringify(b.to) });
       const seeds = d.unknown.filter(f => f.url).map(f => seedRow(f, p.root, p.folderOf.get(num(f.id)!) ?? "", scope));
       if (seeds.length) await rest("sam_sharepoint_files?on_conflict=item_id", {
         method: "POST", headers: { Prefer: "resolution=ignore-duplicates,return=minimal" }, body: JSON.stringify(seeds) });
@@ -660,7 +677,7 @@ export async function applySnapshot(snap: Snapshot) {
     roots.push({ root: p.root, applied, seeded, skipped: p.skipped, refused: d?.refused ?? null,
       // A refused root changes nothing, so it adds nothing to the totals; its would-be rows stay in tombstone_rows.
       listed: d?.listed ?? 0, tombstone: d && !d.refused ? d.tombstone.length : 0, restore: d && !d.refused ? d.restore.length : 0,
-      moved: d && !d.refused ? p.moved.length : 0, unknown: d?.unknown.length ?? 0,
+      moved: d && !d.refused ? p.moved.length : 0, unknown: d?.unknown.length ?? 0, behind: d && !d.refused ? p.behind.length : 0,
       tombstone_rows: (d?.tombstone ?? []).slice(0, 100).map(brief), restore_rows: (d?.restore ?? []).slice(0, 100).map(brief),
       unknown_files: (d?.unknown ?? []).slice(0, 50) });
   }
@@ -668,13 +685,14 @@ export async function applySnapshot(snap: Snapshot) {
   const refusedRoots = roots.filter(r => r.refused);
   const refused = plan.refused ?? (refusedRoots.length ? refusedRoots.map(r => `${r.root}: ${r.refused}`).join("; ") : null);
   const applied = !refused && roots.some(r => r.applied);
-  const sum = (k: "listed" | "tombstone" | "restore" | "unknown" | "seeded" | "moved") => roots.reduce((n, r) => n + r[k], 0);
+  const sum = (k: "listed" | "tombstone" | "restore" | "unknown" | "seeded" | "moved" | "behind") => roots.reduce((n, r) => n + r[k], 0);
   const w = (did: string, would: string) => (mode === "write" ? did : would);
   // Same opening as the one-root text ("snapshot write: N tombstoned, N restored, N listed, N unknown"):
   // the digest looks for "0 unknown" and the System tab shows it as is. Root detail follows " | ".
   const totals = `${sum("tombstone")} ${w("tombstoned", "would tombstone")}, ${sum("restore")} ${w("restored", "would restore")}, ` +
     `${sum("listed")} listed, ${sum("unknown")} unknown` + (sum("seeded") ? `, ${sum("seeded")} added` : "") +
     (sum("moved") ? `, ${sum("moved")} ${w("moved between roots", "would move between roots")}` : "") +
+    (sum("behind") ? `, ${sum("behind")} missed edits ${sum("behind") > MAX_BEHIND ? "(too many: not applied, check the date format)" : w("caught", "would be caught")}` : "") +
     (plan.outside ? `, ${plan.outside} outside every root` : "");
   const detail = roots.length > 1 || refusedRoots.length ? " | " + roots.map(r => r.refused ? `${r.root} REFUSED: ${r.refused}`
     : r.skipped ? `${r.root}: ${r.skipped}` : `${r.root}: ${r.listed} listed, ${r.tombstone} ${w("tombstoned", "would tombstone")}, ${r.unknown} unknown`).join(" | ") : "";
@@ -688,6 +706,6 @@ export async function applySnapshot(snap: Snapshot) {
   return {
     ok: !refused, mode, applied, refused, result, roots, outside: plan.outside,
     listed: sum("listed"), tombstone_count: sum("tombstone"), restore_count: sum("restore"), unknown_count: sum("unknown"),
-    seeded: sum("seeded"), moved: sum("moved"),
+    seeded: sum("seeded"), moved: sum("moved"), behind: sum("behind"),
   };
 }

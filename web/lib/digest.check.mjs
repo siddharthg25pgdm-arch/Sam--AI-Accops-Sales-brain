@@ -111,6 +111,7 @@ const dirty = { scope: "sales", last_run: h(10), last_result: "snapshot write: 0
 eq(buildDigest({ ...base, lastFlowWrite: h(110), sync: dirty }).lead, "A quiet day. One thing needs a look, at the bottom.", "health only");
 ok(!buildDigest({ ...base, lastFlowWrite: h(120) }).health.some(x => /change has reached SAM/.test(x.title)), "a quiet week with a clean recent snapshot (0 unknown) is not an alarm");
 ok(buildDigest({ ...base, lastFlowWrite: h(120), sync: dirty }).health.some(x => /change has reached SAM/.test(x.title)), "silent flow + snapshot found unknown files = alarm");
+ok(buildDigest({ ...base, lastFlowWrite: h(120), sync: { ...dirty, last_result: "snapshot write: 0 tombstoned, 0 restored, 877 listed, 0 unknown, 3 missed edits caught" } }).health.some(x => /change has reached SAM/.test(x.title)), "silent flow + snapshot caught missed edits = alarm");
 ok(buildDigest({ ...base, lastFlowWrite: h(120), sync: { ...healthy.sync, last_run: h(50) } }).health.some(x => /change has reached SAM/.test(x.title)), "silent flow + stale snapshot = alarm");
 ok(sick.subject.endsWith("5 things to check"), sick.subject);
 const fine = buildDigest({ ...base, lastFlowWrite: h(47), usage: { ...zero, questions: 20, model_attempted: 20, provider_failures: 3 } });

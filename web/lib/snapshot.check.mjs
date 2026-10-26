@@ -122,6 +122,14 @@ assert.deepEqual(pr("sales-collateral").moved.map(m => [m.list_item_id, m.to.roo
 assert.deepEqual(pr("sales-enablement").diff.unknown.map(f => f.id), [300, 301], "a moved file is not unknown in its new root");
 assert.equal(pr("sales-enablement").folderOf.get(300), "Industries/Banking");
 
+// Missed edits: the listing says a file changed after the registry last heard (or was renamed in place) -> bring the row forward.
+const dated = multi.map(r => ({ ...r, modified_at: "2026-10-01T00:00:00Z" }));
+p = planSnapshot(dated, msnap([...scFiles.map(f => f.id === 3 ? { ...f, name: "f3.pdf", modified: "2026-10-09T03:51:12Z" }
+  : f.id === 4 ? { ...f, name: "renamed.pdf", modified: "2026-10-01T00:00:30Z" } : { ...f, name: `f${f.id}.pdf`, modified: "2026-10-01T00:00:00Z" }), ...seFiles]), ROOTS);
+assert.deepEqual(pr("sales-collateral").behind.map(b => [b.list_item_id, b.to.modified_at, b.to.filename]),
+  [[3, "2026-10-09T03:51:12Z", "f3.pdf"], [4, "2026-10-01T00:00:00Z", "renamed.pdf"]], "an edit and an in-place rename are caught; 30 s of clock noise is not an edit");
+assert.equal(pr("sales-enablement").behind.length, 0, "no `modified` in the listing (today's flow): nothing is inferred");
+
 // applySnapshot end to end against the stub: per-root PATCH filters, seeding, and last_run held back while any root is refused.
 globalThis.__samRoots = undefined;
 const stub = (registryRows) => { calls = []; globalThis.fetch = async (url, init = {}) => {
