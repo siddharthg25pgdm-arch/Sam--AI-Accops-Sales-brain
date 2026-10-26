@@ -29,7 +29,7 @@ async function rest<T>(path: string, body?: unknown): Promise<T> {
   const t = await r.text();
   return (t ? JSON.parse(t) : null) as T;
 }
-const rpc = <T>(fn: string, args: Record<string, unknown> = {}) => rest<T>(`rpc/${fn}`, args);
+export const rpc = <T>(fn: string, args: Record<string, unknown> = {}) => rest<T>(`rpc/${fn}`, args);
 
 export type Settings = { enabled: boolean; model_enabled: boolean; cta_url: string; cta_label: string };
 export type Qa = { id: string; question: string; answer: string; visual: string | null; visual_data: Record<string, unknown> | null;
