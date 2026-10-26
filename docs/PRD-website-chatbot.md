@@ -188,3 +188,21 @@ The iframe hides the widget from page scripts, so it `postMessage`s each event (
 | 10 | Stage 1 placement | Citrix LP, with GTM, GA4 and Clarity added |
 | 11 | Pop-up timing | 20 s (15 s on the LP), once a visit, teaser only on mobile |
 | 12 | Stage 3 routing | One GHL owner until a country → owner table exists |
+
+### Decided 26 October 2026 (Siddharth)
+
+Build plan: [plans/2026-10-26-website-chatbot-stage1.md](plans/2026-10-26-website-chatbot-stage1.md). Where these differ from sections 4, 11 or 13 above, these win.
+
+- **Stage 1 placement (26 Oct 2026):** the bot launches on the Citrix alternative LP (accops-citrix-lp.vercel.app, our own Vercel project, embedded directly), and GTM, GA4 (330722232) and Clarity are added there.
+- **Open decisions (26 Oct 2026):** the defaults for #1-5 and #7-12 are accepted as recommended.
+- **Decision #6 replaced (26 Oct 2026):** the website uses the existing OpenAI key (gpt-6-luna) with its own ceiling of 300 model answers a day, counted in Postgres before each call. Groq gpt-oss-20b on the existing key is the fallback, then bank-only plus "Talk to sales". There is no separate Groq organisation, which supersedes section 11's isolation and Groq-tier rows.
+- **Visual answers (26 Oct 2026):** answers are visual and interactive. They are built with thesys OpenUI in locked mode, using our own component set, with every factual field filled server-side from approved data and never written by the model. This supersedes section 4 step 2's "2-4 sentences".
+- **Design bar (26 Oct 2026):** "the finest software by Apple", with Mobbin as the design reference.
+- **Analytics (26 Oct 2026):** the SAM admin Website tab is part of stage 1.
+- **Guardrails (26 Oct 2026):** non-negotiable:
+  - no path to internal data, with a leak test that fails the build
+  - cost capped (ceiling, per-visitor and per-IP limits, input/output caps, kill switch, a digest alert at 70%, an OpenAI project budget)
+  - every conversation labelled human / suspect / bot, and bots never reach the model
+  - repeat and answer-cache rules
+  - stage 3 leads quarantined unless clean, never auto-pushed to GHL
+- **Tiered answering (26 Oct 2026):** bank, then a deterministic intent matcher (index built by a Python script), then a shared answer cache, then the model, aiming for at least 60% of answers without a model call.
