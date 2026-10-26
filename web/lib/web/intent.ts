@@ -107,6 +107,10 @@ export function rank(text: string, group: string): { score: number; n: number }[
   return out.sort((a, b) => b.score - a.score || a.n - b.n);
 }
 
+/** The matcher's ranked pairs for this page group (no confidence gate): follow-up chips when the answer has fewer than
+ *  2 (Siddharth, 27 Oct). The index may hold drafts, so the caller keeps only ids live in sam_web_qa_public. */
+export const related = (text: string, page_group: string, n = 5) => rank(text, page_group).slice(0, n).map(r => ix.intents[r.n].qa_id);
+
 export const intentMatch: IntentMatch = (text, page_group) => {
   const r = rank(text, page_group);
   if (!r.length) return null;

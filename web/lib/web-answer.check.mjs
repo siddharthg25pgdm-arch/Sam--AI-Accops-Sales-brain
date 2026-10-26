@@ -17,6 +17,7 @@ export const preGuard = t => S().guard(t);
 export const cacheGet = async h => S().cached;
 export const cachePut = async (h, g, a, src) => { S().puts.push({ h, g, a, src }); };
 export const intentMatch = t => S().intent;
+export const related = (t, g) => S().related ?? [];
 export const isTestConv = (hs, c) => c.startsWith("t_") && hs === "hs-test"; // the real MAC check: web-widget.check`);
 const alias = { "@": web };
 for (const m of ["bot", "limits", "guard", "cache", "intent"]) alias[`@/lib/web/${m}`] = stub;
@@ -47,6 +48,8 @@ const CANDS = [
   { ref: "fact:hysecure-1", kind: "fact", types: ["text"], title: "HySecure", text: "HySecure is ISO 27001:2022 certified.", url: "https://www.accops.com/hysecure" },
   { ref: "asset:7", kind: "asset", types: ["doc_card"], title: "Accops vs Citrix brochure", text: "A two-page comparison.", url: "https://www.accops.com/docs/citrix.pdf" },
   { ref: "qa:lp-steps-1", kind: "qa", types: ["text", "steps"], title: QA["lp-steps-1"].question, text: QA["lp-steps-1"].answer, url: null },
+  { ref: "page:https://accops-citrix-lp.vercel.app/#comparison", kind: "page", types: ["doc_card"], title: "Accops vs Citrix on eight decision criteria",
+    text: "A feature table comparing Accops and Citrix on gateway and load balancing.", url: "https://accops-citrix-lp.vercel.app/#comparison" },
 ];
 const ROOTS = [{ id: "lp-renewal-1", question: QA["lp-renewal-1"].question }, { id: "lp-steps-1", question: QA["lp-steps-1"].question }, { id: "lp-x", question: "Does it run on Nutanix?" }];
 
@@ -122,7 +125,10 @@ const run = async (body, headers) => {
 };
 const typed = (text, x = {}) => ({ ...BASE, turn: { kind: "typed", text }, ...x });
 const click = (qa_id, x = {}) => ({ ...BASE, turn: { kind: "click", qa_id }, ...x });
-const picks = (verdict, blocks) => () => reply({ verdict, blocks });
+const NONE = { type: "none", ref: "none" };
+/** The model's strict JSON (27 Oct, text-first): a written answer + cites + optional visual + follow-ups. */
+const writes = (verdict, answer, cites, o = {}) => () => reply({ verdict, answer, cites, visual: o.visual ?? NONE, followups: o.followups ?? [] });
+const GOOD = "Yes. **HySecure** is ISO 27001:2022 certified."; // every claim is in fact:hysecure-1
 
 // 1. a click and an intent hit never call a model
 fresh();
@@ -135,7 +141,7 @@ fresh({ S: { intent: { qa_id: "lp-steps-1", score: 5, margin: 0.4 } } });
 r = await run(typed("how does the migration work"));
 ok(r.body.source === "intent" && N.model.length === 0 && N.slots.length === 0 && !N.rpc.includes("rpc/sam_web_search"), "intent hit -> no model, no search");
 ok(r.body.blocks.at(-1).type === "cta" && r.body.blocks.at(-1).label === "Plan my migration", "a pair's own CTA");
-fresh({ S: { intent: { qa_id: "retired-1", score: 5, margin: 0.4 } } }); N.openai.push(picks("answered", [{ type: "text", ref: "fact:hysecure-1" }]));
+fresh({ S: { intent: { qa_id: "retired-1", score: 5, margin: 0.4 } } }); N.openai.push(writes("answered", GOOD, ["fact:hysecure-1"]));
 r = await run(typed("is hysecure certified"));
 ok(r.body.source === "model", "an intent hit on a retired pair falls through");
 fresh(); r = await run(click("lp-calc-1"));
@@ -170,58 +176,137 @@ fresh({ cands: [] });
 r = await run(typed("tell me about hysecure"));
 ok(r.body.source === "fallback" && N.model.length === 0 && N.slots.length === 0, "no candidates -> no slot, no model");
 
-// 5. a ref outside the candidates or with a wrong type is dropped (and the request is locked to this request's refs)
-fresh(); N.openai.push(picks("answered", [{ type: "steps", ref: "qa:lp-renewal-1" }, { type: "text", ref: "qa:ghost" },
-  { type: "compare_table", ref: "qa:lp-renewal-1" }, { type: "doc_card", ref: "fact:hysecure-1" }]));
-r = await run(typed("why is the citrix renewal so expensive"));
-ok(r.body.source === "model" && r.body.blocks.map(b => b.type).join() === "compare_table" && !r.body.lead, `only the valid pick survives: ${r.body.blocks.map(b => b.type)}`);
-const sent = N.model[0].body, sch = sent.response_format.json_schema;
-ok(sch.strict === true && sch.name === "answer" && JSON.stringify(sch.schema.properties.blocks.items.properties.ref.enum) === JSON.stringify(CANDS.map(c => c.ref)), "ref enum = this request's candidates");
-ok(sent.model === "gpt-6-luna" && sent.max_completion_tokens === 300 && sent.reasoning_effort === "none" && sent.store === false && !("max_tokens" in sent), "OpenAI body");
-ok(sent.messages[0].role === "system" && /never write text/.test(sent.messages[0].content), "fixed system prompt");
-fresh({ cands: [{ ...CANDS[0], types: ["text"] }] }); // the record has a table, but this candidate only offers text
-N.openai.push(picks("answered", [{ type: "compare_table", ref: "qa:lp-renewal-1" }, { type: "text", ref: "qa:lp-renewal-1" }]));
-const r5 = await run(typed("why is the citrix renewal so expensive"));
-ok(r5.body.blocks.map(b => b.type).join() === "text", "a type the candidate does not offer is dropped");
-fresh(); N.openai.push(picks("partial", [{ type: "compare_table", ref: "qa:lp-renewal-1" }, { type: "compare_table", ref: "qa:lp-renewal-1" },
-  { type: "text", ref: "fact:hysecure-1" }, { type: "doc_card", ref: "asset:7" }]));
-r = await run(typed("compare accops and citrix"));
-ok(r.body.blocks.map(b => b.type).join() === "compare_table,text,doc_card,cta" && r.body.lead === LEAD.partial, `dedupe + partial lead + CTA: ${r.body.blocks.map(b => b.type)}`);
-ok(r.body.blocks[1].body === CANDS[1].text && r.body.blocks[1].source.url === "https://www.accops.com/hysecure", "fact = verbatim quote + its page");
-ok(r.body.blocks[2].url === "https://www.accops.com/docs/citrix.pdf" && r.body.blocks[2].action === "download", "asset doc card");
-ok(r.body.chips.map(c => c.id).join() === "lp-steps-1,lp-x", "chips from the top pair's children");
-ok(N.logs[0].verdict === "partial" && N.logs[0].model === "gpt-6-luna" && N.logs[0].tokens === 900 && N.logs[0].candidates === 4, "tier-3 log fields");
+// 5. tier 3 writes the answer IN the chat (27 Oct): fact-checked text with emphasis + one "Based on" pill
+const { emProblems } = await jiti.import("./emphasis.ts");
+const { factCheck, docIntent } = await jiti.import("./web/facts.ts");
+fresh(); N.openai.push(writes("answered", GOOD, ["fact:hysecure-1", "qa:ghost"], { followups: ["ghost", "lp-steps-1"] }));
+r = await run(typed("is hysecure certified"));
+ok(r.body.source === "model" && r.body.blocks.map(b => b.type).join() === "text" && !r.body.lead, `a written answer: ${JSON.stringify(r.body.blocks)}`);
+ok(r.body.blocks[0].body === GOOD && r.body.blocks[0].ai === true && r.body.blocks[0].source.url === "https://www.accops.com/hysecure", "the text as written, ai, sourced from the first cite");
+ok(r.body.chips.map(c => c.id).join() === "lp-steps-1,lp-renewal-1,lp-x", `follow-ups: the model's approved pick first (a retired one dropped), roots top up: ${r.body.chips.map(c => c.id)}`);
+ok(N.logs[0].refs.join() === "fact:hysecure-1,qa:ghost" && N.logs[0].error === null && N.logs[0].verdict === "answered", "cites logged as refs");
+const sent = N.model[0].body, sch = sent.response_format.json_schema, P = sch.schema.properties;
+ok(sch.strict === true && sch.name === "answer" && sch.schema.required.join() === "verdict,answer,cites,visual,followups" && sch.schema.additionalProperties === false, "strict schema, every field required");
+ok(JSON.stringify(P.cites.items.enum) === JSON.stringify(CANDS.map(c => c.ref)) && P.cites.maxItems === 4, "cites enum = this request's candidates");
+ok(P.visual.properties.ref.enum.join() === "none,qa:lp-renewal-1,qa:lp-steps-1" && P.visual.properties.type.enum[0] === "none", "visual: a qa candidate's own, or none");
+ok(P.followups.items.enum.join() === "lp-renewal-1,lp-steps-1" && P.followups.maxItems === 3, "follow-ups: this request's qa ids");
+ok(!JSON.stringify(sch.schema).includes("minItems"), "only keywords production already accepted (maxItems, enum)");
+ok(sent.model === "gpt-6-luna" && sent.max_completion_tokens === 400 && sent.reasoning_effort === "none" && sent.store === false && !("max_tokens" in sent), "OpenAI body: 400 tokens, effort none");
+ok(sent.messages[0].role === "system" && /ONLY the approved Accops records/.test(sent.messages[0].content) && /\*\*double asterisks\*\*/.test(sent.messages[0].content) && /FIRST sentence/.test(sent.messages[0].content), "fixed system prompt");
+ok(sent.messages[1].content.split("\n").length === 2 + CANDS.length, "one line per candidate");
+fresh({ cands: [...CANDS, ...CANDS.slice(0, 4).map((c, i) => ({ ...c, ref: `${c.ref}-${i}` }))] }); N.openai.push(writes("none", "", []));
+await run(typed("anything else"));
+ok(N.model[0].body.messages[1].content.split("\n").length === 2 + 8, "at most 8 candidates reach the model");
 
-// 6. timeout / 429 / bad JSON -> Groq; both fail -> fallback
-const groqOk = picks("answered", [{ type: "text", ref: "fact:hysecure-1" }]);
+// fact check: an invented number, customer, certification, a blocked figure, a link -> verified facts (verbatim, From pills)
+for (const [why, text] of [["an invented number", "Yes. **HySecure** is ISO 27001:2022 certified and cuts costs by 40%."],
+  ["an invented customer", "Yes. **HySecure** is ISO 27001:2022 certified, and HDFC Bank relies on it."],
+  ["an invented certification", "Yes. **HySecure** is ISO 27001:2022 and SOC 2 certified."],
+  ["the LP's blocked 10X figure", "Yes. **HySecure** is ISO 27001:2022 certified and 10X faster."],
+  ["a link", "Yes. **HySecure** is ISO 27001:2022 certified; see accops.com/hysecure."]]) {
+  fresh(); N.openai.push(writes("answered", text, ["fact:hysecure-1"]));
+  r = await run(typed("is hysecure certified"));
+  ok(r.body.source === "model" && r.body.lead === LEAD.facts && /^fact_check: /.test(N.logs[0].error), `${why} -> verified facts (${N.logs[0].error})`);
+  const tx = r.body.blocks.filter(b => b.type === "text");
+  ok(tx[0].body === CANDS[1].text && tx.every(b => !b.ai && b.source && !b.body.includes("**")), `${why}: the cited quote first, verbatim, no AI text`);
+  ok(tx.map(b => b.body).join("|") === [CANDS[1].text, QA["lp-renewal-1"].answer, QA["lp-steps-1"].answer].join("|"), `${why}: cites first, then search rank, at most 3`);
+  ok(!JSON.stringify(r.body).includes(text) && r.body.blocks.at(-1).type === "cta" && !r.body.blocks.some(b => b.type === "doc_card"), `${why}: never shown, CTA, no links list`);
+  ok(N.puts.length === 1 && N.puts[0].src === "model" && r.body.chips.length > 0, `${why}: cached as the outcome, chips`);
+}
+const FEV = ["HySecure. HySecure is ISO 27001:2022 certified."];
+ok(factCheck("Yes. **HySecure** is ISO 27001:2022 certified.", FEV).length === 0, "fact check passes a supported answer");
+for (const [bad, want] of [["HySecure is 99.9% available.", "number 99.9%"], ["HySecure is twice as fast.", "number 2x"], ["Tata Motors runs HySecure.", "name Tata"],
+  ["Infosys runs HySecure.", "name Infosys"], ["HySecure is FedRAMP authorised.", "name FedRAMP"], ["HySecure is gdpr ready.", "certification gdpr"],
+  ["HySecure replaces Zscaler.", "name Zscaler"], ["HySecure suits banks.", "name BFSI"], ["HySecure is \"certified secure by design\".", "quote \"certified secure by design\""],
+  ["HySecure has run since 2009.", "number 2009"]])
+  ok(factCheck(bad, FEV).includes(want), `fact check catches ${want}: ${factCheck(bad, FEV)}`);
+ok(factCheck("Accops works with Nutanix AHV and 1,000 seats.", ["Nutanix AHV support for 1000 seats"]).length === 0, "tolerant of case, punctuation and thousands commas");
+
+// a qa candidate's own visual; a wrong type is dropped; a page is never a card
+fresh(); N.openai.push(writes("answered", "Citrix moved to **subscription bundles**, so many renewals now include components you may not use.", ["qa:lp-renewal-1"],
+  { visual: { type: "compare_table", ref: "qa:lp-renewal-1" }, followups: ["lp-steps-1"] }));
+r = await run(typed("why is the citrix renewal so expensive"));
+ok(r.body.blocks.map(b => b.type).join() === "text,compare_table" && r.body.blocks[0].ai && r.body.blocks[0].source.url === QA["lp-renewal-1"].sources[0], `text + the pair's own table: ${r.body.blocks.map(b => b.type)}`);
+ok(r.body.chips.map(c => c.id).join() === "lp-steps-1,lp-x", `chips: the model's pick, roots top up, never the cited pair: ${r.body.chips.map(c => c.id)}`);
+fresh(); N.openai.push(writes("answered", "Citrix moved to **subscription bundles**, so many renewals now include components you may not use.", ["qa:lp-renewal-1", "page:https://accops-citrix-lp.vercel.app/#comparison"],
+  { visual: { type: "steps", ref: "qa:lp-renewal-1" } }));
+r = await run(typed("send me the citrix renewal brochure"));
+ok(r.body.blocks.map(b => b.type).join() === "text,doc_card" && r.body.blocks[1].url === "https://www.accops.com/docs/citrix.pdf", `a type the pair lacks is dropped; a document ask gets the asset card, never a page card: ${r.body.blocks.map(b => b.type)}`);
+// doc-intent gating: the same answer with an asset cite shows a card only when the visitor asked for a document
+for (const [q, card] of [["Do you have a brochure comparing Accops and Citrix?", true], ["How does Accops compare with Citrix?", false], ["Send me the datasheet", true], ["Can I download the case study PDF?", true]]) {
+  fresh(); N.openai.push(writes("answered", "The **Accops vs Citrix brochure** is a two-page comparison.", ["asset:7", "page:https://accops-citrix-lp.vercel.app/#comparison"]));
+  r = await run(typed(q));
+  ok(r.body.blocks[0].ai && r.body.blocks.some(b => b.type === "doc_card") === card && !r.body.blocks.some(b => b.type === "doc_card" && b.kind === "Page") && docIntent(q) === card, `doc intent "${q}" -> card ${card}: ${r.body.blocks.map(b => b.type)}`);
+}
+// emphasis limits on model text: <= 4 phrases, <= 6 words each, <= 35% of the words; stray / nested markers stripped
+fresh({ cands: [{ ...CANDS[0], text: `${QA["lp-renewal-1"].answer} Accops offers perpetual or subscription licensing and a site database with no separate SQL Server licence for every user group you migrate over time.` }] });
+N.openai.push(writes("answered", "Citrix moved to **subscription** **bundles**, so **many renewals now include components you may not** use. **Accops** offers **perpetual** **or** subscription **licensing** and a **site database** **with no separate SQL Server licence for every user group you migrate over time*.", ["qa:lp-renewal-1"]));
+r = await run(typed("why is the citrix renewal so expensive"));
+const em = r.body.blocks[0].body, phrases = [...em.matchAll(/\*\*([^*]+)\*\*/g)].map(x => x[1]);
+ok(r.body.blocks[0].ai && emProblems(em).length === 0 && phrases.join("|") === "subscription|bundles|Accops|perpetual" && !em.replace(/\*\*[^*]+\*\*/g, "").includes("*"), `emphasis cleaned to the limits: ${em}`);
+// length: whole sentences up to 70 words; one sentence over 70 -> verified facts
+const long = `HySecure is ISO 27001:2022 certified ${"and certified ".repeat(40)}.`;
+fresh(); N.openai.push(writes("answered", `Yes. **HySecure** is ISO 27001:2022 certified. ${long}`, ["fact:hysecure-1"]));
+r = await run(typed("is hysecure certified"));
+ok(r.body.blocks[0].body === GOOD && r.body.blocks[0].ai, "over 70 words: cut at a whole sentence");
+fresh(); N.openai.push(writes("answered", long, ["fact:hysecure-1"]));
+r = await run(typed("is hysecure certified"));
+ok(r.body.lead === LEAD.facts && /empty or over 70 words/.test(N.logs[0].error), "one sentence over 70 words -> verified facts");
+// partial: the fixed lead + the written answer + CTA
+fresh(); N.openai.push(writes("partial", GOOD, ["fact:hysecure-1"]));
+r = await run(typed("is hyworks certified"));
+ok(r.body.lead === LEAD.partial && r.body.blocks.map(b => b.type).join() === "text,cta" && r.body.blocks[0].ai, "partial -> lead + text + CTA");
+// the 2nd answer in a chat carries the CTA
+fresh(); N.openai.push(writes("answered", GOOD, ["fact:hysecure-1"]));
+r = await run(typed("is hysecure certified", { recent_ms: [1000, 9000] }));
+ok(r.body.blocks.map(b => b.type).join() === "text,cta", "CTA after the 2nd answer");
+// follow-ups: the matcher's next-best approved pairs when the model gives fewer than 2; none when nothing is approved
+fresh({ S: { related: ["lp-steps-1", "not-approved", "lp-renewal-1"] } }); N.openai.push(writes("answered", GOOD, ["fact:hysecure-1"]));
+r = await run(typed("is hysecure certified"));
+ok(r.body.chips.map(c => c.id).join() === "lp-steps-1,lp-renewal-1" && !N.rpc.includes("rpc/sam_web_roots"), `matcher's approved next-best, no roots needed: ${r.body.chips.map(c => c.id)}`);
+fresh({ cands: [CANDS[1]] }); N.openai.push(writes("answered", GOOD, ["fact:hysecure-1"]));
+const savedRoots = ROOTS.splice(0); r = await run(typed("is hysecure certified")); ROOTS.push(...savedRoots);
+ok(r.body.source === "model" && r.body.chips.length === 0, "no approved pairs anywhere -> no chips");
+fresh(); r = await run(click("lp-steps-1"));
+ok(r.body.chips.map(c => c.id).join() === "lp-renewal-1,lp-x", `a bank answer without children still gets follow-ups: ${r.body.chips.map(c => c.id)}`);
+fresh({ S: { related: ["lp-renewal-1"] } }); r = await run(click("lp-steps-1"));
+ok(r.body.chips.map(c => c.id).join() === "lp-renewal-1,lp-x" && N.rpc.filter(f => f === "sam_web_qa_public").length === 2, "bank follow-ups: matcher next-best (read alongside the children), then roots");
+
+// 6. timeout / 429 / bad JSON -> Groq; both fail -> verified facts
+const groqOk = writes("answered", GOOD, ["fact:hysecure-1"]);
 const fails = {
   timeout: () => { throw new DOMException("The operation was aborted due to timeout", "TimeoutError"); },
   429: (b, init) => new Response(`rate limited; you sent ${init.headers.Authorization}`, { status: 429 }),
   500: () => new Response("upstream", { status: 503 }),
   "bad JSON": () => reply("Sure! Here is the answer: HySecure is great"),
-  "wrong shape": () => reply({ verdict: "maybe", blocks: [] }),
+  "wrong shape": () => reply({ verdict: "maybe", answer: "x", cites: [], visual: NONE, followups: [] }),
+  "the old shape": () => reply({ verdict: "answered", blocks: [{ type: "text", ref: "fact:hysecure-1" }] }),
 };
 for (const [why, f] of Object.entries(fails)) {
   fresh(); N.openai.push(f); N.groq.push(groqOk);
   r = await run(typed("is hysecure certified"));
   ok(r.body.source === "model" && N.model.map(m => m.host).join() === "openai,groq" && N.slots.join() === "openai,groq", `${why} -> Groq`);
-  ok(N.logs[0].model === "openai/gpt-oss-20b", `${why}: Groq recorded`);
+  ok(N.logs[0].model === "openai/gpt-oss-20b" && r.body.blocks[0].body === GOOD, `${why}: Groq recorded, its answer shown`);
 }
 const g = N.model[1].body;
 ok(g.max_tokens === 400 && g.reasoning_effort === "low" && g.temperature === 0 && !("max_completion_tokens" in g) && g.response_format.json_schema.strict, "Groq body");
 fresh(); N.openai.push(fails[429]); N.groq.push((b, init) => new Response(`no: ${init.headers.Authorization}`, { status: 500 }));
 r = await run(typed("is hysecure certified"));
-ok(r.body.source === "fallback" && N.logs[0].error === "model" && N.puts.length === 0, "both fail -> fallback, not cached");
+ok(r.body.source === "fallback" && N.logs[0].error === "model" && N.puts.length === 0, "both fail -> not cached");
+ok(r.body.lead === LEAD.facts && r.body.blocks.filter(b => b.type === "text").length === 3 && r.body.blocks.every(b => b.type !== "text" || (!b.ai && b.source)) && r.body.blocks.at(-1).type === "cta", "both fail -> verified facts by search rank + CTA");
 fresh(); N.openai.push(fails[429]); N.slot.groq = false;
 r = await run(typed("is hysecure certified"));
-ok(r.body.source === "fallback" && N.model.length === 1, "Groq cap reached -> no Groq call");
+ok(r.body.source === "fallback" && N.model.length === 1 && r.body.lead === LEAD.facts, "Groq cap reached -> no Groq call, verified facts");
+fresh({ cands: [CANDS[2], CANDS[4]] }); N.slot.openai = false;
+r = await run(typed("is hysecure certified"));
+ok(r.body.source === "fallback" && r.body.lead === LEAD.none && r.body.blocks.map(b => b.type).join() === "cta", "no quotable record (only a page and an asset) -> the honest fallback, never a list of links");
 
 // 10. a tier-3 result is cache-put (every outcome, including none)
 fresh(); N.openai.push(groqOk);
 r = await run(typed("Is HySecure certified?"));
 ok(N.puts.length === 1 && N.puts[0].h === qHash("Is HySecure certified?", "citrix-lp") && N.puts[0].g === "citrix-lp" && N.puts[0].src === "model"
   && JSON.stringify(N.puts[0].a.blocks) === JSON.stringify(r.body.blocks), "model answer cache-put under q_hash");
-fresh(); N.openai.push(picks("none", []));
+fresh(); N.openai.push(writes("none", "", []));
 r = await run(typed("what is the weather"));
 ok(r.body.source === "fallback" && N.puts.length === 1 && N.puts[0].src === "fallback" && r.body.chips.length === 3, "verdict none -> fallback, cached as such, page roots as chips");
 

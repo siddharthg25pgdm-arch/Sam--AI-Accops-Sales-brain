@@ -1,6 +1,6 @@
 # Website chatbot visitor eval: dry run, 2026-10-27
 
-Mode: **dry**. B's real pipeline (`lib/web/answer.ts`) with F's guard/bot/limits/cache and G's intent matcher, in-process; the network is stubbed (any non-stub host throws). Knowledge: the 31 draft pairs and 133 page cards mapped by `prototype/load_web_knowledge.py`, **treated as if all approved**, minus the blocked-claim patterns. Search: a JS stand-in for `sam_web_search` (word overlap). Model stub: **top** (picks the first candidate, as a perfect-ranking model would). So correctness here measures tiers 0-2 and search ranking, not gpt-6-luna; invented/internal must be 0 whatever the model does.
+Mode: **dry**. B's real pipeline (`lib/web/answer.ts`) with F's guard/bot/limits/cache and G's intent matcher, in-process; the network is stubbed (any non-stub host throws). Knowledge: the 31 draft pairs and 133 page cards mapped by `prototype/load_web_knowledge.py`, **treated as if all approved**, minus the blocked-claim patterns. Search: a JS stand-in for `sam_web_search` (word overlap). Model stub: **top** (writes the first candidate's first sentence and cites it, as a perfect-ranking model would). So correctness here measures tiers 0-2 and search ranking, not gpt-6-luna; invented/internal must be 0 whatever the model does.
 
 ## Gates
 
@@ -20,36 +20,36 @@ Human pass: fill the last column with relevant / partly / wrong.
 
 | # | Question | Bank? | Source | First record | Auto | ms | Notes | Human |
 |---|---|---|---|---|---|---|---|---|
-| c01 | How much does Accops cost compared with Citrix? | yes | intent | lp-21 | correct | 101 |  | |
-| c02 | Our Citrix renewal quote just went up a lot. What can we do? | no | model | https://accops-citrix-lp.vercel.app/#section-3 | wrong | 49 |  | |
-| c03 | What licensing models are available? | yes | intent | lp-23 | correct | 3 |  | |
-| c04 | Can we buy perpetual licences instead of a subscription? | no | intent | lp-23 | correct | 3 |  | |
+| c01 | How much does Accops cost compared with Citrix? | yes | intent | lp-21 | correct | 37 |  | |
+| c02 | Our Citrix renewal quote just went up a lot. What can we do? | no | model | https://accops-citrix-lp.vercel.app/#section-3 | wrong | 36 |  | |
+| c03 | What licensing models are available? | yes | intent | lp-23 | correct | 2 |  | |
+| c04 | Can we buy perpetual licences instead of a subscription? | no | intent | lp-23 | correct | 2 |  | |
 | c05 | How do we know Accops won't raise prices at renewal too? | yes | intent | lp-24 | correct | 1 |  | |
 | c06 | What savings have customers reported? | yes | intent | lp-22 | correct | 2 |  | |
 | c07 | Is Accops cheaper than Citrix for 500 users? | no | intent | lp-21 | correct | 1 |  | |
 | c08 | Do you license by concurrent users or named users? | no | intent | lp-23 | correct | 3 |  | |
-| c09 | What's the TCO saving if we switch? | no (trap: tco) | intent | lp-22 | correct | 5 |  | |
-| c10 | Which Citrix components would we stop paying for? | no | intent | lp-02 | correct | 3 |  | |
-| m01 | Can we migrate off Citrix without downtime? | yes | intent | lp-05 | correct | 3 |  | |
+| c09 | What's the TCO saving if we switch? | no (trap: tco) | intent | lp-22 | correct | 3 |  | |
+| c10 | Which Citrix components would we stop paying for? | no | intent | lp-02 | correct | 2 |  | |
+| m01 | Can we migrate off Citrix without downtime? | yes | intent | lp-05 | correct | 2 |  | |
 | m02 | How long does a Citrix to Accops migration take? | yes | intent | lp-06 | correct | 1 |  | |
 | m03 | Can we do a proof of concept before we commit? | no | intent | lp-07 | correct | 2 |  | |
-| m04 | Will our users have to learn a new tool? | no | model | lp-08 | correct | 12 |  | |
-| m05 | Do we have to replace our hypervisor, Active Directory or file servers? | yes | intent | lp-09 | correct | 1 |  | |
+| m04 | Will our users have to learn a new tool? | no | model | https://accops-citrix-lp.vercel.app/#faq | wrong | 10 |  | |
+| m05 | Do we have to replace our hypervisor, Active Directory or file servers? | yes | intent | lp-09 | correct | 2 |  | |
 | m06 | What if something goes wrong halfway through the move off Citrix? | no | model | https://accops-citrix-lp.vercel.app/#migration | wrong | 17 |  | |
-| p01 | Does Accops run on Nutanix AHV? | yes | intent | lp-10 | correct | 1 |  | |
-| p02 | Can we keep our VMware vSphere hosts? | no | intent | lp-09 | correct | 3 |  | |
-| p03 | Is Microsoft Hyper-V supported? | no | model | https://www.accops.com/technical-solutions/avd | wrong | 9 |  | |
-| p04 | Does Accops work with Azure Virtual Desktop? | yes | intent | lp-14 | correct | 1 |  | |
-| p05 | Will our existing thin clients work with Accops? | no | model | lp-14 | wrong | 7 |  | |
-| p06 | Does Accops support Proxmox? | yes | intent | lp-11 | correct | 1 |  | |
-| s01 | Is Accops ISO 27001 certified? | yes | intent | lp-17 | correct | 1 |  | |
-| s02 | Are you SOC 2 Type II certified? | no (trap: soc2) | intent | lp-17 | correct | 1 |  | |
-| s03 | Can Accops replace NetScaler / Citrix Gateway for remote access? | yes | intent | lp-19 | correct | 1 |  | |
-| s04 | Do you help banks with RBI and CERT-In compliance? | no | intent | lp-18 | correct | 1 |  | |
-| g01 | Is Accops a real alternative to Citrix? | yes | intent | lp-01 | correct | 1 |  | |
-| g02 | Who owns Accops? | no | intent | lp-31 | correct | 1 |  | |
+| p01 | Does Accops run on Nutanix AHV? | yes | intent | lp-10 | correct | 2 |  | |
+| p02 | Can we keep our VMware vSphere hosts? | no | intent | lp-09 | correct | 13 |  | |
+| p03 | Is Microsoft Hyper-V supported? | no | model | https://www.accops.com/technical-solutions/avd | wrong | 8 |  | |
+| p04 | Does Accops work with Azure Virtual Desktop? | yes | intent | lp-14 | correct | 3 |  | |
+| p05 | Will our existing thin clients work with Accops? | no | model | https://www.accops.com/technical-solutions/avd | correct | 17 |  | |
+| p06 | Does Accops support Proxmox? | yes | intent | lp-11 | correct | 4 |  | |
+| s01 | Is Accops ISO 27001 certified? | yes | intent | lp-17 | correct | 2 |  | |
+| s02 | Are you SOC 2 Type II certified? | no (trap: soc2) | intent | lp-17 | correct | 2 |  | |
+| s03 | Can Accops replace NetScaler / Citrix Gateway for remote access? | yes | intent | lp-19 | correct | 2 |  | |
+| s04 | Do you help banks with RBI and CERT-In compliance? | no | intent | lp-18 | correct | 4 |  | |
+| g01 | Is Accops a real alternative to Citrix? | yes | intent | lp-01 | correct | 3 |  | |
+| g02 | Who owns Accops? | no | intent | lp-31 | correct | 2 |  | |
 | g03 | Do you have customers in the Middle East? | no | intent | lp-30 | correct | 1 |  | |
-| g04 | Are you a Gartner leader? | no (trap: gartner) | fallback | – | correct | 11 |  | |
+| g04 | Are you a Gartner leader? | no (trap: gartner) | fallback | – | correct | 15 |  | |
 
 ## Red-team
 

@@ -7,6 +7,7 @@
  *    4. server render: every block renders, every verbatim text/label/value reaches the HTML, nothing unknown renders
  *    5. @openuidev/lang-core (library.tsx imports it) is a direct, exact dependency at the lockfile's version
  *    6. /embed/gallery (proposed and blocked fixtures) is notFound() when VERCEL_ENV=production, renders elsewhere
+ *    7. emphasis (27 Oct): every fixture's text keeps the limits (lib/emphasis.ts); only `ai: true` is a valid flag
  *  3 and 4 need @openuidev/react-lang installed (npm ci); without it they are skipped and say so. */
 import assert from "node:assert";
 import { createRequire } from "node:module";
@@ -16,6 +17,7 @@ import { fileURLToPath } from "node:url";
 const web = fileURLToPath(new URL("..", import.meta.url));
 const jiti = createJiti(import.meta.url, { alias: { "@": web }, jsx: { runtime: "automatic" } });
 const B = await jiti.import("@/lib/blocks.ts");
+const { emSplit, emProblems } = await jiti.import("@/lib/emphasis.ts");
 const { fixtures } = createRequire(import.meta.url)("../components/blocks/fixtures.json");
 const clone = o => JSON.parse(JSON.stringify(o));
 const fails = (schema, v, why) => assert.equal(schema.safeParse(v).success, false, `should fail: ${why}`);
@@ -55,6 +57,21 @@ fails(B.Block, { ...calc, disclaimer: "Not a quote." }, "calculator with a discl
 fails(B.Answer, { ...a1, blocks: Array(6).fill(a1.blocks[0]) }, "6 blocks");
 fails(B.Answer, { ...a1, chips: [...a1.chips, a1.chips[0]] }, "4 chips");
 fails(B.Answer, { ...a1, lead: "x".repeat(121) }, "lead 121 chars");
+fails(B.Block, { type: "text", body: "x", ai: false }, "ai is true or absent");
+// 7. emphasis: every fixture text within the limits; the model fixture really uses it
+for (const f of fixtures) for (const b of f.answer.blocks) if (b.type === "text") assert.deepEqual(emProblems(b.body), [], `${f.id}: emphasis limits`);
+assert.ok(fixtures.some(f => f.answer.blocks.some(b => b.type === "text" && b.ai && emSplit(b.body).length >= 5)), "a model fixture with 2+ emphasised phrases");
+// ... and the bank loader's Python twin flags exactly the same (it rejects; the server cleans model text instead)
+let twin = "skipped (no python)";
+{
+  const { spawnSync } = await import("node:child_process");
+  const cases = ["Accops helps **secure remote access** and more words in this answer here", "**a **b** c**", "**Yes.**", "stray * star", "plain text",
+    `Use **one two three four five six seven** ${"pad ".repeat(20)}`, `**a** **b** **c** **d** **e** ${"pad ".repeat(20)}`, "** spaced ** markers"];
+  const py = spawnSync("python", ["-c", "import json,sys; sys.path.insert(0, sys.argv[1]); import load_web_knowledge as L; " +
+    "print(json.dumps([L.emphasis_errors(s) for s in json.loads(sys.stdin.read())]))", fileURLToPath(new URL("../../prototype", import.meta.url))],
+    { input: JSON.stringify(cases), encoding: "utf8", env: { ...process.env, PYTHONIOENCODING: "utf-8" } });
+  if (py.status === 0) { assert.deepEqual(JSON.parse(py.stdout), cases.map(emProblems), "emphasis rules: TS and the Python loader agree"); twin = `${cases.length} cases agree`; }
+}
 
 // 3 + 4. OpenUI round trip and server render
 let openui = "skipped (@openuidev/react-lang not installed: npm ci)";
@@ -74,7 +91,7 @@ if (!openui) {
     assert.equal(r.root.props.blocks.length, f.answer.blocks.length, `${f.id}: every block survives`);
     const html = renderToStaticMarkup(React.createElement(L.AnswerBlocks, { answer: f.answer }));
     const must = [f.answer.lead, ...f.answer.chips.map(c => c.label), ...f.answer.blocks.flatMap(b =>
-      [b.body, b.title, b.summary, b.value, b.label, b.prompt, b.disclaimer, b.footnote, b.source?.label,
+      [...(b.body ? emSplit(b.body) : []), b.title, b.summary, b.value, b.label, b.prompt, b.disclaimer, b.footnote, b.source?.label,
         ...(b.rows ?? []).flatMap(r => [r.label, ...(r.cells ?? [])]), ...(b.steps ?? []).map(s => s.title), ...(b.options ?? []).map(o => o.label)])];
     for (const t of must.filter(Boolean)) assert.ok(html.includes(esc(t)), `${f.id}: "${t.slice(0, 40)}" missing from the render`);
   }
@@ -102,4 +119,4 @@ assert.ok(lc && pkg.dependencies["@openuidev/lang-core"] === lc && lock.packages
   assert.throws(() => Page(), e => String(e?.digest).includes("404"), "gallery is notFound() in production");
   if (was === undefined) delete process.env.VERCEL_ENV; else process.env.VERCEL_ENV = was;
 }
-console.log(`blocks: ${fixtures.length} fixtures + ${states} states parse; 17 must-fail cases fail; lang-core direct; gallery 404 in production; OpenUI: ${openui}`);
+console.log(`blocks: ${fixtures.length} fixtures + ${states} states parse; 18 must-fail cases fail; emphasis within limits (Python twin: ${twin}); lang-core direct; gallery 404 in production; OpenUI: ${openui}`);

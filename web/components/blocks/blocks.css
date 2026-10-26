@@ -3,7 +3,7 @@
    use #c8431c (4.9:1). Muted text is #6b6b6b so it also passes on the #f7f7f7 card surface (5.0:1). */
 .sb {
   --sb-ink: #282828; --sb-ink-2: #5c5c5c; --sb-ink-3: #6b6b6b;
-  --sb-brand: #c8431c; --sb-brand-hover: #b23a17; --sb-brand-tint: #fdf0eb; --sb-navy: #0f1e3a;
+  --sb-brand: #c8431c; --sb-brand-hover: #b23a17; --sb-brand-tint: #fdf0eb; --sb-navy: #0f1e3a; --sb-hl: #fbd9cc;
   --sb-bg: #ffffff; --sb-card: #f7f7f7; --sb-line: #e4e2e2; --sb-line-2: #d5d2d2;
   --sb-win: #1a7f4b; --sb-win-tint: #e8f4ee; --sb-warn: #b45309; --sb-warn-tint: #fdf3e7;
   --sb-r: 12px; --sb-r2: 16px; --sb-shadow: 0 2px 16px #0000000f; --sb-shadow-2: 0 10px 28px rgba(15, 30, 58, .12);
@@ -41,6 +41,11 @@
 /* text */
 .sb-text { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
 .sb-text p { white-space: pre-line; text-wrap: pretty; }
+/* emphasis (signalling): the few words that carry the answer. Navy, 600, on a soft brand-tint band under the lower
+   part of the glyphs: navy on white 16:1, on the band 12.6:1. Static (nothing to reduce); forced colours keep an underline. */
+.sb-em { font-weight: 600; color: var(--sb-navy); background: linear-gradient(transparent 60%, var(--sb-hl) 60%);
+  padding: 0 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+@media (forced-colors: active) { .sb-em { text-decoration: underline; } }
 
 /* doc card (Navan / Shop) */
 .sb-doc { position: relative; display: flex; gap: 12px; padding: 12px; border: 1px solid var(--sb-line); border-radius: var(--sb-r);

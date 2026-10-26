@@ -647,6 +647,76 @@
    ]
   },
   {
+   "id": "model-text",
+   "name": "Model answer: written in the chat, key phrases emphasised",
+   "data": "SYNTHETIC model answer (27 Oct text-first: written from the cited records, fact-checked server-side)",
+   "answer": {
+    "blocks": [
+     {
+      "type": "text",
+      "body": "Accops builds the **gateway and load balancing** into the platform, where Citrix typically requires NetScaler / ADC, licensed separately. The **site database is bundled**, with no separate SQL Server licence, and licensing is **perpetual or subscription**. Support comes **direct from the OEM**, with named engineers.",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#comparison",
+       "url": "https://accops-citrix-lp.vercel.app/#comparison"
+      },
+      "ai": true
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-02",
+      "label": "Which Citrix components does Accops replace?"
+     },
+     {
+      "id": "lp-04",
+      "label": "When is Citrix still the better choice?"
+     }
+    ]
+   }
+  },
+  {
+   "id": "verified-facts",
+   "name": "Verified facts: the written answer failed the fact check",
+   "data": "SYNTHETIC verified facts: fixed lead line + verbatim page quotes (no emphasis) + the settings CTA",
+   "answer": {
+    "lead": "Here's what we've published on that:",
+    "blocks": [
+     {
+      "type": "text",
+      "body": "Gateway & load balancing | Built into the platform | Typically requires NetScaler / ADC, licensed separately",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#comparison",
+       "url": "https://accops-citrix-lp.vercel.app/#comparison"
+      }
+     },
+     {
+      "type": "text",
+      "body": "Site database | Bundled; no separate SQL Server licence",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#comparison",
+       "url": "https://accops-citrix-lp.vercel.app/#comparison"
+      }
+     },
+     {
+      "type": "cta",
+      "label": "Talk to an expert",
+      "action": "talk_to_sales",
+      "url": "https://www.accops.com/schedule-a-free-demo"
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-01",
+      "label": "Is Accops a real alternative to Citrix?"
+     },
+     {
+      "id": "lp-03",
+      "label": "How does Accops compare with Citrix feature by feature?"
+     }
+    ]
+   }
+  },
+  {
    "id": "fallback",
    "name": "Fallback: fixed lead + CTA",
    "data": "fixed lead line (plan 3.4) + the settings CTA + root questions",

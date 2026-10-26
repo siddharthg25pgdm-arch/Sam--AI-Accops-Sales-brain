@@ -20,6 +20,9 @@ Rules (plan section 9, stream A):
     never touched; approving is a person's job in the Website tab.
   - visual_data is validated against the block contract (web/lib/blocks.ts, mirrored below); a Stat value must
     appear verbatim on its source page; a calculator needs figures_approved: true (the table refuses it too).
+  - Emphasis (27 Oct 2026): **phrase** marks key words in `answer` only: at most 4 phrases, each at most 6 words,
+    emphasised words at most 35% of the answer, no unbalanced or nested markers. A pair breaking any of these is
+    REJECTED (web/lib/emphasis.ts emProblems is the twin; the model's text is cleaned there instead).
   - Re-running with unchanged input writes nothing (and so does not bump knowledge_version).
 
 Credentials come from web/.env.local (SUPABASE_URL / SUPABASE_SERVICE_KEY), as load_cards.py does.
@@ -105,6 +108,23 @@ def check_obj(spec: str, v, path: str) -> list[str]:
     return errs
 
 
+EM_PAIR = re.compile(r"\*\*([^\s*](?:[^*\n]*[^\s*])?)\*\*")
+
+
+def emphasis_errors(s: str) -> list[str]:
+    """Twin of web/lib/emphasis.ts emProblems (same rules, same messages; blocks.check compares the two)."""
+    out, phrases = [], EM_PAIR.findall(s)
+    if "*" in EM_PAIR.sub(lambda m: m.group(1), s):
+        out.append("unbalanced or nested ** markers")
+    if len(phrases) > 4:
+        out.append(f"{len(phrases)} emphasised phrases (max 4)")
+    out += [f'"{p}" is {len(p.split())} words (max 6)' for p in phrases if len(p.split()) > 6]
+    w, total = sum(len(p.split()) for p in phrases), len(s.replace("*", "").split())
+    if total and w > 0.35 * total:
+        out.append(f"{w} of {total} words emphasised (max 35%)")
+    return out
+
+
 def page_text(p: dict) -> str:
     return " ".join([p.get("title") or "", p.get("summary") or ""]
                     + [f"{f.get('fact', '')} {f.get('quote', '')}" for f in p.get("facts") or []])
@@ -119,6 +139,9 @@ def validate_qa(q: dict, ids: set[str], pages: dict[str, dict]) -> list[str]:
     ans = q.get("answer") or ""
     if not ans or len(ans) > 600 or len(ans.split()) > 80:
         errs.append("answer: 1-80 words, <= 600 chars")
+    errs += [f"answer emphasis: {e}" for e in emphasis_errors(ans)]
+    if "**" in json.dumps([q.get("question"), q.get("aliases"), q.get("visual_data"), q.get("cta")], ensure_ascii=False):
+        errs.append("** emphasis belongs in the answer only (elsewhere it would show as asterisks)")
     src = q.get("sources") or []
     if not src or not all(isinstance(s, str) and s.startswith("https://") for s in src):
         errs.append("sources: at least one https URL")
@@ -500,6 +523,14 @@ def self_check() -> None:
     up, ins, patch, kept = plan([p], good, {p["url"]: p["content_hash"]}, db_q)
     assert up == [] and ins == [] and [r["id"] for r in patch] == ["lp-hypervisors"] and kept == ["lp-migration"]
     assert MOJIBAKE.search("Accopsâ€™ VDI") and not MOJIBAKE.search("Accops’ VDI — é")
+    # emphasis: the 27 Oct rules, rejected (not cleaned) for bank answers
+    em = {**rows[0], "answer": "Accops delivers **Windows apps and desktops** with VDI, a ZTNA gateway, MFA and SSO in **one platform**, "
+                               "on infrastructure you already own, alongside Citrix until you switch off."}
+    assert validate_qa(em, ids, by_url) == [], validate_qa(em, ids, by_url)
+    for bad, why in [("**a **b** c** and more words here to pad", "unbalanced"), ("Use **one two three four five six seven** " + "pad " * 20, "7 words"),
+                     ("**a** **b** **c** **d** **e** " + "pad " * 20, "5 emphasised"), ("**Yes, it does.** Fine.", "of 4 words"), ("Stray ** marker", "unbalanced")]:
+        assert any(why in e for e in validate_qa({**rows[3], "answer": bad}, ids, by_url)), (bad, validate_qa({**rows[3], "answer": bad}, ids, by_url))
+    assert any("answer only" in e for e in validate_qa({**rows[3], "question": "Is it **fast**?"}, ids, by_url))
     print("load_web_knowledge self-check: ok")
 
 

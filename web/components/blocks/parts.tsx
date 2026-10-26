@@ -12,11 +12,11 @@ export type Act = (type: ActType, params: Record<string, unknown>, label: string
 export const ActCtx = createContext<Act>(() => false);
 export const useAct = () => useContext(ActCtx);
 
-export function SourcePill({ source }: { source: z.infer<typeof Source> }) {
+export function SourcePill({ source, lead = "From" }: { source: z.infer<typeof Source>; lead?: "From" | "Based on" }) {
   return (
     <a className="sb-src" href={source.url} target="_blank" rel="noopener noreferrer" title={source.url}>
       <Icon d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 013.5 3.5l-1 1M9 11.5l-1 1A2.5 2.5 0 014.5 9l1-1" />
-      <span>From {source.label}</span>
+      <span>{lead} {source.label}</span>
       <span className="sb-sr"> (opens in a new tab)</span>
     </a>
   );

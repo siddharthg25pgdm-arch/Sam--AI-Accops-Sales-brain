@@ -1,20 +1,22 @@
 /** POST /api/web/ask, in the order of plan 3.3: validate -> classify -> admit -> pre-guard -> tier 0 bank /
- *  tier 1 intent -> tier 2 cache -> [human, model on, candidates, a slot] tier 3 model (locked) -> fill ->
- *  cache put -> log. Cheapest first; bots and suspects never reach the model. Logging is returned as a
+ *  tier 1 intent -> tier 2 cache -> [human, model on, candidates, a slot] tier 3 model (text-first since 27 Oct:
+ *  a written answer, fact-checked, else verified facts) -> cache put -> log. Cheapest first; bots and suspects never
+ *  reach the model. Every answer ends with follow-up chips when approved pairs exist. Logging is returned as a
  *  callback the route runs after the response (it never blocks the answer). */
 import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
-import { Answer } from "@/lib/blocks";
+import { Answer, type Chip } from "@/lib/blocks";
 import { redact } from "@/lib/redact";
 import { classify, isTestConv } from "@/lib/web/bot";
 import { admit } from "@/lib/web/limits";
 import { preGuard } from "@/lib/web/guard";
 import { cacheGet, cachePut } from "@/lib/web/cache";
-import { intentMatch } from "@/lib/web/intent";
+import { intentMatch, related } from "@/lib/web/intent";
 import type { Ctx, Label, Source } from "./contracts";
 import * as db from "./db";
-import { LEAD, chips, cleanPage, cta, fill, qaBlocks, qaId } from "./fill";
-import { pickBlocks } from "./model";
+import { docIntent } from "./facts";
+import { LEAD, chips, cleanPage, compose, cta, facts, qaBlocks, qaId } from "./fill";
+import { MAX_CANDS, writeAnswer } from "./model";
 import { qHash } from "./normalise";
 
 const Id = z.string().regex(/^[A-Za-z0-9_.:-]{1,80}$/);
@@ -78,14 +80,26 @@ export async function ask(req: Request): Promise<Out> {
   let label: Label = "bot", signals: string[] = [];
 
   const rootChips = async () => chips(await db.roots(page).catch(() => []));
-  const fallback = async () => ({ lead: LEAD.none, blocks: [cta(s)], chips: await rootChips() });
+  const fallback = async (c?: Chip[]) => ({ lead: LEAD.none, blocks: [cta(s)], chips: c ?? await rootChips() });
+  /** Follow-up chips after every answer (Siddharth, 27 Oct): `first` (a pair's children / the model's picks), then while
+   *  fewer than 2, the intent matcher's next-best APPROVED pairs (`ok` = those of `rel` live in sam_web_qa_public),
+   *  then the page's roots. None only when nothing is approved. */
+  const more = async (first: db.QaRef[], rel: string[], skip: string[], ok: Map<string, db.Qa>) => {
+    let rows = first;
+    if (chips(rows, skip).length < 2) rows = [...rows, ...rel.map(id => ok.get(id)).filter((q): q is db.Qa => !!q)];
+    if (chips(rows, skip).length < 2) rows = [...rows, ...(await db.roots(page).catch(() => []))];
+    return chips(rows, skip);
+  };
   /** A pair as an answer: verbatim text + visual, its follow-ups as chips, a CTA when it carries one or later in the chat. */
   const bank = async (id: string) => {
     const qa = (await db.qas([id])).get(id);
     if (!qa) return null; // retired or never approved
     const blocks = qaBlocks(qa);
     if ((qa.cta_url || b.recent_ms.length >= 2) && !blocks.some(x => x.type === "cta")) blocks.push(cta(s, qa));
-    return { blocks, chips: chips(await db.children(id).catch(() => []), [id]) };
+    const rel = related(qa.question, page_group).filter(x => x !== id);
+    const [kids, ok] = await Promise.all([db.children(id).catch(() => []), // in parallel: no added latency
+      rel.length ? db.qas(rel).catch(() => new Map<string, db.Qa>()) : new Map<string, db.Qa>()]);
+    return { blocks, chips: await more(kids, rel, [id], ok) };
   };
 
   const finish = async (source: Source, a: unknown, status = 200): Promise<Out> => {
@@ -117,30 +131,46 @@ export async function ask(req: Request): Promise<Out> {
     const cached = await cacheGet(q_hash!); // tier 2
     if (cached) return finish("cache", cached);
 
-    // Gate for tier 3: human only, model on (env and settings), candidates, and a slot (taken inside pickBlocks).
+    // Gate for tier 3: human only, model on (env and settings), candidates, and a slot (taken inside writeAnswer).
     if (label !== "human" || process.env.WEB_MODEL_OFF === "1" || !s.model_enabled) return finish("fallback", await fallback());
-    const cands = (await db.search(turn.text, page_group, 12)).slice(0, 12);
+    const cands = (await db.search(turn.text, page_group, MAX_CANDS)).slice(0, MAX_CANDS);
     m.candidates = cands.length;
     if (!cands.length) return finish("fallback", await fallback());
     const q = b.prev ? `${turn.text}\n(Their previous question: ${b.prev})` : turn.text;
-    const p = await pickBlocks(q, cands);
-    if (!p) { m.error = "model"; return finish("fallback", await fallback()); }
-    Object.assign(m, { verdict: p.verdict, model: p.model, tokens: p.tokens, refs: p.blocks.map(x => x.ref) });
-
-    const picked = new Set(p.blocks.map(x => x.ref));
-    const pairs = await db.qas([...new Set(cands.filter(c => c.kind === "qa" && picked.has(c.ref)).map(c => qaId(c.ref)))]);
-    const blocks = p.verdict === "none" ? [] : fill(p.blocks, cands, pairs);
-    let a: Answer, source: Source;
-    if (!blocks.length) { a = await fallback(); source = "fallback"; }
-    else {
-      const top = p.blocks.map(x => pairs.get(qaId(x.ref))).find(Boolean); // the best-ranked picked pair
-      const unused = cands.filter(c => c.kind === "qa" && !pairs.has(qaId(c.ref))).map(c => ({ id: qaId(c.ref), question: c.title }));
-      const kids = top ? await db.children(top.id).catch(() => []) : [];
-      if (p.verdict === "partial" || top?.cta_url || b.recent_ms.length >= 2) blocks.push(cta(s, top));
-      a = { ...(p.verdict === "partial" ? { lead: LEAD.partial } : {}), blocks, chips: chips(kids.length ? kids : unused, [...pairs.keys()]) };
-      source = "model";
+    const rel = related(turn.text, page_group), doc = docIntent(turn.text);
+    // One read, alongside the model call, for every pair this answer may show: the candidates' (visual, verified
+    // facts) and the follow-ups'.
+    const [w, pairs] = await Promise.all([writeAnswer(q, cands),
+      db.qas([...new Set([...cands.filter(c => c.kind === "qa").map(c => qaId(c.ref)), ...rel])]).catch(() => new Map<string, db.Qa>())]);
+    if (!w) { // no slot, or both providers failed: verified facts; not cached (the next ask may reach the model)
+      m.error = "model";
+      const blocks = facts([], cands, pairs, doc);
+      const next = await more([], rel, [], pairs);
+      return finish("fallback", blocks.length ? { lead: LEAD.facts, blocks: [...blocks, cta(s)], chips: next } : await fallback(next));
     }
-    // Every tier-3 outcome is shared, including "none", so a repeated junk question costs one model call (plan 2.4).
+    Object.assign(m, { verdict: w.verdict, model: w.model, tokens: w.tokens, refs: w.cites });
+
+    const cited = w.cites.filter(r => r.startsWith("qa:")).map(qaId);
+    const picks = w.followups.map(id => pairs.get(id)).filter((x): x is db.Qa => !!x); // the model's follow-ups, approved only
+    const next = await more(picks, rel, cited, pairs);
+    let a: Answer, source: Source = "model";
+    if (w.verdict === "none") { a = await fallback(next); source = "fallback"; }
+    else {
+      const c = compose(w, cands, pairs, doc);
+      let blocks = c.blocks, lead: string | undefined = w.verdict === "partial" ? LEAD.partial : undefined;
+      if (c.problems.length) { // the written answer may not be shown: verified facts instead; the log says what failed
+        m.error = `fact_check: ${c.problems.join("; ")}`.slice(0, 200);
+        blocks = facts(w.cites, cands, pairs, doc);
+        lead = LEAD.facts;
+      }
+      if (!blocks.length) { a = await fallback(next); source = "fallback"; }
+      else {
+        const top = cited.map(id => pairs.get(id)).find(Boolean);
+        if (lead || top?.cta_url || b.recent_ms.length >= 2) blocks.push(cta(s, top));
+        a = { ...(lead ? { lead } : {}), blocks, chips: next };
+      }
+    }
+    // Every tier-3 outcome is shared, including "none" and a failed fact check, so a repeated question costs one model call (plan 2.4).
     const ok = Answer.safeParse(a);
     if (ok.success) await cachePut(q_hash!, page_group, ok.data, source).catch(e => console.warn(`web cache put: ${redact(e)}`));
     return finish(source, a);

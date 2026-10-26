@@ -8,8 +8,9 @@
  *  3. The widget bridge (app/embed/bridge.ts): init only from an allowed parent; events strip anything but name/id/source/ref.
  *  4. frame-ancestors on /embed only (next.config.ts), from the same origin list the widget trusts.
  *  5. /embed (page.tsx): notFound while inert; when on, a handshake that verifyHs accepts, cleaned page + q, the roots.
- *  6. Every fixture as the widget draws it: each Text / Stat / table / steps shows its source pill; a Text without a
- *     source is not drawn; 3-column tables carry data-col for the narrow stacked-card layout (blocks.css). */
+ *  6. Every fixture as the widget draws it: each Text / Stat / table / steps shows its source pill ("Based on" for the
+ *     model's written answer); a Text without a source is not drawn; **emphasis** is drawn as <strong class="sb-em">
+ *     (never raw asterisks), navy on its highlight band at AA contrast; 3-column tables carry data-col (blocks.css). */
 import assert from "node:assert";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -418,15 +419,19 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   const W = await jiti.import("@/app/embed/Widget.tsx");
   const { fixtures } = createRequire(import.meta.url)("../components/blocks/fixtures.json");
   const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
-  let pills = 0;
+  const { emSplit } = await jiti.import("@/lib/emphasis.ts");
+  let pills = 0, strong = 0;
   for (const f of fixtures) {
     const html = renderToStaticMarkup(React.createElement(W.AnswerView, { a: f.answer }));
     for (const b of f.answer.blocks) {
       if (["text", "stat", "compare_table", "steps", "calculator"].includes(b.type)) {
         ok(b.source, `${f.id}: ${b.type} has a source`);
-        ok(html.includes(`From ${esc(b.source.label)}`), `${f.id}: ${b.type} shows its source pill`);
+        ok(html.includes(`${b.type === "text" && b.ai ? "Based on" : "From"} ${esc(b.source.label)}`), `${f.id}: ${b.type} shows its source pill`);
         pills++;
       }
+      if (b.type === "text") emSplit(b.body).forEach((t, i) => {
+        if (i % 2) { ok(html.includes(`<strong class="sb-em">${esc(t)}</strong>`), `${f.id}: "${t}" emphasised`); strong++; }
+      });
       if (b.type === "compare_table" && b.columns.length === 3)
         ok(b.columns.slice(1).every(c => html.includes(`data-col="${esc(c)}"`)), `${f.id}: 3-column cells carry data-col`);
     }
@@ -434,7 +439,16 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   const t = fixtures.find(f => f.id === "lp-28").answer;
   const bare = { ...t, blocks: [{ type: "text", body: "An unsourced claim: 99% faster." }, ...t.blocks] };
   ok(!renderToStaticMarkup(React.createElement(W.AnswerView, { a: bare })).includes("99% faster"), "a Text without a source is not drawn");
+  ok(!/\*\*/.test(fixtures.map(f => renderToStaticMarkup(React.createElement(W.AnswerView, { a: f.answer }))).join("")), "no raw ** reaches the page");
+  ok(strong >= 2, `emphasis drawn (${strong})`);
   const css = read("components/blocks/blocks.css");
+  const hex = n => css.match(new RegExp(`--sb-${n}: (#[0-9a-f]{6})`, "i"))[1];
+  const lum = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(c => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+    .reduce((a, c, i) => a + c * [0.2126, 0.7152, 0.0722][i], 0);
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  ok(ratio(hex("navy"), hex("hl")) >= 4.5 && ratio(hex("navy"), "#ffffff") >= 4.5, `emphasis contrast: navy on the band ${ratio(hex("navy"), hex("hl")).toFixed(1)}:1`);
+  const emRule = css.match(/\.sb-em \{[^}]*\}/)[0];
+  ok(/color: var\(--sb-navy\)/.test(emRule) && !/animation|transition/.test(emRule) && /forced-colors[^{]*\{ \.sb-em/.test(css), "emphasis: navy, static, visible in forced colours");
   ok(/@container \(max-width: 479px\)[\s\S]*content: attr\(data-col\)/.test(css), "narrow 3-column tables stack as cards (container query)");
   ok(/@container \(max-width: 479px\)[\s\S]*tbody tr\[hidden\] \{ display: none; \}/.test(css), "card mode keeps collapsed row details hidden");
   const shell = renderToStaticMarkup(React.createElement(W.default, { conversationId: "c_x", hs: "h", page: "", origins: [], ask: null,
@@ -443,5 +457,5 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   ok(shell.includes("Please don&#x27;t share personal details") || shell.includes("Please don’t share personal details"), "privacy line above the input");
   ok(shell.includes('maxLength="500"'), "input capped at 500");
   ok(shell.includes("Why did my Citrix renewal go up?") && shell.includes("↳"), "roots as ↳ rows");
-  console.log(`web-widget.check: ${n} assertions passed (loader ${gz} B gzip, ${pills} source pills shown)`);
+  console.log(`web-widget.check: ${n} assertions passed (loader ${gz} B gzip, ${pills} source pills shown, ${strong} emphasised phrases)`);
 }

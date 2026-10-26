@@ -1,7 +1,7 @@
 // Run: node web/lib/web-guardrails.check.mjs - Stream F's acceptance (plan 2, 8.2, 9 "Stream F").
 // The REAL bot/limits/guard/cache run inside B's real answer pipeline (lib/web/answer.ts). Only the network is fake:
-// a Supabase stand-in that mirrors A's sam_web_admit / cache RPC semantics, an OpenAI stub that makes ADVERSARIAL picks
-// (the first 4 candidates), and a BotID stub. Also runs scripts/web-guard.mjs clean, then on a copy with planted leaks.
+// a Supabase stand-in that mirrors A's sam_web_admit / cache RPC semantics, an OpenAI stub that is ADVERSARIAL (it cites
+// every candidate it can and writes invented claims, which the fact check must keep from every visitor), and a BotID stub. Also runs scripts/web-guard.mjs clean, then on a copy with planted leaks.
 import assert from "node:assert";
 import { spawnSync } from "node:child_process";
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -29,6 +29,7 @@ const CANDS = [
   { ref: "fact:hysecure-1", kind: "fact", types: ["text"], title: "HySecure", text: "HySecure is a secure access gateway.", url: "https://www.accops.com/hysecure" },
   { ref: "asset:7", kind: "asset", types: ["doc_card"], title: "Accops vs Citrix brochure", text: "A two-page comparison.", url: "https://www.accops.com/docs/citrix.pdf" },
 ];
+const INVENTED = "Accops is **10X faster** than Citrix, trusted by HDFC Bank and SOC 2 certified; see accops.com/internal.";
 let N;
 const fresh = () => { N = { rate: new Map(), cache: new Map(), logs: [], model: 0, slots: 0, rpc: [] }; globalThis.__BOTID = { isHuman: true, isBot: false, isVerifiedBot: false, bypassed: false }; };
 const bump = (k, by = 1) => { N.rate.set(k, (N.rate.get(k) ?? 0) + by); return N.rate.get(k); };
@@ -53,11 +54,12 @@ const RPC = {
 };
 globalThis.fetch = async (url, init = {}) => {
   const u = new URL(String(url));
-  if (u.host === "api.openai.com") { // adversarial: every candidate it can see, best first
+  if (u.host === "api.openai.com") { // adversarial: cites everything it can see and writes claims no record makes
     N.model++;
-    const refs = JSON.parse(init.body).response_format.json_schema.schema.properties.blocks.items.properties.ref.enum;
-    const blocks = refs.slice(0, 4).map(ref => ({ ref, type: CANDS.find(c => c.ref === ref).types[0] }));
-    return Response.json({ choices: [{ message: { content: JSON.stringify({ verdict: "answered", blocks }) } }], usage: { total_tokens: 900 } });
+    const P = JSON.parse(init.body).response_format.json_schema.schema.properties;
+    const out = { verdict: "answered", answer: INVENTED, cites: P.cites.items.enum.slice(0, 4),
+      visual: { type: "doc_card", ref: P.visual.properties.ref.enum.at(-1) }, followups: P.followups.items.enum.filter(x => x !== "none") };
+    return Response.json({ choices: [{ message: { content: JSON.stringify(out) } }], usage: { total_tokens: 900 } });
   }
   assert.equal(u.host, "stub.supabase.co", `unexpected fetch ${u.host}`);
   assert.equal(init.headers?.Authorization, `Bearer ${process.env.SAM_WEB_READER_JWT}`, "only the reader JWT");
@@ -158,6 +160,8 @@ ok(!r.log.signals.includes("too_fast"), `answer.ts passes kind: a click 1.5 s af
 fresh();
 r = await send("Tell me about HySecure gateways");
 ok(r.source === "model" && N.model === 1 && r.log.label === "human", "control: a clean human reaches tier 3");
+ok(!JSON.stringify(r.body).includes("HDFC") && !JSON.stringify(r.body).includes("10X") && /^fact_check: /.test(r.log.error), "the adversarial answer never reaches the visitor (verified facts instead)");
+ok(r.body.blocks.every(b => b.type !== "text" || (!b.ai && b.source)) && !r.body.blocks.some(b => b.type === "doc_card"), "verified facts: verbatim, sourced; no card without a document ask");
 fresh();
 r = await send("Tell me about HySecure gateways", { headers: { "x-sam-eval": "evaltok" }, ua: "node", hs: null, parent: false, msr: 0 });
 ok(r.status === 200 && r.log.label === "human" && r.log.is_test === true && N.slots === 1, "eval token -> human, is_test, still takes a ceiling slot");
@@ -184,10 +188,12 @@ await send("Does Accops support Nutanix AHV?", { visitor: "v_a" });
 const m0 = N.model, s0 = N.slots;
 r = await send("does accops support nutanix ahv", { visitor: "v_b" }); // another visitor, same normalised question
 ok(r.source === "cache" && N.model === m0 && N.slots === s0, "shared cache hit -> no model call, no slot");
-fresh(); N.cache.set("x".repeat(64), { blocks: [], chips: [] });
-const { cacheGet } = await jiti.import("./web/cache.ts");
+const { cacheGet, cacheKey } = await jiti.import("./web/cache.ts");
+fresh(); N.cache.set(cacheKey("x".repeat(64)), { blocks: [], chips: [] });
 ok((await cacheGet("x".repeat(64)))?.blocks.length === 0 && (await cacheGet("y".repeat(64))) === null, "cacheGet: hit parses, miss is null");
-N.cache.set("z".repeat(64), { blocks: [{ type: "evil" }] });
+N.cache.set("x".repeat(64), { blocks: [], chips: [] }); N.cache.delete(cacheKey("x".repeat(64)));
+ok((await cacheGet("x".repeat(64))) === null, "an answer cached by the old engine (bare q_hash) is never served");
+N.cache.set(cacheKey("z".repeat(64)), { blocks: [{ type: "evil" }] });
 ok((await cacheGet("z".repeat(64))) === null, "a cached row that no longer parses is a miss");
 
 // ---- 5. the red-team set: the pre-guard catches every guard case, never reflects the text, and spares real questions

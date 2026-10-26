@@ -11,4 +11,8 @@ export type PreGuard = (text: string) => { reason: string; answer: Answer } | nu
 export type CacheGet = (q_hash: string) => Promise<Answer | null>;                                           // F
 export type CachePut = (q_hash: string, page_group: string, a: Answer, source: Source) => Promise<void>;      // F
 export type IntentMatch = (text: string, page_group: string) => { qa_id: string; score: number; margin: number } | null; // G
-export type PickBlocks = (q: string, cands: Candidate[]) => Promise<{ verdict: "answered" | "partial" | "none"; blocks: { type: string; ref: string }[]; model: string; tokens: number } | null>; // B
+/** Tier 3 (27 Oct 2026, text-first): the model's written answer, the candidate refs it cites, an optional qa visual
+ *  ({type:"none"} = none) and follow-up qa ids. null = no slot or every provider failed. */
+export type Written = { verdict: "answered" | "partial" | "none"; answer: string; cites: string[]; visual: { type: string; ref: string };
+  followups: string[]; model: string; tokens: number };
+export type WriteAnswer = (q: string, cands: Candidate[]) => Promise<Written | null>; // B

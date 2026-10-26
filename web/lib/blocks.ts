@@ -1,6 +1,11 @@
 import { z } from "zod";
 export const Source = z.object({ label: z.string().max(60), url: z.url() });                     // "accops.com/hysecure"
-export const Text = z.object({ type: z.literal("text"), body: z.string().max(600), source: Source.optional() });
+// Text (27 Oct 2026, text-first): body = a verbatim approved answer, a verbatim page quote, or (ai: true) the model's
+// fact-checked answer. `**phrase**` in body = emphasis (lib/emphasis.ts: <= 4 phrases, <= 6 words each, <= 35% of the
+// words), drawn as <strong>; page quotes carry none. The pill reads "From <page>", or "Based on <page>" when ai.
+export const Text = z.object({ type: z.literal("text"), body: z.string().max(600), source: Source.optional(), ai: z.literal(true).optional() });
+// DocCard: a public document. Model-tier answers add one ONLY when the visitor asks for a document (brochure, datasheet,
+// PDF, whitepaper, deck, case study, download, "send me": lib/web/facts.ts docIntent), after the text; never a page card.
 export const DocCard = z.object({ type: z.literal("doc_card"), title: z.string().max(120), kind: z.string().max(30),
   summary: z.string().max(220), meta: z.string().max(60).optional(), url: z.url(), action: z.enum(["read", "download"]),
   thumb: z.string().max(200).optional() });                                                       // /web-thumbs/<id>.webp or an allowlisted og:image

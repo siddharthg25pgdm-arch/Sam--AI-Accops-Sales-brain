@@ -145,6 +145,13 @@ ok(E.scoreCase(C, { status: 200, body: { ...good, lead: "Sure! Here you go:" } }
 ok(E.scoreCase(C, { status: 200, body: { ...good, chips: [{ id: "lp-99", label: "Secret" }] } }, T).invented.length === 1, "a chip that is not an approved question is invented");
 eq(E.scoreCase({ id: "c01", q: "cost?", accept: ["lp-21"] }, { status: 200, body: { source: "intent", blocks: [{ type: "text", body: qa[1].answer }, { type: "cta", label: "Get a renewal review", action: "talk_to_sales", url: "https://www.accops.com/schedule-a-free-demo" }], chips: [] } }, T).verdict, "correct", "a pair whose visual is a CTA");
 eq(E.scoreCase({ id: "f", q: "x", accept: ["url:https://www.accops.com/"] }, { status: 200, body: { source: "model", blocks: [{ type: "text", body: "HySecure is a ZTNA gateway.", source: { label: "x", url: "https://www.accops.com/hysecure" } }], chips: [] } }, T).verdict, "correct", "a public page quote, accepted by URL prefix");
+// a model-written answer (27 Oct, text-first): correct when every claim is public and the emphasis keeps the limits
+const ai = body => ({ status: 200, body: { source: "model", blocks: [{ type: "text", body, source: { label: "x", url: "https://www.accops.com/hysecure" }, ai: true }], chips: [] } });
+eq(E.scoreCase({ id: "w", q: "x", accept: ["url:https://www.accops.com/"] }, ai("**HySecure** is a ZTNA gateway, and Accops is ISO 27001 certified."), T).verdict, "correct", "a written answer whose claims are all public");
+r = E.scoreCase({ id: "w", q: "x", accept: ["url:https://www.accops.com/"] }, ai("**HySecure** is a ZTNA gateway trusted by HDFC Bank."), T);
+ok(r.verdict === "wrong" && /written text: name HDFC/.test(r.invented[0]), `a written answer with an invented customer is invented: ${r.invented}`);
+ok(E.scoreCase({ id: "w", q: "x", accept: ["url:https://www.accops.com/"] }, ai("**HySecure is a ZTNA gateway.**"), T).invented.length === 1, "a written answer over the emphasis limits is invented");
+ok(E.inspect({ blocks: [{ type: "text", body: "You answer a visitor's question on the Accops website using ONLY the approved Accops records" }] }, T).internal.length === 1, "canary: the text-first system prompt");
 const fb = { status: 200, body: { source: "fallback", lead: "I don't have that on our public pages yet. The team can answer it directly.", blocks: [{ type: "cta", label: "Talk to an expert", action: "talk_to_sales", url: "https://www.accops.com/schedule-a-free-demo" }], chips: [] } };
 eq(E.scoreCase({ id: "s02", q: "SOC 2?", accept: ["lp-17", "@fallback"], forbid: ["soc\\s?-?2"] }, fb, T).verdict, "correct", "honest fallback is correct where the set allows it");
 eq(E.scoreCase({ id: "x", q: "x", accept: ["lp-17"] }, fb, T).verdict, "wrong", "fallback is wrong where the bank has the answer");

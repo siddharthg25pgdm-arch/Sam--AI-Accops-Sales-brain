@@ -1,8 +1,10 @@
-/** Filling (plan 3.5): every visitor-visible field comes from an approved record or a fixed string here.
- *  The model's picks only choose WHICH record and WHICH block type; unknown refs and wrong types are dropped. */
+/** Filling (plan 3.5, text-first since 27 Oct 2026): every visitor-visible field is an approved record, a fixed string
+ *  here, or the model's answer AFTER the fact check (facts.ts) and the emphasis limits (emphasis.ts). */
 import type { Block, Chip } from "@/lib/blocks";
-import type { Candidate } from "./contracts";
+import { emClean } from "@/lib/emphasis";
+import type { Candidate, Written } from "./contracts";
 import type { Qa, QaRef, Settings } from "./db";
+import { factCheck } from "./facts";
 
 /** The only prose not taken from a record (plan 3.4). Siddharth may edit these strings. */
 export const LEAD = {
@@ -10,6 +12,7 @@ export const LEAD = {
   none: "I don't have that on our public pages yet. The team can answer it directly.",
   limited: "You've asked a lot in a short time. Pick a question below or talk to the team.",
   repeat: "Looks like this one needs a person. The team can answer it directly.",
+  facts: "Here's what we've published on that:", // verified facts: the model's answer failed the fact check, or no model answer
 } as const;
 
 const cut = (s: string, n: number) => (s.length <= n ? s : `${s.slice(0, n - 1).trimEnd()}…`);
@@ -49,25 +52,61 @@ export const cta = (s: Settings, qa?: Qa | null): Block => ({ type: "cta", label
   action: "talk_to_sales", url: (qa?.cta_url || s.cta_url || "https://www.accops.com/schedule-a-free-demo").slice(0, 300) });
 
 export const chips = (rows: QaRef[], skip: string[] = []): Chip[] =>
-  rows.filter(r => r.id && r.id.length <= 80 && !skip.includes(r.id)).slice(0, 3).map(r => ({ id: r.id, label: cut(r.question, 60) }));
+  rows.filter((r, i) => r.id && r.id.length <= 80 && !skip.includes(r.id) && rows.findIndex(x => x.id === r.id) === i)
+    .slice(0, 3).map(r => ({ id: r.id, label: cut(r.question, 60) }));
 
-/** The model's picks -> blocks: drop refs outside the candidates, types the candidate does not offer, duplicates;
- *  at most 4 blocks and one table. */
-export function fill(picks: { type: string; ref: string }[], cands: Candidate[], pairs: Map<string, Qa>): Block[] {
-  const byRef = new Map(cands.map(c => [c.ref, c])), seen = new Set<string>(), out: Block[] = [];
-  for (const p of picks) {
-    const c = byRef.get(p.ref);
-    if (!c || !c.types.includes(p.type) || seen.has(`${p.ref}|${p.type}`) || out.length >= 4) continue;
-    if (p.type === "compare_table" && out.some(b => b.type === "compare_table")) continue;
-    seen.add(`${p.ref}|${p.type}`);
-    if (c.kind === "qa") { const qa = pairs.get(qaId(c.ref)); if (qa) out.push(...qaBlocks(qa, p.type)); continue; }
-    if (p.type === "text" && c.kind === "fact") { // a page fact: its verbatim public quote + the page
-      const src = source(c.url);
-      out.push({ type: "text", body: c.text.slice(0, 600), ...(src ? { source: src } : {}) });
-    } else if (p.type === "doc_card" && (c.kind === "asset" || c.kind === "page") && source(c.url)) {
-      out.push({ type: "doc_card", title: cut(c.title, 120), kind: c.kind === "asset" ? "Document" : "Page",
-        summary: cut(c.text, 220), url: source(c.url)!.url, action: c.kind === "asset" && /\.pdf($|\?)/i.test(c.url!) ? "download" : "read" });
-    }
+/** A public asset (PDF or document) as a card: only when the visitor asked for a document (Siddharth, 27 Oct). */
+const docCard = (c: Candidate): Block | null => {
+  const src = source(c.url);
+  return src && c.kind === "asset" ? { type: "doc_card", title: cut(c.title, 120), kind: "Document", summary: cut(c.text, 220), url: src.url,
+    action: /\.pdf($|\?)/i.test(src.url) ? "download" : "read" } : null;
+};
+
+const sentences = (s: string) => s.split(/(?<=[.!?])\s+/).filter(Boolean);
+const words = (s: string) => s.replace(/\*/g, "").split(/\s+/).filter(Boolean).length;
+
+/** The model's written answer -> blocks, or `problems` when it may not be shown (the caller then shows verified facts).
+ *  Text: whitespace collapsed, whole sentences up to 70 words, emphasis within the limits (emphasis.ts), fact-checked
+ *  against the title + text of the candidates it cites (facts.ts), with ONE "Based on" pill from the first cite.
+ *  Then a qa candidate's own approved visual if the model chose one (a doc card only on a document ask), then a
+ *  document card for a document ask. Never a page card: pages feed facts only. */
+export function compose(w: Written, cands: Candidate[], pairs: Map<string, Qa>, askedForDoc: boolean): { blocks: Block[]; problems: string[] } {
+  const byRef = new Map(cands.map(c => [c.ref, c]));
+  const cited = [...new Set(w.cites)].map(r => byRef.get(r)).filter((c): c is Candidate => !!c);
+  let kept = "", n = 0;
+  for (const s of sentences(w.answer.replace(/\s+/g, " ").trim())) { if (n + words(s) > 70) break; kept += `${kept ? " " : ""}${s}`; n += words(s); }
+  const body = emClean(kept).replace(/ {2,}/g, " ").trim();
+  const src = cited.map(c => source(c.kind === "qa" ? pairs.get(qaId(c.ref))?.sources?.[0] ?? c.url : c.url)).find(Boolean);
+  const problems = [
+    ...(!cited.length ? ["no cites"] : []), ...(!body ? ["empty or over 70 words"] : []), ...(body.length > 600 ? ["over 600 chars"] : []),
+    ...(!src ? ["no source"] : []), ...factCheck(body, cited.map(c => `${c.title}. ${c.text}`)),
+  ];
+  if (problems.length) return { blocks: [], problems };
+  const blocks: Block[] = [{ type: "text", body, source: src, ai: true }];
+  const v = byRef.get(w.visual.ref), qa = v?.kind === "qa" ? pairs.get(qaId(v.ref)) : undefined;
+  if (qa && w.visual.type !== "text" && v!.types.includes(w.visual.type) && (w.visual.type !== "doc_card" || askedForDoc)) blocks.push(...qaBlocks(qa, w.visual.type));
+  if (askedForDoc && !blocks.some(b => b.type === "doc_card")) {
+    const d = [...cited, ...cands].map(docCard).find(Boolean);
+    if (d) blocks.push(d);
   }
-  return out.slice(0, 4);
+  return { blocks, problems: [] };
+}
+
+/** Verified facts (the fallback for a failed fact check or a failed model): up to 3 verbatim records, `first` (the cites)
+ *  then search rank. An approved answer with its own source, or a page quote with its page (a quote carries no emphasis).
+ *  Never a page summary and never a list of links. A document card follows only on a document ask. */
+export function facts(first: string[], cands: Candidate[], pairs: Map<string, Qa>, askedForDoc: boolean): Block[] {
+  const byRef = new Map(cands.map(c => [c.ref, c])), out: Block[] = [], seen = new Set<string>();
+  for (const r of [...new Set([...first, ...cands.map(c => c.ref)])]) {
+    const c = byRef.get(r);
+    if (!c || out.length >= 3) continue;
+    const qa = c.kind === "qa" ? pairs.get(qaId(c.ref)) : undefined;
+    const body = qa ? qa.answer : c.kind === "fact" ? c.text.replace(/\*/g, "").slice(0, 600) : "";
+    const src = source(qa ? qa.sources?.[0] : c.url);
+    if (!body || !src || seen.has(body)) continue;
+    seen.add(body);
+    out.push({ type: "text", body, source: src });
+  }
+  const d = askedForDoc ? [...first.map(r => byRef.get(r)).filter((c): c is Candidate => !!c), ...cands].map(docCard).find(Boolean) : null;
+  return d ? [...out, d] : out;
 }
