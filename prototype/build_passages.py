@@ -256,9 +256,10 @@ def main() -> None:
     if a.dry_run:
         print("  dry run: nothing written.")
         return
-    from load_cards import env, rest  # same credentials and project check as the card loader
+    from load_cards import env, rest, rest_all  # same credentials and project check as the card loader
     url, key = env()
-    have = {r["source"]: r for r in rest(url, key, "sam_passages?select=source,doc_version,extractor,audience&ordinal=eq.0&limit=20000") or []}
+    # Paged: a capped read would make every document past the 1,000th look new (re-uploaded nightly).
+    have = {r["source"]: r for r in rest_all(url, key, "sam_passages?select=source,doc_version,extractor,audience&ordinal=eq.0&order=source")}
     changed = [s for s, rows in want.items()
                if (have.get(s) or {}).get("doc_version") != rows[0]["doc_version"]
                or have[s].get("extractor") != EXTRACTOR or have[s].get("audience") != rows[0]["audience"]]
