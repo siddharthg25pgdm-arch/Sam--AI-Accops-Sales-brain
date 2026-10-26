@@ -59,7 +59,11 @@ select 'reader execute ' || p.proname,
   case when p.proname in ('sam_web_qa_rows', 'sam_web_page_rows', 'sam_web_asset_rows', 'sam_web_page_group', 'sam_web_roots',
                           'sam_web_children', 'sam_web_search', 'sam_web_settings', 'sam_web_admit', 'sam_web_take_model_slot', 'sam_web_cache_get',
                           'sam_web_cache_put', 'sam_web_log_message', 'sam_web_log_event', 'sam_v1_public_asset_rows')
-       then 'granted' else 'denied' end,
+       then 'granted'
+       -- Known exception (26 Oct 2026): PRM's RLS helpers stay executable by PUBLIC because ~60 PRM policies call
+       -- them. Each answers only about auth.uid(); the reader has no auth identity, so it gets false / no rows.
+       when p.proname in ('is_admin', 'is_internal', 'member_partner_ids') then 'granted'
+       else 'denied' end,
   case when has_function_privilege('sam_web_reader', p.oid, 'execute') then 'granted' else 'denied' end
 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
 where n.nspname = 'public' and p.prokind = 'f' and p.prosecdef
