@@ -101,7 +101,7 @@
     ],
     "rows": [
      [
-      "NetScaler / ADC (gateway, load balancing)",
+      "NetScaler ADC (gateway, load balancing)",
       "Built into the platform"
      ],
      [
@@ -740,7 +740,11 @@
     ],
     "rows": [
      [
-      "VMware, Nutanix, Proxmox (non-HCI), Hyper-V, Azure",
+      "VMware, Nutanix, Hyper-V, Azure",
+      "Listed"
+     ],
+     [
+      "Proxmox (non-HCI)",
       "Listed"
      ],
      [
@@ -1055,8 +1059,8 @@
    "data": {
     "stats": [
      {
-      "value": "ISO 27001:2022",
-      "label": "Certified",
+      "value": "ISO 27001",
+      "label": "Certified (2022 standard)",
       "source": "https://accops-citrix-lp.vercel.app/#section-2"
      }
     ]
