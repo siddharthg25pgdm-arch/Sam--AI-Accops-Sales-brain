@@ -2380,7 +2380,7 @@
    "key_problem": "Customers choosing where to run VDI need a like-for-like cost view of on-prem 3-tier, on-prem HCI and Azure, including DR.",
    "key_outcomes": [
     "User profile (slide 2): shared hosted desktop, medium user, 4 users per vCPU, 1.5 GB RAM, 5 GB profile",
-    "3-year TCO with one DC (slide 3, sized for about 20,000 users): 3-tier Rs 8.61 crore (Rs 1,196/user/month, excludes network, DR, monitoring, DC cost), HCI Rs 10.85 crore (Rs 1,507), Azure Rs 12.61 crore (Rs 1,751, all-inclusive)",
+    "3-year TCO with one DC (slide 3, sized for 2,000 users at Rs 43,055 each over 3 years): 3-tier Rs 8.61 crore (Rs 1,196/user/month, excludes network, DR, monitoring, DC cost), HCI Rs 10.85 crore (Rs 1,507), Azure Rs 12.61 crore (Rs 1,751, all-inclusive)",
     "With DR: 3-tier Rs 10.76 crore (Rs 1,494), HCI Rs 15.51 crore (Rs 2,154), Azure Rs 14.93 crore (Rs 2,073, 25% DR always available) - Azure beats HCI once DR is included",
     "DR assumptions (slides 5, 7, 9): 100% hardware at the on-prem DR site with 10% Accops licences; Azure DR passive with 15% of VMs running",
     "Accops in Azure case studies (10) and workspace-as-a-service / managed DaaS slides (11-12)"
