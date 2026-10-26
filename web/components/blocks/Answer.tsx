@@ -1,0 +1,41 @@
+"use client";
+import { useEffect, useState, type ReactNode } from "react";
+import type { Chip } from "@/lib/blocks";
+import { useAct } from "./parts";
+
+/** The answer root: the fixed lead line, the blocks staggered in 40 ms apart, then up to 3 follow-up chips. */
+export function Answer({ lead, blocks, chips }: { lead?: string | null; blocks: ReactNode[]; chips: Chip[] }) {
+  const act = useAct();
+  let k = 0;
+  return (
+    <div className="sb sb-answer">
+      {lead && <p className="sb-lead sb-in" style={{ ["--i" as string]: k++ }}>{lead}</p>}
+      {blocks.map((b, i) => <div key={i} className="sb-in" style={{ ["--i" as string]: k++ }}>{b}</div>)}
+      {chips.length > 0 && (
+        <ul className="sb-chips sb-in" style={{ ["--i" as string]: k++ }} aria-label="Related questions">
+          {chips.map(c => (
+            <li key={c.id}>
+              <button type="button" className="sb-chip" onClick={() => act("ask", { qa_id: c.id, source: "chip" }, c.label)}>{c.label}</button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+/** Model answers only: a 3-dot pulse for up to 600 ms, then skeleton lines. Bank and intent answers never show it. */
+export function Thinking({ skeleton = false }: { skeleton?: boolean }) {
+  const [late, setLate] = useState(skeleton);
+  useEffect(() => { if (!late) { const t = setTimeout(() => setLate(true), 600); return () => clearTimeout(t); } }, [late]);
+  return (
+    <div className="sb sb-thinking" role="status">
+      <span className="sb-sr">Finding an answer</span>
+      {late ? (
+        <span className="sb-skel" aria-hidden="true"><span /><span /><span /></span>
+      ) : (
+        <span className="sb-dots" aria-hidden="true"><span /><span /><span /></span>
+      )}
+    </div>
+  );
+}
