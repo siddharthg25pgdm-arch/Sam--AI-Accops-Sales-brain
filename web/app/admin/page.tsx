@@ -16,10 +16,11 @@ import { loadRatings, loadClears, latestRatings, learnDemotions, wrongAssetTally
 import { saveRequest, mergeRequest, promote, clearRank, pinAsset } from "./actions";
 import { TopBar } from "@/components/TopBar";
 import { Sparkline, Meter, DailyColumns, BarList, Heatmap, Histogram, num, ms } from "@/components/charts";
+import { Website } from "./website";
 
 export const dynamic = "force-dynamic";
 
-const TABS = [["overview", "Overview"], ["usage", "Usage"], ["quality", "Quality"], ["content", "Content"], ["requests", "Requests"], ["system", "System"], ["conversations", "Conversations"]] as const;
+const TABS = [["overview", "Overview"], ["usage", "Usage"], ["quality", "Quality"], ["content", "Content"], ["requests", "Requests"], ["system", "System"], ["conversations", "Conversations"], ["website", "Website"]] as const;
 type Tab = (typeof TABS)[number][0];
 const PERIODS = [7, 30, 90] as const;
 // A channel is a first-class dimension: the public website chatbot (docs/NOTE-website-chatbot.md)
@@ -63,7 +64,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<SP
     return `/admin${s ? `?${s}` : ""}`;
   };
 
-  const d = tab === "conversations" || tab === "system" ? null : await dashboard(days, includeTest, testUsers());
+  const d = tab === "conversations" || tab === "system" || tab === "website" ? null : await dashboard(days, includeTest, testUsers());
   const periodLabel = `Last ${days} days`;
   const range = d ? `${fmtDate(d.window.from)} – ${fmtDate(d.window.to)}` : "";
 
@@ -96,7 +97,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<SP
         </nav>
 
         {!persistent() && <div className="notice">Events are held in memory only. Add SUPABASE_URL and SUPABASE_SERVICE_KEY, run the docs/supabase-sam-*.sql files, and this becomes permanent.</div>}
-        {persistent() && !d && tab !== "conversations" && tab !== "system" && <div className="notice">The dashboard query failed. Check that docs/supabase-sam-observability.sql has been applied; the server log has the status code.</div>}
+        {persistent() && !d && tab !== "conversations" && tab !== "system" && tab !== "website" && <div className="notice">The dashboard query failed. Check that docs/supabase-sam-observability.sql has been applied; the server log has the status code.</div>}
 
         {tab === "overview" && d && <Overview d={d} days={days} href={href} includeTest={includeTest} />}
         {tab === "usage" && d && <Usage d={d} href={href} />}
@@ -105,6 +106,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<SP
         {tab === "requests" && d && <RequestsTab d={d} sp={sp} days={days} includeTest={includeTest} href={href} />}
         {tab === "system" && <System />}
         {tab === "conversations" && <Conversations sp={sp} days={days} includeTest={includeTest} href={href} />}
+        {tab === "website" && <Website sp={sp} days={days} includeTest={includeTest} href={href} />}
 
         <details className="defs" id="definitions">
           <summary>Definitions</summary>
@@ -841,7 +843,7 @@ async function System() {
                 <td className="nowrap"><span className={`status ${j.state}`}><i aria-hidden="true" />{j.stale ? "Not run" : j.last ? j.last.status : "No run yet"}</span></td>
                 <td className="nowrap">{j.last ? fmtTime(j.last.started_at) : "–"}</td>
                 <td className="r nowrap">{hours(j.ageH)}</td>
-                <td className="nowrap">{fmtTime(j.next)}<div className="subline">daily {j.at}</div></td>
+                <td className="nowrap">{fmtTime(j.next)}<div className="subline">{j.everyH ? "weekly" : "daily"} {j.at}</div></td>
                 <td className="clip" title={j.last?.summary ?? ""}>{j.last?.summary || "–"}</td>
               </tr>
             ))}</tbody></table></div>

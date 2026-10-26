@@ -11,6 +11,7 @@ import { ratio, type Ratio, type Usage } from "./metrics";
 import { STATUS_LABEL, type GapSignal, type RankedRequest } from "./requests";
 import type { CardingQueueRow, ChangedFile, FamilyRow, SyncRow } from "./sharepoint";
 import { latestRatings, FEEDBACK_LABEL, type Rating } from "./feedback";
+import type { WebsiteDigest } from "./web-dashboard";
 
 /** Distinct reps at which a request is "worth creating". */
 export const WORTH_CREATING = 3;
@@ -43,6 +44,8 @@ export type DigestInput = {
   families?: FamilyRow[] | null;
   /** Scheduled jobs that have not run in 30 h, or whose last run failed (jobHealth in lib/ops.ts). */
   jobs?: HealthItem[] | null;
+  /** The website chatbot, last 24 hours (lib/web-dashboard.ts websiteDigest). Omitted until its tables exist. */
+  website?: WebsiteDigest | null;
 };
 
 export type DigestRating = { kind: "wrong_asset" | "missing"; label: string; question: string; shown: string[]; who: string; at: string };
@@ -73,6 +76,9 @@ export type Digest = {
     week: { questions_per_day: number; answered: Ratio; fallback: Ratio; p95_ms: number | null } | null;
   } | null;
   ratings: { total: number; helpful: number; wrong_asset: number; missing: number; examples: DigestRating[]; url: string } | null;
+  /** The Website line: the chatbot's last 24 hours, real traffic. Null on a day with no conversation and no model use. */
+  website: { conversations: number; human: number; suspect: number; bot: number; without_model: Ratio; model_answers: number;
+    peak_pct: number | null; cta_clicks: number; missed: number; url: string } | null;
   health: HealthItem[];
   admin_url: string;
 };
@@ -101,6 +107,9 @@ const daysText = (h: number) => h < 48 ? `${Math.round(h)} hours` : `${Math.roun
 /** "snapshot report: 1 would tombstone, ..." -> "1 would tombstone, ..."; a refusal keeps its reason. */
 const snapText = (r: string) => r.replace(/^snapshot (report|write)( REFUSED)?:\s*/, (_, _m, ref) => ref ? "refused: " : "");
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+/** The website's 70% ceiling warning (plan 2.2) and its retention (PRD section 10); lib/web-dashboard.ts has the same values. */
+export const WEB_WARN_PCT = 70, WEB_RETENTION_DAYS = 180;
+const istDay = (iso: string) => new Date(Date.parse(iso) + 330 * 60_000).toISOString().slice(0, 10);
 
 // ---------------------------------------------------------------- assembly (checked)
 
@@ -225,6 +234,28 @@ export function buildDigest(i: DigestInput): Digest {
       detail: "When it does, SAM stops replying on WhatsApp without any error. Make a permanent token: docs/TASK-whatsapp-meta-setup.md, \"Replace the token\"." });
   }
 
+  // The website chatbot. Plan 2.2: warn whenever an IST day the last 24 hours touched reached 70% of a daily ceiling
+  // (OpenAI's model_ceiling, and the Groq cap), so a runaway is seen the morning after, not at the month's invoice.
+  const wi = i.website;
+  const webDays = new Set([istDay(since), istDay(i.now)]);
+  const peakOf = (cap: number | null, pick: (u: WebsiteDigest["usage"][number]) => number) => {
+    const xs = (wi?.usage ?? []).filter(u => webDays.has(u.day) && cap && cap > 0).map(u => ({ day: u.day, n: pick(u), pct: Math.floor((pick(u) * 100) / cap!) })); // floor: 209 of 300 has not "reached 70%"
+    return xs.sort((a, b) => b.pct - a.pct)[0] ?? null;
+  };
+  const peakModel = peakOf(wi?.model_ceiling ?? null, u => u.model_answers), peakGroq = peakOf(wi?.groq_daily_cap ?? null, u => u.groq_answers);
+  if (peakModel && peakModel.pct >= WEB_WARN_PCT) health.push({ title: `Warning: website model use reached ${peakModel.pct}% of the daily ceiling`,
+    detail: `${peakModel.n} of ${wi!.model_ceiling} OpenAI answers on ${day(peakModel.day)} (India time). At the ceiling the website answers from the bank only until midnight. Raise the ceiling or switch the model off on the Website tab.` });
+  if (peakGroq && peakGroq.pct >= WEB_WARN_PCT) health.push({ title: `Warning: website Groq fallback reached ${peakGroq.pct}% of its daily cap`,
+    detail: `${peakGroq.n} of ${wi!.groq_daily_cap} Groq answers on ${day(peakGroq.day)}. Groq's free tier is shared with the reps' SAM, so OpenAI is probably failing: check the System tab.` });
+  const oldestDays = wi?.oldest_conversation_at ? (Date.parse(i.now) - Date.parse(wi.oldest_conversation_at)) / 86_400_000 : null;
+  if (oldestDays != null && oldestDays > WEB_RETENTION_DAYS - 10) health.push({ title: `Website conversations are ${Math.floor(oldestDays)} days old`,
+    detail: `They are kept ${WEB_RETENTION_DAYS} days, then purged (PRD section 10). Schedule sam_web_purge(${WEB_RETENTION_DAYS}) before the oldest passes the limit.` });
+  const website = wi && (wi.conversations > 0 || (peakModel?.n ?? 0) > 0) ? {
+    conversations: wi.conversations, human: wi.human, suspect: wi.suspect, bot: wi.bot,
+    without_model: ratio(wi.without_model.num, wi.without_model.den), model_answers: wi.model_answers, peak_pct: peakModel?.pct ?? null,
+    cta_clicks: wi.cta_clicks, missed: wi.missed, url: `${admin}?tab=website`,
+  } : null;
+
   // The subject and the lead say the same thing: the subject for the inbox, the lead in the email.
   const newReq = requests?.new_count ?? 0, worth = requests?.worth_count ?? 0, qs = usage?.questions ?? 0;
   const parts = [
@@ -234,6 +265,7 @@ export function buildDigest(i: DigestInput): Digest {
     changed && plural(changed, "file") + " changed",
     qs && plural(qs, "question"),
     ratings && plural(ratings.total, "rating"),
+    website && plural(website.conversations, "website chat"),
     health.length && plural(health.length, "thing") + " to check",
   ].filter(Boolean) as string[];
   const subject = `SAM: ${parts.length ? parts.join(", ") : "nothing new"}`;
@@ -245,14 +277,25 @@ export function buildDigest(i: DigestInput): Digest {
     newReq ? `${plural(newReq, "new content request")} since yesterday.` : requests && !top?.worth && `${plural(requests.open_count, "content request")} open, nothing new since yesterday.`,
   ].filter(Boolean) as string[];
   const lead = !parts.length ? "Nothing new in the last 24 hours. No requests, no library changes, no questions, and nothing needs you."
-    : [...(said.length ? said : [!changed && !qs && !ratings ? "A quiet day." : "No new content requests."]), ...(health.length ? [needs] : [])].join(" ");
+    : [...(said.length ? said : [!changed && !qs && !ratings && !website ? "A quiet day." : "No new content requests."]), ...(health.length ? [needs] : [])].join(" ");
 
   const p = istParts(i.now);
   return {
     subject, lead, generated_at: i.now,
     period: { from: since, to: i.now, label: `Last 24 hours, to ${p.hh}:${p.mm} IST` },
-    requests, gaps, library, usage, ratings, health, admin_url: admin,
+    requests, gaps, library, usage, ratings, website, health, admin_url: admin,
   };
+}
+
+/** The Website line, one sentence: "12 conversations (9 human, 2 suspect, 1 bot) · 71% answered without the model · ...". */
+export function websiteLine(w: NonNullable<Digest["website"]>): string {
+  return [
+    `${plural(w.conversations, "conversation")} (${w.human} human, ${w.suspect} suspect, ${w.bot} bot)`,
+    w.without_model.den ? `${w.without_model.pct == null ? `${w.without_model.num} of ${w.without_model.den}` : `${Math.round(w.without_model.pct)}%`} answered without the model` : "",
+    `${plural(w.model_answers, "model answer")}${w.peak_pct != null ? `, ${w.peak_pct}% of the daily ceiling at peak` : ""}`,
+    plural(w.cta_clicks, "talk-to-sales click"),
+    w.missed ? plural(w.missed, "missed question") : "",
+  ].filter(Boolean).join(" · ");
 }
 
 // ---------------------------------------------------------------- HTML (email-safe)
@@ -370,6 +413,11 @@ export function renderHtml(d: Digest): string {
       row(stat(String(u.questions), u.questions === 1 ? "question" : "questions") + stat(String(u.people), u.people === 1 ? "person" : "people") + stat(pct(u.answered), "answered")) +
       row(td(`padding:10px 0 0 0;font-size:13px;line-height:19px;color:${INK};`, detail, `colspan="3"`)) +
       row(td(`padding:2px 0 0 0;font-size:13px;line-height:19px;color:${GREY};`, week, `colspan="3"`)))));
+  }
+
+  if (d.website) {
+    out.push(section("Website chatbot", "The chatbot on the Citrix LP, real traffic. Bots and suspects never reach the model and are left out of the rate.",
+      table(row(td(`padding:4px 0 0 0;font-size:14px;line-height:21px;color:${INK};`, esc(websiteLine(d.website))))), ["Website tab", d.website.url]));
   }
 
   if (d.health.length) {
