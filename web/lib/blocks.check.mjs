@@ -5,6 +5,8 @@
  *    3. toOpenUI(): every fixture -> OpenUI Lang -> the OpenUI parser with zero errors, root = Answer, one node per block;
  *       an off-contract answer throws before it can render
  *    4. server render: every block renders, every verbatim text/label/value reaches the HTML, nothing unknown renders
+ *    5. @openuidev/lang-core (library.tsx imports it) is a direct, exact dependency at the lockfile's version
+ *    6. /embed/gallery (proposed and blocked fixtures) is notFound() when VERCEL_ENV=production, renders elsewhere
  *  3 and 4 need @openuidev/react-lang installed (npm ci); without it they are skipped and say so. */
 import assert from "node:assert";
 import { createRequire } from "node:module";
@@ -79,4 +81,25 @@ if (!openui) {
   assert.throws(() => L.toOpenUI({ blocks: [{ type: "chart" }], chips: [] }), "an off-contract answer never renders");
   openui = `${fixtures.length} fixtures round-trip and render`;
 }
-console.log(`blocks: ${fixtures.length} fixtures + ${states} states parse; 17 must-fail cases fail; OpenUI: ${openui}`);
+// 5. lang-core is direct and exact (not left to hoisting), and the same version react-lang resolves
+const pkg = createRequire(import.meta.url)("../package.json"), lock = createRequire(import.meta.url)("../package-lock.json");
+const lc = lock.packages["node_modules/@openuidev/lang-core"]?.version;
+assert.ok(lc && pkg.dependencies["@openuidev/lang-core"] === lc && lock.packages[""].dependencies["@openuidev/lang-core"] === lc,
+  `@openuidev/lang-core must be a direct exact dependency (${lc}), got ${pkg.dependencies["@openuidev/lang-core"]}`);
+
+// 6. the gallery is never served in production (fonts, CSS and the client gallery stubbed: only the gate runs)
+{
+  const { mkdtempSync, writeFileSync } = await import("node:fs"), path = await import("node:path"), { tmpdir } = await import("node:os");
+  const stub = path.join(mkdtempSync(path.join(tmpdir(), "gallery-")), "stub.mjs");
+  writeFileSync(stub, "export const Barlow = () => ({ variable: 'f' }); export default () => null;");
+  const gj = createJiti(import.meta.url, { alias: { "next/font/google": stub, "@/components/blocks/blocks.css": stub, "./gallery.css": stub, "./Gallery": stub, "@": web }, jsx: { runtime: "automatic" } });
+  const Page = (await gj.import("@/app/embed/gallery/page.tsx")).default, was = process.env.VERCEL_ENV;
+  for (const env of [undefined, "development", "preview"]) {
+    if (env) process.env.VERCEL_ENV = env; else delete process.env.VERCEL_ENV;
+    assert.ok(Page(), `gallery renders with VERCEL_ENV=${env}`);
+  }
+  process.env.VERCEL_ENV = "production";
+  assert.throws(() => Page(), e => String(e?.digest).includes("404"), "gallery is notFound() in production");
+  if (was === undefined) delete process.env.VERCEL_ENV; else process.env.VERCEL_ENV = was;
+}
+console.log(`blocks: ${fixtures.length} fixtures + ${states} states parse; 17 must-fail cases fail; lang-core direct; gallery 404 in production; OpenUI: ${openui}`);
