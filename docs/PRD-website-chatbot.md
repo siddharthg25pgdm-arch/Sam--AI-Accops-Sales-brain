@@ -206,3 +206,20 @@ Build plan: [plans/2026-10-26-website-chatbot-stage1.md](plans/2026-10-26-websit
   - repeat and answer-cache rules
   - stage 3 leads quarantined unless clean, never auto-pushed to GHL
 - **Tiered answering (26 Oct 2026):** bank, then a deterministic intent matcher (index built by a Python script), then a shared answer cache, then the model, aiming for at least 60% of answers without a model call.
+
+### Decided 27 October 2026 (Siddharth): text-first answers
+
+This supersedes the 26 Oct "Visual answers" decision's "every factual field … never written by the model" and the plan's locked mode ("pick blocks only, no AI-written sentences"). Section 4's "2-4 sentences" applies again. Details: [plans/web-s1-contract-notes.md](plans/web-s1-contract-notes.md), "27 Oct: text-first answers".
+
+- **Why:** on the first test ("How is Accops different from Citrix", no approved pairs yet) the bot answered with page cards and "Read" links after 8 s, and never answered in the chat.
+- **The model writes the answer:** tier 3 writes 2-4 sentences (at most 70 words) from this request's approved public records only. The first sentence answers the question, in plain B2B English, with 2-4 key phrases in **bold**. It cites the records it used.
+- **The server checks every fact:** any number, product or brand, competitor, customer or organisation, certification or standard, or quoted claim that is not in the cited records' text means the visitor gets "verified facts" instead: 2-3 verbatim quotes with their sources. The same happens when the model fails or times out. Never a list of page links.
+- **Emphasis everywhere visitor text appears:** `**phrase**` is drawn as bold navy on a soft highlight band. Limits: at most 4 phrases, at most 6 words each, at most 35% of the words. Model text is trimmed to these limits; a bank answer that breaks them is rejected by the loader.
+- **Documents only on request:** a document card appears only when the visitor asks for a document (brochure, datasheet, PDF, whitepaper, deck, case study, download, "send me"), after the text. Pages feed facts only, never a card as the answer. One small "Based on accops.com/…" pill sits under the written text.
+- **Follow-up buttons after every answer:** the model's picks and, if fewer than 2, the matcher's next-best approved questions for the page. None only when nothing is approved.
+- **Latency (target p95 5 s or less):**
+  - 8 candidates
+  - output capped at 400 tokens
+  - the lowest reasoning effort each model accepts
+  - OpenAI 6 s, then Groq, then verified facts
+- **Unchanged:** cache (keyed to the new engine, so old page-card answers are never served), guardrails, ceiling, bots never reaching tier 3, and the bank/intent tiers (whose approved answers now just render their emphasis).

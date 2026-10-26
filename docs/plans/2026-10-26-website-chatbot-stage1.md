@@ -16,6 +16,8 @@
 
 ## 1. The locked-mode decision and the OpenUI facts
 
+> **Superseded 27 Oct 2026 (Siddharth): text-first answers.** Tier 3 now writes a short, fact-checked answer with emphasised key phrases, and falls back to verified facts when the check fails. Document cards appear only on a document ask, and follow-up chips follow every answer. Sections 1, 3.4, 3.5 and 7.4-7.5 below describe the old "pick blocks only" mode. The current contract is in [web-s1-contract-notes.md](web-s1-contract-notes.md), "27 Oct: text-first answers".
+
 **Chosen: (b). The model returns strict JSON `{verdict, blocks:[{type, ref}]}`. The server fills the blocks from approved records, and the iframe renders them with OpenUI components (`createLibrary` + `<Renderer>`).**
 Why, in one line: the `ref` field is an enum of the candidate ids for that request, enforced by constrained decoding (OpenAI and Groq both support `json_schema` with `strict: true`; Groq lists `openai/gpt-oss-20b`), so **the model cannot write a single word a visitor sees**. With (a), OpenUI Lang lets the model write prop strings that we would then have to strip.
 
