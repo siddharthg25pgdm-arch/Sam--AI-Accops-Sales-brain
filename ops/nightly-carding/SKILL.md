@@ -49,12 +49,23 @@ Runs unattended before Siddharth's 08:30 morning digest. The digest reports what
 4. For each `todo` item, one at a time, read its text file:
    - `uncarded`: write a new card into `corpus/cards/batch-auto-<YYYY-MM-DD>.json` (a JSON list;
      `batch: "auto-<YYYY-MM-DD>"`). Save the file after every card.
-   - `changed_since_card`: find the existing card with the same `source` in its batch file and
-     update it from the new text in place (so `carded_at` moves). Note what changed in
-     `needs_human` only if a rep should know (e.g. figures changed, now superseded).
-   - `renamed`: do not edit; list it in the log for a human.
+   - `changed_since_card`: find the existing card in its batch file - by `card_source` when the todo
+     item has one (a renamed-and-edited file: keep that `source`, the card is bound to the file by
+     item_id), else by the same `source` - and update it from the new text in place (so `carded_at`
+     moves). Note what changed in `needs_human` only if a rep should know (e.g. figures changed, now
+     superseded).
+   - Pure renames never reach `todo` (carding_prep skips them: the bound card still fits).
+   - Files from a root other than Sales Collateral (`root` on the todo item; 2025_Sales Enablement is
+     sales tools): playbooks, cheat sheets, discovery and quick-reference docs are `asset_type` "Sales
+     Tool"; templates are "Template"; spreadsheets (calculators, trackers) are "Sales Tool" and their
+     card never quotes a figure from a cell. `publish_year` from the body only - the folder name
+     ("2025_...") and that root's file dates (all 15 Jan 2026, a bulk copy) are not a year. Industries
+     with no core.terms label (Critical Infra / Utilities) stay empty and go in the log for a human.
 5. Gate: `prototype/compare_cards.py` (fix real problems in tonight's cards), validate every changed
-   batch file is valid JSON, scan tonight's cards for the sensitive patterns above, then
+   batch file is valid JSON, scan tonight's cards for the sensitive patterns above,
+   `prototype/card_grounding.py --batch <each changed batch file>` (every figure on a card must be in
+   that file's own text: fix a figure that is wrong or came from another document; if it was read from
+   an image or is your own count, say so in the card's wording or `needs_human`), then
    `load_cards.py --dry-run`, `load_cards.py`, `load_cards.py --check` (must show 0 missing, 0 extra,
    0 title differences).
    Then passages (needs `docs/supabase-sam-passages.sql` applied; skip with a `warn` if it is not):
@@ -68,8 +79,13 @@ Runs unattended before Siddharth's 08:30 morning digest. The digest reports what
    - `grep -q -- --log-run prototype/carding_prep.py && prototype/.venv/Scripts/python.exe prototype/carding_prep.py --log-run carding <status> "<same line>"`
      (the grep guards a checkout that predates run logging: there, `--log-run` would start a real prep)
      where status is `ok` (carded and loaded, or nothing to card), `warn` (done, but something was left
-     for a human: renamed files, cards not loaded, a skipped gate) or `failed`. This row is what the
+     for a human: cards not loaded, a skipped gate, unbacked figures left on a card) or `failed`. This row is what the
      System tab's Scheduled jobs panel and the morning digest read; without it the night looks missed.
 
-If anything fails midway, commit what is valid, do not load a card file that fails the gate, and log
-the failure plainly (step 7 with `failed`). The morning digest will show whatever is still in the queue.
+If anything fails midway, do not load a card file that fails the gate; commit only card files that
+passed the gate (load_cards.py loads every batch file each night, so a committed-but-unloaded card is
+loaded by the next good run), and log the failure plainly (step 7 with `failed`). The morning digest
+shows whatever is still in the queue, and raises any file waiting more than 3 days.
+
+A new root's first backlog (hundreds of files) is not a nightly job: run it in a supervised session
+with `carding_prep.py --limit 40`, a few batches, committing after each.
