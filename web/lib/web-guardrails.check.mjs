@@ -259,12 +259,18 @@ const fake = over => async (url, init) => {
   const p = new URL(url).pathname.replace("/rest/v1", ""), reader = !!init.headers.Authorization;
   if (p === "/") return Response.json({ paths: Object.fromEntries((reader ? ["/", "/sam_web_qa_public", "/rpc/sam_web_search", ...(over ? ["/sam_asset_cards"] : [])] : ["/"]).map(k => [k, {}])) });
   if (over && reader && p === "/sam_asset_cards") return Response.json([{ id: 1 }]);
+  if (reader && ["/sam_web_assets_public", "/sam_web_qa_public"].includes(p)) return Response.json([]);
   return new Response("{}", { status: reader ? 403 : 401 });
 };
 const E = { url: "https://stub.supabase.co", apikey: "sb_publishable_stub", jwt: "jwt" };
 ok((await probes(E, fake(false))).length === 0, "probes: a correct grant set has no findings");
 const pf = await probes(E, fake(true));
 ok(pf.some(f => f.includes("reader OpenAPI lists /sam_asset_cards")) && pf.some(f => f.includes("reader can read sam_asset_cards (200)")), `probes: over-granted reader caught: ${pf}`);
+// Supabase's new keys close the OpenAPI index to non-secret keys (27 Oct 2026): closed is fine, unreadable own views are not
+const closedIdx = async (url, init) => new URL(url).pathname === "/rest/v1/" ? new Response("{}", { status: 401 }) : fake(false)(url, init);
+ok((await probes(E, closedIdx)).length === 0, "probes: a closed OpenAPI index (401) is not a finding");
+const blind = await probes(E, async (url, init) => /sam_web_(assets|qa)_public/.test(url) ? new Response("{}", { status: 401 }) : fake(false)(url, init));
+ok(blind.some(f => f.includes("reader cannot read its own view")), `probes: a reader that can't read its views is caught: ${blind}`);
 const down = await probes(E, async () => { throw new TypeError("fetch failed"); });
 ok(down.length > 0 && down.every(f => f.includes("unreachable")), "probes: unreachable DB is a finding (fail safe)");
 

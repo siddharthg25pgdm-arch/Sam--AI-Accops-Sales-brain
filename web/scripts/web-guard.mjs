@@ -103,7 +103,13 @@ export async function probes({ url, apikey, jwt }, f = fetch) {
       const paths = Object.keys((await r.json().catch(() => ({}))).paths ?? {});
       const bad = who === "anon" ? paths.filter(p => /^\/(rpc\/)?(sam_|adi_)/.test(p)) : paths.filter(p => !READER_PATHS.has(p));
       if (bad.length) out.push(`${who} OpenAPI lists ${bad.slice(0, 8).join(", ")}${bad.length > 8 ? ` (+${bad.length - 8})` : ""}`);
-    } else if (r && who === "reader") out.push(`reader OpenAPI returned ${r.status}`); // the reader must reach its own index
+    } else if (r && who === "reader" && ![401, 403].includes(r.status)) out.push(`reader OpenAPI returned ${r.status}`);
+    // A closed index (401/403: Supabase's new API keys serve OpenAPI to secret keys only, found 27 Oct 2026) hides
+    // the table list, which is safer; the per-table probes below still run. The reader must still reach its views:
+    if (who === "reader") for (const v of ["sam_web_assets_public", "sam_web_qa_public"]) {
+      const x = await get(who, `/${v}?select=*&limit=1`);
+      if (x && x.status !== 200) out.push(`reader cannot read its own view ${v} (${x.status})`);
+    }
     for (const t of INTERNAL) {
       const x = await get(who, `/${t}?select=*&limit=1`);
       if (x && ![401, 403, 404].includes(x.status)) out.push(`${who} can read ${t} (${x.status})`);
