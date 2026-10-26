@@ -80,7 +80,7 @@ declare t text; n bigint; ms numeric; worst numeric := 0; t0 timestamptz; ok boo
   expected text[] := array[
     -- The approved public asset list (sam_v1_public_assets minus Regulation / Third-Party Research, minus titles
     -- carrying a blocked claim), as read on 26 Oct 2026. The PRD's count of 11 was taken 26 Sep; case studies were
-    -- published since. Left out by the blocked patterns: "Food Processing Firm ... (50% Lower TCO)".
+    -- published since. Case studies may carry their own published figures (26 Oct decision).
     -- Any change shows up below as missing/extra: update this list deliberately.
     'A Leading BPO Delivers Seamless Customer Service with Wire-Speed VoIP for Work-from-Home Users',
     'A Major Indian E-commerce Firm Eliminates Data Security Concerns Using Accops Application Access Gateway',
@@ -95,6 +95,7 @@ declare t text; n bigint; ms numeric; worst numeric := 0; t0 timestamptz; ok boo
     'Accops Nano: Compliant BYOD Access from a USB Stick',
     'Alphasure Adopts DaaS to Enable Work from Anywhere, Records 70% Drop in Attrition and Saves 50% on Office Rent',
     'City Pharmacy Replaces Citrix XenApp with Accops HyWorks for ERP Virtualisation',
+    'Food Processing Firm Adopts Accops Digital Workspace for Secure Work from Home (50% Lower TCO)',
     'Kalupur Bank Switches to ZTNA-Based Remote Access, Cuts Support Resolution Time 45x',
     'Major Indian DTH and OTT Platform: Secure Remote Access for 300+ Vendors',
     'Maveric Wins New Customers and Optimises OpEx by 20% Using Accops Secure Remote Access',
@@ -170,14 +171,30 @@ begin
 
   -- 6. blocked claims and the asset list (patterns read through the definer row function's own rule: re-check here
   -- with the literal claims, since the reader cannot read sam_web_blocked_patterns)
+  -- fig: published figures, allowed only on case studies (26 Oct decision). always: blocked everywhere.
+  -- A case study: pages_public.case_study, or an asset of type 'Case Study'. A pair counts as one only if every
+  -- source is a case-study page or PDF.
   select count(*) into n from sam_web_pages_public p, jsonb_array_elements(p.facts) f
-  where ((f ->> 'fact') || ' ' || (f ->> 'quote')) ~*'\m10\s?x\M|\m4\s?x\M|\m40\s?%|\mTCO\M|total cost of ownership|\mgartner\M|magic quadrant|\$\s?(220|132)\M|mid-term repricing|reduce seats at renewal|sign-off';
+  where ((f ->> 'fact') || ' ' || (f ->> 'quote')) ~* '\mgartner\M|magic quadrant|\$\s?(220|132)\M|\millustrative\M|\mplaceholder\M|mid-term repricing|reduce seats at renewal|perpetual licensing remains available|sign-off'
+     or (not p.case_study and ((f ->> 'fact') || ' ' || (f ->> 'quote')) ~* '\m10\s?x\M|\m4\s?x\M|\m40\s?%|\mTCO\M|total cost of ownership');
   insert into _probe values ('blocked claims in sam_web_pages_public facts', '0', n::text);
   select count(*) into n from sam_web_pages_public p
-  where (coalesce(p.summary, '') || ' ' || p.title) ~*'\m10\s?x\M|\m4\s?x\M|\mTCO\M|\mgartner\M|magic quadrant|\millustrative\M|\mplaceholder\M|sign-off';
+  where (coalesce(p.summary, '') || ' ' || p.title) ~* '\mgartner\M|magic quadrant|\millustrative\M|\mplaceholder\M|sign-off'
+     or (not p.case_study and (coalesce(p.summary, '') || ' ' || p.title) ~* '\m10\s?x\M|\m4\s?x\M|\mTCO\M|total cost of ownership');
   insert into _probe values ('blocked claims in sam_web_pages_public titles/summaries', '0', n::text);
-  select count(*) into n from sam_web_qa_public q where (q.answer || ' ' || q.question) ~*'\mTCO\M|\mgartner\M|magic quadrant|\m10\s?x\M|\m4\s?x\M';
-  insert into _probe values ('blocked claims in sam_web_qa_public', '0', n::text);
+  select count(*) into n from sam_web_pages_public p where p.case_study and p.url !~* '^https://www\.accops\.com/';
+  insert into _probe values ('case studies outside www.accops.com (the LP never is one)', '0', n::text);
+  select count(*) into n from sam_web_qa_public q
+  where (q.answer || ' ' || q.question) ~* '\mgartner\M|magic quadrant|\$\s?(220|132)\M|sign-off'
+     or ((q.answer || ' ' || q.question || ' ' || coalesce(q.visual_data::text, '')) ~* '\m10\s?x\M|\m4\s?x\M|\m40\s?%|\mTCO\M|total cost of ownership'
+         and exists (select 1 from unnest(q.sources) s
+                     where s not in (select url from sam_web_pages_public where case_study
+                                     union select public_url from sam_web_assets_public where asset_type = 'Case Study')));
+  insert into _probe values ('blocked claims in sam_web_qa_public (figures only with case-study-only sources)', '0', n::text);
+  select count(*) into n from sam_web_assets_public a
+  where (a.title || ' ' || coalesce(a.brief, '')) ~* '\mgartner\M|magic quadrant|sign-off'
+     or (a.asset_type <> 'Case Study' and (a.title || ' ' || coalesce(a.brief, '')) ~* '\m10\s?x\M|\m4\s?x\M|\mTCO\M|total cost of ownership');
+  insert into _probe values ('blocked claims in sam_web_assets_public', '0', n::text);
   select count(*) into n from sam_web_pages_public where url !~* '^https://(www\.accops\.com|accops-citrix-lp\.vercel\.app)([/?#]|$)';
   insert into _probe values ('pages outside the host allowlist', '0', n::text);
 

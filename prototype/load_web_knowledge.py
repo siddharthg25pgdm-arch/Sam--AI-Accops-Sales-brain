@@ -138,6 +138,8 @@ def validate_qa(q: dict, ids: set[str], pages: dict[str, dict]) -> list[str]:
         errs += check_obj(v, data, "visual_data")
         if v == "stat" and isinstance(data, dict) and isinstance(data.get("value"), str):
             at = q.get("_stat_source") or (src[0] if src else "-")
+            if src and at != src[0]:   # the widget's source pill shows sources[0]: a figure must show its own source
+                errs.append(f"stat: its source {at} must be the pair's first source (the pill shows sources[0])")
             page = pages.get(at)
             if page is None:
                 errs.append(f"stat: source page {at} is not in the page cards")
@@ -476,9 +478,11 @@ def self_check() -> None:
                 "visual": {"type": "doc_card", "data": {"cards": [{"title": "A", "url": "https://x/a.pdf", "blurb": "b"},
                                                                   {"title": "B", "url": "https://x/b", "blurb": "c"}]}}}, notes)
     assert d["cta"] is None and d["cta_url"] is None and d["visual_data"]["action"] == "download" and notes == ["lp-y: doc_card keeps 1 of 2 cards"]
-    s = map_qa({"id": "lp-z", "question": "Products?", "short_answer": "Fewer.", "sources": [LP + "#faq"],
+    s = map_qa({"id": "lp-z", "question": "Products?", "short_answer": "Fewer.", "sources": [LP + "#section-4", LP + "#faq"],
                 "visual": {"type": "stat", "data": {"stats": [{"value": "8 → 1", "label": "Products", "source": LP + "#section-4"}]}}})
     assert validate_qa(s, {"lp-z"}, by_url) == []                  # checked against the stat's own source page
+    s2 = {**s, "sources": [LP + "#faq", LP + "#section-4"]}         # the pill would show #faq for a #section-4 figure
+    assert any("first source" in e for e in validate_qa(s2, {"lp-z"}, by_url))
 
     p = map_page(FIXTURE_PAGES[0])
     assert "words" not in p and "carded_by" not in p and p["products"] == [] and p["needs_recard"] is False

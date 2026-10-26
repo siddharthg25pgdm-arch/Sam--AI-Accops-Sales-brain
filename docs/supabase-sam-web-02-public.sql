@@ -18,22 +18,29 @@ create or replace function sam_web_qa_rows()
 returns table (id text, question text, aliases text[], answer text, visual text, visual_data jsonb, pages text[],
                parent_id text, nudge_weight int, regions text[], cta text, cta_url text, sources text[], updated_at timestamptz)
 language sql stable security definer set search_path = public, pg_catalog as $$
-  with b as (select coalesce(string_agg('(' || pattern || ')', '|'), 'a^') as rx from sam_web_blocked_patterns)
+  -- A pair whose sources are ALL published case studies (case-study page cards or case-study PDFs) may carry their
+  -- figures; any other source (the LP, a product page) puts the pair under every pattern.
+  with b as (select sam_web_blocked_rx(false) as rx, sam_web_blocked_rx(true) as rx_cs),
+  cs as (select p.url from sam_web_pages p where p.case_study and not p.needs_recard and not p.title_blocked
+         union select a.public_url from sam_v1_public_asset_rows() a where lower(a.asset_type) = 'case study'),
+  q as (select q.*, not exists (select 1 from unnest(q.sources) s where s not in (select url from cs)) as case_study
+        from sam_web_qa q
+        where q.status = 'approved' and cardinality(q.sources) > 0 and (q.review_by is null or q.review_by >= current_date))
   select q.id, q.question, q.aliases, q.answer, q.visual, q.visual_data - 'figures_approved', q.pages, q.parent_id,
          q.nudge_weight, q.regions, q.cta, q.cta_url, q.sources, q.updated_at
-  from sam_web_qa q, b
-  where q.status = 'approved' and cardinality(q.sources) > 0 and (q.review_by is null or q.review_by >= current_date)
-    and q.question !~* b.rx and q.answer !~* b.rx and coalesce(q.visual_data::text, '') !~* b.rx
+  from q, b
+  where (q.question || ' ' || q.answer || ' ' || coalesce(q.visual_data::text, '')) !~* case when q.case_study then b.rx_cs else b.rx end
   order by q.id
 $$;
 
 create or replace function sam_web_page_rows()
 returns table (url text, title text, page_type text, page_group text, products text[], industries text[], summary text,
-               facts jsonb, questions_answered text[], cta text, lastmod date, thumb_url text, updated_at timestamptz)
+               facts jsonb, questions_answered text[], cta text, lastmod date, thumb_url text, updated_at timestamptz,
+               case_study boolean)
 language sql stable security definer set search_path = public, pg_catalog as $$
   -- The blocked filtering was done at write time (sam_web_pages_stamp in 01).
   select p.url, p.title, p.page_type, p.page_group, p.products, p.industries, p.summary_public, p.facts_public,
-         p.questions_public, p.cta, p.lastmod, p.thumb_url, p.updated_at
+         p.questions_public, p.cta, p.lastmod, p.thumb_url, p.updated_at, p.case_study
   from sam_web_pages p
   where not p.needs_recard and not p.title_blocked
     and p.url ~* '^https://(www\.accops\.com|accops-citrix-lp\.vercel\.app)([/?#]|$)'
@@ -45,14 +52,17 @@ create or replace function sam_web_asset_rows()
 returns table (asset_id text, title text, asset_type text, industry text, products text[], brief text, publish_year int,
                public_url text, updated_at timestamptz)
 language sql stable security definer set search_path = public, pg_catalog as $$
-  with b as (select coalesce(string_agg('(' || pattern || ')', '|'), 'a^') as rx from sam_web_blocked_patterns)
+  -- A case study = asset_type 'Case Study' (the v1 field; no title/url guessing). Its own figures may show.
+  with b as (select sam_web_blocked_rx(false) as rx, sam_web_blocked_rx(true) as rx_cs),
+  a as (select a.*, case when lower(a.asset_type) = 'case study' then b.rx_cs else b.rx end as rx
+        from sam_v1_public_asset_rows() a, b)
   select a.asset_id, a.title, a.asset_type, a.industry, a.products,
          (select string_agg(s, ' ' order by n) from regexp_split_to_table(a.brief, '(?<=[.!?])\s+') with ordinality t(s, n)
-          where s !~* b.rx),
+          where s !~* a.rx),
          a.publish_year, a.public_url, a.updated_at
-  from sam_v1_public_asset_rows() a, b
+  from a
   where lower(a.asset_type) not in ('regulation', 'third-party research')
-    and a.title !~* b.rx
+    and a.title !~* a.rx
   order by a.title, a.asset_id
 $$;
 

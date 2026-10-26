@@ -69,6 +69,7 @@ create table if not exists sam_web_pages (
   updated_at         timestamptz not null default now(),
   -- What a visitor may see, derived by the stamp trigger below from sam_web_blocked_patterns (never written by the
   -- loader). Filtering at write time keeps sam_web_search free of ~3,000 regex checks per question.
+  case_study         boolean not null default false,                       -- page_type 'case-study' on www.accops.com
   title_blocked      boolean not null default false,
   summary_public     text,                                                  -- summary minus sentences with a blocked claim
   facts_public       jsonb not null default '[]',                           -- facts minus any with a blocked claim
@@ -102,16 +103,22 @@ revoke execute on function sam_web_page_group(text) from public, anon, authentic
 -- A page fact (fact or quote), a page title, a Q&A pair or a public asset title that matches any pattern never
 -- reaches a visitor; summary sentences that match are cut. POSIX ARE, case-insensitive. No back-references
 -- (the views OR every pattern into one regex). Delete a row once the claim is signed off and sourced.
+-- except_case_studies (Siddharth, 26 Oct): figures published in a case study may be shown with that case study as
+-- the source. Such a pattern does not apply to a case study (sam_web_is_case_study below); it still applies
+-- everywhere else, the Citrix LP included.
 create table if not exists sam_web_blocked_patterns (
-  pattern  text primary key,
-  reason   text not null,
-  added_at timestamptz not null default now()
+  pattern             text primary key,
+  reason              text not null,
+  except_case_studies boolean not null default false,
+  added_at            timestamptz not null default now()
 );
+insert into sam_web_blocked_patterns (pattern, reason, except_case_studies) values
+  ('\m10\s?x\M',                                  'unsourced headline tile (accops.com/why-accops: 10x shorter time to value)', true),
+  ('\m4\s?x\M',                                   'unsourced headline tile (accops.com/why-accops: 4x reduction in support time)', true),
+  ('\m40\s?%',                                    'unsourced headline tile (accops.com/why-accops: 40% lower TCO)', true),
+  ('\mTCO\M|total cost of ownership',             'TCO figures outside published case studies (eval trap: "what is the TCO saving?")', true)
+on conflict (pattern) do nothing;
 insert into sam_web_blocked_patterns (pattern, reason) values
-  ('\m10\s?x\M',                                  'unsourced headline tile (accops.com/why-accops: 10x shorter time to value)'),
-  ('\m4\s?x\M',                                   'unsourced headline tile (accops.com/why-accops: 4x reduction in support time)'),
-  ('\m40\s?%',                                    'unsourced headline tile (accops.com/why-accops: 40% lower TCO)'),
-  ('\mTCO\M|total cost of ownership',             'TCO figures are not approved for the bot (eval trap: "what is the TCO saving?")'),
   ('\$\s?(220|132)\M',                            'illustrative per-seat rates on the Citrix LP calculator'),
   ('\millustrative\M|\mplaceholder\M',            'LP placeholder copy and cards that describe it'),
   ('sign-off',                                    'LP copy still awaiting Sales leadership / Legal sign-off'),
@@ -160,16 +167,21 @@ begin
   return new;
 end $$;
 
--- Every blocked pattern OR-ed into one regex ('a^' never matches).
-create or replace function sam_web_blocked_rx() returns text
+-- Every blocked pattern that applies OR-ed into one regex ('a^' never matches). For a case study the
+-- except_case_studies patterns (published figures) are left out.
+create or replace function sam_web_blocked_rx(case_study boolean default false) returns text
 language sql stable set search_path = public, pg_catalog as $$
-  select coalesce(string_agg('(' || pattern || ')', '|'), 'a^') from sam_web_blocked_patterns
+  select coalesce(string_agg('(' || b.pattern || ')', '|'), 'a^') from sam_web_blocked_patterns b
+  where not (coalesce(sam_web_blocked_rx.case_study, false) and b.except_case_studies)
 $$;
 
 create or replace function sam_web_pages_stamp() returns trigger
 language plpgsql set search_path = public, pg_catalog as $$
-declare rx text := sam_web_blocked_rx();
+declare rx text;
 begin
+  -- A case study = an accops.com page carded as page_type 'case-study'. The Citrix LP never is.
+  new.case_study := coalesce(new.page_type, '') = 'case-study' and new.url ~* '^https://www\.accops\.com/';
+  rx := sam_web_blocked_rx(new.case_study);
   new.page_group := sam_web_page_group(new.url);
   new.updated_at := now();
   new.title_blocked := coalesce(new.title, '') ~* rx;
@@ -229,6 +241,8 @@ alter table sam_web_blocked_patterns enable row level security;
 alter table sam_web_settings enable row level security;
 -- Supabase grants new objects to anon/authenticated by default: take that back.
 revoke all on sam_web_qa, sam_web_pages, sam_web_page_rules, sam_web_blocked_patterns, sam_web_settings from public, anon, authenticated;
-revoke execute on function sam_web_blocked_rx() from public, anon, authenticated;
+revoke execute on function sam_web_blocked_rx(boolean) from public, anon, authenticated;
+-- The page trigger runs as the writer (the loader's service key).
+grant execute on function sam_web_blocked_rx(boolean), sam_web_page_group(text) to service_role;
 -- The loader and the admin tab use the service key.
 grant select, insert, update, delete on sam_web_qa, sam_web_pages, sam_web_page_rules, sam_web_blocked_patterns, sam_web_settings to service_role;
