@@ -1,0 +1,81 @@
+/* The /embed panel chrome (plan 7.2, 7.5 layout). Everything is scoped under .sam-w; the answers bring their own
+   styles (components/blocks/blocks.css, imported once by page.tsx). Tokens mirror blocks.css: navy header, the AA
+   orange #c8431c only for the CTA (inside the answers), ink #282828 / #5c5c5c / #6b6b6b, line #e4e2e2. */
+.sam-w {
+  --w-navy: #0f1e3a; --w-ink: #282828; --w-ink-2: #5c5c5c; --w-ink-3: #6b6b6b; --w-line: #e4e2e2; --w-card: #f7f7f7;
+  --w-ease: cubic-bezier(.22, .61, .36, 1);
+  position: fixed; inset: 0; display: flex; flex-direction: column; background: #fff; color: var(--w-ink);
+  font-family: var(--sb-font, "Barlow"), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 15px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+}
+.sam-w *, .sam-w *::before, .sam-w *::after { box-sizing: border-box; }
+.sam-w :focus-visible { outline: 2px solid var(--w-navy); outline-offset: 2px; border-radius: 8px; }
+.sam-w p, .sam-w h1, .sam-w ul { margin: 0; padding: 0; }
+.sam-w ul { list-style: none; }
+.sam-w button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.sam-w a { color: inherit; text-decoration: none; }
+
+/* header: navy, a quiet mark, no fake human */
+.w-head { flex: none; display: flex; align-items: center; gap: 12px; padding: 12px 8px 12px 16px; padding-top: max(12px, env(safe-area-inset-top));
+  background: var(--w-navy); color: #fff; }
+.w-mark { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 11px; background: rgba(255, 255, 255, .1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12); }
+.w-head-t { flex: 1; min-width: 0; }
+.w-head h1 { font-size: 16px; font-weight: 600; line-height: 1.25; letter-spacing: -.005em; }
+.w-head-t p { font-size: 12.5px; line-height: 1.3; color: rgba(255, 255, 255, .72); }
+.w-x { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: rgba(255, 255, 255, .86); transition: background 160ms; }
+.w-x:hover { background: rgba(255, 255, 255, .1); color: #fff; }
+.sam-w .w-x:focus-visible { outline-color: #fff; border-radius: 50%; }
+
+/* the thread */
+.w-body { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 20px 16px 24px;
+  display: flex; flex-direction: column; gap: 18px; scroll-padding-top: 12px; }
+.w-me { align-self: flex-end; max-width: 86%; padding: 9px 14px; border-radius: 18px 18px 6px 18px; background: var(--w-navy); color: #fff;
+  font-size: 15px; line-height: 1.42; animation: w-in 220ms var(--w-ease) both; }
+.w-me p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.w-bot { min-width: 0; }
+@keyframes w-in { from { opacity: 0; transform: translateY(6px) scale(.98); } }
+
+/* empty state: a line, the page's questions as quiet ↳ rows (Plane), an honest way to a person (Podia) */
+.w-hello { display: flex; flex-direction: column; }
+.w-hello-t { font-size: 19px; font-weight: 600; line-height: 1.3; letter-spacing: -.01em; }
+.w-hello-s { margin-top: 4px !important; font-size: 14px; color: var(--w-ink-2); }
+.w-eyebrow { margin: 22px 0 4px !important; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--w-ink-3); }
+.w-roots li + li { border-top: 1px solid var(--w-line); }
+.w-roots button { display: flex; align-items: flex-start; gap: 10px; min-height: 48px; padding: 12px 8px; margin: 0 -8px; width: calc(100% + 16px);
+  border-radius: 10px; text-align: left; font-weight: 500; line-height: 1.4; transition: background 160ms; }
+.w-roots button:hover { background: var(--w-card); }
+.w-roots button:disabled { cursor: default; opacity: .55; }
+.w-glyph { flex: none; width: 16px; color: var(--w-ink-3); font-weight: 400; }
+.w-human { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; min-height: 44px; margin-top: 14px;
+  font-size: 14px; font-weight: 600; color: var(--w-navy); }
+.w-human span { font-weight: 400; color: var(--w-ink-2); }
+.w-human .sb-ic { width: 15px; height: 15px; transition: transform 200ms var(--w-ease); }
+.w-human:hover .sb-ic { transform: translateX(2px); }
+
+/* footer: the privacy line right above the input (Klaviyo), then a pill input with a round send */
+.w-foot { flex: none; padding: 8px 12px 12px; padding-bottom: max(12px, env(safe-area-inset-bottom)); background: #fff;
+  box-shadow: 0 -1px 0 var(--w-line); }
+.w-privacy { padding: 0 6px 8px; font-size: 12px; line-height: 1.4; color: var(--w-ink-3); text-align: center; }
+.w-privacy a { text-decoration: underline; text-underline-offset: 2px; }
+.w-input { position: relative; display: flex; align-items: flex-end; gap: 8px; padding: 5px 5px 5px 16px; border: 1px solid #d5d2d2;
+  border-radius: 24px; background: #fff; transition: border-color 160ms, box-shadow 160ms; }
+.w-input:focus-within { border-color: var(--w-navy); box-shadow: 0 0 0 3px rgba(15, 30, 58, .1); }
+.w-input textarea { flex: 1; min-width: 0; max-height: 120px; padding: 8px 0; border: 0; outline: 0; resize: none; background: transparent;
+  font: inherit; font-size: 15px; line-height: 1.4; color: var(--w-ink); field-sizing: content; }
+.w-input textarea::placeholder { color: #8a8a8a; }
+.sam-w .w-input textarea:focus-visible { outline: 0; }
+.w-count { align-self: center; font-size: 12px; color: var(--w-ink-3); font-variant-numeric: tabular-nums; }
+.w-send { position: relative; display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 50%; background: var(--w-navy);
+  color: #fff; transition: background 160ms, transform 160ms var(--w-ease); }
+.w-send::after { content: ""; position: absolute; inset: -5px; } /* 48 px target */
+.w-send:disabled { background: #e9e8e8; color: #9a9a9a; cursor: default; }
+.w-send:not(:disabled):active { transform: scale(.94); }
+
+/* phones: iOS zooms inputs under 16 px */
+@media (max-width: 480px), (pointer: coarse) {
+  .w-input textarea { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sam-w *, .sam-w *::before, .sam-w *::after { animation: none !important; transition: none !important; }
+}
