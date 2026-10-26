@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAM architecture · October 2026</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --paper: #faf7f2; --paper-2: #f2ede4; --ink: #1c1917; --muted: #57534e; --soft: #78716c;
+    --rule: rgba(28,25,23,0.13); --accent: #b5523a; --accent-tint: #fbeee9; --link: #2563eb;
+    --built: #2f7d4f; --prog: #a96b12; --plan: #2563eb; --prop: #7c3aed;
+    --sans: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    --serif: Georgia, "Times New Roman", serif;
+    --mono: Consolas, "Cascadia Mono", ui-monospace, Menlo, monospace;
+  }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: var(--sans); background: var(--paper); color: var(--ink); padding: 2.5rem 1.5rem 3rem; line-height: 1.5; }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  .eyebrow { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem; }
+  h1 { font-family: var(--serif); font-weight: 400; font-size: 2.6rem; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 0.6rem; }
+  h2 { font-family: var(--serif); font-weight: 400; font-size: 1.65rem; letter-spacing: -0.01em; margin: 2.6rem 0 0.4rem; break-after: avoid; }
+  h2 .n { font-family: var(--mono); font-size: 0.85rem; color: var(--accent); vertical-align: middle; margin-right: 0.5rem; letter-spacing: 0.05em; }
+  h3 { font-size: 0.95rem; font-weight: 600; margin: 1.2rem 0 0.4rem; break-after: avoid; }
+  p, li { font-size: 0.93rem; color: var(--muted); max-width: 78ch; }
+  p + p { margin-top: 0.55rem; }
+  b, strong { color: var(--ink); font-weight: 600; }
+  ul.plain { margin: 0.4rem 0 0 1.1rem; } ul.plain li { margin-bottom: 0.25rem; }
+  code { font-family: var(--mono); font-size: 0.8em; color: var(--ink); background: rgba(28,25,23,0.06); padding: 0 0.25rem; border-radius: 3px; }
+  .lede { font-size: 1.02rem; color: var(--muted); max-width: 80ch; }
+  .part { margin-top: 3rem; padding: 1.4rem 1.5rem; border-radius: 8px; background: var(--ink); color: #faf7f2; break-before: page; }
+  .part .eyebrow { color: #d6cfc4; margin-bottom: 0.3rem; }
+  .part h2 { margin: 0; color: #faf7f2; font-size: 1.9rem; }
+  .part p { color: #d6cfc4; margin-top: 0.4rem; }
+  .part.first { break-before: auto; }
+  .fig { background: var(--paper-2); border: 1px solid var(--rule); border-radius: 8px; padding: 0.9rem; margin: 0.9rem 0; break-inside: avoid; }
+  .fig svg { width: 100%; height: auto; display: block; }
+  .fig .cap { font-size: 0.78rem; color: var(--soft); margin-top: 0.5rem; }
+  .grid { display: grid; gap: 0.9rem; margin-top: 0.9rem; }
+  .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: 1fr 1fr 1fr; } .g4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 760px) { .g2, .g3, .g4 { grid-template-columns: 1fr; } }
+  .card { background: #fff; border: 1px solid var(--rule); border-radius: 6px; padding: 0.9rem 1rem; break-inside: avoid; }
+  .card h4 { font-size: 0.86rem; font-weight: 600; margin-bottom: 0.35rem; }
+  .card p, .card li { font-size: 0.82rem; }
+  .note { border-left: 3px solid var(--accent); background: var(--accent-tint); padding: 0.7rem 0.9rem; border-radius: 0 6px 6px 0; margin: 0.9rem 0; break-inside: avoid; }
+  .note p { font-size: 0.86rem; color: #5a3328; max-width: none; }
+  .src { font-family: var(--mono); font-size: 0.68rem; color: var(--soft); margin-top: 0.5rem; letter-spacing: 0.02em; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--rule); margin-top: 0.8rem; font-size: 0.83rem; }
+  th { font-family: var(--mono); font-size: 0.64rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 0.55rem 0.75rem; background: var(--paper-2); border-bottom: 1px solid var(--rule); }
+  td { padding: 0.55rem 0.75rem; border-bottom: 1px solid rgba(28,25,23,0.07); color: var(--muted); vertical-align: top; }
+  td:first-child { color: var(--ink); font-weight: 600; }
+  tr { break-inside: avoid; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; margin-top: 0.9rem; }
+  @media (max-width: 760px) { .stats { grid-template-columns: 1fr 1fr; } }
+  .stat { background: #fff; border: 1px solid var(--rule); border-radius: 6px; padding: 0.8rem 0.9rem; break-inside: avoid; }
+  .stat b { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.9rem; line-height: 1.05; }
+  .stat span { font-size: 0.78rem; color: var(--muted); display: block; margin-top: 0.2rem; }
+  .tag { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 0.05rem 0.45rem; border-radius: 999px; border: 1px solid; white-space: nowrap; }
+  .tag.built { color: var(--built); border-color: var(--built); background: #eef6f0; }
+  .tag.prog { color: var(--prog); border-color: var(--prog); background: #fdf4e3; }
+  .tag.plan { color: var(--plan); border-color: var(--plan); background: #eef3fd; }
+  .tag.prop { color: var(--prop); border-color: var(--prop); background: #f4effd; border-style: dashed; }
+  .mock { background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 0.9rem 1rem; font-size: 0.83rem; break-inside: avoid; }
+  .mock dl { display: grid; grid-template-columns: 8.5rem 1fr; gap: 0.25rem 0.6rem; }
+  .mock dt { font-family: var(--mono); font-size: 0.72rem; color: var(--soft); padding-top: 0.1rem; }
+  .mock dd { color: var(--ink); }
+  .mock .q { font-weight: 600; color: var(--ink); margin-bottom: 0.5rem; }
+  .mock .send { color: var(--built); font-weight: 600; margin: 0.35rem 0; }
+  .mock .doc { border: 1px solid var(--rule); border-radius: 6px; padding: 0.5rem 0.65rem; margin-top: 0.45rem; }
+  .mock .doc small { color: var(--soft); display: block; }
+  .mock .btns { margin-top: 0.6rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .mock .btns span { border: 1px solid var(--rule); border-radius: 999px; padding: 0.1rem 0.6rem; font-size: 0.75rem; color: var(--muted); }
+  .glossary dt { font-weight: 600; color: var(--ink); font-size: 0.88rem; margin-top: 0.5rem; }
+  .glossary dd { font-size: 0.86rem; color: var(--muted); margin-left: 0; }
+  .footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-family: var(--mono); font-size: 0.7rem; color: var(--soft); }
+  /* SVG diagram styles */
+  .bx { fill: #fff; stroke: #bdb4a6; stroke-width: 1.2; }
+  .bx2 { fill: #ebe5da; stroke: #bdb4a6; stroke-width: 1.2; }
+  .bxg { fill: #eef6f0; stroke: #2f7d4f; stroke-width: 1.3; }
+  .bxa { fill: #fbeee9; stroke: #b5523a; stroke-width: 1.3; }
+  .bxb { fill: #eef3fd; stroke: #2563eb; stroke-width: 1.2; }
+  .bxd { fill: #f6f3ee; stroke: #a8a29e; stroke-width: 1.2; stroke-dasharray: 6 4; }
+  .core { fill: #f7f3ec; stroke: #1c1917; stroke-width: 2; }
+  .t { font-family: var(--sans); font-size: 15px; font-weight: 600; fill: #1c1917; }
+  .s { font-family: var(--sans); font-size: 12.5px; fill: #57534e; }
+  .m { font-family: var(--mono); font-size: 11px; fill: #78716c; letter-spacing: 0.08em; }
+  .mc { font-family: var(--mono); font-size: 11.5px; fill: #1c1917; }
+  .ln { stroke: #57534e; stroke-width: 1.6; fill: none; marker-end: url(#ar); }
+  .lna { stroke: #b5523a; stroke-width: 1.6; fill: none; marker-end: url(#ara); stroke-dasharray: 5 4; }
+  .lng { stroke: #2f7d4f; stroke-width: 1.6; fill: none; marker-end: url(#arg); }
+  .tg { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; }
+  @page { size: A4; margin: 12mm; }
+  @media print {
+    body { background: #fff; padding: 0; font-size: 12px; }
+    .wrap { max-width: none; }
+    h1 { font-size: 2.1rem; }
+    .fig { background: #faf8f4; }
+    .pb { break-before: page; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0, 9 3.5, 0 7" fill="#57534e"/></marker>
+    <marker id="ara" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0, 9 3.5, 0 7" fill="#b5523a"/></marker>
+    <marker id="arg" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0, 9 3.5, 0 7" fill="#2f7d4f"/></marker>
+  </defs>
+</svg>
+<div class="wrap">
+
+<p class="eyebrow">Accops · Sales &amp; Marketing · Architecture · 26 October 2026</p>
+<h1>SAM: how it works today, and where it is going</h1>
+<p class="lede">SAM is Accops' sales and marketing "brain". A rep asks a question in plain words ("a banking case study I can send a CIO") and SAM points to the right document in the Sales Collateral library, says whether it can go to a customer, and links to it. This document explains how that works today and what we plan next. It replaces the older system map (<code>docs/sam-how-it-works.html</code>, 24 Sep 2026).</p>
+
+<div class="grid g4">
+  <div class="card"><h4>RAG</h4><p>"Retrieval-augmented generation": first <b>find</b> the relevant material, then let an AI model write the answer <b>from that material only</b>.</p></div>
+  <div class="card"><h4>Card</h4><p>A one-page structured summary of one document (title, type, industry, product, year, visibility). Claude writes one card per document.</p></div>
+  <div class="card"><h4>Passage</h4><p>A short chunk of a document's own text, one page or slide at a time, used when a tool needs to quote what the document says.</p></div>
+  <div class="card"><h4>Embedding</h4><p>A list of numbers that captures a text's meaning, used for "search by meaning". <b>SAM does not use embeddings today</b>; it searches by words.</p></div>
+</div>
+
+<div class="fig">
+<svg viewBox="0 0 1000 255" role="img" aria-label="SAM end to end: source, registry, cards and passages, rules, answer engine, channels, with feedback back to marketing">
+  <text class="m" x="10" y="38">1 · SOURCE</text><text class="m" x="176" y="38">2 · TRACK</text><text class="m" x="342" y="38">3 · READ</text><text class="m" x="508" y="38">4 · DECIDE</text><text class="m" x="674" y="38">5 · ANSWER</text><text class="m" x="840" y="38">6 · DELIVER</text>
+  <rect class="bx" x="10" y="50" width="140" height="120" rx="6"/>
+  <text class="t" x="80" y="80" text-anchor="middle">Sales Collateral</text>
+  <text class="s" x="80" y="102" text-anchor="middle">SharePoint library</text>
+  <text class="s" x="80" y="119" text-anchor="middle">878 files</text>
+  <rect class="bx" x="176" y="50" width="140" height="120" rx="6"/>
+  <text class="t" x="246" y="80" text-anchor="middle">Registry</text>
+  <text class="s" x="246" y="102" text-anchor="middle">one row per file:</text>
+  <text class="s" x="246" y="119" text-anchor="middle">name, folder, link,</text>
+  <text class="s" x="246" y="136" text-anchor="middle">dates</text>
+  <rect class="bx" x="342" y="50" width="140" height="120" rx="6"/>
+  <text class="t" x="412" y="80" text-anchor="middle">Cards + passages</text>
+  <text class="s" x="412" y="102" text-anchor="middle">what each document</text>
+  <text class="s" x="412" y="119" text-anchor="middle">says: 384 cards,</text>
+  <text class="s" x="412" y="136" text-anchor="middle">12,728 passages</text>
+  <rect class="bx" x="508" y="50" width="140" height="120" rx="6"/>
+  <text class="t" x="578" y="80" text-anchor="middle">Rules</text>
+  <text class="s" x="578" y="102" text-anchor="middle">one version per doc,</text>
+  <text class="s" x="578" y="119" text-anchor="middle">2024 or later,</text>
+  <text class="s" x="578" y="136" text-anchor="middle">public vs internal</text>
+  <rect class="bx" x="674" y="50" width="140" height="120" rx="6"/>
+  <text class="t" x="744" y="80" text-anchor="middle">Answer engine</text>
+  <text class="s" x="744" y="102" text-anchor="middle">search first, model</text>
+  <text class="s" x="744" y="119" text-anchor="middle">picks, SAM writes</text>
+  <text class="s" x="744" y="136" text-anchor="middle">every line</text>
+  <rect class="bxg" x="840" y="50" width="140" height="120" rx="6"/>
+  <text class="t" x="910" y="80" text-anchor="middle">Channels</text>
+  <text class="s" x="910" y="102" text-anchor="middle">web app, WhatsApp,</text>
+  <text class="s" x="910" y="119" text-anchor="middle">Dwight, SAM Live</text>
+  <path class="ln" d="M150 110 H174"/><path class="ln" d="M316 110 H340"/><path class="ln" d="M482 110 H506"/><path class="ln" d="M648 110 H672"/><path class="ln" d="M814 110 H838"/>
+  <path class="lna" d="M910 170 V212 H80 V173"/>
+  <text class="s" x="495" y="238" text-anchor="middle" style="fill:#b5523a">Feedback: ratings and "doesn't exist" requests reach marketing, who add or fix content in SharePoint</text>
+</svg>
+<p class="cap">SAM end to end. Each numbered stage has its own section below.</p>
+</div>
+
+<!-- ======================================================= PART 1 -->
+<div class="part first">
+  <p class="eyebrow">Part 1</p>
+  <h2>How SAM works today</h2>
+  <p>As of 26 October 2026. Every claim is taken from the code and the project documents; sources are listed in small print under each section.</p>
+</div>
+
+<h2><span class="n">01</span>Where the documents come from</h2>
+<p>SAM reads one library: <b>Sales Collateral</b> in SharePoint. SAM never writes to SharePoint and never changes a file. It keeps two views of the library: a list of files (kept current by Power Automate) and a full synced copy on Siddharth's laptop, which the nightly reading job uses.</p>
+<div class="fig">
+<svg viewBox="0 0 1000 270" role="img" aria-label="SharePoint Sales Collateral feeds Power Automate and the registry, and a OneDrive copy feeds nightly carding. Marketing 2.0 is not ingested.">
+  <rect class="bx" x="10" y="20" width="340" height="160" rx="6"/>
+  <text class="t" x="26" y="48">SharePoint (Microsoft 365)</text>
+  <text class="s" x="26" y="74">Tenant: propalmsnetwork</text>
+  <text class="s" x="26" y="94">Site: Company</text>
+  <text class="s" x="26" y="114">Folder: /Shared Documents/Sales/</text>
+  <text class="s" x="26" y="132">Sales Collateral</text>
+  <text class="t" x="26" y="162" style="font-size:14px">878 files on 26 Oct 2026</text>
+  <rect class="bxd" x="10" y="200" width="340" height="58" rx="6"/>
+  <text class="t" x="26" y="224" style="font-size:14px;fill:#57534e">Marketing 2.0 (MarketingTeam site)</text>
+  <text class="s" x="26" y="245">Not ingested: excluded until specific folders are named</text>
+  <rect class="bx" x="430" y="20" width="250" height="90" rx="6"/>
+  <text class="t" x="555" y="50" text-anchor="middle">Power Automate</text>
+  <text class="s" x="555" y="72" text-anchor="middle">sees names, folders, links</text>
+  <text class="s" x="555" y="90" text-anchor="middle">and dates, never contents</text>
+  <rect class="bx" x="740" y="20" width="250" height="90" rx="6"/>
+  <text class="t" x="865" y="50" text-anchor="middle">SAM registry</text>
+  <text class="mc" x="865" y="72" text-anchor="middle">sam_sharepoint_files</text>
+  <text class="s" x="865" y="92" text-anchor="middle">878 rows = 878 files</text>
+  <rect class="bx" x="430" y="150" width="250" height="106" rx="6"/>
+  <text class="t" x="555" y="180" text-anchor="middle">OneDrive sync</text>
+  <text class="s" x="555" y="202" text-anchor="middle">a full copy on Siddharth's</text>
+  <text class="s" x="555" y="220" text-anchor="middle">laptop, "always keep on</text>
+  <text class="s" x="555" y="238" text-anchor="middle">this device"</text>
+  <rect class="bx" x="740" y="150" width="250" height="106" rx="6"/>
+  <text class="t" x="865" y="180" text-anchor="middle">Nightly carding</text>
+  <text class="s" x="865" y="202" text-anchor="middle">reads the documents from</text>
+  <text class="s" x="865" y="220" text-anchor="middle">the synced copy, because</text>
+  <text class="s" x="865" y="238" text-anchor="middle">Microsoft Graph is blocked</text>
+  <path class="ln" d="M350 65 H428"/><path class="ln" d="M680 65 H738"/>
+  <path class="ln" d="M350 150 C 390 150, 390 203, 428 203"/><path class="ln" d="M680 203 H738"/>
+</svg>
+<p class="cap">Two paths out of one library. The file list arrives within minutes; the reading happens once a night.</p>
+</div>
+<p class="src">Sources: docs/TASK-sharepoint-ingestion.md §4; docs/ROADMAP.md P5 ("Marketing 2.0 ... excluded until specific folders are named"); prototype/carding_prep.py (OneDrive path, "Why OneDrive"); registry count read 26 Oct 2026.</p>
+
+<h2><span class="n">02</span>Noticing changes</h2>
+<p>Two Power Automate flows keep the registry honest. One catches every add or edit within minutes. The other runs every night at 02:00 IST, lists the whole library, and marks files that have disappeared as deleted. It has a safety guard: if it can see fewer than 90% of the files SAM already knows about, it assumes the listing is broken and refuses to change anything.</p>
+<div class="fig">
+<svg viewBox="0 0 1000 312" role="img" aria-label="Lane A: file changed, flow, webhook, registry. Lane B: 02:00 snapshot, guard at 90 percent, tombstone or refuse.">
+  <text class="m" x="10" y="22">A · EVERY ADD OR EDIT, WITHIN MINUTES</text>
+  <rect class="bx2" x="10" y="35" width="170" height="80" rx="6"/>
+  <text class="t" x="95" y="65" text-anchor="middle">File added or</text>
+  <text class="t" x="95" y="84" text-anchor="middle">edited</text>
+  <rect class="bx" x="215" y="35" width="240" height="80" rx="6"/>
+  <text class="t" x="335" y="62" text-anchor="middle">Flow: "SAM - Sales</text>
+  <text class="t" x="335" y="81" text-anchor="middle">Collateral changed"</text>
+  <text class="s" x="335" y="101" text-anchor="middle">Power Automate</text>
+  <rect class="bx" x="490" y="35" width="220" height="80" rx="6"/>
+  <text class="t" x="600" y="68" text-anchor="middle">SAM webhook</text>
+  <text class="s" x="600" y="90" text-anchor="middle">checks the shared secret</text>
+  <rect class="bxg" x="745" y="35" width="245" height="80" rx="6"/>
+  <text class="t" x="867" y="65" text-anchor="middle">Registry updated</text>
+  <text class="s" x="867" y="86" text-anchor="middle">new row, or new name, folder,</text>
+  <text class="s" x="867" y="103" text-anchor="middle">date or link</text>
+  <path class="ln" d="M180 75 H213"/><path class="ln" d="M455 75 H488"/><path class="ln" d="M710 75 H743"/>
+  <text class="m" x="10" y="160">B · EVERY NIGHT AT 02:00 IST, CATCHES DELETIONS</text>
+  <rect class="bx2" x="10" y="185" width="170" height="80" rx="6"/>
+  <text class="t" x="95" y="220" text-anchor="middle">02:00 IST</text>
+  <text class="s" x="95" y="241" text-anchor="middle">scheduled run</text>
+  <rect class="bx" x="215" y="185" width="240" height="80" rx="6"/>
+  <text class="t" x="335" y="212" text-anchor="middle">Flow: "SAM - daily</text>
+  <text class="t" x="335" y="231" text-anchor="middle">SharePoint snapshot"</text>
+  <text class="s" x="335" y="251" text-anchor="middle">lists every file in the library</text>
+  <polygon class="bx" points="490,225 600,172 710,225 600,278"/>
+  <text class="t" x="600" y="214" text-anchor="middle" style="font-size:13.5px">Sees at least 90%</text>
+  <text class="t" x="600" y="231" text-anchor="middle" style="font-size:13.5px">of the files SAM</text>
+  <text class="t" x="600" y="248" text-anchor="middle" style="font-size:13.5px">knows?</text>
+  <rect class="bxg" x="745" y="168" width="245" height="56" rx="6"/>
+  <text class="t" x="867" y="192" text-anchor="middle" style="font-size:14px">Yes: mark missing files</text>
+  <text class="s" x="867" y="211" text-anchor="middle">as deleted ("tombstone")</text>
+  <rect class="bxa" x="745" y="240" width="245" height="56" rx="6"/>
+  <text class="t" x="867" y="264" text-anchor="middle" style="font-size:14px">No: refuse, change nothing</text>
+  <text class="s" x="867" y="283" text-anchor="middle">and log "refused"</text>
+  <path class="ln" d="M180 225 H213"/><path class="ln" d="M455 225 H488"/>
+  <path class="lng" d="M690 214 C 720 205, 720 196, 743 196"/><path class="ln" d="M690 236 C 720 245, 720 268, 743 268" style="stroke:#b5523a" marker-end="url(#ara)"/>
+  <text class="s" x="712" y="190" style="fill:#2f7d4f">yes</text><text class="s" x="714" y="276" style="fill:#b5523a">no</text>
+</svg>
+<p class="cap">The registry knows where every file is. It does not yet know what a new file says; that is the next step (carding).</p>
+</div>
+<div class="note"><p><b>The guard earned its keep in October.</b> From 1 Oct, Power Automate's standard "Get files" step silently returned 283 fewer files (the oldest ones, created 2021-22) while still reporting success. Without the guard, SAM would have marked them all deleted. Instead it refused every night until Power Automate suspended the flow. On 19 Oct the listing step was replaced with direct paged listing; the first run listed 878, matched 878, deleted 0.</p></div>
+<p class="src">Sources: web/lib/sharepoint.ts (MIN_SHARE = 0.9, diffSnapshot); docs/TASK-snapshot-flow.md; docs/SALES-BRAIN-PLATFORM.md §3 Freshness; sam_ops_runs.</p>
+
+<h2 class="pb"><span class="n">03</span>Carding: reading each document once</h2>
+<p>A <b>card</b> is SAM's structured summary of one document. Cards are what SAM's answer model reads; it never reads the files themselves. Claude writes the cards every morning at 07:00 IST on Siddharth's laptop, for any file that is new, changed or renamed since its last card. The cards are saved to git (so every card can be reviewed and rebuilt) and loaded into the database.</p>
+<div class="fig">
+<svg viewBox="0 0 1000 285" role="img" aria-label="Nightly carding: Windows task, Claude skill, carding_prep, Claude writes cards, gate, load_cards, build_passages, commit, log, digest">
+  <rect class="bx2" x="10" y="20" width="176" height="95" rx="6"/>
+  <text class="t" x="98" y="48" text-anchor="middle">07:00 IST</text>
+  <text class="s" x="98" y="70" text-anchor="middle">Windows Task on</text>
+  <text class="s" x="98" y="87" text-anchor="middle">Siddharth's laptop</text>
+  <rect class="bx" x="206" y="20" width="176" height="95" rx="6"/>
+  <text class="t" x="294" y="48" text-anchor="middle">Claude Code skill</text>
+  <text class="mc" x="294" y="70" text-anchor="middle">/sam-nightly-carding</text>
+  <text class="s" x="294" y="89" text-anchor="middle">runs without a person</text>
+  <rect class="bx" x="402" y="20" width="176" height="95" rx="6"/>
+  <text class="mc" x="490" y="46" text-anchor="middle" style="font-weight:600">carding_prep.py</text>
+  <text class="s" x="490" y="68" text-anchor="middle">takes the queue, copies</text>
+  <text class="s" x="490" y="85" text-anchor="middle">files from OneDrive,</text>
+  <text class="s" x="490" y="102" text-anchor="middle">extracts their text</text>
+  <rect class="bx" x="598" y="20" width="176" height="95" rx="6"/>
+  <text class="t" x="686" y="48" text-anchor="middle">Claude writes cards</text>
+  <text class="s" x="686" y="70" text-anchor="middle">one per document; no</text>
+  <text class="s" x="686" y="87" text-anchor="middle">contact details or</text>
+  <text class="s" x="686" y="104" text-anchor="middle">credentials, ever</text>
+  <rect class="bx" x="794" y="20" width="176" height="95" rx="6"/>
+  <text class="t" x="882" y="48" text-anchor="middle">Gate</text>
+  <text class="s" x="882" y="70" text-anchor="middle">required fields; tags</text>
+  <text class="s" x="882" y="87" text-anchor="middle">must be on the master</text>
+  <text class="s" x="882" y="104" text-anchor="middle">lists (core.terms)</text>
+  <path class="ln" d="M186 67 H204"/><path class="ln" d="M382 67 H400"/><path class="ln" d="M578 67 H596"/><path class="ln" d="M774 67 H792"/>
+  <path class="ln" d="M882 115 V163"/>
+  <rect class="bx" x="794" y="165" width="176" height="95" rx="6"/>
+  <text class="mc" x="882" y="193" text-anchor="middle" style="font-weight:600">load_cards.py</text>
+  <text class="s" x="882" y="215" text-anchor="middle">cards into the database</text>
+  <text class="mc" x="882" y="234" text-anchor="middle">sam_asset_cards</text>
+  <rect class="bx" x="598" y="165" width="176" height="95" rx="6"/>
+  <text class="mc" x="686" y="193" text-anchor="middle" style="font-weight:600">build_passages.py</text>
+  <text class="s" x="686" y="215" text-anchor="middle">page/slide text into</text>
+  <text class="mc" x="686" y="234" text-anchor="middle">sam_passages</text>
+  <rect class="bx" x="402" y="165" width="176" height="95" rx="6"/>
+  <text class="t" x="490" y="193" text-anchor="middle">Commit + push</text>
+  <text class="s" x="490" y="215" text-anchor="middle">cards live in git as the</text>
+  <text class="s" x="490" y="232" text-anchor="middle">reviewable record</text>
+  <rect class="bx" x="206" y="165" width="176" height="95" rx="6"/>
+  <text class="t" x="294" y="193" text-anchor="middle">Log the run</text>
+  <text class="mc" x="294" y="215" text-anchor="middle">sam_ops_runs</text>
+  <text class="s" x="294" y="234" text-anchor="middle">ok / warn / failed</text>
+  <rect class="bxg" x="10" y="165" width="176" height="95" rx="6"/>
+  <text class="t" x="98" y="193" text-anchor="middle">08:30 digest</text>
+  <text class="s" x="98" y="215" text-anchor="middle">tells Siddharth what</text>
+  <text class="s" x="98" y="232" text-anchor="middle">was carded overnight</text>
+  <path class="ln" d="M794 212 H776"/><path class="ln" d="M598 212 H580"/><path class="ln" d="M402 212 H384"/><path class="ln" d="M206 212 H188"/>
+</svg>
+<p class="cap">The nightly carding job. Only Claude reads document bodies; this is the "carding boundary" Siddharth set on 6 Sep.</p>
+</div>
+<div class="grid g2">
+  <div class="mock">
+    <p class="eyebrow" style="margin-bottom:0.5rem">What a card holds (illustrative)</p>
+    <dl>
+      <dt>title</dt><dd>HySecure ZTNA product deck</dd>
+      <dt>asset_type</dt><dd>Deck <span style="color:var(--soft)">(from the master list)</span></dd>
+      <dt>industry</dt><dd>Cross-industry</dd>
+      <dt>products</dt><dd>HySecure</dd>
+      <dt>competitors</dt><dd>any the document names</dd>
+      <dt>client</dt><dd>described, never named: "a large private bank"</dd>
+      <dt>visibility</dt><dd>internal, or "both" when published</dd>
+      <dt>publish_year</dt><dd>read from the document body, not the filename</dd>
+      <dt>brief, outcomes</dt><dd>what it is, what results it states</dd>
+      <dt>trust notes</dt><dd>expired? superseded by a newer file? stale risk?</dd>
+      <dt>confidence</dt><dd>0 to 1, plus "needs a human" notes</dd>
+    </dl>
+  </div>
+  <div>
+    <table>
+      <tr><th>Why a file is queued</th><th>What carding does</th></tr>
+      <tr><td>New (no card yet)</td><td>Writes a card. If it is a newer version of a carded document, it goes first.</td></tr>
+      <tr><td>Changed since its card</td><td>Re-reads and updates the card.</td></tr>
+      <tr><td>Renamed</td><td>Re-checks the card. Cards are tied to SharePoint's item ID, so a rename never loses the link.</td></tr>
+      <tr><td>Older copy of a carded document</td><td>Skipped and logged: answers use the newer one.</td></tr>
+    </table>
+    <p style="margin-top:0.6rem;font-size:0.83rem">Today: <b>384 cards</b>. A new file is findable by name within minutes (registry), and fully described the next morning (card).</p>
+  </div>
+</div>
+<p class="src">Sources: prototype/carding_prep.py; prototype/load_cards.py; docs/supabase-sam-asset-families.sql (queue reasons uncarded / changed_since_card / renamed, family_role); ~/.claude/skills/sam-nightly-carding/SKILL.md; docs/HANDOVER.md 29 Sep.</p>
+
+<h2><span class="n">04</span>Passages: the documents' own words</h2>
+<p>Cards say what a document is about. Sometimes a tool needs the exact words, for example SAM Live during a call. For that, every carded PDF, PowerPoint and Word file is also split into <b>passages</b>, one page, slide or section at a time. Today there are <b>12,728</b>.</p>
+<div class="fig">
+<svg viewBox="0 0 1000 290" role="img" aria-label="Passages are built nightly and searched with Postgres full-text search then re-ranked by SAM">
+  <text class="m" x="10" y="18">BUILT EVERY NIGHT, AFTER CARDING</text>
+  <rect class="bx" x="10" y="30" width="176" height="88" rx="6"/>
+  <text class="t" x="98" y="58" text-anchor="middle">Carded document</text>
+  <text class="s" x="98" y="80" text-anchor="middle">PDF, PPTX or DOCX</text>
+  <text class="s" x="98" y="97" text-anchor="middle">(spreadsheets skipped)</text>
+  <rect class="bx" x="206" y="30" width="176" height="88" rx="6"/>
+  <text class="t" x="294" y="58" text-anchor="middle">Split</text>
+  <text class="s" x="294" y="80" text-anchor="middle">by page, slide or</text>
+  <text class="s" x="294" y="97" text-anchor="middle">heading, never across</text>
+  <rect class="bx" x="402" y="30" width="176" height="88" rx="6"/>
+  <text class="t" x="490" y="58" text-anchor="middle">Pack</text>
+  <text class="s" x="490" y="80" text-anchor="middle">into chunks of about</text>
+  <text class="s" x="490" y="97" text-anchor="middle">400-1,200 characters</text>
+  <rect class="bx" x="598" y="30" width="176" height="88" rx="6"/>
+  <text class="t" x="686" y="58" text-anchor="middle">Scrub</text>
+  <text class="s" x="686" y="80" text-anchor="middle">e-mails, phone numbers,</text>
+  <text class="s" x="686" y="97" text-anchor="middle">IPs, credentials removed</text>
+  <rect class="bxg" x="794" y="30" width="176" height="88" rx="6"/>
+  <text class="mc" x="882" y="58" text-anchor="middle" style="font-weight:600">sam_passages</text>
+  <text class="s" x="882" y="80" text-anchor="middle">each marked public</text>
+  <text class="s" x="882" y="97" text-anchor="middle">or internal</text>
+  <path class="ln" d="M186 74 H204"/><path class="ln" d="M382 74 H400"/><path class="ln" d="M578 74 H596"/><path class="ln" d="M774 74 H792"/>
+  <text class="m" x="10" y="165">ON EVERY SEARCH</text>
+  <rect class="bx2" x="10" y="177" width="176" height="96" rx="6"/>
+  <text class="t" x="98" y="207" text-anchor="middle">A question</text>
+  <text class="s" x="98" y="229" text-anchor="middle">from a tool such</text>
+  <text class="s" x="98" y="246" text-anchor="middle">as SAM Live</text>
+  <rect class="bx" x="206" y="177" width="176" height="96" rx="6"/>
+  <text class="t" x="294" y="207" text-anchor="middle">Full-text search</text>
+  <text class="s" x="294" y="229" text-anchor="middle">in Postgres: any word</text>
+  <text class="s" x="294" y="246" text-anchor="middle">matches, then ranked</text>
+  <rect class="bx" x="402" y="177" width="176" height="96" rx="6"/>
+  <text class="t" x="490" y="207" text-anchor="middle">SAM re-ranks</text>
+  <text class="s" x="490" y="229" text-anchor="middle">same word and name</text>
+  <text class="s" x="490" y="246" text-anchor="middle">scoring as answers,</text>
+  <text class="s" x="490" y="263" text-anchor="middle">plus freshness</text>
+  <rect class="bx" x="598" y="177" width="176" height="96" rx="6"/>
+  <text class="t" x="686" y="207" text-anchor="middle">Filter by caller</text>
+  <text class="s" x="686" y="229" text-anchor="middle">internal text only for</text>
+  <text class="s" x="686" y="246" text-anchor="middle">tools with permission</text>
+  <rect class="bxg" x="794" y="177" width="176" height="96" rx="6"/>
+  <text class="t" x="882" y="207" text-anchor="middle">Passages back</text>
+  <text class="s" x="882" y="229" text-anchor="middle">with page or slide, link,</text>
+  <text class="s" x="882" y="246" text-anchor="middle">trust note; at most</text>
+  <text class="s" x="882" y="263" text-anchor="middle">3 per document</text>
+  <path class="ln" d="M186 225 H204"/><path class="ln" d="M382 225 H400"/><path class="ln" d="M578 225 H596"/><path class="ln" d="M774 225 H792"/>
+</svg>
+<p class="cap">How passages are made and found.</p>
+</div>
+<div class="note"><p><b>How search works, exactly.</b> SAM searches by <b>words, not meaning</b>. For documents (cards), it scores each one in memory: words that match, words in the title, all words matching, the document type asked for, freshness, and known names (products, regulations, regions, competitors). For passages, Postgres full-text search (English stemming, any word may match) finds candidates, then the same scoring re-ranks them. <b>No embeddings anywhere.</b> This was a deliberate choice (ROADMAP P5): add meaning-based search only once real questions show word search missing things.</p></div>
+<p class="src">Sources: prototype/build_passages.py; docs/supabase-sam-passages.sql (tsvector, plainto_tsquery with OR, ts_rank_cd); web/lib/passages.ts; web/lib/cards.ts searchAssets; docs/ROADMAP.md P5. Count read 26 Oct 2026.</p>
+
+<h2 class="pb"><span class="n">05</span>The rules that decide what can be answered</h2>
+<p>Not every file should answer a question. Five old versions of the same deck would bury the current one, and a 2019 brochure may describe a product that has changed. So SAM applies a few rules, the same in the app and in the database.</p>
+<div class="fig">
+<svg viewBox="0 0 1000 235" role="img" aria-label="878 files become 475 assets become 271 answerable">
+  <rect x="20" y="15" width="560" height="46" rx="5" fill="#ddd5c8"/>
+  <text class="t" x="34" y="44">878 files in Sales Collateral</text>
+  <rect x="20" y="95" width="304" height="46" rx="5" fill="#e9e2d6"/>
+  <text class="t" x="34" y="124">475 assets</text>
+  <rect x="20" y="175" width="173" height="46" rx="5" fill="#cfe6d6"/>
+  <text class="t" x="34" y="204">271 answerable</text>
+  <text class="s" x="210" y="204">204 held back</text>
+  <path class="ln" d="M60 61 V93"/><path class="ln" d="M60 141 V173"/>
+  <text class="s" x="600" y="70">PDF and PowerPoint copies of one document merged;</text>
+  <text class="s" x="600" y="87">temp files, shortcuts, CSVs and archive folders dropped</text>
+  <text class="s" x="600" y="148">Only the newest version of each document;</text>
+  <text class="s" x="600" y="165">2024 or later unless an exception or a pin;</text>
+  <text class="s" x="600" y="182">hand exclusions and empty files out</text>
+</svg>
+<p class="cap">From files to answerable documents (counts from the 26 Oct health check).</p>
+</div>
+<div class="grid g2">
+  <div class="card"><h4>1 · Version families: one answer slot per document</h4><p>Every version, re-save and edition of a document ("v2", "Final", "(1)", a date prefix) is grouped into a <b>family</b>. Only the newest copy answers; the answer says "N older versions not shown". Editions such as "sharable", Japanese or Middle East are siblings: SAM picks the one the question needs (the sharable one when the rep is sending).</p></div>
+  <div class="card"><h4>2 · Pre-2024 documents are excluded, with exceptions</h4><p>A document answers only if it was published in 2024 or later (year from the document itself; if unknown, the year it was last modified). <b>Exceptions:</b> certificates, analyst reports, regulations, third-party research and brand assets (logos, signatures). Excluded documents never answer and are never offered as substitutes.</p></div>
+  <div class="card"><h4>3 · Pins and overrides</h4><p>An admin can <b>pin</b> an older document to keep it answering (Content tab, Pin / Unpin). A hand <b>override</b> can exclude a document (e.g. an empty deck) or split two files that were wrongly grouped. Cards marked low-confidence and "empty" are also out.</p></div>
+  <div class="card"><h4>4 · Master lists (core.terms)</h4><p>One shared list per tag: <b>industries, asset types, products, competitors</b>. Each has one label and its alternative spellings. The database rejects an industry or asset type that is not on the list, so "BFSI", "Banking" and "banking" can never become three industries. The same lists serve other Accops apps.</p></div>
+</div>
+<p class="src">Sources: web/lib/family.ts; docs/supabase-sam-asset-families.sql; web/lib/cards.ts (eligibility, answerable); docs/brain/01-core-reference-lists.sql, 02-sam-wired-to-core.sql; docs/HANDOVER.md 30 Sep; docs/SALES-BRAIN-PLATFORM.md §1.</p>
+
+<h2 class="pb"><span class="n">06</span>Public or internal: what a rep may send</h2>
+<p>Every document is either <b>public</b> (published on accops.com, safe to send to a customer) or <b>internal</b> (Accops staff only). SAM decides this from the card and the link, never from the AI model's opinion, and says it on every answer.</p>
+<div class="fig">
+<svg viewBox="0 0 1000 330" role="img" aria-label="Internal path gives a SharePoint link and an internal-only warning. Public path gives an accops.com link and says it can be sent. Publish requests move documents from internal to public.">
+  <text class="m" x="10" y="20">INTERNAL (MOST OF THE LIBRARY)</text>
+  <text class="m" x="520" y="20">PUBLIC (PUBLISHED BY ACCOPS)</text>
+  <rect class="bx" x="10" y="32" width="470" height="60" rx="6"/>
+  <text class="t" x="245" y="57" text-anchor="middle">Card says internal</text>
+  <text class="s" x="245" y="78" text-anchor="middle">not published, or no public link</text>
+  <rect class="bx" x="10" y="112" width="470" height="60" rx="6"/>
+  <text class="t" x="245" y="137" text-anchor="middle">Link: SharePoint, view-only</text>
+  <text class="s" x="245" y="158" text-anchor="middle">needs an Accops login, so it is useless to a customer anyway</text>
+  <rect class="bxa" x="10" y="192" width="470" height="60" rx="6"/>
+  <text class="t" x="245" y="217" text-anchor="middle">SAM says: "Internal only:</text>
+  <text class="t" x="245" y="237" text-anchor="middle">don't send outside Accops"</text>
+  <rect class="bx" x="520" y="32" width="470" height="60" rx="6"/>
+  <text class="t" x="755" y="57" text-anchor="middle">Card says published, with a public link</text>
+  <text class="s" x="755" y="78" text-anchor="middle">visibility "both"</text>
+  <rect class="bx" x="520" y="112" width="470" height="60" rx="6"/>
+  <text class="t" x="755" y="137" text-anchor="middle">Link: the accops.com page first,</text>
+  <text class="s" x="755" y="158" text-anchor="middle">else the PDF on downloads.accops.com</text>
+  <rect class="bxg" x="520" y="192" width="470" height="60" rx="6"/>
+  <text class="t" x="755" y="217" text-anchor="middle">SAM says: "It is public, so it</text>
+  <text class="t" x="755" y="237" text-anchor="middle">can be sent to a customer"</text>
+  <path class="ln" d="M245 92 V110"/><path class="ln" d="M245 172 V190"/><path class="ln" d="M755 92 V110"/><path class="ln" d="M755 172 V190"/>
+  <rect class="bxb" x="10" y="272" width="980" height="46" rx="6"/>
+  <text class="t" x="500" y="300" text-anchor="middle" style="font-size:14px">Publish request: a rep asks for an internal document to go public → Siddharth approves → once it has an accops.com link, it turns public</text>
+</svg>
+<p class="cap">The sendability line on every answer is written by SAM's code from this split. The model is never asked whether something can be sent.</p>
+</div>
+<div class="grid g3">
+  <div class="card"><h4>The public wall is in the database</h4><p>A database view, <code>sam_v1_public_assets</code>, holds only documents that are published on accops.com, current, eligible and not expired (22 on 26 Oct). A separate low-privilege database role, <code>sam_web_reader</code>, can read that view and nothing else; a test script proves 15 other objects are refused. Anything customer-facing (the future website bot) will use only this role.</p></div>
+  <div class="card"><h4>Customer names stay inside</h4><p>A card stores a real customer name separately from its anonymised description ("India's largest private bank"). The real name is in no view and no API response.</p></div>
+  <div class="card"><h4>Passage policy (17 Oct 2026)</h4><p>Siddharth decided that passage text of both public and internal documents may be stored in the database. Internal passages go only to tools holding a special permission (today: SAM Live). Everyone else gets public passages. One setting switches internal passages off instantly. SAM still never sends a file to anyone.</p></div>
+</div>
+<p class="src">Sources: web/lib/cards.ts (assetLink, internalLink); web/lib/agent.ts (sendLine, guardSending); docs/supabase-sam-publish-requests.sql; docs/supabase-sam-v1-brain.sql; docs/supabase-sam-v1-public-proof.sql; docs/HANDOVER.md "Passages, 17 October 2026"; web/lib/passages.ts.</p>
+
+<h2 class="pb"><span class="n">07</span>Answering a question</h2>
+<p>All channels share one answer engine. The order matters: SAM <b>searches the rep's own words first</b>, so the model can only add to what plain search finds, never replace it. The model then picks the best documents by number. <b>SAM's code, not the model, writes every document line</b> from the card, so a document title can never be invented.</p>
+<div class="fig">
+<svg viewBox="0 0 1000 350" role="img" aria-label="Channels feed one engine: search first, model picks, grounding guard, answer. Model chain: gpt-6-luna, gpt-oss-120b, gpt-oss-20b, retrieval only.">
+  <text class="m" x="10" y="14">CHANNELS</text>
+  <rect class="bx" x="10" y="24" width="180" height="56" rx="6"/>
+  <text class="t" x="100" y="47" text-anchor="middle">Web app</text>
+  <text class="s" x="100" y="67" text-anchor="middle">sam-accops.vercel.app</text>
+  <rect class="bx" x="10" y="90" width="180" height="56" rx="6"/>
+  <text class="t" x="100" y="113" text-anchor="middle">WhatsApp</text>
+  <text class="s" x="100" y="133" text-anchor="middle">Meta, test number</text>
+  <rect class="bx" x="10" y="156" width="180" height="56" rx="6"/>
+  <text class="t" x="100" y="179" text-anchor="middle">REST API + MCP</text>
+  <text class="s" x="100" y="199" text-anchor="middle">Dwight extension</text>
+  <rect class="bx" x="10" y="222" width="180" height="56" rx="6"/>
+  <text class="t" x="100" y="245" text-anchor="middle">SAM Live</text>
+  <text class="s" x="100" y="265" text-anchor="middle">call copilot (+ passages)</text>
+  <path class="ln" d="M190 52 C 212 52, 210 140, 228 145"/><path class="ln" d="M190 118 C 210 118, 210 145, 228 148"/>
+  <path class="ln" d="M190 184 C 210 184, 210 152, 228 152"/><path class="ln" d="M190 250 C 214 250, 210 158, 228 156"/>
+  <rect class="bx" x="230" y="105" width="175" height="96" rx="6"/>
+  <text class="t" x="317" y="132" text-anchor="middle">1 · Search first</text>
+  <text class="s" x="317" y="154" text-anchor="middle">the rep's own words,</text>
+  <text class="s" x="317" y="171" text-anchor="middle">every time; internal or</text>
+  <text class="s" x="317" y="188" text-anchor="middle">external decided here</text>
+  <rect class="bx" x="430" y="105" width="195" height="96" rx="6"/>
+  <text class="t" x="527" y="132" text-anchor="middle">2 · Model picks</text>
+  <text class="s" x="527" y="154" text-anchor="middle">reads the top cards, may</text>
+  <text class="s" x="527" y="171" text-anchor="middle">search twice more, returns</text>
+  <text class="s" x="527" y="188" text-anchor="middle">one sentence + "PICKS: 2, 1"</text>
+  <rect class="bx" x="650" y="105" width="175" height="96" rx="6"/>
+  <text class="t" x="737" y="132" text-anchor="middle">3 · Grounding guard</text>
+  <text class="s" x="737" y="154" text-anchor="middle">SAM writes every</text>
+  <text class="s" x="737" y="171" text-anchor="middle">document line from</text>
+  <text class="s" x="737" y="188" text-anchor="middle">the card</text>
+  <rect class="bxg" x="850" y="105" width="140" height="96" rx="6"/>
+  <text class="t" x="920" y="132" text-anchor="middle">Answer</text>
+  <text class="s" x="920" y="154" text-anchor="middle">verdict, can-I-send</text>
+  <text class="s" x="920" y="171" text-anchor="middle">line, documents,</text>
+  <text class="s" x="920" y="188" text-anchor="middle">trust notes</text>
+  <path class="ln" d="M405 153 H428"/><path class="ln" d="M625 153 H648"/><path class="ln" d="M825 153 H848"/>
+  <path class="ln" d="M527 201 V218"/>
+  <text class="m" x="640" y="236">MODEL CHAIN</text>
+  <text class="s" x="640" y="256">each step is used only if the one</text>
+  <text class="s" x="640" y="273">above fails (error, limit, timeout);</text>
+  <text class="s" x="640" y="290">the last step still returns documents</text>
+  <rect class="bxb" x="430" y="220" width="195" height="26" rx="5"/><text class="s" x="527" y="238" text-anchor="middle" style="fill:#1c1917;font-weight:600">gpt-6-luna (OpenAI)</text>
+  <rect class="bx" x="430" y="254" width="195" height="26" rx="5"/><text class="s" x="527" y="272" text-anchor="middle">gpt-oss-120b (Groq)</text>
+  <rect class="bx" x="430" y="288" width="195" height="26" rx="5"/><text class="s" x="527" y="306" text-anchor="middle">gpt-oss-20b (Groq)</text>
+  <rect class="bx2" x="430" y="322" width="195" height="26" rx="5"/><text class="s" x="527" y="340" text-anchor="middle">search results only, no model</text>
+  <rect class="bx2" x="850" y="225" width="140" height="70" rx="6"/>
+  <text class="s" x="920" y="248" text-anchor="middle">every question,</text>
+  <text class="s" x="920" y="265" text-anchor="middle">answer, model and</text>
+  <text class="mc" x="920" y="284" text-anchor="middle">error → sam_events</text>
+  <path class="ln" d="M920 201 V223"/>
+</svg>
+<p class="cap">One engine behind every channel. The model chooses; the code writes.</p>
+</div>
+<div class="grid g2">
+  <div class="mock">
+    <p class="eyebrow" style="margin-bottom:0.5rem">What an answer looks like (illustrative)</p>
+    <p class="q">"Banking case study I can send a CIO"</p>
+    <p>Best match: a public banking case study on secure remote access.</p>
+    <p class="send">It is public, so it can be sent to a customer.</p>
+    <div class="doc"><b>Case study: a large private bank</b> <small>Case Study · 2025 · public · accops.com link · 2 older versions not shown</small></div>
+    <div class="doc"><b>Banking solution deck</b> <small>Deck · 2024 · internal only · SharePoint link</small></div>
+    <div class="btns"><span>Yes</span><span>Wrong asset</span><span>What I need doesn't exist</span><span>Ask marketing to create this</span></div>
+  </div>
+  <div class="card">
+    <h4>Guards worth knowing</h4>
+    <ul class="plain">
+      <li><b>No invented documents.</b> The model only returns numbers; titles, years and links come from cards.</li>
+      <li><b>Sending asks</b> get a public document first when one fits; an internal one recommended for sending gets "Internal only".</li>
+      <li><b>Pricing</b> is answered only from a current price list.</li>
+      <li><b>Honest gaps:</b> when nothing fits, SAM says so, offers the nearest substitutes, and offers "Ask marketing to create this".</li>
+      <li><b>Last measured (1 Oct 2026):</b> 27 of 28 test questions had the right document in the top 3; 0 invented document names. 20 of the 30 test questions are still modelled, not real.</li>
+    </ul>
+  </div>
+</div>
+<p class="src">Sources: web/lib/agent.ts (seedSearch, finish, sendLine, MAX_SEARCHES = 3); web/lib/agent-openai.ts (tiers); web/lib/api.ts; web/lib/whatsapp.ts; web/components/Chat.tsx; docs/HANDOVER.md 1 Oct; docs/BUILD-LOG.md.</p>
+
+<h2 class="pb"><span class="n">08</span>Feedback and day-to-day operations</h2>
+<p>SAM runs a daily loop with no one pressing buttons, and reports on itself every morning. Reps' ratings feed straight back into ranking and into marketing's to-do list.</p>
+<div class="fig">
+<svg viewBox="0 0 1000 190" role="img" aria-label="Daily timeline in IST: 02:00 snapshot, 07:00 carding, 08:00 health cron and rollup, 08:30 digest, change flow all day">
+  <text class="m" x="40" y="16">THE DAILY LOOP (IST)</text>
+  <line x1="40" y1="115" x2="960" y2="115" stroke="#57534e" stroke-width="1.6"/>
+  <g class="m"><text x="40" y="136" text-anchor="middle">00:00</text><text x="270" y="136" text-anchor="middle">06:00</text><text x="500" y="136" text-anchor="middle">12:00</text><text x="730" y="136" text-anchor="middle">18:00</text><text x="960" y="136" text-anchor="middle">24:00</text></g>
+  <circle cx="117" cy="115" r="6" fill="#1c1917"/><line x1="117" y1="109" x2="117" y2="80" stroke="#a8a29e"/>
+  <text class="t" x="117" y="58" text-anchor="middle">02:00</text><text class="s" x="117" y="75" text-anchor="middle">deletion snapshot</text>
+  <circle cx="308" cy="115" r="6" fill="#b5523a"/><line x1="308" y1="109" x2="300" y2="92" stroke="#a8a29e"/>
+  <text class="t" x="296" y="70" text-anchor="end">07:00</text><text class="s" x="296" y="87" text-anchor="end">nightly carding</text>
+  <circle cx="347" cy="115" r="6" fill="#1c1917"/><line x1="347" y1="109" x2="355" y2="56" stroke="#a8a29e"/>
+  <text class="t" x="360" y="38">08:00</text><text class="s" x="360" y="55">health check + metrics rollup</text>
+  <circle cx="366" cy="115" r="6" fill="#2f7d4f"/><line x1="366" y1="109" x2="380" y2="92" stroke="#a8a29e"/>
+  <text class="t" x="384" y="80">08:30</text><text class="s" x="384" y="97">morning digest e-mail to Siddharth</text>
+  <rect x="40" y="152" width="920" height="24" rx="4" fill="#eef3fd" stroke="#2563eb" stroke-width="1"/>
+  <text class="s" x="500" y="169" text-anchor="middle" style="fill:#1c1917">Change flow: every add or edit in Sales Collateral, all day, within minutes</text>
+</svg>
+</div>
+<div class="fig">
+<svg viewBox="0 0 1000 250" role="img" aria-label="Ratings: helpful protects, wrong asset demotes, doesn't exist creates a content request for marketing">
+  <rect class="bx2" x="10" y="95" width="170" height="60" rx="6"/>
+  <text class="t" x="95" y="121" text-anchor="middle">Rep rates</text>
+  <text class="s" x="95" y="140" text-anchor="middle">an answer</text>
+  <rect class="bx" x="240" y="15" width="240" height="60" rx="6"/>
+  <text class="t" x="360" y="40" text-anchor="middle">"Yes" (helpful)</text>
+  <text class="s" x="360" y="60" text-anchor="middle">for that topic</text>
+  <rect class="bx" x="240" y="95" width="240" height="60" rx="6"/>
+  <text class="t" x="360" y="120" text-anchor="middle">"Wrong asset"</text>
+  <text class="s" x="360" y="140" text-anchor="middle">2+ reps agree, last 60 days</text>
+  <rect class="bx" x="240" y="175" width="240" height="60" rx="6"/>
+  <text class="t" x="360" y="200" text-anchor="middle">"What I need doesn't exist"</text>
+  <text class="s" x="360" y="220" text-anchor="middle">or "Ask marketing to create this"</text>
+  <path class="ln" d="M180 125 C 210 125, 210 45, 238 45"/><path class="ln" d="M180 125 H238"/><path class="ln" d="M180 125 C 210 125, 210 205, 238 205"/>
+  <rect class="bxg" x="530" y="15" width="200" height="60" rx="6"/>
+  <text class="t" x="630" y="40" text-anchor="middle">Blocks a demotion</text>
+  <text class="s" x="630" y="60" text-anchor="middle">for that topic</text>
+  <rect class="bx" x="530" y="95" width="200" height="60" rx="6"/>
+  <text class="t" x="630" y="120" text-anchor="middle">Document ranks lower</text>
+  <text class="s" x="630" y="140" text-anchor="middle">for that topic; admin can clear</text>
+  <rect class="bx" x="530" y="175" width="200" height="60" rx="6"/>
+  <text class="t" x="630" y="200" text-anchor="middle">Content request</text>
+  <text class="s" x="630" y="220" text-anchor="middle">one vote per rep</text>
+  <rect class="bxa" x="790" y="175" width="200" height="60" rx="6"/>
+  <text class="t" x="890" y="200" text-anchor="middle">Marketing's queue</text>
+  <text class="s" x="890" y="220" text-anchor="middle">"worth creating" at 3+ reps</text>
+  <path class="ln" d="M480 45 H528"/><path class="ln" d="M480 125 H528"/><path class="ln" d="M480 205 H528"/><path class="ln" d="M730 205 H788"/>
+</svg>
+<p class="cap">What each rating button does.</p>
+</div>
+<div class="grid g3">
+  <div class="card"><h4>/admin dashboard</h4><p>Tabs for Overview, Usage, Quality (what reps told us, demotions), Content (cards, versions, exclusions, pins), Requests, System (scheduled jobs, model tokens) and Conversations. Test traffic is kept out of the numbers.</p></div>
+  <div class="card"><h4>Morning digest, 08:30 IST</h4><p>An e-mail to Siddharth: new content requests, things asked for but never requested, library changes, overnight carding, usage, and a "needs a look" list (a job that has not run in 30 hours, a silent change flow, model failures, the WhatsApp token running out).</p></div>
+  <div class="card"><h4>Job log</h4><p>Every scheduled job writes a row to <code>sam_ops_runs</code>: snapshot, carding prep, carding, health check, rollup and digest. "Nothing to do" and "did not run" are told apart.</p></div>
+</div>
+<p class="src">Sources: web/lib/feedback.ts; docs/supabase-sam-feedback.sql; web/lib/requests.ts; web/lib/digest.ts; web/lib/ops.ts; docs/supabase-sam-ops.sql; docs/HANDOVER.md 29-30 Sep; docs/SALES-BRAIN-PLATFORM.md §5.</p>
+
+<h2 class="pb"><span class="n">09</span>Today's numbers</h2>
+<p>Checked on 26 October 2026.</p>
+<div class="stats">
+  <div class="stat"><b>878 = 878</b><span>files in the library = rows in SAM's registry</span></div>
+  <div class="stat"><b>384</b><span>cards (one per carded document)</span></div>
+  <div class="stat"><b>271 / 475</b><span>assets that can answer, of all assets</span></div>
+  <div class="stat"><b>12,728</b><span>passages (page or slide text)</span></div>
+  <div class="stat"><b>Daily</b><span>every scheduled job has run every day since 19 Oct; none failed or was refused</span></div>
+  <div class="stat"><b>22</b><span>documents in the public-only view</span></div>
+  <div class="stat"><b>144 / 500 MB</b><span>database used, Supabase free plan (SAM's share about 35 MB)</span></div>
+  <div class="stat"><b>38</b><span>real (non-test) questions and events so far, from 2 people</span></div>
+</div>
+<p class="src">Sources: registry, cards, passages, public view, sam_events and sam_ops_runs read 26 Oct 2026; storage figures from Siddharth's check of the Supabase dashboard, 26 Oct 2026. The database's own asset view counts PDF and PowerPoint twins separately (515 rows, 280 answerable), so it differs from the 475 / 271 the app uses; both apply the same rules.</p>
+
+<h2><span class="n">10</span>Honest weak points</h2>
+<table>
+  <tr><th style="width:24%">Weak point</th><th>What it means</th><th style="width:28%">Fix</th></tr>
+  <tr><td>Carding needs Siddharth's laptop</td><td>The 07:00 job runs on the laptop and needs it on and signed in. If it is off, new files are findable by name but not described until the next run.</td><td>Move carding to a cloud scheduled job <span class="tag prop">Proposed</span></td></tr>
+  <tr><td>Microsoft Graph is blocked</td><td>A Conditional Access policy blocks SAM from reading SharePoint directly. We rely on Power Automate for the file list and OneDrive sync for the contents.</td><td>Needs an IT decision (app access to the one library)</td></tr>
+  <tr><td>WhatsApp is on a test setup</td><td>It runs on a Meta test number. Its access token expires on <b>3 Nov 2026</b> and the test number itself in early December 2026.</td><td>A permanent token, then a production number <span class="tag plan">Planned</span></td></tr>
+  <tr><td>No Teams bot</td><td>Teams is where sales lives, and SAM is not there yet. Deferred by Siddharth.</td><td>Teams bot <span class="tag plan">Planned</span></td></tr>
+  <tr><td>Almost no real usage</td><td>38 real events from 2 people, none since 1 Oct. The rep demo has not happened, so quality is measured on test questions, 20 of which are invented.</td><td>Rep demo, then replace test questions with real ones</td></tr>
+  <tr><td>No automatic backups</td><td>The free plan has none. Cards can be rebuilt from git and passages from the files, but the question log, ratings and content requests cannot.</td><td>A scheduled export, or a paid plan <span class="tag prop">Proposed</span></td></tr>
+</table>
+<p class="src">Sources: docs/HANDOVER.md ("Two live constraints", 29 Sep table); corpus/README.md; docs/TASK-whatsapp-meta-setup.md ("Two expiry dates"); docs/ROADMAP.md P3.1; sam_events read 26 Oct 2026; docs/eval-set.md.</p>
+
+<!-- ======================================================= PART 2 -->
+<div class="part">
+  <p class="eyebrow">Part 2</p>
+  <h2>Where we are going</h2>
+  <p>One Sales Brain core, many thin channels. Every channel asks the same core and gets the same rules, the same documents and the same honesty.</p>
+</div>
+
+<p style="margin-top:1rem"><span class="tag built">Built</span> live today &nbsp; <span class="tag prog">In progress</span> partly there &nbsp; <span class="tag plan">Planned</span> in the project documents &nbsp; <span class="tag prop">Proposed</span> new in this document, not yet agreed</p>
+
+<div class="fig">
+<svg viewBox="0 0 1000 610" role="img" aria-label="Target architecture: sources feed the Sales Brain core with six layers, which serves six channel adapters, with operations underneath">
+  <text class="m" x="10" y="36">SOURCES</text>
+  <rect class="bx" x="10" y="50" width="200" height="74" rx="6"/>
+  <text class="t" x="24" y="76">SharePoint</text><text class="s" x="24" y="95">Sales Collateral</text>
+  <rect x="24" y="103" width="50" height="16" rx="8" fill="#eef6f0" stroke="#2f7d4f"/><text class="tg" x="49" y="115" text-anchor="middle" fill="#2f7d4f">BUILT</text>
+  <rect class="bx" x="10" y="140" width="200" height="74" rx="6"/>
+  <text class="t" x="24" y="166">Website pages</text><text class="s" x="24" y="185">carded for the website bot</text>
+  <rect x="24" y="193" width="64" height="16" rx="8" fill="#eef3fd" stroke="#2563eb"/><text class="tg" x="56" y="205" text-anchor="middle" fill="#2563eb">PLANNED</text>
+  <rect class="bx" x="10" y="230" width="200" height="74" rx="6"/>
+  <text class="t" x="24" y="256">Q&amp;A bank</text><text class="s" x="24" y="275">approved answers</text>
+  <rect x="24" y="283" width="64" height="16" rx="8" fill="#eef3fd" stroke="#2563eb"/><text class="tg" x="56" y="295" text-anchor="middle" fill="#2563eb">PLANNED</text>
+  <path class="ln" d="M210 87 H258"/><path class="ln" d="M210 177 H258"/><path class="ln" d="M210 267 H258"/>
+
+  <rect class="core" x="260" y="20" width="460" height="510" rx="10"/>
+  <text class="t" x="490" y="48" text-anchor="middle" style="font-size:18px">Sales Brain core</text>
+  <text class="m" x="490" y="66" text-anchor="middle">ONE BRAIN, ONE SET OF RULES</text>
+
+  <rect class="bx" x="280" y="80" width="420" height="66" rx="6"/>
+  <text class="t" x="294" y="100">Ingest</text><text class="s" x="294" y="118">change flow, nightly snapshot, carding</text>
+  <rect x="294" y="125" width="50" height="14" rx="7" fill="#eef6f0" stroke="#2f7d4f"/><text class="tg" x="319" y="136" text-anchor="middle" fill="#2f7d4f" style="font-size:9px">BUILT</text>
+  <rect x="350" y="125" width="196" height="14" rx="7" fill="#f4effd" stroke="#7c3aed" stroke-dasharray="3 2"/><text class="tg" x="448" y="136" text-anchor="middle" fill="#7c3aed" style="font-size:9px">PROPOSED: CARDING IN THE CLOUD</text>
+
+  <rect class="bx" x="280" y="154" width="420" height="66" rx="6"/>
+  <text class="t" x="294" y="174">Cards + passages</text><text class="s" x="294" y="192">what each document says, and its own words</text>
+  <rect x="294" y="199" width="50" height="14" rx="7" fill="#eef6f0" stroke="#2f7d4f"/><text class="tg" x="319" y="210" text-anchor="middle" fill="#2f7d4f" style="font-size:9px">BUILT</text>
+
+  <rect class="bx" x="280" y="228" width="420" height="66" rx="6"/>
+  <text class="t" x="294" y="248">Retrieval</text><text class="s" x="294" y="266">word scoring for cards, full-text search for passages</text>
+  <rect x="294" y="273" width="50" height="14" rx="7" fill="#eef6f0" stroke="#2f7d4f"/><text class="tg" x="319" y="284" text-anchor="middle" fill="#2f7d4f" style="font-size:9px">BUILT</text>
+  <rect x="350" y="273" width="222" height="14" rx="7" fill="#f4effd" stroke="#7c3aed" stroke-dasharray="3 2"/><text class="tg" x="461" y="284" text-anchor="middle" fill="#7c3aed" style="font-size:9px">PROPOSED: + MEANING-BASED (HYBRID)</text>
+
+  <rect class="bx" x="280" y="302" width="420" height="66" rx="6"/>
+  <text class="t" x="294" y="322">Policy layer</text><text class="s" x="294" y="340">public vs internal enforced in the database, not the prompt</text>
+  <rect x="294" y="347" width="84" height="14" rx="7" fill="#fdf4e3" stroke="#a96b12"/><text class="tg" x="336" y="358" text-anchor="middle" fill="#a96b12" style="font-size:9px">IN PROGRESS</text>
+
+  <rect class="bx" x="280" y="376" width="420" height="66" rx="6"/>
+  <text class="t" x="294" y="396">Answer service + grounding</text><text class="s" x="294" y="414">search first, model picks, SAM writes every line</text>
+  <rect x="294" y="421" width="50" height="14" rx="7" fill="#eef6f0" stroke="#2f7d4f"/><text class="tg" x="319" y="432" text-anchor="middle" fill="#2f7d4f" style="font-size:9px">BUILT</text>
+
+  <rect class="bx" x="280" y="450" width="420" height="66" rx="6"/>
+  <text class="t" x="294" y="470">Visual answers</text><text class="s" x="294" y="488">cards, comparison tables, buttons; same pieces everywhere</text>
+  <rect x="294" y="495" width="84" height="14" rx="7" fill="#fdf4e3" stroke="#a96b12"/><text class="tg" x="336" y="506" text-anchor="middle" fill="#a96b12" style="font-size:9px">IN PROGRESS</text>
+
+  <text class="m" x="780" y="36">CHANNELS (THIN ADAPTERS)</text>
+  <rect class="bx" x="780" y="50" width="210" height="66" rx="6"/>
+  <text class="t" x="794" y="70">SAM web app</text><text class="s" x="794" y="87">login; result cards</text>
+  <rect x="794" y="95" width="50" height="14" rx="7" fill="#eef6f0" stroke="#2f7d4f"/><text class="tg" x="819" y="106" text-anchor="middle" fill="#2f7d4f" style="font-size:9px">BUILT</text>
+  <rect class="bx" x="780" y="126" width="210" height="66" rx="6"/>
+  <text class="t" x="794" y="146">Teams bot</text><text class="s" x="794" y="163">Adaptive Cards, sales' home</text>
+  <rect x="794" y="171" width="60" height="14" rx="7" fill="#eef3fd" stroke="#2563eb"/><text class="tg" x="824" y="182" text-anchor="middle" fill="#2563eb" style="font-size:9px">PLANNED</text>
+  <rect class="bx" x="780" y="202" width="210" height="66" rx="6"/>
+  <text class="t" x="794" y="222">WhatsApp bot</text><text class="s" x="794" y="239">test number today</text>
+  <rect x="794" y="247" width="50" height="14" rx="7" fill="#eef6f0" stroke="#2f7d4f"/><text class="tg" x="819" y="258" text-anchor="middle" fill="#2f7d4f" style="font-size:9px">BUILT</text>
+  <rect x="850" y="247" width="134" height="14" rx="7" fill="#eef3fd" stroke="#2563eb"/><text class="tg" x="917" y="258" text-anchor="middle" fill="#2563eb" style="font-size:9px">PLANNED: PROD NUMBER</text>
+  <rect class="bx" x="780" y="278" width="210" height="66" rx="6"/>
+  <text class="t" x="794" y="298">Website chatbot</text><text class="s" x="794" y="315">public-only role, Q&amp;A bank first</text>
+  <rect x="794" y="323" width="60" height="14" rx="7" fill="#eef3fd" stroke="#2563eb"/><text class="tg" x="824" y="334" text-anchor="middle" fill="#2563eb" style="font-size:9px">PLANNED</text>
+  <rect class="bx" x="780" y="354" width="210" height="66" rx="6"/>
+  <text class="t" x="794" y="374">SAM Live</text><text class="s" x="794" y="391">call copilot, its own app</text>
+  <rect x="794" y="399" width="50" height="14" rx="7" fill="#eef6f0" stroke="#2f7d4f"/><text class="tg" x="819" y="410" text-anchor="middle" fill="#2f7d4f" style="font-size:9px">BUILT</text>
+  <rect class="bx" x="780" y="430" width="210" height="66" rx="6"/>
+  <text class="t" x="794" y="450">Dwight / MCP</text><text class="s" x="794" y="467">Chrome extension, AI tools</text>
+  <rect x="794" y="475" width="50" height="14" rx="7" fill="#eef6f0" stroke="#2f7d4f"/><text class="tg" x="819" y="486" text-anchor="middle" fill="#2f7d4f" style="font-size:9px">BUILT</text>
+  <path class="ln" d="M720 83 H778"/><path class="ln" d="M720 159 H778"/><path class="ln" d="M720 235 H778"/><path class="ln" d="M720 311 H778"/><path class="ln" d="M720 387 H778"/><path class="ln" d="M720 463 H778"/>
+
+  <rect class="bx2" x="10" y="548" width="980" height="50" rx="6"/>
+  <text class="t" x="24" y="571" style="font-size:14px">Operations</text>
+  <text class="s" x="24" y="589">morning digest, /admin dashboard, job log, feedback loop</text>
+  <rect x="420" y="563" width="50" height="16" rx="8" fill="#eef6f0" stroke="#2f7d4f"/><text class="tg" x="445" y="575" text-anchor="middle" fill="#2f7d4f">BUILT</text>
+  <text class="s" x="490" y="576">automatic backups</text>
+  <rect x="600" y="563" width="72" height="16" rx="8" fill="#f4effd" stroke="#7c3aed" stroke-dasharray="3 2"/><text class="tg" x="636" y="575" text-anchor="middle" fill="#7c3aed">PROPOSED</text>
+</svg>
+<p class="cap">The target: channels hold no rules of their own. What is public, what is current and what can be said are decided once, in the core.</p>
+</div>
+
+<h3>Element by element</h3>
+<table>
+  <tr><th style="width:20%">Element</th><th>Today</th><th>Target</th><th style="width:13%">Status</th></tr>
+  <tr><td>Ingest</td><td>Change flow, 02:00 snapshot and 07:00 carding, all daily since 19 Oct.</td><td>The same, without depending on one laptop.</td><td><span class="tag built">Built</span></td></tr>
+  <tr><td>Cards + passages</td><td>384 cards, 12,728 passages, rebuilt nightly.</td><td>Also cards for website pages and an approved Q&amp;A bank (website bot PRD).</td><td><span class="tag built">Built</span> <span class="tag plan">Planned</span></td></tr>
+  <tr><td>Retrieval</td><td>Word-based scoring; Postgres full-text for passages.</td><td>Keep word search; add meaning-based search only if real questions show misses.</td><td><span class="tag built">Built</span></td></tr>
+  <tr><td>Policy layer</td><td>Public view + public-only role in the database; internal passages behind a permission. SAM chat's own internal/external decisions are made in code.</td><td>Every channel reads through database-enforced rules; changing what is public means a reviewed database change, never a prompt.</td><td><span class="tag prog">In progress</span></td></tr>
+  <tr><td>Answer service</td><td>Search first, model picks, code writes, sendability line, honest gaps.</td><td>Unchanged; reused by every channel.</td><td><span class="tag built">Built</span></td></tr>
+  <tr><td>Visual answers</td><td>The web app shows each document as a result card with trust warnings and rating buttons. Other channels get text.</td><td>The design doc's "response composer": rich cards on web, Adaptive Cards in Teams, short text on WhatsApp, data for tools.</td><td><span class="tag prog">In progress</span></td></tr>
+  <tr><td>SAM web app</td><td>Live at sam-accops.vercel.app, login required.</td><td>Unchanged.</td><td><span class="tag built">Built</span></td></tr>
+  <tr><td>Teams bot</td><td>Not built; deferred. Needs an Azure Bot registration (may involve IT).</td><td>Sales' main channel, Adaptive Cards for follow-ups.</td><td><span class="tag plan">Planned</span></td></tr>
+  <tr><td>WhatsApp bot</td><td>Works on a Meta test number.</td><td>Permanent token, then a dedicated production number.</td><td><span class="tag built">Built</span> <span class="tag plan">Planned</span></td></tr>
+  <tr><td>Website chatbot</td><td>PRD drafted 30 Sep 2026, awaiting approval. Nothing built.</td><td>Stage 1 on one landing page, then all of accops.com. Q&amp;A bank first, small model second, honest fallback; reads only the public view.</td><td><span class="tag plan">Planned</span></td></tr>
+  <tr><td>SAM Live</td><td>Call copilot in its own app; reads internal passages with its own permission.</td><td>Unchanged; one more consumer of the core.</td><td><span class="tag built">Built</span></td></tr>
+  <tr><td>Dwight / MCP</td><td>Chrome extension and AI tools use the REST API and MCP with tokens.</td><td>Sync the catalogue through the brain API's change feed.</td><td><span class="tag built">Built</span></td></tr>
+</table>
+<p class="src">Sources: docs/SALES-BRAIN-PLATFORM.md §1-2, §7; docs/ROADMAP.md P3, P5, P8; docs/PRD-website-chatbot.md §3-4, §13; docs/NOTE-website-chatbot.md; docs/2026-09-04-sam-design.md §4 (response composer), §6 (channels); docs/TASK-whatsapp-meta-setup.md.</p>
+
+<h3>What this document proposes (not yet in the plan)</h3>
+<table>
+  <tr><th style="width:30%">Proposal</th><th>Why, in one line</th></tr>
+  <tr><td><span class="tag prop">Proposed</span> Carding as a cloud scheduled job</td><td>Removes the single biggest dependency: today a closed laptop means no new cards.</td></tr>
+  <tr><td><span class="tag prop">Proposed</span> Hybrid search (words + meaning) for passages</td><td>Long call-time questions rarely use a document's exact words; only once usage data shows word search missing things, per ROADMAP P5.</td></tr>
+  <tr><td><span class="tag prop">Proposed</span> One set of visual answer pieces for all channels</td><td>A card, a comparison table and buttons defined once, so Teams, WhatsApp and the website show the same thing as the web app.</td></tr>
+  <tr><td><span class="tag prop">Proposed</span> Automatic database backups</td><td>The question log, ratings and content requests cannot be rebuilt from git if lost.</td></tr>
+</table>
+
+<h2>Glossary</h2>
+<dl class="glossary grid g2" style="display:grid">
+  <div><dt>RAG</dt><dd>Retrieval-augmented generation: find the material first, then let the model answer only from it.</dd>
+  <dt>Card</dt><dd>SAM's structured one-page summary of one document. What the answer model reads.</dd>
+  <dt>Passage</dt><dd>A chunk of a document's own text, one page, slide or section, used to quote it.</dd>
+  <dt>Embedding</dt><dd>Numbers that capture meaning, used for meaning-based search. Not used by SAM today.</dd>
+  <dt>Registry</dt><dd>SAM's list of every file in Sales Collateral: name, folder, link, dates. No contents.</dd>
+  <dt>Carding</dt><dd>Reading a document once and writing its card. Done by Claude, nightly.</dd>
+  <dt>Family</dt><dd>All versions, re-saves and editions of one document. Only the newest answers.</dd>
+  <dt>Answerable</dt><dd>Current in its family and eligible (2024 or later, an exception, or pinned).</dd></div>
+  <div><dt>Pin</dt><dd>An admin's choice to keep an older document answering.</dd>
+  <dt>Grounding guard</dt><dd>The rule that SAM's code, not the model, writes every document line from the card.</dd>
+  <dt>Sendability line</dt><dd>The sentence on every answer saying what may go to a customer.</dd>
+  <dt>Public view / role</dt><dd>A database window showing only published documents, and a login that can see only that window.</dd>
+  <dt>Power Automate</dt><dd>Microsoft's workflow tool; it tells SAM when files change.</dd>
+  <dt>Supabase</dt><dd>The hosted Postgres database SAM keeps its data in.</dd>
+  <dt>MCP</dt><dd>Model Context Protocol: a standard way for AI tools to call SAM.</dd>
+  <dt>Webhook</dt><dd>A web address a system calls to say "something happened".</dd></div>
+</dl>
+
+<h2 class="pb">Who owns what</h2>
+<table>
+  <tr><th style="width:24%">Who</th><th>Owns</th></tr>
+  <tr><td>Siddharth Gupta (marketing)</td><td><b>Content and approvals:</b> what goes into Sales Collateral, publish requests (internal to public), pins and exclusions, the content-request queue, owner decisions (scope, model choice, passage policy), and the tokens and accounts SAM runs on.</td></tr>
+  <tr><td>Claude-built automation</td><td><b>The jobs:</b> the change and snapshot flows, nightly carding and passage builds, the health check and rollup, the morning digest, the job log, and the checks that run before any change ships.</td></tr>
+  <tr><td>Sales and marketing team</td><td>Asking real questions, rating answers, and asking marketing for missing content. This is what makes SAM better.</td></tr>
+  <tr><td>Accops IT</td><td>Microsoft 365 access decisions: Graph access for SAM, and the Azure Bot registration a Teams bot needs.</td></tr>
+</table>
+
+<div class="footer">SAM architecture · 26 October 2026 · Written from the sam-accops repository (code, docs and the live database, read-only). Supersedes docs/sam-how-it-works.html (24 Sep 2026).</div>
+</div>
+</body>
+</html>
