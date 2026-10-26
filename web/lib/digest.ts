@@ -239,7 +239,7 @@ export function buildDigest(i: DigestInput): Digest {
   const wi = i.website;
   const webDays = new Set([istDay(since), istDay(i.now)]);
   const peakOf = (cap: number | null, pick: (u: WebsiteDigest["usage"][number]) => number) => {
-    const xs = (wi?.usage ?? []).filter(u => webDays.has(u.day) && cap && cap > 0).map(u => ({ day: u.day, n: pick(u), pct: Math.round((pick(u) / cap!) * 100) }));
+    const xs = (wi?.usage ?? []).filter(u => webDays.has(u.day) && cap && cap > 0).map(u => ({ day: u.day, n: pick(u), pct: Math.floor((pick(u) * 100) / cap!) })); // floor: 209 of 300 has not "reached 70%"
     return xs.sort((a, b) => b.pct - a.pct)[0] ?? null;
   };
   const peakModel = peakOf(wi?.model_ceiling ?? null, u => u.model_answers), peakGroq = peakOf(wi?.groq_daily_cap ?? null, u => u.groq_answers);
