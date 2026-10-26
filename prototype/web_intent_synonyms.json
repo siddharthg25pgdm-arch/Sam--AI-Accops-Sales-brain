@@ -6,10 +6,10 @@
     "can", "could", "will", "would", "shall", "should", "may", "might", "must", "need", "needs",
     "i", "me", "my", "we", "us", "our", "ours", "you", "your", "yours", "it", "its", "they", "them", "their", "he", "she", "his", "her",
     "this", "that", "these", "those", "there", "here", "what", "which", "who", "whom", "whose", "when", "where", "why", "how",
-    "any", "some", "all", "each", "every", "much", "many", "more", "most", "very", "really", "just", "also", "too", "still", "already",
+    "any", "some", "all", "each", "every", "much", "more", "most", "very", "really", "just", "also", "too", "still", "already",
     "please", "pls", "plz", "kindly", "tell", "know", "want", "like", "get", "got", "let", "lets", "s", "t", "d", "ll", "re", "ve", "m",
     "yes", "no", "not", "dont", "doesnt", "isnt", "wont", "cant", "ok", "okay", "hi", "hello", "hey", "thanks", "thank",
-    "accops", "accop", "company", "solution", "solutions", "product", "products",
+    "accops", "accop", "solution", "solutions", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
     "kya", "hai", "hain", "ho", "hoga", "hogi", "hoge", "ka", "ki", "ke", "ko", "se", "me", "mein", "pe", "par", "aur", "ya", "bhi", "toh", "to", "kaise", "kaisa", "kaun", "kab", "kyun", "kahan",
     "karein", "karen", "kare", "karna", "karte", "karta", "karti", "kar", "sakte", "sakta", "skte", "chahiye", "lagega", "lagta", "hum", "humein", "hamara", "hamare", "apna", "apne", "aap", "aapka", "aapke", "chalega", "chalta", "saath", "sath", "wala", "wale", "kitna", "kitne", "kuch", "yeh", "ye", "woh", "wo", "na", "nahi"
   ],
@@ -28,7 +28,7 @@
     "headquartered": "headquarters", "hq": "headquarters",
     "customers": "customer",
     "abroad": "international", "overseas": "international", "globally": "global",
-    "gpus": "gpu", "videos": "video"
+    "parts": "components", "part": "components", "pieces": "components", "gpus": "gpu", "videos": "video", "uses": "use", "using": "use", "used": "use"
   },
   "entity_add": {
     "Citrix": ["netscaler", "net scaler", "xenapp", "xendesktop", "cvad", "citrix adc", "citrix gateway", "storefront", "hdx", "citrix virtual apps", "citrix daas"],
