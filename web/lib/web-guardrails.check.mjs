@@ -100,7 +100,7 @@ const send = async (text, o = {}) => {
 // ---- 1. classify: eval -> human; forged / expired / missing hs, bot UA, BotID -> bot; timing -> suspect
 fresh();
 const req = (h = SAME, ua = BROWSER) => new Request(`${HOST}/api/web/ask`, { method: "POST", headers: { ...h, "user-agent": ua } });
-const ctx = (o = {}) => ({ conversation_id: "c_x", visitor_id: "v_x", page: "", page_group: "general", country: null, ip_hash: "h", ua: BROWSER,
+const ctx = (o = {}) => ({ kind: "typed", conversation_id: "c_x", visitor_id: "v_x", page: "", page_group: "general", country: null, ip_hash: "h", ua: BROWSER,
   hs: hsAt("c_x", 60_000), parent: true, ms_since_render: 30_000, recent_ms: [1_000], eval: false, ...o });
 let c = await classify(req(), ctx());
 ok(c.label === "human" && c.signals.length === 0, `clean browser ask -> human (${c.signals})`);
@@ -131,6 +131,10 @@ for (const [why, o, sig] of [
   ["timestamps out of order", { recent_ms: [5000, 1000] }, "cadence_unordered"],
   ["claims a render before the token was minted", { ms_since_render: 10 * 60_000 }, "render_clock"],
 ]) { c = await classify(req(), ctx(o)); ok(c.label === "suspect" && c.signals.includes(sig), `${why} -> suspect (${c.signals})`); }
+for (const [kind, msr, flagged] of [["typed", 1500, true], ["typed", 2500, false], ["click", 1500, false], ["click", 150, true]]) {
+  c = await classify(req(), ctx({ kind, ms_since_render: msr }));
+  ok(c.signals.includes("too_fast") === flagged && c.label === (flagged ? "suspect" : "human"), `${kind} send ${msr} ms after render -> ${c.label} (${c.signals})`);
+}
 ok(cadence([0, 4000, 11000, 15500]) === null && cadence([0, 500]) === null, "human cadence is not flagged");
 ok("age" in verifyHs(hsAt("c.with.dots", 5000), "c.with.dots"), "conversation ids with dots verify");
 const saved = process.env.WEB_HS_SECRET; delete process.env.WEB_HS_SECRET;
@@ -147,6 +151,10 @@ for (const [why, o, label] of [["no hs", { hs: null }, "bot"], ["forged hs", { h
 fresh(); globalThis.__BOTID = { isHuman: false, isBot: true, isVerifiedBot: false, bypassed: false };
 let r = await send("Tell me about HySecure gateways");
 ok(r.source === "fallback" && N.model === 0 && r.log.label === "bot", "BotID bot -> no model");
+fresh(); r = await send("Tell me about HySecure gateways", { msr: 1500 });
+ok(r.log.signals.includes("too_fast") && r.log.label === "suspect" && N.model === 0, "answer.ts passes kind: a typed send 1.5 s after render is suspect");
+fresh(); r = await send(null, { click: "qa_unknown", msr: 1500 });
+ok(!r.log.signals.includes("too_fast"), `answer.ts passes kind: a click 1.5 s after render is fine (${r.log.signals})`);
 fresh();
 r = await send("Tell me about HySecure gateways");
 ok(r.source === "model" && N.model === 1 && r.log.label === "human", "control: a clean human reaches tier 3");
@@ -200,6 +208,8 @@ for (const t of RT.cases) {
     if (t.label) ok(r.log.label === t.label && N.model === 0, `#${t.id} labelled ${r.log.label}`);
     if (t.expect_page_group) ok(r.log.page_group === t.expect_page_group && !JSON.stringify(r.body).includes(t.page), `#${t.id} page -> ${r.log.page_group}, not reflected`);
     if (t.via === "guard") ok(N.model === 0 && N.slots === 0 && !JSON.stringify(r.body).includes(text), `#${t.id}: no model, text not echoed`);
+    if (r.source === "guard") ok(r.log.guard_reason === t.guard, `#${t.id} logs guard_reason ${r.log.guard_reason}, want ${t.guard}`);
+    else ok(r.log.guard_reason === null, `#${t.id} not guarded, guard_reason is null`);
   }
 }
 for (const q of RT.must_not_guard) ok(preGuard(q) === null, `false positive: "${q}" -> ${preGuard(q)?.reason}`);
@@ -212,7 +222,7 @@ const runGuard = dir => spawnSync(process.execPath, [guard, dir], { encoding: "u
 let g = runGuard(web);
 ok(g.status === 0, `web-guard clean tree exits 0:\n${g.stdout}${g.stderr}`);
 const copy = path.join(tmp, "web");
-for (const d of ["app", "lib", "data", "public", "instrumentation-client.ts"]) { try { cpSync(path.join(web, d), path.join(copy, d), { recursive: true }); } catch {} }
+for (const d of ["app", "components", "lib", "data", "public", "instrumentation-client.ts"]) { try { cpSync(path.join(web, d), path.join(copy, d), { recursive: true }); } catch {} }
 ok(runGuard(copy).status === 0, "the copied tree is clean too");
 const PLANTS = [
   ["lib/web/leak.ts", "export const k = process.env.SUPABASE_SERVICE_KEY;", "the service key"],

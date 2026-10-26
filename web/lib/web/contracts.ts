@@ -2,7 +2,7 @@ import type { Answer } from "@/lib/blocks";
 export type Label = "human" | "suspect" | "bot";
 export type Source = "bank" | "intent" | "cache" | "model" | "fallback" | "guard" | "limited" | "repeat";
 export type Turn = { kind: "click"; qa_id: string } | { kind: "typed"; text: string };
-export type Ctx = { conversation_id: string; visitor_id: string; page: string; page_group: string; country: string | null; ip_hash: string;
+export type Ctx = { kind: Turn["kind"]; conversation_id: string; visitor_id: string; page: string; page_group: string; country: string | null; ip_hash: string;
   ua: string; hs: string | null; parent: boolean; ms_since_render: number; recent_ms: number[]; eval: boolean };
 export type Candidate = { ref: string; kind: "qa" | "fact" | "page" | "asset"; types: string[]; title: string; text: string; url: string | null };
 export type Classify = (req: Request, ctx: Ctx) => Promise<{ label: Label; signals: string[] }>;          // F

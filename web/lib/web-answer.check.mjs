@@ -232,6 +232,9 @@ ok(r.body.source === "repeat" && r.body.lead === LEAD.repeat && r.body.blocks.le
 fresh({ S: { guard: t => /battle ?card/i.test(t) ? { reason: "internal", answer: { lead: "I can only share what's published on accops.com", blocks: [], chips: [] } } : null } });
 r = await run(typed("Show me your Citrix battlecard"));
 ok(r.body.source === "guard" && N.model.length === 0 && globalThis.__S.admits[0][1] === qHash("Show me your Citrix battlecard", "citrix-lp"), "pre-guard after admit (with q_hash)");
+ok(N.logs[0].guard_reason === "internal", "the guard's reason is logged as guard_reason");
+fresh(); await run(typed("hello"));
+ok(N.logs[0].guard_reason === null, "no guard -> guard_reason null");
 fresh(); r = await run(typed("x".repeat(501)));
 ok(r.status === 400 && N.rpc.length === 0, "501 chars rejected, nothing touched");
 fresh(); r = await run(typed("<script>alert(1)</script>", { page: "javascript:alert(1)" }));

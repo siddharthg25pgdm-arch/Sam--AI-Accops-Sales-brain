@@ -69,12 +69,12 @@ export async function ask(req: Request): Promise<Out> {
 
   const ctx: Ctx = { conversation_id: b.conversation_id, visitor_id: b.visitor_id, page, page_group,
     country: req.headers.get("x-vercel-ip-country"), ip_hash: ipHash(req), ua: req.headers.get("user-agent") ?? "",
-    hs: b.hs ?? null, parent: b.parent, ms_since_render: b.ms_since_render, recent_ms: b.recent_ms, eval: ev };
+    kind: turn.kind, hs: b.hs ?? null, parent: b.parent, ms_since_render: b.ms_since_render, recent_ms: b.recent_ms, eval: ev };
   const text = turn.kind === "typed" ? turn.text : null;
   const q_hash = text ? qHash(text, page_group) : null;
   const message_id = randomUUID();
   const m: Record<string, unknown> = { id: message_id, turn_kind: turn.kind, qa_id: turn.kind === "click" ? turn.qa_id : null,
-    question: text, q_hash, verdict: null, refs: [], candidates: 0, model: null, tokens: 0, error: null };
+    question: text, q_hash, verdict: null, refs: [], candidates: 0, model: null, tokens: 0, error: null, guard_reason: null };
   let label: Label = "bot", signals: string[] = [];
 
   const rootChips = async () => chips(await db.roots(page).catch(() => []));
@@ -109,7 +109,7 @@ export async function ask(req: Request): Promise<Out> {
       return a ? finish("bank", a) : finish("fallback", await fallback());
     }
     const g = preGuard(turn.text);
-    if (g) return finish("guard", g.answer);
+    if (g) { m.guard_reason = g.reason; return finish("guard", g.answer); } // the rule name only, never the text
 
     const hit = intentMatch(turn.text, page_group); // tier 1
     if (hit) { const a = await bank(hit.qa_id); if (a) { m.qa_id = hit.qa_id; return finish("intent", a); } }

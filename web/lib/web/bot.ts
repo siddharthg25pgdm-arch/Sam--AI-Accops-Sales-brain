@@ -52,9 +52,8 @@ export const classify: Classify = async (req, ctx) => {
   else if (ctx.ms_since_render > hs.age + 2000) suspect.push("render_clock"); // claims a render before the token existed
 
   if (!ctx.parent) suspect.push("no_parent"); // /embed opened directly, never got an origin-checked init
-  // ponytail: Ctx has no turn kind (the body is already parsed by answer.ts), so the click rule (< 300 ms) applies to
-  // every send; the stricter typed rule (< 2 s) needs `kind` in Ctx. Cadence still catches scripted typing.
-  if (ctx.ms_since_render < 300) suspect.push("too_fast");
+  // A chip click can land fast (300 ms); typing a question and sending it under 2 s after render is not a person.
+  if (ctx.ms_since_render < (ctx.kind === "typed" ? 2000 : 300)) suspect.push("too_fast");
   const c = cadence(ctx.recent_ms);
   if (c) suspect.push(c);
 
