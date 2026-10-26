@@ -760,23 +760,8 @@
   ],
   "industries": [],
   "summary": "Watch Accops videos to discover secure workspace solutions, VDI demos, MFA, Zero Trust access, and technology insights for modern enterprises.",
-  "facts": [
-   {
-    "fact": "Device Posture & Endpoint Compliance Demo",
-    "quote": "Device Posture & Endpoint Compliance Demo"
-   },
-   {
-    "fact": "Verify endpoint health and policy compliance before access.",
-    "quote": "Verify endpoint health and policy compliance before access."
-   },
-   {
-    "fact": "Deliver secure and compliant remote IT assistance.",
-    "quote": "Deliver secure and compliant remote IT assistance."
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Explore Accops Videos?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": null,
   "lastmod": "2026-10-15",
@@ -994,9 +979,7 @@
   "industries": [],
   "summary": "Stay updated with Accops' latest announcements, industry insights, and innovations. Discover how we empower businesses globally. Visit our newsroom today!",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about News?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": null,
   "lastmod": "2026-10-15",
@@ -1034,21 +1017,19 @@
     "quote": "The fine can go up to ₹250 crore for each violation, alongside reputational harm and operational fallout."
    },
    {
-    "fact": "In this context, the role of enterprise access, including role-based access control (RBAC), the concept of least privilege (PoLP), multi-factor authentication (MFA), encryption, and logging, is at the center of compliance conversations.",
-    "quote": "In this context, the role of enterprise access, including role-based access control (RBAC), the concept of least privilege (PoLP), multi-factor authentication (MFA), encryption, and logging, is at the center of compliance conversations."
-   },
-   {
     "fact": "The DPDP Act applies to all organizations that process the digital personal data of Indian residents, irrespective of geography and company size.",
     "quote": "The DPDP Act applies to all organizations that process the digital personal data of Indian residents, irrespective of geography and company size."
    },
    {
     "fact": "The primary obligations are consent-based processing with simple withdrawal, data minimization, accuracy, strong security safeguards, and individual rights of access, correction, and deletion (usually within 90 days).",
     "quote": "The primary obligations are consent-based processing with simple withdrawal, data minimization, accuracy, strong security safeguards, and individual rights of access, correction, and deletion (usually within 90 days)."
+   },
+   {
+    "fact": "The rules, notified in 2025, bring these principles into effect with a series of timelines commencing from November 2025.",
+    "quote": "The rules, notified in 2025, bring these principles into effect with a series of timelines commencing from November 2025."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about India’s DPDP Rules 2025?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2026-02-25",
   "lastmod": "2026-10-07",
@@ -1073,33 +1054,11 @@
   "summary": "A few years ago, if a compliance leader at a bank or healthcare organization had been asked whether regulatory requirements could be managed seamlessly across remote teams, cloud systems, and digital platforms, the answer would likely have been cautious. Compliance was traditionally centered around physical offices, controlled networks, and manual oversight.",
   "facts": [
    {
-    "fact": "A few years ago, if a compliance leader at a bank or healthcare organization had been asked whether regulatory requirements could be managed seamlessly across remote teams, cloud systems, and digital platforms, the answer would likely have been cautious.",
-    "quote": "A few years ago, if a compliance leader at a bank or healthcare organization had been asked whether regulatory requirements could be managed seamlessly across remote teams, cloud systems, and digital platforms, the answer would likely have been cautious."
-   },
-   {
-    "fact": "Compliance was traditionally centered around physical offices, controlled networks, and manual oversight.",
-    "quote": "Compliance was traditionally centered around physical offices, controlled networks, and manual oversight."
-   },
-   {
-    "fact": "In this environment, organizations can no longer treat compliance as a periodic audit exercise.",
-    "quote": "In this environment, organizations can no longer treat compliance as a periodic audit exercise."
-   },
-   {
-    "fact": "It must be embedded into everyday digital operations, making compliance-first digital workplaces a critical foundation for regulated industries.",
-    "quote": "It must be embedded into everyday digital operations, making compliance-first digital workplaces a critical foundation for regulated industries."
-   },
-   {
-    "fact": "The Rising Challenge of Compliance in Regulated Sectors",
-    "quote": "The Rising Challenge of Compliance in Regulated Sectors"
-   },
-   {
-    "fact": "Organizations face severe financial penalties, operational interruptions, and permanent damage to their brand image when they fail to comply with these established requirements.",
-    "quote": "Organizations face severe financial penalties, operational interruptions, and permanent damage to their brand image when they fail to comply with these established requirements."
+    "fact": "According to PwC’s Global Compliance Survey, nearly 90 percent of compliance professionals report that their responsibilities have increased in recent years due to regulatory complexity and digital transformation.",
+    "quote": "According to PwC’s Global Compliance Survey, nearly 90 percent of compliance professionals report that their responsibilities have increased in recent years due to regulatory complexity and digital transformation."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Why Compliance-First Digital Workplaces Are Critical for Regulated Industries?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2026-02-16",
   "lastmod": "2026-10-07",
@@ -1120,10 +1079,6 @@
   "summary": "The cybersecurity industry is currently grappling with a paradox: encryption, compliance, and spending are at record highs, yet data privacy remains fragile. This stems from a reliance on a 2021 playbook to fight a 2026 war.",
   "facts": [
    {
-    "fact": "The cybersecurity industry is currently grappling with a paradox: encryption, compliance, and spending are at record highs, yet data privacy remains fragile.",
-    "quote": "The cybersecurity industry is currently grappling with a paradox: encryption, compliance, and spending are at record highs, yet data privacy remains fragile."
-   },
-   {
     "fact": "This stems from a reliance on a 2021 playbook to fight a 2026 war.",
     "quote": "This stems from a reliance on a 2021 playbook to fight a 2026 war."
    },
@@ -1136,17 +1091,19 @@
     "quote": "In 2026, the primary threat to data privacy is the weaponisation of legitimate access rather than sophisticated software exploits."
    },
    {
-    "fact": "While a user’s identity can be verified with near-total certainty, organisations remain remarkably vulnerable to the context of that identity—specifically the what, how, and when of the access request.",
-    "quote": "While a user’s identity can be verified with near-total certainty, organisations remain remarkably vulnerable to the context of that identity—specifically the what, how, and when of the access request."
+    "fact": "By anchoring identity in physical hardware (such as FIDO2-compliant keys) and augmenting it with continuous monitoring of liveness and presence, it is possible to ensure that the authorised individual remains physically present at the keys throughout the interaction.",
+    "quote": "By anchoring identity in physical hardware (such as FIDO2-compliant keys) and augmenting it with continuous monitoring of liveness and presence, it is possible to ensure that the authorised individual remains physically present at the keys throughout the interaction."
    },
    {
-    "fact": "Securing the new perimeter requires the validation of three distinct pillars through persistent, 24/7/365 monitoring:",
-    "quote": "Securing the new perimeter requires the validation of three distinct pillars through persistent, 24/7/365 monitoring:"
+    "fact": "Under a Zero Trust Network Access (ZTNA) 2.0 framework, this is achieved through a “Privacy of Exclusion” model.",
+    "quote": "Under a Zero Trust Network Access (ZTNA) 2.0 framework, this is achieved through a “Privacy of Exclusion” model."
+   },
+   {
+    "fact": "This approach is necessary to satisfy the rigorous “Need-to-Know” requirements of global regulations like the GDPR or India’s DPDPA.",
+    "quote": "This approach is necessary to satisfy the rigorous “Need-to-Know” requirements of global regulations like the GDPR or India’s DPDPA."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Data Privacy Week 2026?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2026-01-27",
   "lastmod": "2026-09-29",
@@ -1176,24 +1133,20 @@
     "quote": "“Government has increased cyber security allocations, healthcare will invest more because of DPDP and education will adopt virtual labs to support NEP 2.0,” Yadav told TechObserver.in’s Mohd Ujaley."
    },
    {
-    "fact": "Our model has been to listen to customers, respond fast, iterate and move on.",
-    "quote": "Our model has been to listen to customers, respond fast, iterate and move on."
-   },
-   {
-    "fact": "Organisations are integrating applications under a single identity platform and implementing IAM (Identity and Access Management).",
-    "quote": "Organisations are integrating applications under a single identity platform and implementing IAM (Identity and Access Management)."
-   },
-   {
-    "fact": "Today organisations are balancing identity, contextual access and containerised computing to support distributed workforces.",
-    "quote": "Today organisations are balancing identity, contextual access and containerised computing to support distributed workforces."
-   },
-   {
-    "fact": "ESG requirements will also push organisations to reconsider high powered devices for users who need only basic computing.",
-    "quote": "ESG requirements will also push organisations to reconsider high powered devices for users who need only basic computing."
-   },
-   {
     "fact": "DPDP requires organisations to know where personal data is stored and to delete it end to end on request.",
     "quote": "DPDP requires organisations to know where personal data is stored and to delete it end to end on request."
+   },
+   {
+    "fact": "With DPDP similar expectations will apply across industries, including hospitality and others that handle Aadhaar and PAN data.",
+    "quote": "With DPDP similar expectations will apply across industries, including hospitality and others that handle Aadhaar and PAN data."
+   },
+   {
+    "fact": "Healthcare will invest more because DPDP brings formal data protection obligations.",
+    "quote": "Healthcare will invest more because DPDP brings formal data protection obligations."
+   },
+   {
+    "fact": "With NEP 2.0 allowing flexible learning across institutions, colleges and universities need virtual labs and modern digital infrastructure to deliver courses and practical examinations remotely.",
+    "quote": "With NEP 2.0 allowing flexible learning across institutions, colleges and universities need virtual labs and modern digital infrastructure to deliver courses and practical examinations remotely."
    }
   ],
   "questions_answered": [
@@ -1235,21 +1188,19 @@
     "quote": "The DPDP Act isn’t just about avoiding fines; it’s about earning and retaining customer trust in an increasingly data-driven world."
    },
    {
-    "fact": "Beyond the checkbox: From compliance to a culture of trust",
-    "quote": "Beyond the checkbox: From compliance to a culture of trust"
-   },
-   {
-    "fact": "A law is passed, and organisations scramble to put a policy in place, often with little regard for the practical implementation.",
-    "quote": "A law is passed, and organisations scramble to put a policy in place, often with little regard for the practical implementation."
-   },
-   {
     "fact": "The DPDP Act, with its emphasis on “consented, lawful and transparent use,” and “data minimisation,” demands a proactive, security-first mindset.",
     "quote": "The DPDP Act, with its emphasis on “consented, lawful and transparent use,” and “data minimisation,” demands a proactive, security-first mindset."
+   },
+   {
+    "fact": "This approach contains the breach before it can escalate into a catastrophic data leak, which is precisely what the DPDP Act aims to prevent.",
+    "quote": "This approach contains the breach before it can escalate into a catastrophic data leak, which is precisely what the DPDP Act aims to prevent."
+   },
+   {
+    "fact": "Under the DPDP Act, organisations are accountable for any data processing activities carried out on their behalf.",
+    "quote": "Under the DPDP Act, organisations are accountable for any data processing activities carried out on their behalf."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about The compliance-ready enterprise?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-11-18",
   "lastmod": "2026-09-23",
@@ -1283,10 +1234,6 @@
     "quote": "Today, as employees connect from anywhere, on any device, accessing cloud-hosted applications via the high-speed, dynamic tunnels of 5G, that ‘hard shell, soft centre’ model is obsolete."
    },
    {
-    "fact": "The Triple Threat: Cloud, 5G, and the Evolving Indian Enterprise",
-    "quote": "The Triple Threat: Cloud, 5G, and the Evolving Indian Enterprise"
-   },
-   {
     "fact": "5G promises ultra-low latency and massive machine-to-machine connectivity, enabling transformative use cases like Smart Factories, remote healthcare, and large-scale IoT deployments.",
     "quote": "5G promises ultra-low latency and massive machine-to-machine connectivity, enabling transformative use cases like Smart Factories, remote healthcare, and large-scale IoT deployments."
    },
@@ -1295,13 +1242,15 @@
     "quote": "The challenge is that 5G’s Service-Based Architecture (SBA) is inherently open and cloud-native, introducing new threat vectors that traditional security was never designed for."
    },
    {
-    "fact": "Cybersecurity threats targeting Indian organisations are escalating in sophistication.",
-    "quote": "Cybersecurity threats targeting Indian organisations are escalating in sophistication."
+    "fact": "In the context of a 5G-enabled ecosystem, this means granting a manufacturing floor sensor access only to the data analytics pipeline it needs, not the company’s HR system.",
+    "quote": "In the context of a 5G-enabled ecosystem, this means granting a manufacturing floor sensor access only to the data analytics pipeline it needs, not the company’s HR system."
+   },
+   {
+    "fact": "The Indian economy is on a path to a $1 trillion digital GDP, with cloud and 5G serving as primary accelerators.",
+    "quote": "The Indian economy is on a path to a $1 trillion digital GDP, with cloud and 5G serving as primary accelerators."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Zero Trust in the 5G and Cloud Era?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-11-10",
   "lastmod": "2026-09-21",
@@ -1467,10 +1416,6 @@
   "summary": "There was a time when passwords, firewalls, and audit logs were enough to meet compliance requirements. But digital operations have come a long way since then, and the threats have grown with them.",
   "facts": [
    {
-    "fact": "There was a time when passwords, firewalls, and audit logs were enough to meet compliance requirements.",
-    "quote": "There was a time when passwords, firewalls, and audit logs were enough to meet compliance requirements."
-   },
-   {
     "fact": "Ransomware and insider threats are rising, and phishing attacks jumped by 175% in just the first half of 2024, as noted in the Digital Threat Report.",
     "quote": "Ransomware and insider threats are rising, and phishing attacks jumped by 175% in just the first half of 2024, as noted in the Digital Threat Report."
    },
@@ -1487,13 +1432,15 @@
     "quote": "At the same time, the RBI is tightening its grip."
    },
    {
-    "fact": "By leveraging containerised sessions and virtual environments, institutions can create secure, isolated workspaces, ensuringno data leaves the protected zone.",
-    "quote": "By leveraging containerised sessions and virtual environments, institutions can create secure, isolated workspaces, ensuringno data leaves the protected zone."
+    "fact": "Both DPDP and RBI guidelines require institutions to ensure that data is being handled securely and ethically.",
+    "quote": "Both DPDP and RBI guidelines require institutions to ensure that data is being handled securely and ethically."
+   },
+   {
+    "fact": "With RBI and DPDP setting a higher bar, security teams are finding new ways to build trust—through clear access rules, simple controls, and better visibility across users and devices.",
+    "quote": "With RBI and DPDP setting a higher bar, security teams are finding new ways to build trust—through clear access rules, simple controls, and better visibility across users and devices."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Zero Trust is the new compliance?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-08-18",
   "lastmod": "2026-09-15",
@@ -1519,33 +1466,11 @@
   "summary": "Accops, a Reliance Jio company and leading provider of Zero Trust Network Access (ZTNA) solutions, partnered with AI security company Mirror Security to launch the industry’s first zero-code exposure solution for AI coding assistants. This product integrates Mirror Security’s VectaX, the world’s fastest fully homomorphic encryption (FHE) engine optimized for AI workloads, with Accops’ HySecure ZTN",
   "facts": [
    {
-    "fact": "“Our customers have been asking for a solution that allows them to leverage the productivity benefits of AI without exposing their intellectual property.",
-    "quote": "“Our customers have been asking for a solution that allows them to leverage the productivity benefits of AI without exposing their intellectual property."
-   },
-   {
-    "fact": "This partnership delivers exactly that—enabling our enterprise clients to embrace AI innovation while maintaining the highest levels of security and compliance through our proven ZTNA service,” Vijender Yadav, CEO of Accops, said.",
-    "quote": "This partnership delivers exactly that—enabling our enterprise clients to embrace AI innovation while maintaining the highest levels of security and compliance through our proven ZTNA service,” Vijender Yadav, CEO of Accops, said."
-   },
-   {
-    "fact": "Currently, all major AI coding assistants require access to plaintext code on external servers, posing serious risks to intellectual property, compliance, and business confidentiality especially in sensitive sectors like BFSI, healthcare, telecom, and government.",
-    "quote": "Currently, all major AI coding assistants require access to plaintext code on external servers, posing serious risks to intellectual property, compliance, and business confidentiality especially in sensitive sectors like BFSI, healthcare, telecom, and government."
-   },
-   {
-    "fact": "Organizations are often forced to choose between blocking AI tools and losing productivity, or adopting them and risking data exposure.",
-    "quote": "Organizations are often forced to choose between blocking AI tools and losing productivity, or adopting them and risking data exposure."
-   },
-   {
-    "fact": "With source code remaining encrypted even during AI processing, enterprises can safely adopt AI coding assistants while maintaining the highest levels of privacy, security, and regulatory compliance.",
-    "quote": "With source code remaining encrypted even during AI processing, enterprises can safely adopt AI coding assistants while maintaining the highest levels of privacy, security, and regulatory compliance."
-   },
-   {
-    "fact": "By combining our homomorphic encryption technology with Accops’ enterprise-grade ZTNA platform, we’re enabling organisations full AI productivity with zero code exposure,” Pankaj Thapa, CEO of Mirror Security, added.",
-    "quote": "By combining our homomorphic encryption technology with Accops’ enterprise-grade ZTNA platform, we’re enabling organisations full AI productivity with zero code exposure,” Pankaj Thapa, CEO of Mirror Security, added."
+    "fact": "Accops ’ customer base of over 1,000 organizations across India, the Middle East, and Japan is now positioned to rapidly deploy secure AI coding capabilities across a wide range of industries.",
+    "quote": "Accops ’ customer base of over 1,000 organizations across India, the Middle East, and Japan is now positioned to rapidly deploy secure AI coding capabilities across a wide range of industries."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops & Mirror Security Launch Zero-Code Exposure Tool for AI Coders.?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-08-05",
   "lastmod": "2026-09-14",
@@ -1575,24 +1500,8 @@
     "quote": "Recent reports, like Manufacturing Dive’s 2024 analysis, clearly indicate that Indian manufacturing units are not just contemplating but actively recognising the tangible advantages of hybrid work models."
    },
    {
-    "fact": "Then there’s the formidable challenge of compliance.",
-    "quote": "Then there’s the formidable challenge of compliance."
-   },
-   {
-    "fact": "It’s this confluence of security, compliance, and reliability concerns that has necessitated caution, pushing manufacturers to await solutions that offer unwavering confidence.",
-    "quote": "It’s this confluence of security, compliance, and reliability concerns that has necessitated caution, pushing manufacturers to await solutions that offer unwavering confidence."
-   },
-   {
-    "fact": "Unassailable audit trails: Comprehensive session logs provide an immutable record of “who did what, where, and when.” This not only ensures compliance but also provides invaluable forensic data for incident response.",
-    "quote": "Unassailable audit trails: Comprehensive session logs provide an immutable record of “who did what, where, and when.” This not only ensures compliance but also provides invaluable forensic data for incident response."
-   },
-   {
-    "fact": "Isolation and containment: Solutions leveraging virtual desktops and application delivery separate factory systems from user devices.",
-    "quote": "Isolation and containment: Solutions leveraging virtual desktops and application delivery separate factory systems from user devices."
-   },
-   {
-    "fact": "Compliance personnel can meticulously audit records from anywhere, streamlining regulatory adherence.",
-    "quote": "Compliance personnel can meticulously audit records from anywhere, streamlining regulatory adherence."
+    "fact": "As India’s manufacturing sector continues its rapid digitisation, driven by Industry 4.0, the ability to adapt and respond with agility will matter just as much as sheer efficiency or scale.",
+    "quote": "As India’s manufacturing sector continues its rapid digitisation, driven by Industry 4.0, the ability to adapt and respond with agility will matter just as much as sheer efficiency or scale."
    }
   ],
   "questions_answered": [
@@ -1698,10 +1607,6 @@
     "quote": "A significant portion of its total environmental impact, often as high as 80%, is incurred during its manufacturing and shipping, not its operational use."
    },
    {
-    "fact": "Critically, VDI allows IT to isolate sensitive factory applications and data within the secure data centre, ensuring data integrity and shrinking the attack surface.",
-    "quote": "Critically, VDI allows IT to isolate sensitive factory applications and data within the secure data centre, ensuring data integrity and shrinking the attack surface."
-   },
-   {
     "fact": "Navigating Windows 10 EOL and Future OS Transitions: Repurposing maximizes the utility of existing IT investments and provides crucial adaptability for evolving software landscapes.",
     "quote": "Navigating Windows 10 EOL and Future OS Transitions: Repurposing maximizes the utility of existing IT investments and provides crucial adaptability for evolving software landscapes."
    },
@@ -1718,9 +1623,7 @@
     "quote": "They connect to virtual desktops running a supported OS like Windows 11 in the data centre, ensuring continued security, compliance, and functionality without buying new machines."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Greener IT for Factories?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-07-17",
   "lastmod": "2026-08-20",
@@ -1750,33 +1653,23 @@
   "summary": "Global Captive Centres (GCCs) are transforming into innovation hubs by adopting secure, agile delivery models. They are replacing legacy systems with workspace virtualization, zero trust access, and robust identity management.",
   "facts": [
    {
-    "fact": "This shift enables developers to work securely from anywhere, ensuring compliance and boosting productivity while optimizing costs and enhancing operational resilience.",
-    "quote": "This shift enables developers to work securely from anywhere, ensuring compliance and boosting productivity while optimizing costs and enhancing operational resilience."
+    "fact": "In regulated industries such as BFSI, healthcare, and government, GCCs must enforce strict audit trails, prevent data leaks, and meet frameworks like RBI’s Cybersecurity guidelines, DPDP Act, or GDPR.",
+    "quote": "In regulated industries such as BFSI, healthcare, and government, GCCs must enforce strict audit trails, prevent data leaks, and meet frameworks like RBI’s Cybersecurity guidelines, DPDP Act, or GDPR."
    },
    {
-    "fact": "To ensure developers can work securely from anywhere, without sacrificing regulatory compliance or a seamless developer experience.",
-    "quote": "To ensure developers can work securely from anywhere, without sacrificing regulatory compliance or a seamless developer experience."
+    "fact": "Cost Optimisation & Reduced: Moving away from traditional physical workstations to virtual desktops dramatically cuts endpoint hardware costs, often by up to 60%.",
+    "quote": "Cost Optimisation & Reduced: Moving away from traditional physical workstations to virtual desktops dramatically cuts endpoint hardware costs, often by up to 60%."
    },
    {
-    "fact": "This must be flexible enough for unreliable home networks or BYOD devices, without compromising control or compliance.In the past, development teams in captives operated within office campuses, safeguarded by layers of network firewalls and physical security.",
-    "quote": "This must be flexible enough for unreliable home networks or BYOD devices, without compromising control or compliance.In the past, development teams in captives operated within office campuses, safeguarded by layers of network firewalls and physical security."
+    "fact": "This extends hardware life by 3-5 years and reduces Total Cost of Ownership (TCO) through centralised management, streamlining patch cycles, and lowering IT support overheads.",
+    "quote": "This extends hardware life by 3-5 years and reduces Total Cost of Ownership (TCO) through centralised management, streamlining patch cycles, and lowering IT support overheads."
    },
    {
-    "fact": "This must be flexible enough for unreliable home networks or BYOD devices, without compromising control or compliance.",
-    "quote": "This must be flexible enough for unreliable home networks or BYOD devices, without compromising control or compliance."
-   },
-   {
-    "fact": "It provides cloud- or on-premise-hosted desktops, offering isolated, high-performance environments preloaded with development tools, SDKs, and IDEs, ensuring code stays within the organisation’s control.",
-    "quote": "It provides cloud- or on-premise-hosted desktops, offering isolated, high-performance environments preloaded with development tools, SDKs, and IDEs, ensuring code stays within the organisation’s control."
-   },
-   {
-    "fact": "With ZTNA, organisations eliminate broad VPN tunnels that expose the corporate network.",
-    "quote": "With ZTNA, organisations eliminate broad VPN tunnels that expose the corporate network."
+    "fact": "Superior Developer Experience: Developers experience uninterrupted, high-performance work sessions over standard broadband or 4G connections due to lightweight remote display protocols.",
+    "quote": "Superior Developer Experience: Developers experience uninterrupted, high-performance work sessions over standard broadband or 4G connections due to lightweight remote display protocols."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about From desktops to delivery?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-06-20",
   "lastmod": "2026-08-20",
@@ -1922,18 +1815,6 @@
   "summary": "Accops Systems, a leading provider of secure remote access and digital workspace solutions, today announced the launch of a new Partner Program under the Accops Partner Connect Program (APCP), along with the debut of the Accops Partner Portal—a unified, digital-first platform built to enhance partner engagement, enablement, and performance at scale. The new program introduces a restructured tier s",
   "facts": [
    {
-    "fact": "Learning & Certification: Refined training and certification paths aligned with the updated partner structure",
-    "quote": "Learning & Certification: Refined training and certification paths aligned with the updated partner structure"
-   },
-   {
-    "fact": "The new Partner Program and Portal, built within the APCP framework, position partners to compete more effectively, execute faster, and deliver sustained value to customers.",
-    "quote": "The new Partner Program and Portal, built within the APCP framework, position partners to compete more effectively, execute faster, and deliver sustained value to customers."
-   },
-   {
-    "fact": "Accops Systems empowers organisations with secure, anytime-anywhere access to business applications from any device, while ensuring complete governance and control.",
-    "quote": "Accops Systems empowers organisations with secure, anytime-anywhere access to business applications from any device, while ensuring complete governance and control."
-   },
-   {
     "fact": "Founded in 2012 with a vision to democratise remote access, Accops today serves over 950 organisations across 10 countries.",
     "quote": "Founded in 2012 with a vision to democratise remote access, Accops today serves over 950 organisations across 10 countries."
    },
@@ -1942,9 +1823,7 @@
     "quote": "In September 2023, it became part of the Reliance Jio group through a strategic investment by JPL."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops Launches New Partner Program and Digital Portal under Revitalised APCP Framework?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-05-26",
   "lastmod": "2026-08-07",
@@ -1974,24 +1853,16 @@
     "quote": "What Smart tech evolutions have happened in remote desktop management segment in last 1 year?"
    },
    {
-    "fact": "This regulatory pressure significantly accelerated the practical implementation and strategic importance of Zero Trust Network Access (ZTNA) within Indian organisations managing remote access.",
-    "quote": "This regulatory pressure significantly accelerated the practical implementation and strategic importance of Zero Trust Network Access (ZTNA) within Indian organisations managing remote access."
-   },
-   {
-    "fact": "Organisations are actively demanding ZTNA solutions that inherently help them adhere to these pressing compliance norms.",
-    "quote": "Organisations are actively demanding ZTNA solutions that inherently help them adhere to these pressing compliance norms."
-   },
-   {
-    "fact": "However, the most complex challenge is navigating the intricate compliance landscape.",
-    "quote": "However, the most complex challenge is navigating the intricate compliance landscape."
-   },
-   {
     "fact": "This includes adhering to the Digital Personal Data Protection (DPDP) Act and maintaining governance control over organisational data at every level.",
     "quote": "This includes adhering to the Digital Personal Data Protection (DPDP) Act and maintaining governance control over organisational data at every level."
    },
    {
     "fact": "Concurrently, meeting strict CERT-In directives (like the 6-hour incident reporting / 180-day log retention mandates), fulfilling sector-specific or data localisation requirements, integrating legacy systems, and securing IT/OT convergence are major concerns.",
     "quote": "Concurrently, meeting strict CERT-In directives (like the 6-hour incident reporting / 180-day log retention mandates), fulfilling sector-specific or data localisation requirements, integrating legacy systems, and securing IT/OT convergence are major concerns."
+   },
+   {
+    "fact": "The persistent need for stronger security and the influence of regulations like the DPDP Act are encouraging MSMEs to choose inherently secure and compliant solutions.",
+    "quote": "The persistent need for stronger security and the influence of regulations like the DPDP Act are encouraging MSMEs to choose inherently secure and compliant solutions."
    }
   ],
   "questions_answered": [
@@ -2023,33 +1894,23 @@
   "summary": "The pharmaceutical sector is moving toward a digital-first future, and virtualisation will be the foundation of safe and legal operations. Recognising this change and acting now will give companies a competitive edge in pharmaceutical innovation as well as improved security and regulatory status.",
   "facts": [
    {
-    "fact": "Recognising this change and acting now will give companies a competitive edge in pharmaceutical innovation as well as improved security and regulatory status.",
-    "quote": "Recognising this change and acting now will give companies a competitive edge in pharmaceutical innovation as well as improved security and regulatory status."
-   },
-   {
-    "fact": "These technologies are reshaping drug discovery, clinical trials, and regulatory compliance, offering immense potential to accelerate innovation.",
-    "quote": "These technologies are reshaping drug discovery, clinical trials, and regulatory compliance, offering immense potential to accelerate innovation."
-   },
-   {
-    "fact": "However, this rapid shift presents critical challenges, particularly in securing sensitive data, maintaining regulatory compliance, and ensuring IT scalability.",
-    "quote": "However, this rapid shift presents critical challenges, particularly in securing sensitive data, maintaining regulatory compliance, and ensuring IT scalability."
-   },
-   {
     "fact": "The recent enactment of the Digital Personal Data Protection (DPDP) Act in India has intensified these challenges, compelling pharmaceutical companies to rethink their data security and IT infrastructure approach.",
     "quote": "The recent enactment of the Digital Personal Data Protection (DPDP) Act in India has intensified these challenges, compelling pharmaceutical companies to rethink their data security and IT infrastructure approach."
    },
    {
-    "fact": "It offers a secure, scalable, and compliant IT environment that addresses regulatory requirements and cybersecurity threats while driving operational efficiency.",
-    "quote": "It offers a secure, scalable, and compliant IT environment that addresses regulatory requirements and cybersecurity threats while driving operational efficiency."
+    "fact": "The DPDP Act introduces a rigorous framework for data protection, mandating strict data localisation, real-time monitoring, and granular access controls.",
+    "quote": "The DPDP Act introduces a rigorous framework for data protection, mandating strict data localisation, real-time monitoring, and granular access controls."
    },
    {
-    "fact": "Pharmaceutical organisations must modernise their IT infrastructure to protect intellectual property (IP), safeguard patient data, and optimise research efficiency while maintaining seamless collaboration across global teams.",
-    "quote": "Pharmaceutical organisations must modernise their IT infrastructure to protect intellectual property (IP), safeguard patient data, and optimise research efficiency while maintaining seamless collaboration across global teams."
+    "fact": "Furthermore, as global regulatory bodies tighten data security mandates, virtualisation provides the flexibility to adhere to multiple compliance frameworks, including HIPAA, GDPR, and the DPDP Act.",
+    "quote": "Furthermore, as global regulatory bodies tighten data security mandates, virtualisation provides the flexibility to adhere to multiple compliance frameworks, including HIPAA, GDPR, and the DPDP Act."
+   },
+   {
+    "fact": "Organisations adopting virtualised IT solutions will fully comply with the DPDP Act and other global data protection regulations, protect valuable research and IP, optimise IT costs while scaling computing power, and enable real-time collaboration across research teams.",
+    "quote": "Organisations adopting virtualised IT solutions will fully comply with the DPDP Act and other global data protection regulations, protect valuable research and IP, optimise IT costs while scaling computing power, and enable real-time collaboration across research teams."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accelerating Pharma Innovation?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-04-07",
   "lastmod": "2026-08-07",
@@ -2074,10 +1935,6 @@
   "summary": "Pune, March 25, 2025: As deepfake attacks on facial authentication systems become increasingly sophisticated, organisations are facing a growing threat of identity fraud.Research indicates that deepfake-enabled cyber fraud is expected to exceed $40 billion by 2027, underscoring the urgent need for robust identity verification solutions. To address this challenge, Accops, a leader in cybersecurity ",
   "facts": [
    {
-    "fact": "This ensures that organisations using facial recognition for authentication can detect and block synthetic identity fraud in real time.",
-    "quote": "This ensures that organisations using facial recognition for authentication can detect and block synthetic identity fraud in real time."
-   },
-   {
     "fact": "Recent data shows that deepfake-related tools on dark web forums increased by 223% between Q1 2023 and Q1 2024, making it easier for fraudsters to create convincing digital identities.",
     "quote": "Recent data shows that deepfake-related tools on dark web forums increased by 223% between Q1 2023 and Q1 2024, making it easier for fraudsters to create convincing digital identities."
    },
@@ -2086,21 +1943,15 @@
     "quote": "With 92% of enterprises reporting financial losses due to deepfake-related fraud, businesses need an advanced solution to protect their identity verification processes."
    },
    {
-    "fact": "Facial Capture & Authentication – Users authenticate using Accops BioAuth’s facial recognition system.",
-    "quote": "Facial Capture & Authentication – Users authenticate using Accops BioAuth’s facial recognition system."
+    "fact": "Accops, recently awarded Security Product Company of the Year at the DSCI Excellence Awards 2024, provides secure remote access and digital workspace solutions to over 900 enterprises worldwide.",
+    "quote": "Accops, recently awarded Security Product Company of the Year at the DSCI Excellence Awards 2024, provides secure remote access and digital workspace solutions to over 900 enterprises worldwide."
    },
    {
-    "fact": "With deepfake-powered identity fraud on the rise, organisations must go beyond traditional facial recognition.",
-    "quote": "With deepfake-powered identity fraud on the rise, organisations must go beyond traditional facial recognition."
-   },
-   {
-    "fact": "By integrating deepfake detection,organisations can verify candidates and prevent fraudulent hires before onboarding.",
-    "quote": "By integrating deepfake detection,organisations can verify candidates and prevent fraudulent hires before onboarding."
+    "fact": "Recognised in the Gartner Magic Quadrant for Desktop as a Service (DaaS), Accops is trusted by banks,governments, and large-scale enterprises for its robust cybersecurity solutions.",
+    "quote": "Recognised in the Gartner Magic Quadrant for Desktop as a Service (DaaS), Accops is trusted by banks,governments, and large-scale enterprises for its robust cybersecurity solutions."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops and pi-labs Partner to Protect Facial Authentication from Deepfake Threats?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-03-25",
   "lastmod": "2026-08-07",
@@ -2120,35 +1971,8 @@
   ],
   "industries": [],
   "summary": "Zero Trust Network Access (ZTNA) has emerged as a robust solution in this regard, offering strict authentication protocols and minimising unauthorised access. We live in a world where cyber threats are continuously evolving, making security frameworks that go beyond traditional perimeter-based defences a must have for organisations.",
-  "facts": [
-   {
-    "fact": "We live in a world where cyber threats are continuously evolving, making security frameworks that go beyond traditional perimeter-based defences a must have for organisations.",
-    "quote": "We live in a world where cyber threats are continuously evolving, making security frameworks that go beyond traditional perimeter-based defences a must have for organisations."
-   },
-   {
-    "fact": "However, while ZTNA strengthens security, gaps still exist—particularly around endpoint vulnerabilities, insider threats, and compliance challenges.",
-    "quote": "However, while ZTNA strengthens security, gaps still exist—particularly around endpoint vulnerabilities, insider threats, and compliance challenges."
-   },
-   {
-    "fact": "The micro-segmentation approach of ZTNA solutions isolates applications, effectively containing potential threats within individual segments.",
-    "quote": "The micro-segmentation approach of ZTNA solutions isolates applications, effectively containing potential threats within individual segments."
-   },
-   {
-    "fact": "For example, if an employee typically logs in from a corporate office but suddenly attempts access from an unrecognised location with a high-risk IP address, ZTNA can flag this anomaly and enforce additional verification steps or block access entirely.",
-    "quote": "For example, if an employee typically logs in from a corporate office but suddenly attempts access from an unrecognised location with a high-risk IP address, ZTNA can flag this anomaly and enforce additional verification steps or block access entirely."
-   },
-   {
-    "fact": "Centralised Data Control and Compliance Assurance",
-    "quote": "Centralised Data Control and Compliance Assurance"
-   },
-   {
-    "fact": "For industries with stringent regulatory requirements, VDI helps maintain compliance by ensuring that data remains within defined geographical boundaries, reducing concerns related to data sovereignty and unauthorised access.",
-    "quote": "For industries with stringent regulatory requirements, VDI helps maintain compliance by ensuring that data remains within defined geographical boundaries, reducing concerns related to data sovereignty and unauthorised access."
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about False sense of security? Why ZTNA + VDI Together Are Essential for Closing Security Gaps?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-03-20",
   "lastmod": "2026-08-07",
@@ -2179,25 +2003,15 @@
     "quote": "technology research organisation revealed that 63% of government CIOs plan to increase their IT budgets, focusing on digital transformation initiatives."
    },
    {
-    "fact": "Ensuring data security and compliance while supporting a distributed workforce is a critical challenge for government IT modernisation.",
-    "quote": "Ensuring data security and compliance while supporting a distributed workforce is a critical challenge for government IT modernisation."
-   },
-   {
     "fact": "In the first half of 2024, India experienced about 600 cases of significant cyberattacks with the government sector being a primary target.",
     "quote": "In the first half of 2024, India experienced about 600 cases of significant cyberattacks with the government sector being a primary target."
    },
    {
     "fact": "A leading technology research organisation predicts that by 2026, at least 500 million smartphone users will regularly use digital identity wallets for verifiable claims, improving the citizen experience, enhancing security, and reducing the risk of fraud.",
     "quote": "A leading technology research organisation predicts that by 2026, at least 500 million smartphone users will regularly use digital identity wallets for verifiable claims, improving the citizen experience, enhancing security, and reducing the risk of fraud."
-   },
-   {
-    "fact": "By prioritising cybersecurity, investing in digital identity solutions, and empowering the government workforce, public sector organisations can bridge the digital divide, enhance service delivery, and build a more responsive and citizen-centric government.",
-    "quote": "By prioritising cybersecurity, investing in digital identity solutions, and empowering the government workforce, public sector organisations can bridge the digital divide, enhance service delivery, and build a more responsive and citizen-centric government."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Bridging the Digital Divide?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-01-08",
   "lastmod": "2026-07-29",
@@ -2229,25 +2043,23 @@
     "quote": "Indeed, the average cost of a data breach in the manufacturing sector is $3.86 million, according to a study by a research centre that studies information security, privacy, and data protection."
    },
    {
-    "fact": "This approach fundamentally reimagines how manufacturing organizations protect their most critical digital assets.",
-    "quote": "This approach fundamentally reimagines how manufacturing organizations protect their most critical digital assets."
-   },
-   {
-    "fact": "By isolating sensitive systems and creating granular access controls, VDI transforms the traditional perimeter of cybersecurity.",
-    "quote": "By isolating sensitive systems and creating granular access controls, VDI transforms the traditional perimeter of cybersecurity."
-   },
-   {
     "fact": "By centralizing data storage and management, manufacturers can better control access and prevent unauthorized data transfers, ensuring compliance with regulations such as DPDP Act, GDPR, HIPPA or industry-specific standards.",
     "quote": "By centralizing data storage and management, manufacturers can better control access and prevent unauthorized data transfers, ensuring compliance with regulations such as DPDP Act, GDPR, HIPPA or industry-specific standards."
    },
    {
-    "fact": "Furthermore, regulatory compliance, once a complex maze of documentation and manual checks, becomes a streamlined process.",
-    "quote": "Furthermore, regulatory compliance, once a complex maze of documentation and manual checks, becomes a streamlined process."
+    "fact": "VDI allows manufacturers to enforce security policies consistently, reducing human error and ensuring adherence to stringent industry standards like NIST and ISO 27001.",
+    "quote": "VDI allows manufacturers to enforce security policies consistently, reducing human error and ensuring adherence to stringent industry standards like NIST and ISO 27001."
+   },
+   {
+    "fact": "A 2022 report by a leading consulting and auditing firm found that manufacturers who implemented VDI solutions saw an average 20% reduction in IT costs.",
+    "quote": "A 2022 report by a leading consulting and auditing firm found that manufacturers who implemented VDI solutions saw an average 20% reduction in IT costs."
+   },
+   {
+    "fact": "For manufacturers navigating the complex digital transformation of Industry 4.0, VDI is no longer optional.",
+    "quote": "For manufacturers navigating the complex digital transformation of Industry 4.0, VDI is no longer optional."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about The Digital Shield?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2024-12-26",
   "lastmod": "2026-07-29",
@@ -2314,10 +2126,6 @@
     "quote": "A recent report by a cybersecurity research firm predicts that cybercrime will cost the world $10.5 trillion annually by 2025, highlighting the importance of securing remote access in all industries, including manufacturing."
    },
    {
-    "fact": "Suspicious sessions can be terminated instantly, and compromised virtual desktops can be isolated from the network, preventing the spread of malware and minimizing downtime.",
-    "quote": "Suspicious sessions can be terminated instantly, and compromised virtual desktops can be isolated from the network, preventing the spread of malware and minimizing downtime."
-   },
-   {
     "fact": "A recent report by a global technology company highlighted that unplanned downtime costs Fortune 500 companies an average of 11% of their annual revenue.",
     "quote": "A recent report by a global technology company highlighted that unplanned downtime costs Fortune 500 companies an average of 11% of their annual revenue."
    },
@@ -2326,9 +2134,7 @@
     "quote": "According to a leading communication technology company study, 60% of data breaches involve vulnerabilities for which a patch was available but not applied."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Navigating the Cybersecurity Maze?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2024-12-18",
   "lastmod": "2026-07-29",
@@ -2353,35 +2159,8 @@
    "Government"
   ],
   "summary": "The global shift to remote work, accelerated by the pandemic, has brought significant security challenges. As cyber threats evolve, a dispersed workforce needs a proactive, integrated approach.",
-  "facts": [
-   {
-    "fact": "Continuous monitoring has become essential for real-time visibility to protect data, ensure compliance, and enable secure remote work.",
-    "quote": "Continuous monitoring has become essential for real-time visibility to protect data, ensure compliance, and enable secure remote work."
-   },
-   {
-    "fact": "By employing secure containerisation technologies, devices can be isolated from critical systems, reducing the risk of security breaches.",
-    "quote": "By employing secure containerisation technologies, devices can be isolated from critical systems, reducing the risk of security breaches."
-   },
-   {
-    "fact": "By detecting unusual activity and triggering alerts for abnormal behavior, organisations can proactively address potential security incidents before they escalate.",
-    "quote": "By detecting unusual activity and triggering alerts for abnormal behavior, organisations can proactively address potential security incidents before they escalate."
-   },
-   {
-    "fact": "To fully benefit from continuous monitoring, organisations should adopt:",
-    "quote": "To fully benefit from continuous monitoring, organisations should adopt:"
-   },
-   {
-    "fact": "Automated Response Mechanisms: Implement automated responses to quickly address threats, such as blocking unauthorised users or isolating affected devices.",
-    "quote": "Automated Response Mechanisms: Implement automated responses to quickly address threats, such as blocking unauthorised users or isolating affected devices."
-   },
-   {
-    "fact": "Comprehensive Reporting: Ensure continuous monitoring solutions provide robust reporting for compliance and analysis after security incidents.",
-    "quote": "Comprehensive Reporting: Ensure continuous monitoring solutions provide robust reporting for compliance and analysis after security incidents."
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Cyber proofing remote work through continuous monitoring?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": "2024-12-05",
   "lastmod": "2026-07-28",
@@ -2434,31 +2213,8 @@
   ],
   "industries": [],
   "summary": "IAM has evolved into a cornerstone of cybersecurity, adapting to the ever-changing landscape of remote work. It’s the key to navigating the complexities of this new, distributed work environment, providing a sense of security and control.",
-  "facts": [
-   {
-    "fact": "It allows organisations to verify and authorise users, ensuring that only the right individuals can access the right resources at the right time.",
-    "quote": "It allows organisations to verify and authorise users, ensuring that only the right individuals can access the right resources at the right time."
-   },
-   {
-    "fact": "IAM helps organisations meet those ever-increasing regulatory requirements and industry standards.",
-    "quote": "IAM helps organisations meet those ever-increasing regulatory requirements and industry standards."
-   },
-   {
-    "fact": "Finally, we must recognize endpoint security.",
-    "quote": "Finally, we must recognize endpoint security."
-   },
-   {
-    "fact": "As organizations continue their digital transformation journeys, IAM will be the compass guiding them through the security challenges of the borderless enterprise.",
-    "quote": "As organizations continue their digital transformation journeys, IAM will be the compass guiding them through the security challenges of the borderless enterprise."
-   },
-   {
-    "fact": "Organizations can empower their remote workforce by adopting a strategic approach to IAM while keeping their valuable assets safe and sound.",
-    "quote": "Organizations can empower their remote workforce by adopting a strategic approach to IAM while keeping their valuable assets safe and sound."
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Transforming IT Security?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": "2024-12-04",
   "lastmod": "2026-07-28",
@@ -2593,25 +2349,23 @@
     "quote": "The adoption of such secure remote work solutions has seen a significant uptick across enterprises, especially in the wake of the Covid-19 pandemic."
    },
    {
-    "fact": "However, the crisis showcased the viability and benefits of remote work, pushing organizations to rethink their work models.",
-    "quote": "However, the crisis showcased the viability and benefits of remote work, pushing organizations to rethink their work models."
-   },
-   {
     "fact": "Question 2: With the rise of the gig economy and geographically dispersed teams, what security considerations need to be prioritized to ensure data protection and collaboration efficiency?",
     "quote": "Question 2: With the rise of the gig economy and geographically dispersed teams, what security considerations need to be prioritized to ensure data protection and collaboration efficiency?"
    },
    {
-    "fact": "The decentralization inherent in remote work models exposes organizations to heightened risks of cyber threats and data breaches, which could lead to severe financial and reputational damage.",
-    "quote": "The decentralization inherent in remote work models exposes organizations to heightened risks of cyber threats and data breaches, which could lead to severe financial and reputational damage."
+    "fact": "Question 3: As regulations around data privacy and security become stricter globally, how can secure remote work platforms help organizations stay compliant?",
+    "quote": "Question 3: As regulations around data privacy and security become stricter globally, how can secure remote work platforms help organizations stay compliant?"
    },
    {
-    "fact": "By ensuring secure access, data protection, and efficient collaboration, Accops enables organizations to navigate the complexities of modern work environments, promoting productivity and security in equal measure.",
-    "quote": "By ensuring secure access, data protection, and efficient collaboration, Accops enables organizations to navigate the complexities of modern work environments, promoting productivity and security in equal measure."
+    "fact": "Question 4: With the growing focus on Zero Trust security models, how does Accops support organizations in implementing this approach within their digital workspace solutions?",
+    "quote": "Question 4: With the growing focus on Zero Trust security models, how does Accops support organizations in implementing this approach within their digital workspace solutions?"
+   },
+   {
+    "fact": "This proactive approach has helped us guide numerous clients towards a stronger Zero Trust model since 2012.",
+    "quote": "This proactive approach has helped us guide numerous clients towards a stronger Zero Trust model since 2012."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Empowering Hybrid Work?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2024-04-23",
   "lastmod": "2026-07-09",
@@ -2648,25 +2402,15 @@
     "quote": "The event will take place from April 23-25 at the Dubai World Trade Centre, where Accops will showcase its comprehensive suite of security solutions, demonstrating a long-standing commitment to the Middle East market."
    },
    {
-    "fact": "These solutions facilitate robust, flexible remote access, enabling organizations to securely maintain operations amidst the dynamic challenges of today’s cyber landscape.",
-    "quote": "These solutions facilitate robust, flexible remote access, enabling organizations to securely maintain operations amidst the dynamic challenges of today’s cyber landscape."
-   },
-   {
     "fact": "At GISEC 2024, Accops will not only display these technologies but also engage with partners and clients to discuss strategies for navigating the evolving cybersecurity threats.",
     "quote": "At GISEC 2024, Accops will not only display these technologies but also engage with partners and clients to discuss strategies for navigating the evolving cybersecurity threats."
    },
    {
-    "fact": "GISEC provides us with a perfect opportunity to connect with our customers, understand their challenges, and deliver solutions that meet the complex demands of their industries,” added Vijender Yadav.",
-    "quote": "GISEC provides us with a perfect opportunity to connect with our customers, understand their challenges, and deliver solutions that meet the complex demands of their industries,” added Vijender Yadav."
-   },
-   {
-    "fact": "Accops empowers organizations to thrive in the work-from-anywhere era with its suite of secure and versatile solutions.",
-    "quote": "Accops empowers organizations to thrive in the work-from-anywhere era with its suite of secure and versatile solutions."
+    "fact": "Founded in 2012 with a vision to democratize remote access technologies, Accops has evolved into a trusted partner for over 850 organizations across 10 countries.",
+    "quote": "Founded in 2012 with a vision to democratize remote access technologies, Accops has evolved into a trusted partner for over 850 organizations across 10 countries."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops Reinforces Its Commitment to the Middle East at GISEC 2024?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2024-04-17",
   "lastmod": "2026-07-01",
@@ -2691,28 +2435,28 @@
   "summary": "In the rapidly evolving technology landscape, adaptability is crucial for success. In a recent interaction with the mind driving innovation at Accops Systems, Vijender Yadav, Co-founder, Managing Director, and CTO, we uncovered the nuances of nurturing creativity, staying agile, and aligning with current trends.",
   "facts": [
    {
-    "fact": "And we recognize the ones with the most significant impact on customer satisfaction and business outcomes.",
-    "quote": "And we recognize the ones with the most significant impact on customer satisfaction and business outcomes."
-   },
-   {
-    "fact": "This learning culture, coupled with our willingness to embrace a fail-forward mindset, ensures we are continuously evolving and disruptive, creating a new normal which is defined by a higher bar of performance for ourselves, and better outcomes for our customers.",
-    "quote": "This learning culture, coupled with our willingness to embrace a fail-forward mindset, ensures we are continuously evolving and disruptive, creating a new normal which is defined by a higher bar of performance for ourselves, and better outcomes for our customers."
-   },
-   {
-    "fact": "This also aligns seamlessly with our mission – to delight customers every day by delivering excellence & continuous innovation in our remote productivity offerings, helping them enable their workforce to have the freedom to work from anywhere and get better at what they do.",
-    "quote": "This also aligns seamlessly with our mission – to delight customers every day by delivering excellence & continuous innovation in our remote productivity offerings, helping them enable their workforce to have the freedom to work from anywhere and get better at what they do."
-   },
-   {
-    "fact": "Having said that, we are equally adept at servicing large enterprises and government organizations—our extensive and diverse clientele is a testament to our capability.",
-    "quote": "Having said that, we are equally adept at servicing large enterprises and government organizations—our extensive and diverse clientele is a testament to our capability."
-   },
-   {
-    "fact": "As the market dynamics shift, particularly after the strategic realignments by global VDI players, Accops stands out for its stability, reliability, and flexibility—qualities our customers are increasingly seeking.",
-    "quote": "As the market dynamics shift, particularly after the strategic realignments by global VDI players, Accops stands out for its stability, reliability, and flexibility—qualities our customers are increasingly seeking."
-   },
-   {
     "fact": "Presently, our focus is on deepening our penetration in the SEA and EMEA regions, where we’re fortifying our relationships with over 100 resellers and technology partners like Jio and Nutanix.",
     "quote": "Presently, our focus is on deepening our penetration in the SEA and EMEA regions, where we’re fortifying our relationships with over 100 resellers and technology partners like Jio and Nutanix."
+   },
+   {
+    "fact": "Accops’ remote access solutions aid organizations in reducing Scope 1 emissions, which come from direct sources like building offices or transportation fleets, by enabling employees to work remotely and decreasing the need for office-based systems like heating and cooling.",
+    "quote": "Accops’ remote access solutions aid organizations in reducing Scope 1 emissions, which come from direct sources like building offices or transportation fleets, by enabling employees to work remotely and decreasing the need for office-based systems like heating and cooling."
+   },
+   {
+    "fact": "In terms of Scope 2 emissions, which result from the production of electricity and heating consumed by a company in operations and building products, Accops’ thin clients offer a significant reduction in electrical consumption, potentially up to 90% over 5-7 years.",
+    "quote": "In terms of Scope 2 emissions, which result from the production of electricity and heating consumed by a company in operations and building products, Accops’ thin clients offer a significant reduction in electrical consumption, potentially up to 90% over 5-7 years."
+   },
+   {
+    "fact": "For Scope 3 emissions, which are indirect emissions in a company’s value chain, Accops enhances productivity and operational efficiency.",
+    "quote": "For Scope 3 emissions, which are indirect emissions in a company’s value chain, Accops enhances productivity and operational efficiency."
+   },
+   {
+    "fact": "Our workforce has grown 4 times in last 3 years, while maintaining same size of office space.",
+    "quote": "Our workforce has grown 4 times in last 3 years, while maintaining same size of office space."
+   },
+   {
+    "fact": "After every offline customer meeting, we are planting 5-10 trees, tagging the trees against our customer names, with commitment to maintain the trees for 3 years.",
+    "quote": "After every offline customer meeting, we are planting 5-10 trees, tagging the trees against our customer names, with commitment to maintain the trees for 3 years."
    }
   ],
   "questions_answered": [
@@ -2762,17 +2506,15 @@
     "quote": "As we celebrate our 11th anniversary, our approach aligns with the government’s vision, promoting self-reliance and technological advancement."
    },
    {
-    "fact": "We remain committed to helping organizations navigate through market volatility and evolving industry dynamics, adopt innovative solutions to stay agile and ahead in the game,” said Vijender Yadav, Co-founder, Managing Director and CTO of Accops.",
-    "quote": "We remain committed to helping organizations navigate through market volatility and evolving industry dynamics, adopt innovative solutions to stay agile and ahead in the game,” said Vijender Yadav, Co-founder, Managing Director and CTO of Accops."
+    "fact": "Accops’ 11th year anniversary celebration coincides with its commitment to delivering innovative solutions, its strategic partnership with Jio. and its dedication to the ‘Make in India’ initiative,contributing to the nation’s vision of self-reliance and technological advancement.",
+    "quote": "Accops’ 11th year anniversary celebration coincides with its commitment to delivering innovative solutions, its strategic partnership with Jio. and its dedication to the ‘Make in India’ initiative,contributing to the nation’s vision of self-reliance and technological advancement."
    },
    {
-    "fact": "“During a period of market consolidation and realignment, Accops emerged as a dependable alternative for organizations grappling with rising costs and support complexities.",
-    "quote": "“During a period of market consolidation and realignment, Accops emerged as a dependable alternative for organizations grappling with rising costs and support complexities."
+    "fact": "Founded in 2012 with a vision to democratize remote access technologies, Accops has evolved into a trusted partner for over 850 organizations across 10 countries.",
+    "quote": "Founded in 2012 with a vision to democratize remote access technologies, Accops has evolved into a trusted partner for over 850 organizations across 10 countries."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops reaffirms its market leadership in India with its cutting-edge digital workspace solutions?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2024-02-19",
   "lastmod": "2026-06-18",
@@ -2791,29 +2533,15 @@
   "summary": "Homegrown workspace virtualisation service provider Accops has set a plan to double its revenue and expand overseas at a time the digital workspace and cloud service industry is undergoing a major consolidation. The two most prominent deals in the sector in 2022 include Broadcom’s plan to acquire VWware in a $61 billion cash-and-stock deal while digital workspace service provider Citrix has been a",
   "facts": [
    {
-    "fact": "The consolidation has thrown open opportunities for other players in the segment with some of the customers seeking alternate options.",
-    "quote": "The consolidation has thrown open opportunities for other players in the segment with some of the customers seeking alternate options."
-   },
-   {
     "fact": "The company clocked a revenue of Rs 70 crore last year.",
     "quote": "The company clocked a revenue of Rs 70 crore last year."
    },
    {
     "fact": "Accops has around 750 clients with operations in three geographies – India, Japan, and West Asia.",
     "quote": "Accops has around 750 clients with operations in three geographies – India, Japan, and West Asia."
-   },
-   {
-    "fact": "He said that the company has grown significantly during the pandemic period and being the only made-in-India company at that time, could expand its presence significantly.",
-    "quote": "He said that the company has grown significantly during the pandemic period and being the only made-in-India company at that time, could expand its presence significantly."
-   },
-   {
-    "fact": "We use machine learning which build algorithms and some of which are pre-programmed and some of which we learn from customers.",
-    "quote": "We use machine learning which build algorithms and some of which are pre-programmed and some of which we learn from customers."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops plans to double its revenue and expand overseas?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2022-11-05",
   "lastmod": "2026-06-18",
@@ -2834,15 +2562,8 @@
    "Government"
   ],
   "summary": "The current government has a strong push for Make in India and digitally enabled government services. The trend seems to continue in the right direction with the availability of faster and affordable connectivity across urban and rural India.",
-  "facts": [
-   {
-    "fact": "The IT budget is an opportunity for the government to push the agenda further by enabling government organisations to adopt made in India cyber security products by proving specific budgets.",
-    "quote": "The IT budget is an opportunity for the government to push the agenda further by enabling government organisations to adopt made in India cyber security products by proving specific budgets."
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Union Budget 2019?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": "2019-01-29",
   "lastmod": "2026-06-17",
@@ -2878,25 +2599,15 @@
     "quote": "With a vision to increase stability within the Indian banking sphere, the RBI has instituted clear guidelines in handing and processing information to ensure that all data leaks are reported at the right time and security measures are put in place immediately."
    },
    {
-    "fact": "Accops has come forth with a step-by-step compliance structure that UCBs can adopt to have a holistic and integrated approach towards cybersecurity operation transformation.",
-    "quote": "Accops has come forth with a step-by-step compliance structure that UCBs can adopt to have a holistic and integrated approach towards cybersecurity operation transformation."
-   },
-   {
     "fact": "Accops has carefully reviewed the requirements of the RBI guidelines and is equipped to solve cybersecurity issues while reducing the compliance complexities for UCBs.",
     "quote": "Accops has carefully reviewed the requirements of the RBI guidelines and is equipped to solve cybersecurity issues while reducing the compliance complexities for UCBs."
    },
    {
-    "fact": "Urban Cooperative Banks (UCBs) get the following Accop’s solutions to adhere to RBI’s new guidelines-",
-    "quote": "Urban Cooperative Banks (UCBs) get the following Accop’s solutions to adhere to RBI’s new guidelines-"
-   },
-   {
-    "fact": "Accops HySecure provides a zero-trust network access architecture to isolate critical application servers from internal as well as external devices, providing logical network segmentation, enabling access on a need to basis.",
-    "quote": "Accops HySecure provides a zero-trust network access architecture to isolate critical application servers from internal as well as external devices, providing logical network segmentation, enabling access on a need to basis."
+    "fact": "Accops HySecure also has a layer 5-7 VPN.",
+    "quote": "Accops HySecure also has a layer 5-7 VPN."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops helps urban cooperative banks adhere to RBI’s new cyber security guidelines?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2020-02-21",
   "lastmod": "2026-06-17",
@@ -2922,16 +2633,8 @@
   "summary": "Accops HyWorks, a Secure Digital Workspace solution provided by Accops Systems, is now integrated seamlessly with Microsoft’s latest offering Azure Windows Virtual Desktop (WVD), enabling secure and compliant Desktop-as-a-Service for office users as well as work from home users. Every organization is busy in setting up their business continuity plan to ensure their workforce remain productive from",
   "facts": [
    {
-    "fact": "Accops HyWorks, a Secure Digital Workspace solution provided by Accops Systems, is now integrated seamlessly with Microsoft’s latest offering Azure Windows Virtual Desktop (WVD), enabling secure and compliant Desktop-as-a-Service for office users as well as work from home users.",
-    "quote": "Accops HyWorks, a Secure Digital Workspace solution provided by Accops Systems, is now integrated seamlessly with Microsoft’s latest offering Azure Windows Virtual Desktop (WVD), enabling secure and compliant Desktop-as-a-Service for office users as well as work from home users."
-   },
-   {
     "fact": "Every organization is busy in setting up their business continuity plan to ensure their workforce remain productive from home, as the concerns with Covid-19 are increasing.",
     "quote": "Every organization is busy in setting up their business continuity plan to ensure their workforce remain productive from home, as the concerns with Covid-19 are increasing."
-   },
-   {
-    "fact": "With Azure WVD integration, customers can avoid capex investments and quickly deploy virtual apps or virtual desktop-based access for their extranet users.",
-    "quote": "With Azure WVD integration, customers can avoid capex investments and quickly deploy virtual apps or virtual desktop-based access for their extranet users."
    },
    {
     "fact": "Promising a simplified virtual desktop infrastructure on Azure cloud, Microsoft has provided Windows 10 virtual machines that allows multiple concurrent interactive sessions.",
@@ -2944,11 +2647,13 @@
    {
     "fact": "Accops has already integrated Windows 10 multi-session into its virtual workspace solution, Accops HyWorks.",
     "quote": "Accops has already integrated Windows 10 multi-session into its virtual workspace solution, Accops HyWorks."
+   },
+   {
+    "fact": "Recently, Accops’ Japan team successfully rolled out the solution for around 1,000 users of Fukuoka Board of Education.",
+    "quote": "Recently, Accops’ Japan team successfully rolled out the solution for around 1,000 users of Fukuoka Board of Education."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops adds value to Azure WVD, enables secure VDI from Azure cloud?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2020-03-23",
   "lastmod": "2026-06-17",
@@ -2971,27 +2676,8 @@
    "IT / ITeS"
   ],
   "summary": "Coronavirus spread is happening unabated across India as in the rest of the world. Worrying financial implications and trends have started to emerge.",
-  "facts": [
-   {
-    "fact": "Enterprises and organizations that can swiftly move technology work capacity to digital platforms will be able to reduce the impact of the pandemic and continue to address their customers almost unhindered.",
-    "quote": "Enterprises and organizations that can swiftly move technology work capacity to digital platforms will be able to reduce the impact of the pandemic and continue to address their customers almost unhindered."
-   },
-   {
-    "fact": "But, allowing work from home en masse using normal or traditional VPN poses serious security risks, especially for companies that come under various compliance regimes like BFSI sector.",
-    "quote": "But, allowing work from home en masse using normal or traditional VPN poses serious security risks, especially for companies that come under various compliance regimes like BFSI sector."
-   },
-   {
-    "fact": "Accops offers compliant and secure work from home solutions that enable the workforce to stay productive from their homes.",
-    "quote": "Accops offers compliant and secure work from home solutions that enable the workforce to stay productive from their homes."
-   },
-   {
-    "fact": "Accops’ Remote Desktop-based solution options include ‘Office PC Access From Home’ and ‘Virtual Apps/Desktops Access’ to help organizations set up work from home infrastructure and keep their operations running.",
-    "quote": "Accops’ Remote Desktop-based solution options include ‘Office PC Access From Home’ and ‘Virtual Apps/Desktops Access’ to help organizations set up work from home infrastructure and keep their operations running."
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about How CIOs Can Prepare for Exponential Increase in Work From Home Demand?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": "2020-03-27",
   "lastmod": "2026-06-17",
@@ -3013,23 +2699,8 @@
    "Government"
   ],
   "summary": "Accops Systems, a leading Work From Home solutions developer and provider, has announced its full-fledged support to help enterprises set up Secure Remote Access environment for their workforce amid the Coronavirus threats by offering complimentary Accops Workspace Virtualization licences for 3 Months up to 50 users. Accops is also offering unlimited complimentary Accops Workspace Virtualization l",
-  "facts": [
-   {
-    "fact": "But, allowing work from home en masse using normal or traditional VPN poses serious security risks, especially for companies that come under various compliance regimes like BFSI sector.",
-    "quote": "But, allowing work from home en masse using normal or traditional VPN poses serious security risks, especially for companies that come under various compliance regimes like BFSI sector."
-   },
-   {
-    "fact": "Accops offers compliant and secure work from home solutions that enable the workforce to stay productive from their homes.",
-    "quote": "Accops offers compliant and secure work from home solutions that enable the workforce to stay productive from their homes."
-   },
-   {
-    "fact": "Accops’ Remote Desktop-based solution options include ‘Office PC Access From Home’ and ‘Virtual Apps/Desktops Access’ to help organizations set up work from home infrastructure and keep their operations running.",
-    "quote": "Accops’ Remote Desktop-based solution options include ‘Office PC Access From Home’ and ‘Virtual Apps/Desktops Access’ to help organizations set up work from home infrastructure and keep their operations running."
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Covid-19 crisis?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": "2020-03-27",
   "lastmod": "2026-06-17",
@@ -3058,22 +2729,6 @@
   "summary": "Accops Systems, one of the leading Indian company with global footprint, providing remote productivity solutions to businesses, has joined hands with Bulwark Distribution to serve enterprises across Middle East with simple and cost-effective work-from-home solutions. Headquartered in Dubai, Bulwark Distribution, a prominent Value-Added Distributor (VAD) of IT Security and Information Communication",
   "facts": [
    {
-    "fact": "Organizations across the world are focusing on the well-being of their employees, enabling work-from-home to check the spread of the novel coronavirus.",
-    "quote": "Organizations across the world are focusing on the well-being of their employees, enabling work-from-home to check the spread of the novel coronavirus."
-   },
-   {
-    "fact": "Accops offers compliant and secure work-from-home solutions that enable the workforce to stay productive from their homes or anywhere else.",
-    "quote": "Accops offers compliant and secure work-from-home solutions that enable the workforce to stay productive from their homes or anywhere else."
-   },
-   {
-    "fact": "Accops offers ‘Office PC Access From Home’, ‘Virtual Apps/Desktops Access’, ‘ Desktop-as-a-Service ‘, ‘Secure Access Gateway’ and ‘Identity and Access Management’ solutions to help organizations to quickly set up work-from-home infrastructure.",
-    "quote": "Accops offers ‘Office PC Access From Home’, ‘Virtual Apps/Desktops Access’, ‘ Desktop-as-a-Service ‘, ‘Secure Access Gateway’ and ‘Identity and Access Management’ solutions to help organizations to quickly set up work-from-home infrastructure."
-   },
-   {
-    "fact": "Moreover, Accops solution is integrated seamlessly with Microsoft’s latest offering Azure Windows Virtual Desktop (WVD), enabling secure and compliant Workspace-as-a-Service (WaaS) for office users as well as remote users.",
-    "quote": "Moreover, Accops solution is integrated seamlessly with Microsoft’s latest offering Azure Windows Virtual Desktop (WVD), enabling secure and compliant Workspace-as-a-Service (WaaS) for office users as well as remote users."
-   },
-   {
     "fact": "Accops was established in Oct 2012 and is headquartered in Pune, India.",
     "quote": "Accops was established in Oct 2012 and is headquartered in Pune, India."
    },
@@ -3082,9 +2737,7 @@
     "quote": "Bulwark serves the entire region with innovations from more than 20 technology vendors and works with more than 500+ partners, with the aim of bringing the best in technology to the region."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops and Bulwark Join Hands to Deliver Secure WFH Solutions to Enterprises in the Middle East Region?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2020-05-14",
   "lastmod": "2026-06-17",
@@ -3125,17 +2778,15 @@
     "quote": "“The current scenario has accelerated our growth, with demand for our solutions shooting up about 10 times since March 2020."
    },
    {
-    "fact": "“In terms of revenues, we expect to have 3x revenue growth compared to last year, balancing the increased sales with reduced per unit cost.”",
-    "quote": "“In terms of revenues, we expect to have 3x revenue growth compared to last year, balancing the increased sales with reduced per unit cost.”"
-   },
-   {
     "fact": "Pune-headquartered Accops has been working on zero-trust-based remote access solutions since 2012, and the sudden opportunity gave it a chance to prove its mettle to new clients.",
     "quote": "Pune-headquartered Accops has been working on zero-trust-based remote access solutions since 2012, and the sudden opportunity gave it a chance to prove its mettle to new clients."
+   },
+   {
+    "fact": "Accops has empowered over 100 enterprises in India, Middle-East and Japan, among others, to get their critical functions up and running to ensure business continuity in this pandemic-hit environment.",
+    "quote": "Accops has empowered over 100 enterprises in India, Middle-East and Japan, among others, to get their critical functions up and running to ensure business continuity in this pandemic-hit environment."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Work-from-home solutions?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2020-08-13",
   "lastmod": "2026-06-17",
@@ -3162,14 +2813,6 @@
   "summary": "Accops Systems, a trusted developer and provider of end-to-end Digital Workspace solutions, has launched a revolutionary solution to empower BYOD users to securely access corporate applications and virtual desktop infrastructure from anywhere. Delivered in a simple pen drive, the all-new Accops Nano allows organizations to fortify personal or unmanaged end devices with the highest level of securit",
   "facts": [
    {
-    "fact": "Delivered in a simple pen drive, the all-new Accops Nano allows organizations to fortify personal or unmanaged end devices with the highest level of security controls, mitigating concerns over threats from untraced keylogger or malware potentially residing in users’ devices.",
-    "quote": "Delivered in a simple pen drive, the all-new Accops Nano allows organizations to fortify personal or unmanaged end devices with the highest level of security controls, mitigating concerns over threats from untraced keylogger or malware potentially residing in users’ devices."
-   },
-   {
-    "fact": "Using Accops Nano, organizations can roll out work-from-anywhere solution en masse, without having to provision laptops to everyone or worry about threats originating from unpatched devices.",
-    "quote": "Using Accops Nano, organizations can roll out work-from-anywhere solution en masse, without having to provision laptops to everyone or worry about threats originating from unpatched devices."
-   },
-   {
     "fact": "Typically, only about 20-30% of employees in any organization get office-provided laptops.",
     "quote": "Typically, only about 20-30% of employees in any organization get office-provided laptops."
    },
@@ -3178,17 +2821,15 @@
     "quote": "The remaining 70-80% would use their personal laptops and desktops to access office PCs or internal applications remotely,” Vijender Yadav, CEO & Co-founder, Accops."
    },
    {
-    "fact": "Again, organizations cannot control users’ home PCs or laptops due to privacy related issues.",
-    "quote": "Again, organizations cannot control users’ home PCs or laptops due to privacy related issues."
+    "fact": "Accops Nano is customized and hardened Linux-based Live OS that can be delivered in a simple, consumer grade USB 3.0 pen drive.",
+    "quote": "Accops Nano is customized and hardened Linux-based Live OS that can be delivered in a simple, consumer grade USB 3.0 pen drive."
    },
    {
-    "fact": "One of the measures that organizations can take is to force users to have some endpoint security software in their personal devices.",
-    "quote": "One of the measures that organizations can take is to force users to have some endpoint security software in their personal devices."
+    "fact": "Accops was established in Oct 2012 and is headquartered in Pune, India.",
+    "quote": "Accops was established in Oct 2012 and is headquartered in Pune, India."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops’ plug-n-play solution for secure remote access from personal devices?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2020-09-11",
   "lastmod": "2026-06-16",
@@ -3212,33 +2853,15 @@
   "summary": "Accops Systems, a one-stop destination for all remote work requirements, has come up with a comprehensive and cost-effective solution that can deliver high-quality, wire-speed voice and customer data securely to call centre executives working from home, enabling uninterrupted customer services and business processes from anywhere. Using Accops solution for voice traffic, organizations can equip th",
   "facts": [
    {
-    "fact": "Using Accops solution for voice traffic, organizations can equip their remote workforce to attend to customer needs anytime, anywhere, using any device and any network, without worrying about any jitters, lags or call drops.",
-    "quote": "Using Accops solution for voice traffic, organizations can equip their remote workforce to attend to customer needs anytime, anywhere, using any device and any network, without worrying about any jitters, lags or call drops."
+    "fact": "It is a hybrid solution wherein business applications are delivered over a Layer-7 tunnel and voice traffic through a Layer-3 tunnel to provide a smooth, high-quality voice performance.",
+    "quote": "It is a hybrid solution wherein business applications are delivered over a Layer-7 tunnel and voice traffic through a Layer-3 tunnel to provide a smooth, high-quality voice performance."
    },
    {
-    "fact": "“A person-to-person telephonic conversation is still the most preferred means for customers to communicate with a service provider, especially in case of an urgent or sensitive problem.",
-    "quote": "“A person-to-person telephonic conversation is still the most preferred means for customers to communicate with a service provider, especially in case of an urgent or sensitive problem."
-   },
-   {
-    "fact": "For organizations, reliable communication plays a critical role in serving customers, supporting business processes, and generating revenues.",
-    "quote": "For organizations, reliable communication plays a critical role in serving customers, supporting business processes, and generating revenues."
-   },
-   {
-    "fact": "In the current scenario when most of the employees are working remotely, organizations are using various mechanisms to allow remote access to CRM and other internal business applications.",
-    "quote": "In the current scenario when most of the employees are working remotely, organizations are using various mechanisms to allow remote access to CRM and other internal business applications."
-   },
-   {
-    "fact": "Many organizations are looking at options like GSM-based or IP network-based connectivity to keep the communication channels between remote BPO executives and consumers open.",
-    "quote": "Many organizations are looking at options like GSM-based or IP network-based connectivity to keep the communication channels between remote BPO executives and consumers open."
-   },
-   {
-    "fact": "On the other hand, a typical IP network induces latency and jitters in the voice, causing unpleasant experience for both users and customers seeking help.",
-    "quote": "On the other hand, a typical IP network induces latency and jitters in the voice, causing unpleasant experience for both users and customers seeking help."
+    "fact": "Accops was established in Oct 2012 and is headquartered in Pune, India.",
+    "quote": "Accops was established in Oct 2012 and is headquartered in Pune, India."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops VoIP solution helps optimise costs, boosts performance of work-from-home BPO users?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2021-11-20",
   "lastmod": "2026-06-16",
@@ -3268,14 +2891,6 @@
   "summary": "Accops Systems, an India-based global provider of integrated work-from-anywhere solutions, has teamed up with Teradici®, the creator of industry-leading PCoIP® technology and Emmy Award-winning Cloud Access Software (CAS), to enable professionals working with graphics-intensive applications to have accurate, distortion-free, high-quality remote access to graphics workstations. The Accops solution ",
   "facts": [
    {
-    "fact": "With a large section of the workforce still working from home – and may continue to do so for longer than expected – organisations must provide their workforce with reliable, accessible, and powerful workstations.",
-    "quote": "With a large section of the workforce still working from home – and may continue to do so for longer than expected – organisations must provide their workforce with reliable, accessible, and powerful workstations."
-   },
-   {
-    "fact": "Organizations either need to set up graphic workstations physically at the users’ locations, or ask their workforce to return to the office, giving up the safety and flexibility of working from home.",
-    "quote": "Organizations either need to set up graphic workstations physically at the users’ locations, or ask their workforce to return to the office, giving up the safety and flexibility of working from home."
-   },
-   {
     "fact": "Teradici CAS and PCoIP technology benefits customers significantly with Turbo tunnelling to deliver 3D and other rich interactive applications.",
     "quote": "Teradici CAS and PCoIP technology benefits customers significantly with Turbo tunnelling to deliver 3D and other rich interactive applications."
    },
@@ -3290,11 +2905,13 @@
    {
     "fact": "Teradici Cloud Access Software, which won an Engineering Emmy from the Television Academy in 2020, powers the most secure remote solutions with unparalleled performance for even the most graphics-intensive applications.",
     "quote": "Teradici Cloud Access Software, which won an Engineering Emmy from the Television Academy in 2020, powers the most secure remote solutions with unparalleled performance for even the most graphics-intensive applications."
+   },
+   {
+    "fact": "Teradici technology is trusted by leading media companies, design houses, financial firms and government agencies and is deployed to more than 15 million users around the world.",
+    "quote": "Teradici technology is trusted by leading media companies, design houses, financial firms and government agencies and is deployed to more than 15 million users around the world."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops Partners with Teradici® to Deliver Secure and Highly Responsive Remote Access to Graphics Workstations?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2021-04-23",
   "lastmod": "2026-06-16",
@@ -3335,19 +2952,9 @@
    {
     "fact": "Accops works with 100+ channel partners who play a significant role in taking its comprehensive remote work products and solutions to the market.",
     "quote": "Accops works with 100+ channel partners who play a significant role in taking its comprehensive remote work products and solutions to the market."
-   },
-   {
-    "fact": "Technology Excellence Award – Access Gateway",
-    "quote": "Technology Excellence Award – Access Gateway"
-   },
-   {
-    "fact": "Mr Mohan Bhat, MD & Co-founder of Accops, said: “Our partners have played a crucial role in helping our customers realize what’s possible – from driving digital transformation to delivering innovation and valuable business outcomes.",
-    "quote": "Mr Mohan Bhat, MD & Co-founder of Accops, said: “Our partners have played a crucial role in helping our customers realize what’s possible – from driving digital transformation to delivering innovation and valuable business outcomes."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops announces the winners of Partner Achievement Awards 2021?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2021-10-11",
   "lastmod": "2026-06-16",
@@ -3375,29 +2982,11 @@
   "summary": "Accops, an India-based global provider of integrated remote access products and solutions, has launched Accops BioAuth, a fingerprint & facial authentication solution with continuous user environment monitoring that will enable organizations to create a trusted work environment at employees’ homes, empowering users of critical business applications to be productive wherever they are. The state-of-",
   "facts": [
    {
-    "fact": "By enabling user environment monitoring, organizations may allow their employees to work with highly sensitive data from their homes, extending them the benefits of remote work, not just during the ongoing pandemic but in the post-pandemic world as well.",
-    "quote": "By enabling user environment monitoring, organizations may allow their employees to work with highly sensitive data from their homes, extending them the benefits of remote work, not just during the ongoing pandemic but in the post-pandemic world as well."
-   },
-   {
-    "fact": "BioAuth can use biometric devices from multiple vendors, giving a choice to organizations to adopt any biometric device.",
-    "quote": "BioAuth can use biometric devices from multiple vendors, giving a choice to organizations to adopt any biometric device."
-   },
-   {
-    "fact": "“Ensuring strict compliance has become one of the major challenges for organizations.",
-    "quote": "“Ensuring strict compliance has become one of the major challenges for organizations."
-   },
-   {
-    "fact": "With the spike in the number of cyberattacks over the past year, especially credential thefts, organizations today are adopting Multi-factor Authentication (MFA) to prevent unauthorized access and overcome the limitations of “passwords-only” authentication.",
-    "quote": "With the spike in the number of cyberattacks over the past year, especially credential thefts, organizations today are adopting Multi-factor Authentication (MFA) to prevent unauthorized access and overcome the limitations of “passwords-only” authentication."
-   },
-   {
     "fact": "Accops was established in Oct 2012 and is headquartered in Pune, India, and currently has a significant presence in over 10 countries, serving more than 600 clients across multiple critical verticals like BFSI, Healthcare, Pharma, Government, Defence etc.",
     "quote": "Accops was established in Oct 2012 and is headquartered in Pune, India, and currently has a significant presence in over 10 countries, serving more than 600 clients across multiple critical verticals like BFSI, Healthcare, Pharma, Government, Defence etc."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops BioAuth Secures Remote Work with Facial Authentication?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2021-11-12",
   "lastmod": "2026-06-16",
@@ -3420,19 +3009,8 @@
    "Pharma / Healthcare"
   ],
   "summary": "India’s Accops Systems has released a new biometric authentication solution for remote work environments. Accops BioAuth supports both face and fingerprint recognition, and can provide ongoing authentication to prevent data breaches after an employee is logged in.",
-  "facts": [
-   {
-    "fact": "Accops BioAuth supports both face and fingerprint recognition, and can provide ongoing authentication to prevent data breaches after an employee is logged in.",
-    "quote": "Accops BioAuth supports both face and fingerprint recognition, and can provide ongoing authentication to prevent data breaches after an employee is logged in."
-   },
-   {
-    "fact": "“Ensuring security across digital workspace with a geographically distributed workforce is a major challenge for organizations today,” said Accops CEO Vijender Yadav.",
-    "quote": "“Ensuring security across digital workspace with a geographically distributed workforce is a major challenge for organizations today,” said Accops CEO Vijender Yadav."
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Accops Unveils New Remote Authentication Solution for the Enterprise?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": "2022-03-31",
   "lastmod": "2026-06-15",
@@ -3460,29 +3038,11 @@
   "summary": "Accops Systems launched Accops BioAuth, a fingerprint and facial authentication solution with continuous user environment monitoring, enabling organizations to authenticate DaaS users no matter where they are working from. This unique solution will help data-sensitive businesses, like BFSI, Pharma, BPO/KPO, critical PSUs, prevent identity impersonation, shoulder surfing, as well as authentication-",
   "facts": [
    {
-    "fact": "Accops Systems launched Accops BioAuth, a fingerprint and facial authentication solution with continuous user environment monitoring, enabling organizations to authenticate DaaS users no matter where they are working from.",
-    "quote": "Accops Systems launched Accops BioAuth, a fingerprint and facial authentication solution with continuous user environment monitoring, enabling organizations to authenticate DaaS users no matter where they are working from."
-   },
-   {
-    "fact": "“Ensuring security across digital workspace with a geographically distributed workforce is a major challenge for organizations today.",
-    "quote": "“Ensuring security across digital workspace with a geographically distributed workforce is a major challenge for organizations today."
-   },
-   {
-    "fact": "Accops DaaS enables organizations to provide their end-users with secure office PCs on the cloud without any Capex while reducing the administrative burden on IT teams.",
-    "quote": "Accops DaaS enables organizations to provide their end-users with secure office PCs on the cloud without any Capex while reducing the administrative burden on IT teams."
-   },
-   {
-    "fact": "Unlike other DaaS providers, Accops offers an enterprise-ready remote work infrastructure with integrated ZTNA, biometric-based MFA, productivity monitoring, endpoint compliance checks, and data protection capabilities.",
-    "quote": "Unlike other DaaS providers, Accops offers an enterprise-ready remote work infrastructure with integrated ZTNA, biometric-based MFA, productivity monitoring, endpoint compliance checks, and data protection capabilities."
-   },
-   {
     "fact": "Also, it can be seamlessly integrated with Linux-based thin clients and zero clients provided by Accops, reducing TCO by 40% compared to desktops.",
     "quote": "Also, it can be seamlessly integrated with Linux-based thin clients and zero clients provided by Accops, reducing TCO by 40% compared to desktops."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops BioAuth helps businesses prevent authentication-related attacks?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2022-04-01",
   "lastmod": "2026-06-15",
@@ -3509,29 +3069,11 @@
     "quote": "Accops Systems, an Indian-origin global provider of integrated remote access products and solutions, received the ‘Future Security Leaders Award 2022’ in the category of ‘Cohesive Security’ at GCC Security Symposium & CISO Awards 2022 held in Dubai on May 17 th."
    },
    {
-    "fact": "The award acknowledges Accops’ outstanding contribution towards cybersecurity and secure remote access.",
-    "quote": "The award acknowledges Accops’ outstanding contribution towards cybersecurity and secure remote access."
-   },
-   {
-    "fact": "This award recognizes our constant efforts in enabling compliant enterprise mobility,” said Mr.",
-    "quote": "This award recognizes our constant efforts in enabling compliant enterprise mobility,” said Mr."
-   },
-   {
-    "fact": "About GCC Security Symposium & CISO Awards",
-    "quote": "About GCC Security Symposium & CISO Awards"
-   },
-   {
-    "fact": "GCC Security Symposium & CISO Awards is an annual event organized by the Global CISO Forum, an international outfit that unites security leaders from all over the world and acknowledges their contributions to cybersecurity, accelerating the adoption of security best practices.",
-    "quote": "GCC Security Symposium & CISO Awards is an annual event organized by the Global CISO Forum, an international outfit that unites security leaders from all over the world and acknowledges their contributions to cybersecurity, accelerating the adoption of security best practices."
-   },
-   {
-    "fact": "Using the Accops Digital Workspace suite, organizations can deliver all types of business applications to their roaming and remote users, be it employees, contractors, field teams or C-level executives.",
-    "quote": "Using the Accops Digital Workspace suite, organizations can deliver all types of business applications to their roaming and remote users, be it employees, contractors, field teams or C-level executives."
+    "fact": "The end-to-end integrated and simplified offering from Accops helps organizations adopt a work-from-anywhere model swiftly without the hassle of managing multiple-point products while reducing TCO by 40% and decreasing support time by 4X.",
+    "quote": "The end-to-end integrated and simplified offering from Accops helps organizations adopt a work-from-anywhere model swiftly without the hassle of managing multiple-point products while reducing TCO by 40% and decreasing support time by 4X."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops wins Future Security Leaders Award in Dubai for its secure Digital Workspace solution?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2022-05-19",
   "lastmod": "2026-06-15",
@@ -3558,24 +3100,12 @@
     "quote": "Veronica Martin caught up with Harish Menon, CEO at Accops to discuss GITEX 2022 and the company’s plans for the region."
    },
    {
-    "fact": "I am absolutely thrilled to be a part of GITEX and showcase our solutions to customers, partners, and exhibitors.",
-    "quote": "I am absolutely thrilled to be a part of GITEX and showcase our solutions to customers, partners, and exhibitors."
-   },
-   {
     "fact": "In the last 12 months, how has your company performed in the MENA market?",
     "quote": "In the last 12 months, how has your company performed in the MENA market?"
    },
    {
     "fact": "We have seen a healthy double-digit growth over the last 8 quarters in MENA with many marquee wins in Government, Semi Government and Enterprise cutting across Industry verticals.",
     "quote": "We have seen a healthy double-digit growth over the last 8 quarters in MENA with many marquee wins in Government, Semi Government and Enterprise cutting across Industry verticals."
-   },
-   {
-    "fact": "Today users are coming from different locations, users who are not limited to employees but extend to partners, vendors, customers.",
-    "quote": "Today users are coming from different locations, users who are not limited to employees but extend to partners, vendors, customers."
-   },
-   {
-    "fact": "Our digital workspace suite helps customers work with less vendors, improve operational efficiency and user experience.",
-    "quote": "Our digital workspace suite helps customers work with less vendors, improve operational efficiency and user experience."
    }
   ],
   "questions_answered": [
@@ -3613,22 +3143,6 @@
   "summary": "TechnoBind, a specialist distributor for data and associated domains, today announced their partnership with Accops Systems, a leader in Digital Workspace technologies in India delivering secure remote access solutions to help businesses build a future-ready hybrid work infrastructure. This is the newest addition to TechnoBind’s alliances adding to their stack of technologies helping customers est",
   "facts": [
    {
-    "fact": "This is the newest addition to TechnoBind’s alliances adding to their stack of technologies helping customers establish a secure and compliant Digital Workspace.",
-    "quote": "This is the newest addition to TechnoBind’s alliances adding to their stack of technologies helping customers establish a secure and compliant Digital Workspace."
-   },
-   {
-    "fact": "“Our partnership with Accops strengthens our offerings for customers who are looking to adapt to the new normal of hybrid work model with distributed workforces.",
-    "quote": "“Our partnership with Accops strengthens our offerings for customers who are looking to adapt to the new normal of hybrid work model with distributed workforces."
-   },
-   {
-    "fact": "At Technobind, our focus on the stack approach for the partners has helped them play a significantly bigger role at their customers’ end and Accops, we are confident will only strengthen the same,” comments Prashanth GJ, CEO at TechnoBind Solutions.",
-    "quote": "At Technobind, our focus on the stack approach for the partners has helped them play a significantly bigger role at their customers’ end and Accops, we are confident will only strengthen the same,” comments Prashanth GJ, CEO at TechnoBind Solutions."
-   },
-   {
-    "fact": "On the other hand, Accops has always strived to offer unmatched experience to customers with a secure and integrated technology stack assuring agility, flexibility and faster ROI.",
-    "quote": "On the other hand, Accops has always strived to offer unmatched experience to customers with a secure and integrated technology stack assuring agility, flexibility and faster ROI."
-   },
-   {
     "fact": "Accops today boasts a significant presence in over 10 countries, serving more than 700 enterprise customers, across multiple critical verticals such as BFSI, Government & PSUs, Healthcare, Pharma, Education, Manufacturing, and IT/ITes, among others.",
     "quote": "Accops today boasts a significant presence in over 10 countries, serving more than 700 enterprise customers, across multiple critical verticals such as BFSI, Government & PSUs, Healthcare, Pharma, Education, Manufacturing, and IT/ITes, among others."
    },
@@ -3637,9 +3151,7 @@
     "quote": "Accops was established in Oct 2012 and is headquartered in Pune, India."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about TechnoBind Partners with Digital Workspace Leader Accops?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2022-10-27",
   "lastmod": "2026-06-10",
@@ -3673,23 +3185,9 @@
    {
     "fact": "Starting off the next decade of journey towards newer heights, we thank all our 250+ partners spread across the globe and promise the same level of commitment and support that we have always extended to, what we consider as, our extended families.",
     "quote": "Starting off the next decade of journey towards newer heights, we thank all our 250+ partners spread across the globe and promise the same level of commitment and support that we have always extended to, what we consider as, our extended families."
-   },
-   {
-    "fact": "Together, we intend to help our customers securely “Access” their “Operations” from anywhere, using any device, making the workspace more secure in the face of evolving cyber threats.",
-    "quote": "Together, we intend to help our customers securely “Access” their “Operations” from anywhere, using any device, making the workspace more secure in the face of evolving cyber threats."
-   },
-   {
-    "fact": "The winners of Accops Partner Awards 2022",
-    "quote": "The winners of Accops Partner Awards 2022"
-   },
-   {
-    "fact": "Government & PSU Partner of the Year Award",
-    "quote": "Government & PSU Partner of the Year Award"
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops Celebrates its Partners’ Achievements at UTSAH 2022?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2022-11-02",
   "lastmod": "2026-06-10",
@@ -3717,35 +3215,8 @@
    "Education"
   ],
   "summary": "PUNE, India, Dec. 21, 2022 /PRNewswire/ — Accops, an Indian-origin provider of remote access products and solutions, has joined hands with Centre for Development of Advanced Computing (C-DAC), a premier R&D organization under Ministry of Electronics & Information Technology, Govt.",
-  "facts": [
-   {
-    "fact": "The state-of-the-art solution enables enterprises and government organizations to create a trusted work environment on demand and empower users of critical applications to be securely productive from wherever they are.",
-    "quote": "The state-of-the-art solution enables enterprises and government organizations to create a trusted work environment on demand and empower users of critical applications to be securely productive from wherever they are."
-   },
-   {
-    "fact": "Backed by another patented technology for face liveness detection, Accops BioAuth can identify if the user sitting in front of the device is a living person or is a static photo, recorded video or another user with face mask.",
-    "quote": "Backed by another patented technology for face liveness detection, Accops BioAuth can identify if the user sitting in front of the device is a living person or is a static photo, recorded video or another user with face mask."
-   },
-   {
-    "fact": "“A robust user authentication mechanism is the need of the hour to boost cybersecurity and ensures strict compliance with regulatory guidelines.",
-    "quote": "“A robust user authentication mechanism is the need of the hour to boost cybersecurity and ensures strict compliance with regulatory guidelines."
-   },
-   {
-    "fact": "C-DAC aims to market these technologies and products so that it can be beneficial to organizations and society.",
-    "quote": "C-DAC aims to market these technologies and products so that it can be beneficial to organizations and society."
-   },
-   {
-    "fact": "Users of critical data and applications are generally aware of the compliance requirements and the need for such monitoring in case they need to work from home.",
-    "quote": "Users of critical data and applications are generally aware of the compliance requirements and the need for such monitoring in case they need to work from home."
-   },
-   {
-    "fact": "With the spike in the number of cyberattacks over the past year, especially credential thefts, organizations today need a robust password-less authentication mechanism, underlining need for the facial authentication solution.",
-    "quote": "With the spike in the number of cyberattacks over the past year, especially credential thefts, organizations today need a robust password-less authentication mechanism, underlining need for the facial authentication solution."
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Accops partners with C-DAC to provide a modern facial auth solution for global companies?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": "2022-12-21",
   "lastmod": "2026-06-09",
@@ -3775,10 +3246,6 @@
   "summary": "PUNE, India, Jan. 6, 2023 /PRNewswire/ — Savex Technologies, the third largest information and communication technology distributor in India, announced that it is teaming up with Accops, an Indian origin provider of remote access solutions, offering partners and their customers a better choice for building a secure digital workspace for sustainable growth.",
   "facts": [
    {
-    "fact": "Accops is a digital workspace and converged identity & access management product company that helps organizations build or access on demand work-from-anywhere technology infrastructure.",
-    "quote": "Accops is a digital workspace and converged identity & access management product company that helps organizations build or access on demand work-from-anywhere technology infrastructure."
-   },
-   {
     "fact": "Headquartered in Pune, India, Accops currently has a significant presence in over 10 countries, serving over 750 clients across multiple critical verticals, like BFSI, Healthcare, Pharma, Government, IT/ITes, Education and Defence.",
     "quote": "Headquartered in Pune, India, Accops currently has a significant presence in over 10 countries, serving over 750 clients across multiple critical verticals, like BFSI, Healthcare, Pharma, Government, IT/ITes, Education and Defence."
    },
@@ -3787,21 +3254,19 @@
     "quote": "Accops is the only made-in-India ‘ Digital Workspace ‘ provider with over 500 clients in Indian subcontinent."
    },
    {
-    "fact": "We are confident that this Make-in-India advantage, our product portfolio and credibility will not only help grow business for both organizations but also give a richer experience to the channel community who are looking for options,” said Harish Menon, CEO, Accops.",
-    "quote": "We are confident that this Make-in-India advantage, our product portfolio and credibility will not only help grow business for both organizations but also give a richer experience to the channel community who are looking for options,” said Harish Menon, CEO, Accops."
-   },
-   {
     "fact": "Established in 1986 and continuously evolving since then, Savex is one of the largest Information and Communication Technology distributor in India.",
     "quote": "Established in 1986 and continuously evolving since then, Savex is one of the largest Information and Communication Technology distributor in India."
    },
    {
     "fact": "Headquartered in Mumbai, the company is having 39 sales offices, and 42 stock locations, a sales force of over 600 and 10000+ partners in 700 cities.",
     "quote": "Headquartered in Mumbai, the company is having 39 sales offices, and 42 stock locations, a sales force of over 600 and 10000+ partners in 700 cities."
+   },
+   {
+    "fact": "Savex also has a network of over 200,000 engineers as part of our extended team.",
+    "quote": "Savex also has a network of over 200,000 engineers as part of our extended team."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Savex teams up with Accops to deliver channels, customers better remote access solutions?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Facebook",
    "url": "https://www.facebook.com/savextechnologies"
@@ -3832,28 +3297,8 @@
   "summary": "Vijender Yadav, Co-founder, MD and CTO at Accops discusses how their solutions enhance security, simplify management and improve scalability What are the solutions offered by Accops to secure remote/hybrid workforce? At Accops, we understand the unique challenges presented by today’s remote and hybrid workforce.",
   "facts": [
    {
-    "fact": "This suite not only caters to various users, devices, and access profiles but also enables organizations to operate seamlessly across borders.",
-    "quote": "This suite not only caters to various users, devices, and access profiles but also enables organizations to operate seamlessly across borders."
-   },
-   {
-    "fact": "In essence, Accops is not just about securing the remote workforce; we empower it, enabling businesses to adeptly handle the complexities of remote work without sacrificing security, compliance, or productivity.",
-    "quote": "In essence, Accops is not just about securing the remote workforce; we empower it, enabling businesses to adeptly handle the complexities of remote work without sacrificing security, compliance, or productivity."
-   },
-   {
     "fact": "Since 2012, we’ve pioneered the shift from broad Layer-3 VPNs to precise Layer-4/7 application tunnel-based access, enhancing security in vendor access and BYOD scenarios.",
     "quote": "Since 2012, we’ve pioneered the shift from broad Layer-3 VPNs to precise Layer-4/7 application tunnel-based access, enhancing security in vendor access and BYOD scenarios."
-   },
-   {
-    "fact": "Our solution, known for its robust device binding and compliance checks, has led many organizations to migrate from traditional VPNs to our more efficient solution.",
-    "quote": "Our solution, known for its robust device binding and compliance checks, has led many organizations to migrate from traditional VPNs to our more efficient solution."
-   },
-   {
-    "fact": "Our end-user computing virtualization solution enables seamless delivery of applications and desktop environments to any device, effectively isolating business applications from endpoints.",
-    "quote": "Our end-user computing virtualization solution enables seamless delivery of applications and desktop environments to any device, effectively isolating business applications from endpoints."
-   },
-   {
-    "fact": "HySecure stands out for its ability to provide a seamless and secure user experience, enabling organizations to manage remote access efficiently while adhering to stringent compliance and security standards.",
-    "quote": "HySecure stands out for its ability to provide a seamless and secure user experience, enabling organizations to manage remote access efficiently while adhering to stringent compliance and security standards."
    }
   ],
   "questions_answered": [
@@ -3896,29 +3341,11 @@
     "quote": "Pune/Bengaluru, 27th November 2023: In a strategic move that signals a major shift in cybersecurity paradigms, Accops, a leader in secure remote access and digital workspace solutions, has joined forces with QNu Labs, innovators in quantum-safe cryptography."
    },
    {
-    "fact": "This initiative is pivotal for organizations seeking to navigate the complexities of a quantum computing world.",
-    "quote": "This initiative is pivotal for organizations seeking to navigate the complexities of a quantum computing world."
-   },
-   {
-    "fact": "Sunil Gupta, Co-Founder and CEO of QNu Labs shared his insights,” Risk to today’s encryption from quantum computers is globally recognized and proactive actions are being taken by enterprises to mitigate the risk.",
-    "quote": "Sunil Gupta, Co-Founder and CEO of QNu Labs shared his insights,” Risk to today’s encryption from quantum computers is globally recognized and proactive actions are being taken by enterprises to mitigate the risk."
-   },
-   {
-    "fact": "Using the Accops Digital Workspace suite, organizations can deliver any type of business application to their workforce and vendors, offering them the freedom to work from anywhere, anytime, using their favourite devices.",
-    "quote": "Using the Accops Digital Workspace suite, organizations can deliver any type of business application to their workforce and vendors, offering them the freedom to work from anywhere, anytime, using their favourite devices."
-   },
-   {
     "fact": "Headquartered in Pune, India, Accops currently has a significant presence in over 10 countries, serving over 800 clients across multiple critical verticals, like BFSI, Healthcare, Pharma, Government, IT/ITes, Education and Defence, etc.",
     "quote": "Headquartered in Pune, India, Accops currently has a significant presence in over 10 countries, serving over 800 clients across multiple critical verticals, like BFSI, Healthcare, Pharma, Government, IT/ITes, Education and Defence, etc."
-   },
-   {
-    "fact": "QNu Labs has also developed an ecosystem of partners with capabilities to carry out R&D, manufacturing, testing and certifications for the new and emerging quantum technology.",
-    "quote": "QNu Labs has also developed an ecosystem of partners with capabilities to carry out R&D, manufacturing, testing and certifications for the new and emerging quantum technology."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops & QNu Labs Unite to Harness Quantum Advancements for Enhanced Cybersecurity?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2023-11-27",
   "lastmod": "2026-06-09",
@@ -3948,29 +3375,27 @@
     "quote": "PUNE, India, March 29, 2023 /PRNewswire/ – Accops, a leading product company in the end-user computing virtualization segment in the APAC region, has been named a Representative Vendor in the Gartner Market Guide for Desktop as a Service (DaaS) for the year 2023."
    },
    {
-    "fact": "Accops offers a fully managed, turnkey DaaS solution that enables organizations to provide their end-users with secure office PCs on the cloud.",
-    "quote": "Accops offers a fully managed, turnkey DaaS solution that enables organizations to provide their end-users with secure office PCs on the cloud."
-   },
-   {
-    "fact": "Unlike other DaaS providers, Accops delivers an enterprise-ready remote work infrastructure with integrated ZTNA, MFA, SSO, productivity monitoring, endpoint compliance checks, and advanced data protection capabilities.",
-    "quote": "Unlike other DaaS providers, Accops delivers an enterprise-ready remote work infrastructure with integrated ZTNA, MFA, SSO, productivity monitoring, endpoint compliance checks, and advanced data protection capabilities."
-   },
-   {
     "fact": "“We are excited to be recognized in this Gartner Market Guide for DaaS,” said Harish Menon, CEO of Accops.",
     "quote": "“We are excited to be recognized in this Gartner Market Guide for DaaS,” said Harish Menon, CEO of Accops."
    },
    {
-    "fact": "He further said, “To us, such recognitions not only reflect our expanding market share in the digital workspace and endpoint transformation business, but also confirm that our clients worldwide are receiving exceptional value and experience from their investments in Accops.”",
-    "quote": "He further said, “To us, such recognitions not only reflect our expanding market share in the digital workspace and endpoint transformation business, but also confirm that our clients worldwide are receiving exceptional value and experience from their investments in Accops.”"
-   },
-   {
     "fact": "According to the Gartner Market Guide, investment in DaaS is rising as clients seek to provide secure solutions that are less prone to cyberthreats.",
     "quote": "According to the Gartner Market Guide, investment in DaaS is rising as clients seek to provide secure solutions that are less prone to cyberthreats."
+   },
+   {
+    "fact": "Fifty-five percent of clients told Gartner that they plan to increase spending in DaaS through 2024.",
+    "quote": "Fifty-five percent of clients told Gartner that they plan to increase spending in DaaS through 2024."
+   },
+   {
+    "fact": "The DaaS market is forecast to grow through 2026, but at significantly lower rates.",
+    "quote": "The DaaS market is forecast to grow through 2026, but at significantly lower rates."
+   },
+   {
+    "fact": "The compound annual growth rate (CAGR) from 2022 to 2026 is forecast to be approximately 14%, compared with a CAGR of 59% between 2019 and 2022.",
+    "quote": "The compound annual growth rate (CAGR) from 2022 to 2026 is forecast to be approximately 14%, compared with a CAGR of 59% between 2019 and 2022."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops recognized in the 2023 Gartner® Market Guide for Desktop as a Service?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2023-03-29",
   "lastmod": "2026-06-09",
@@ -3996,21 +3421,11 @@
   "summary": "Digital workplace provider Accops adds its facial and fingerprint biometric authentication MFA system into its Desktop as a Service (DaaS) business to protect its clients from security breaches and vulnerabilities. The Pune, India-based company says its BioAuth solution authenticates users with facial recognition via laptop, PC, and tablet cameras to compare a scan to a registered face template in",
   "facts": [
    {
-    "fact": "The Pune, India-based company says its BioAuth solution authenticates users with facial recognition via laptop, PC, and tablet cameras to compare a scan to a registered face template in Accops’ database.",
-    "quote": "The Pune, India-based company says its BioAuth solution authenticates users with facial recognition via laptop, PC, and tablet cameras to compare a scan to a registered face template in Accops’ database."
-   },
-   {
     "fact": "BioAuth complies with data security regulatory bodies like the GDPR, GLBA, and SEBI as well, Accops says.",
     "quote": "BioAuth complies with data security regulatory bodies like the GDPR, GLBA, and SEBI as well, Accops says."
-   },
-   {
-    "fact": "“Ensuring security across digital workspace with a geographically distributed workforce is a major challenge for organizations today.",
-    "quote": "“Ensuring security across digital workspace with a geographically distributed workforce is a major challenge for organizations today."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops launches biometric authentication for virtual desktop users?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2022-04-01",
   "lastmod": "2026-06-01",
@@ -4038,24 +3453,12 @@
     "quote": "Veronica Martin caught up with Harish Menon, CEO at Accops to discuss GITEX 2022 and the company’s plans for the region."
    },
    {
-    "fact": "I am absolutely thrilled to be a part of GITEX and showcase our solutions to customers, partners, and exhibitors.",
-    "quote": "I am absolutely thrilled to be a part of GITEX and showcase our solutions to customers, partners, and exhibitors."
-   },
-   {
     "fact": "In the last 12 months, how has your company performed in the MENA market?",
     "quote": "In the last 12 months, how has your company performed in the MENA market?"
    },
    {
     "fact": "We have seen a healthy double-digit growth over the last 8 quarters in MENA with many marquee wins in Government, Semi Government and Enterprise cutting across Industry verticals.",
     "quote": "We have seen a healthy double-digit growth over the last 8 quarters in MENA with many marquee wins in Government, Semi Government and Enterprise cutting across Industry verticals."
-   },
-   {
-    "fact": "Today users are coming from different locations, users who are not limited to employees but extend to partners, vendors, customers.",
-    "quote": "Today users are coming from different locations, users who are not limited to employees but extend to partners, vendors, customers."
-   },
-   {
-    "fact": "Our digital workspace suite helps customers work with less vendors, improve operational efficiency and user experience.",
-    "quote": "Our digital workspace suite helps customers work with less vendors, improve operational efficiency and user experience."
    }
   ],
   "questions_answered": [
@@ -4078,15 +3481,8 @@
   "products": [],
   "industries": [],
   "summary": "The best part is solving complex problems that others can’t tackle. Each day brings new challenges, and the satisfaction comes from understanding issues, developing effective solutions, and communicating them clearly.",
-  "facts": [
-   {
-    "fact": "Source: Financial Express, 27 January 2025",
-    "quote": "Source: Financial Express, 27 January 2025"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about AFTER HOURS?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-01-29",
   "lastmod": "2026-05-21",
@@ -4108,15 +3504,8 @@
    "Government"
   ],
   "summary": "In this new reality, an employee’s password—even when paired with a simple OTP—is no longer a robust defence; it is a liability waiting to be exploited through sophisticated phishing or social engineering. The most significant security incidents within a financial institution rarely begin with a blaring siren.",
-  "facts": [
-   {
-    "fact": "Beyond compliance: The mandate for zero trust",
-    "quote": "Beyond compliance: The mandate for zero trust"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Moving beyond OTPs?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-06-11",
   "lastmod": "2026-05-21",
@@ -4145,33 +3534,27 @@
   "summary": "New alliance aims to deliver secure digital workspace solutions for a hybrid-first future Pune/Dubai: Accops, a leading provider of secure digital workspace technologies, today announced a strategic partnership with FVC, a prominent value-added distributor in the Middle East and Africa. The partnership aims to empower regional enterprises with secure, seamless access to business applications—enabl",
   "facts": [
    {
-    "fact": "Authentication (MFA), Endpoint hardware and Unified Endpoint Management systems,enabling organisations to ensure business continuity, security, and workforce agility—regardless of where their teams or applications reside.",
-    "quote": "Authentication (MFA), Endpoint hardware and Unified Endpoint Management systems,enabling organisations to ensure business continuity, security, and workforce agility—regardless of where their teams or applications reside."
-   },
-   {
-    "fact": "Accops addresses this need by simplifying remote access architectures while ensuring strict compliance with data protection, sovereignty, and auditability mandates.",
-    "quote": "Accops addresses this need by simplifying remote access architectures while ensuring strict compliance with data protection, sovereignty, and auditability mandates."
-   },
-   {
-    "fact": "By consolidating access management, endpoint security, and virtual workspaces into a single platform, Accops enables organisations to:",
-    "quote": "By consolidating access management, endpoint security, and virtual workspaces into a single platform, Accops enables organisations to:"
-   },
-   {
-    "fact": "needs of our customers across the Middle East.”",
-    "quote": "needs of our customers across the Middle East.”"
-   },
-   {
-    "fact": "Accops empowers organisations to thrive in the work-from-anywhere era with its secure and agile digital workspace solutions.",
-    "quote": "Accops empowers organisations to thrive in the work-from-anywhere era with its secure and agile digital workspace solutions."
-   },
-   {
     "fact": "Founded in 2012 to democratise remote access technologies, Accops is recognised in the Gartner Magic Quadrant for Desktop as a Service (DaaS) and rated a “Customers’ Choice” for DaaS and Access Management by Gartner Peer Insights.",
     "quote": "Founded in 2012 to democratise remote access technologies, Accops is recognised in the Gartner Magic Quadrant for Desktop as a Service (DaaS) and rated a “Customers’ Choice” for DaaS and Access Management by Gartner Peer Insights."
+   },
+   {
+    "fact": "Today, over 950 organisations across 10 countries trust Accops.",
+    "quote": "Today, over 950 organisations across 10 countries trust Accops."
+   },
+   {
+    "fact": "Winner of the Security Product Company of the Year at the DSCI Excellence Awards 2024, Accops is a cybersecurity partner of choice for banks, governments, and large enterprises.",
+    "quote": "Winner of the Security Product Company of the Year at the DSCI Excellence Awards 2024, Accops is a cybersecurity partner of choice for banks, governments, and large enterprises."
+   },
+   {
+    "fact": "Established in 2000, FVC offers expertise in unified communications, collaboration, audio-visual, and cybersecurity solutions.",
+    "quote": "Established in 2000, FVC offers expertise in unified communications, collaboration, audio-visual, and cybersecurity solutions."
+   },
+   {
+    "fact": "With a team of over 150 professionals and partnerships with more than 40 global vendors,FVC operates in over 50 countries, supporting a network of 4,000+ channel partners.",
+    "quote": "With a team of over 150 professionals and partnerships with more than 40 global vendors,FVC operates in over 50 countries, supporting a network of 4,000+ channel partners."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops Strengthens Middle East Presence through Strategic Partnership with FVC?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2025-04-18",
   "lastmod": "2025-04-18",
@@ -4207,23 +3590,9 @@
    {
     "fact": "Mohan Bhat, Co-founder and MD, who was instrumental in accelerating the company growth 3x, will now step into a new role as Chief Strategy Officer (CSO), focusing on customer success.",
     "quote": "Mohan Bhat, Co-founder and MD, who was instrumental in accelerating the company growth 3x, will now step into a new role as Chief Strategy Officer (CSO), focusing on customer success."
-   },
-   {
-    "fact": "“We are striving to deliver more success to our customers with support of our channel partners.",
-    "quote": "“We are striving to deliver more success to our customers with support of our channel partners."
-   },
-   {
-    "fact": "With Harish’s decades of experience, customers and partners can expect better engagement and multi-fold increase in value delivered by Accops,” said Bhat.",
-    "quote": "With Harish’s decades of experience, customers and partners can expect better engagement and multi-fold increase in value delivered by Accops,” said Bhat."
-   },
-   {
-    "fact": "“Innovation at Accops is to meet the unsaid, unarticulated needs of clients who choose our solutions for not only transforming their employee experience but also to ensure business operations are streamlined and stay compliant with regulatory frameworks.",
-    "quote": "“Innovation at Accops is to meet the unsaid, unarticulated needs of clients who choose our solutions for not only transforming their employee experience but also to ensure business operations are streamlined and stay compliant with regulatory frameworks."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Accops appoints Harish Menon as the Chief Executive Officer?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": "2022-07-07",
   "lastmod": "2022-07-07",
@@ -5579,9 +4948,7 @@
   "industries": [],
   "summary": "Explore Accops' on-demand webinars to gain valuable insights into cutting-edge secure access solutions and the latest innovations in remote work technology.",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about On Demand TechTalks?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": null,
   "lastmod": "2026-10-15",
@@ -5599,9 +4966,7 @@
   "industries": [],
   "summary": "Guarding the Gate: Modernising Identity and Access for High Velocity Threat Environment",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Guarding the Gate?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://www.youtube.com/embed/j7VsqCpdd4I?rel=0"
@@ -5622,9 +4987,7 @@
   "industries": [],
   "summary": "Navigating the Uncertainty: A Zero Trust Blueprint for Secure Remote Work with Accops",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Navigating the Uncertainty?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://www.youtube.com/embed/bhFpUQncfn8?rel=0"
@@ -5647,9 +5010,7 @@
   ],
   "summary": "Unlocking Secure Digital Workspaces for Government, PSU & Defense with Accops",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Unlocking Secure Digital Workspaces for Government, PSU & Defense with Accops?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://www.youtube.com/embed/2WMZcdNEITk?rel=0"
@@ -5668,11 +5029,9 @@
   "page_type": "resource",
   "products": [],
   "industries": [],
-  "summary": "",
+  "summary": "Meeting Global Data Standards in IT Outsourcing with Accops",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Meeting Global Data Standards in IT Outsourcing with Accops?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://www.youtube.com/embed/8DsYNGuo8-U?rel=0"
@@ -5695,11 +5054,9 @@
   "industries": [
    "BFSI"
   ],
-  "summary": "",
+  "summary": "Secure Digital Workspace for Next-Gen Banking",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Secure Digital Workspace for Next-Gen Banking?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://www.youtube.com/embed/rVTH-IBV78E?rel=0"
@@ -5720,9 +5077,7 @@
   "industries": [],
   "summary": "The Hybrid Workspace Illusion: The blueprint for unified secure access",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about The Hybrid Workspace Illusion?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://www.youtube.com/embed/TQk917LgsE8?rel=0"
@@ -5741,11 +5096,9 @@
   "page_type": "resource",
   "products": [],
   "industries": [],
-  "summary": "",
+  "summary": "The Invisible Hands: Securing Third Party Vendor Access",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about The Invisible Hands?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/1104074364"
@@ -5766,16 +5119,9 @@
    "VDI"
   ],
   "industries": [],
-  "summary": "",
-  "facts": [
-   {
-    "fact": "Windows 10 EOL: Why VDI Delivers Superior TCO & ROI",
-    "quote": "Windows 10 EOL: Why VDI Delivers Superior TCO & ROI"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Windows 10 EOL?"
-  ],
+  "summary": "Windows 10 EOL: Why VDI Delivers Superior TCO & ROI",
+  "facts": [],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/1101516196"
@@ -5796,11 +5142,9 @@
    "VDI"
   ],
   "industries": [],
-  "summary": "",
+  "summary": "Expand your horizon,switch to Next-Gen VDI",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Expand your horizon,switch to Next-Gen VDI?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/923695106"
@@ -5821,9 +5165,7 @@
   "industries": [],
   "summary": "Revolutionizing Remote Access for Secure and Efficient Digital Workspaces",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Revolutionizing Remote Access for Secure and Efficient Digital Workspaces?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/889820361"
@@ -5844,11 +5186,9 @@
    "MFA"
   ],
   "industries": [],
-  "summary": "",
+  "summary": "Facial Auth-based MFA for Compliance",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Facial Auth-based MFA for Compliance?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/875883478"
@@ -5869,11 +5209,9 @@
   "industries": [
    "Education"
   ],
-  "summary": "",
+  "summary": "Transforming Education with Virtual ICT Labs",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Transforming Education with Virtual ICT Labs?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/860133573"
@@ -5892,11 +5230,9 @@
   "page_type": "resource",
   "products": [],
   "industries": [],
-  "summary": "",
+  "summary": "Virtualized Internet Access with Airgap",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Virtualized Internet Access with Airgap?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/849450482"
@@ -5917,11 +5253,9 @@
    "VDI"
   ],
   "industries": [],
-  "summary": "",
+  "summary": "The Future of Access: Rethinking Security Beyond VDI",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about The Future of Access?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/845846818"
@@ -5942,11 +5276,9 @@
    "DaaS"
   ],
   "industries": [],
-  "summary": "",
+  "summary": "Choosing your cloud for DaaS: Azure vs AWS vs GCP vs OCI",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Choosing your cloud for DaaS?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/845842407"
@@ -5967,11 +5299,9 @@
    "ZTNA"
   ],
   "industries": [],
-  "summary": "",
+  "summary": "Deliver Any Application via ZTNA Gateway",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Deliver Any Application via ZTNA Gateway?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/845824562"
@@ -5992,11 +5322,9 @@
    "MFA"
   ],
   "industries": [],
-  "summary": "",
+  "summary": "Secure your legacy apps with adaptive MFA",
   "facts": [],
-  "questions_answered": [
-   "What does Accops say about Secure your legacy apps with adaptive MFA?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/845822668"
@@ -6023,27 +5351,8 @@
    "BFSI"
   ],
   "summary": "Learn how Accops helps you in tackling critical IT and security challenges Cloud Hosted Virtual Desktops, popularly known as Desktop-as-a-Service or DaaS, bring along some unique business benefits and value additions for BFSI organizations when compared with on-premise deployments. Facial recognition-based biometric authentication is the closest to a foolproof authentication mechanism we have toda",
-  "facts": [
-   {
-    "fact": "Cloud Hosted Virtual Desktops, popularly known as Desktop-as-a-Service or DaaS, bring along some unique business benefits and value additions for BFSI organizations when compared with on-premise deployments.",
-    "quote": "Cloud Hosted Virtual Desktops, popularly known as Desktop-as-a-Service or DaaS, bring along some unique business benefits and value additions for BFSI organizations when compared with on-premise deployments."
-   },
-   {
-    "fact": "Facial recognition-based biometric authentication is the closest to a foolproof authentication mechanism we have today.",
-    "quote": "Facial recognition-based biometric authentication is the closest to a foolproof authentication mechanism we have today."
-   },
-   {
-    "fact": "Remote Browser Isolation: A modern approach to mitigate the modern cyberthreats",
-    "quote": "Remote Browser Isolation: A modern approach to mitigate the modern cyberthreats"
-   },
-   {
-    "fact": "Internet Isolation is one such best protection mechanism which mitigates ransomware, zero-day attacks as well as polymorphic malware.",
-    "quote": "Internet Isolation is one such best protection mechanism which mitigates ransomware, zero-day attacks as well as polymorphic malware."
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about eBooks?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": null,
   "lastmod": "2026-10-15",
@@ -7976,36 +7285,9 @@
    "Government",
    "Pharma / Healthcare"
   ],
-  "summary": "",
-  "facts": [
-   {
-    "fact": "Sales Acceleration Partner of the Year Award",
-    "quote": "Sales Acceleration Partner of the Year Award"
-   },
-   {
-    "fact": "Best Customer Experience of the Year Award",
-    "quote": "Best Customer Experience of the Year Award"
-   },
-   {
-    "fact": "Industry Expert of the Year Award - Government",
-    "quote": "Industry Expert of the Year Award - Government"
-   },
-   {
-    "fact": "Industry Expert of the Year Award - Pharma",
-    "quote": "Industry Expert of the Year Award - Pharma"
-   },
-   {
-    "fact": "Industry Expert of the Year Award - BFSI",
-    "quote": "Industry Expert of the Year Award - BFSI"
-   },
-   {
-    "fact": "Industry Expert of the Year Award - Manufacturing",
-    "quote": "Industry Expert of the Year Award - Manufacturing"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Accops - Partner Awards?"
-  ],
+  "summary": "Accops - Partner Awards",
+  "facts": [],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/634549231?h=bc65d3aca4&badge=0&autopause=0&player_id=0&app_id=58479"
@@ -8029,21 +7311,11 @@
   "summary": "Nanjgel Solutions is a leading Systems Integrator that provides next-generation innovative solutions & services to help organizations gain complete VISIBILITY-CONTROL-MANAGEMENT and to help them secure tomorrow's threats today. Nanjgel has a very strong portfolio of security products, providing innovative solutions to a large base of enterprises, government and other critical organizations in Indi",
   "facts": [
    {
-    "fact": "Nanjgel Solutions is a leading Systems Integrator that provides next-generation innovative solutions & services to help organizations gain complete VISIBILITY-CONTROL-MANAGEMENT and to help them secure tomorrow's threats today.",
-    "quote": "Nanjgel Solutions is a leading Systems Integrator that provides next-generation innovative solutions & services to help organizations gain complete VISIBILITY-CONTROL-MANAGEMENT and to help them secure tomorrow's threats today."
-   },
-   {
-    "fact": "Nanjgel has a very strong portfolio of security products, providing innovative solutions to a large base of enterprises, government and other critical organizations in India and Middle East.",
-    "quote": "Nanjgel has a very strong portfolio of security products, providing innovative solutions to a large base of enterprises, government and other critical organizations in India and Middle East."
-   },
-   {
     "fact": "Nanjgel did a wonderful job supporting the joint customers during the Covid-19 pandemic and making sure that they could continue their businesses.",
     "quote": "Nanjgel did a wonderful job supporting the joint customers during the Covid-19 pandemic and making sure that they could continue their businesses."
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Nanjgel Solutions Pvt Ltd?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/622439922?h=fe0d47dc0f&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
@@ -8063,19 +7335,8 @@
   "products": [],
   "industries": [],
   "summary": "Nanjgel Solutions is a leading Systems Integrator that provides next-generation innovative solutions & services to help organizations gain complete VISIBILITY-CONTROL-MANAGEMENT and to help them secure tomorrow's threats today. The account management team at Nanjgel excelled with their performances during the lockdown days.",
-  "facts": [
-   {
-    "fact": "Nanjgel Solutions is a leading Systems Integrator that provides next-generation innovative solutions & services to help organizations gain complete VISIBILITY-CONTROL-MANAGEMENT and to help them secure tomorrow's threats today.",
-    "quote": "Nanjgel Solutions is a leading Systems Integrator that provides next-generation innovative solutions & services to help organizations gain complete VISIBILITY-CONTROL-MANAGEMENT and to help them secure tomorrow's threats today."
-   },
-   {
-    "fact": "2021 Best Account Management Team of the Year Award",
-    "quote": "2021 Best Account Management Team of the Year Award"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Nanjgel Solutions Pvt Ltd?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": null,
   "lastmod": "2026-10-15",
@@ -8092,23 +7353,8 @@
   "products": [],
   "industries": [],
   "summary": "Technociate has deep expertise in the domains of Linux, Servers, Network Security, Best of Breed Storage, Networking, Virtualization and Backup Solutions. They explore new ways of making technology work for their customers.",
-  "facts": [
-   {
-    "fact": "They explore new ways of making technology work for their customers.",
-    "quote": "They explore new ways of making technology work for their customers."
-   },
-   {
-    "fact": "With highly skilled professionals in emerging technologies as their backbone, they deliver technically sound solutions to their customers.",
-    "quote": "With highly skilled professionals in emerging technologies as their backbone, they deliver technically sound solutions to their customers."
-   },
-   {
-    "fact": "2021 Best Implementation Team of the Year Award",
-    "quote": "2021 Best Implementation Team of the Year Award"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Technociate Solutions Pvt Ltd?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": null,
   "lastmod": "2026-10-15",
@@ -8125,27 +7371,8 @@
   "products": [],
   "industries": [],
   "summary": "Vinca Cybertech focuses on delivering end-to-end cyber security solutions and services. Their main differentiator is their approach as they believe in understanding customer pain points thoroughly and providing them with the right solutions and services.",
-  "facts": [
-   {
-    "fact": "They help their customers build best of breed solutions for their customers which are simple, secure, and scalable.",
-    "quote": "They help their customers build best of breed solutions for their customers which are simple, secure, and scalable."
-   },
-   {
-    "fact": "The support team of Vinca have played an important in the retention of our customers and growth of our business.",
-    "quote": "The support team of Vinca have played an important in the retention of our customers and growth of our business."
-   },
-   {
-    "fact": "Their team never stop with just providing what a customer needs and go that extra mile to ensure that the customers are delighted.",
-    "quote": "Their team never stop with just providing what a customer needs and go that extra mile to ensure that the customers are delighted."
-   },
-   {
-    "fact": "2021 Best Support Team of the Year Award",
-    "quote": "2021 Best Support Team of the Year Award"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Vinca Cybertech Pvt Ltd?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": null,
   "lastmod": "2026-10-15",
@@ -8165,15 +7392,8 @@
    "Manufacturing"
   ],
   "summary": "Crescent Technologies is a dedicated IT company offering a wide range of cutting-edge products, services, and support. They are one of the preferred companies for Systems Integration.",
-  "facts": [
-   {
-    "fact": "2021 Best Cloud Enabler of the Year Award Winner",
-    "quote": "2021 Best Cloud Enabler of the Year Award Winner"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Crescent Technologies?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/623056612?h=3a24935385&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
@@ -8197,35 +7417,8 @@
    "BFSI"
   ],
   "summary": "Ashtech Infotech (India) Pvt. Ltd is a System Integration and Services Organization that believes in delivering unmatched business value to its customers through a combination of Technology Strength, Process Excellence, Quality Frameworks and Service Delivery.",
-  "facts": [
-   {
-    "fact": "Ltd is a System Integration and Services Organization that believes in delivering unmatched business value to its customers through a combination of Technology Strength, Process Excellence, Quality Frameworks and Service Delivery.",
-    "quote": "Ltd is a System Integration and Services Organization that believes in delivering unmatched business value to its customers through a combination of Technology Strength, Process Excellence, Quality Frameworks and Service Delivery."
-   },
-   {
-    "fact": "Ashtech has a lot of expertise in BFSI-specific applications and has managed to develop strong relations with their customers by providing managed services.",
-    "quote": "Ashtech has a lot of expertise in BFSI-specific applications and has managed to develop strong relations with their customers by providing managed services."
-   },
-   {
-    "fact": "Ashtech has succeeded in positioning Accops’ product as a comprehensive alternative to leading VDI providers and helped win the battle against prominent competitions while alleviating the pains faced by customers.",
-    "quote": "Ashtech has succeeded in positioning Accops’ product as a comprehensive alternative to leading VDI providers and helped win the battle against prominent competitions while alleviating the pains faced by customers."
-   },
-   {
-    "fact": "2021 Best Customer Experience of the Year Award Winner",
-    "quote": "2021 Best Customer Experience of the Year Award Winner"
-   },
-   {
-    "fact": "2021 Industry Expert of the Year - BFSI Award Winner",
-    "quote": "2021 Industry Expert of the Year - BFSI Award Winner"
-   },
-   {
-    "fact": "2021 Technology Excellence - VDI Award Winner",
-    "quote": "2021 Technology Excellence - VDI Award Winner"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Ashtech Infotech (India) Pvt Ltd?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/622438339?h=fa20c3c142&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
@@ -8245,23 +7438,8 @@
   "products": [],
   "industries": [],
   "summary": "Team Computers is a bridge between business needs and the world of IT solutions. They are one of the most trusted solution partners.",
-  "facts": [
-   {
-    "fact": "Their teams have exhibited a very sharp understanding of Accops’ core technologies and offerings, and have generated a highly positive response from customers.",
-    "quote": "Their teams have exhibited a very sharp understanding of Accops’ core technologies and offerings, and have generated a highly positive response from customers."
-   },
-   {
-    "fact": "2021 Commercial Partner of the Year Award Winner",
-    "quote": "2021 Commercial Partner of the Year Award Winner"
-   },
-   {
-    "fact": "2021 Industry Expert of the Year - IT-ITes Award Winner",
-    "quote": "2021 Industry Expert of the Year - IT-ITes Award Winner"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Team Computers Pvt Ltd?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/622302192?h=8336221cb8&badge=0&autopause=0&player_id=0&app_id=58479"
@@ -8283,19 +7461,8 @@
   ],
   "industries": [],
   "summary": "Ashtech Infotech (India) Pvt Ltd is a System Integration and Services Organization that believes in delivering unmatched business value to its customers through a combination of Technology Strength, Process Excellence, Quality Frameworks and Service Delivery. Ashtech has succeeded in positioning Accops’ product as a comprehensive alternative to leading VDI providers and helped win the battle again",
-  "facts": [
-   {
-    "fact": "Ashtech Infotech (India) Pvt Ltd is a System Integration and Services Organization that believes in delivering unmatched business value to its customers through a combination of Technology Strength, Process Excellence, Quality Frameworks and Service Delivery.",
-    "quote": "Ashtech Infotech (India) Pvt Ltd is a System Integration and Services Organization that believes in delivering unmatched business value to its customers through a combination of Technology Strength, Process Excellence, Quality Frameworks and Service Delivery."
-   },
-   {
-    "fact": "Ashtech has succeeded in positioning Accops’ product as a comprehensive alternative to leading VDI providers and helped win the battle against prominent competitions while alleviating the pains faced by customers.",
-    "quote": "Ashtech has succeeded in positioning Accops’ product as a comprehensive alternative to leading VDI providers and helped win the battle against prominent competitions while alleviating the pains faced by customers."
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Ashtech Infotech (India) Pvt Ltd?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": null,
   "lastmod": "2026-10-15",
@@ -8320,15 +7487,9 @@
    {
     "fact": "Network Techlab shares the same amount of passion as Accops in solving critical business problems and has helped Accops achieved a lot of success in the 10+ years-long journey.",
     "quote": "Network Techlab shares the same amount of passion as Accops in solving critical business problems and has helped Accops achieved a lot of success in the 10+ years-long journey."
-   },
-   {
-    "fact": "2021 Best Pre-Sales Team of the Year Award",
-    "quote": "2021 Best Pre-Sales Team of the Year Award"
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Network Techlab (I) Pvt Ltd?"
-  ],
+  "questions_answered": [],
   "cta": null,
   "published": null,
   "lastmod": "2026-10-15",
@@ -8349,23 +7510,9 @@
    {
     "fact": "Meta Infotech is 21-year-old organization providing IT solutions to large and very large corporates in India.",
     "quote": "Meta Infotech is 21-year-old organization providing IT solutions to large and very large corporates in India."
-   },
-   {
-    "fact": "Being a large enterprise accounts-focused company, Meta Infotech has greatly helped Accops win over several enterprise customers.",
-    "quote": "Being a large enterprise accounts-focused company, Meta Infotech has greatly helped Accops win over several enterprise customers."
-   },
-   {
-    "fact": "Having a very confident and experienced partner on its side has helped Accops cater to customers better.",
-    "quote": "Having a very confident and experienced partner on its side has helped Accops cater to customers better."
-   },
-   {
-    "fact": "2021 Industry Expert of the Year - FSI Award Winner",
-    "quote": "2021 Industry Expert of the Year - FSI Award Winner"
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Meta Infotech Pvt Ltd?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/622300205?h=c812093580&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
@@ -8387,31 +7534,8 @@
    "Manufacturing"
   ],
   "summary": "Softcell Technologies Global Private Limited (Softcell) provides IT solutions to enterprise customers across the country. They believe in delivering robust solutions in IT Security, Data Centre Technology, Cloud Management Solutions, Mobility Solutions and Engineering Solutions.",
-  "facts": [
-   {
-    "fact": "Softcell Technologies Global Private Limited (Softcell) provides IT solutions to enterprise customers across the country.",
-    "quote": "Softcell Technologies Global Private Limited (Softcell) provides IT solutions to enterprise customers across the country."
-   },
-   {
-    "fact": "Softcell is very well-known System Integrator delivering turnkey solutions to customers.",
-    "quote": "Softcell is very well-known System Integrator delivering turnkey solutions to customers."
-   },
-   {
-    "fact": "Their deep-rooted relationships with customers and expertise in the enterprise segment have benefitted Accops to a great extent.",
-    "quote": "Their deep-rooted relationships with customers and expertise in the enterprise segment have benefitted Accops to a great extent."
-   },
-   {
-    "fact": "Over the decade-long journey, Softcell has helped Accops acquire some very influential enterprise customers who have helped Accops script its success story.",
-    "quote": "Over the decade-long journey, Softcell has helped Accops acquire some very influential enterprise customers who have helped Accops script its success story."
-   },
-   {
-    "fact": "2021 Industry Expert of the Year - Manufacturing Award Winner",
-    "quote": "2021 Industry Expert of the Year - Manufacturing Award Winner"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Softcell Technologies Global Pvt Ltd?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/623256417?h=9af9951dca&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
@@ -8433,23 +7557,8 @@
    "Media"
   ],
   "summary": "Vion Consulting helps companies better their operational effectiveness and efficiency and gives them an unparalleled ability to know and act on consumer intent. By applying the power of big data and machine learning, their ultimate vision is to develop predictive models to automate customer interactions in multiple languages.",
-  "facts": [
-   {
-    "fact": "2021 Industry Expert of the Year - MSI Award Winner",
-    "quote": "2021 Industry Expert of the Year - MSI Award Winner"
-   },
-   {
-    "fact": "2021 Technology Excellence - Access Gateway Award Winner",
-    "quote": "2021 Technology Excellence - Access Gateway Award Winner"
-   },
-   {
-    "fact": "2021 Social Media Champion of the Year Award Winner",
-    "quote": "2021 Social Media Champion of the Year Award Winner"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Vion Consulting Pvt Ltd?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/622149529?h=fefa4a8b9f&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
@@ -8471,23 +7580,8 @@
    "Pharma / Healthcare"
   ],
   "summary": "New Era is a leading SI and a Premier Solution Provider in IT space. The company can execute a broad range of System Integration and Project Management related to IT needs.",
-  "facts": [
-   {
-    "fact": "New Era has a unique balance between technological expertise and business acumen, which helps them create innovative and holistic solutions for customers.",
-    "quote": "New Era has a unique balance between technological expertise and business acumen, which helps them create innovative and holistic solutions for customers."
-   },
-   {
-    "fact": "Their added focus on pharma industry has helped Accops greatly in building and rolling out customer-centric solutions for many pharma customers, winning several critical deals against strong competitions.",
-    "quote": "Their added focus on pharma industry has helped Accops greatly in building and rolling out customer-centric solutions for many pharma customers, winning several critical deals against strong competitions."
-   },
-   {
-    "fact": "2021 Industry Expert of the Year - Pharma Award Winner",
-    "quote": "2021 Industry Expert of the Year - Pharma Award Winner"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about New Era Informatique Pvt Ltd?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/623256334?h=b98cb59d34&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
@@ -8511,15 +7605,9 @@
    {
     "fact": "Founded in 2016, the company has a vision to be one of the leading system integrators bringing disruptive and emerging technologies to enterprises to improve their security posture.",
     "quote": "Founded in 2016, the company has a vision to be one of the leading system integrators bringing disruptive and emerging technologies to enterprises to improve their security posture."
-   },
-   {
-    "fact": "2021 Partner Synergy of the Year Award Winner",
-    "quote": "2021 Partner Synergy of the Year Award Winner"
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Regent Digitech Pvt Ltd?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/622296332?h=97947c08a7&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
@@ -8547,27 +7635,9 @@
    {
     "fact": "In our 10+ years-long journey with Network Techlab, we have achieved a substantial amount of joint success.",
     "quote": "In our 10+ years-long journey with Network Techlab, we have achieved a substantial amount of joint success."
-   },
-   {
-    "fact": "They have got a solid technical and solutioning team whose work has been constantly appreciated by our customers.",
-    "quote": "They have got a solid technical and solutioning team whose work has been constantly appreciated by our customers."
-   },
-   {
-    "fact": "Network Techlab has helped expand its reach in many organizations.",
-    "quote": "Network Techlab has helped expand its reach in many organizations."
-   },
-   {
-    "fact": "2021 Sales Acceleration Partner of the Year Award Winner",
-    "quote": "2021 Sales Acceleration Partner of the Year Award Winner"
-   },
-   {
-    "fact": "2021 Industry Expert of the Year - BPO-KPO Award Winner",
-    "quote": "2021 Industry Expert of the Year - BPO-KPO Award Winner"
    }
   ],
-  "questions_answered": [
-   "What does Accops say about Network Techlab (I) Pvt Ltd?"
-  ],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/622299913?h=fa15748398&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
@@ -8587,15 +7657,8 @@
   "products": [],
   "industries": [],
   "summary": "Vion Consulting helps companies better their operational effectiveness and efficiency and gives them an unparalleled ability to know and act on consumer intent. By applying the power of big data and machine learning, their ultimate vision is to develop predictive models to automate customer interactions in multiple languages.",
-  "facts": [
-   {
-    "fact": "2021 Best Enterprise Sales Team of the Year Award",
-    "quote": "2021 Best Enterprise Sales Team of the Year Award"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Vion Consulting Pvt Ltd?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": null,
   "published": null,
   "lastmod": "2026-10-15",
@@ -8614,23 +7677,8 @@
    "Government"
   ],
   "summary": "Bharti Airtel Services Ltd provides telecommunication services. The Company offers mobile, voice, and data services, as well as fixed line, high speed broadband, IPTV, and DTH services.",
-  "facts": [
-   {
-    "fact": "The efforts they have put in over the last couple of years in developing strong connects with the right kinds of customers have started bearing fruits now.",
-    "quote": "The efforts they have put in over the last couple of years in developing strong connects with the right kinds of customers have started bearing fruits now."
-   },
-   {
-    "fact": "2021 Strategic Acquisition of the Year Award Winner",
-    "quote": "2021 Strategic Acquisition of the Year Award Winner"
-   },
-   {
-    "fact": "2021 Industry Expert of the Year - Government Award Winner",
-    "quote": "2021 Industry Expert of the Year - Government Award Winner"
-   }
-  ],
-  "questions_answered": [
-   "What does Accops say about Bharti Airtel Services Ltd?"
-  ],
+  "facts": [],
+  "questions_answered": [],
   "cta": {
    "label": "Watch the video",
    "url": "https://player.vimeo.com/video/622552187?h=326a7fb6dc&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"

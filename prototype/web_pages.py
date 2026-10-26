@@ -42,8 +42,8 @@ NO_FACTS = LEGAL | {"career"}
 # Aliases too ambiguous on web copy: GCC is also the Gulf region, "industrial" an adjective, etc.
 SKIP_ALIASES = {"gcc", "industrial", "horizontal", "it/ites", "frame", "horizon", "duo", "rbi", "cms", "nano"}
 CTA_WORDS = re.compile(r"demo|talk to|contact|expert|download|register|get started|request|schedule|buy|watch|book|video", re.I)
-CLAIM_WORDS = re.compile(r"\d|certif|ISO|Gartner|compliant|complian|award|recogni|patent|Made.in.India|STQC|CERT-In|"
-                         r"RBI|SEBI|IRDAI|DPDP|FIPS|Common Criteria|customers|organi[sz]ations", re.I)
+# A sentence is a claim worth quoting if it carries a number or a named certification/regulation/analyst.
+CLAIM_WORDS = re.compile(r"\d|certified|ISO 27001|Gartner|Made.in.India|STQC|CERT-In|RBI|SEBI|IRDAI|DPDP|FIPS|Common Criteria")
 
 
 # ------------------------------------------------------------------ discovery
@@ -227,7 +227,7 @@ def auto_facts(lines: list[str], limit: int = 6) -> list[dict]:
     out = []
     for ln in lines:
         for sent in re.split(r"(?<=[.!?])\s+(?=[A-Z\"])", ln):
-            if 40 <= len(sent) <= 280 and CLAIM_WORDS.search(sent) and not re.search(r"cookie|©|copyright", sent, re.I):
+            if 40 <= len(sent) <= 280 and sent[-1] in ".!?" and CLAIM_WORDS.search(sent) and not re.search(r"cookie|©|copyright", sent, re.I):
                 if not any(norm(sent) == norm(f["quote"]) for f in out):
                     out.append({"fact": sent, "quote": sent})
             if len(out) >= limit:
@@ -236,10 +236,8 @@ def auto_facts(lines: list[str], limit: int = 6) -> list[dict]:
 
 
 def auto_questions(title: str, lines: list[str], ptype: str) -> list[str]:
-    qs = [ln for ln in lines if ln.endswith("?") and 15 < len(ln) < 140][:5]
-    if not qs and ptype not in ("legal", "other"):
-        qs = [f"What does Accops say about {title.split('|')[0].split(':')[0].strip()}?"]
-    return qs
+    # ponytail: only the page's own FAQ headings; a templated question would read as a real one. Claude adds the rest.
+    return [ln for ln in lines if ln.endswith("?") and 15 < len(ln) < 140][:5]
 
 
 def auto_summary(rec: dict) -> str:
@@ -247,7 +245,7 @@ def auto_summary(rec: dict) -> str:
     if len(d) > 60 and "corporate website" not in d:
         return d
     sents = re.split(r"(?<=[.!?])\s+", " ".join(l for l in rec["lines"] if len(l) > 60))
-    return " ".join(sents[:2])[:400]
+    return " ".join(sents[:2])[:400] or rec["title"]
 
 
 def pick_cta(lk: list[dict]) -> dict | None:
@@ -288,6 +286,23 @@ def build_card(rec: dict, ptype: str, terms, old: dict | None, log: list) -> dic
     return card
 
 
+def selftest():
+    """python prototype/web_pages.py --selftest : the quote check and tagging, no network."""
+    rec = {"url": "u", "title": "T", "description": "", "fetched_at": "now",
+           "lines": ["Accops HyID adds MFA — “for legacy apps”.", "1000+", "Organisations"], "links": []}
+    old = {"url": "u", "carded_by": "claude", "title": "T", "summary": "s", "page_type": "product", "products": [],
+           "industries": [], "questions_answered": [], "facts": [
+               {"fact": "ok", "quote": 'HyID adds MFA - "for legacy apps".'}, {"fact": "ok", "quote": "1000+ | Organisations"},
+               {"fact": "invented", "quote": "2000+ Organisations"}]}
+    old["content_hash"] = build_card(rec, "product", load_terms(), None, [])["content_hash"]
+    log = []
+    card = build_card(rec, "product", load_terms(), old, log)
+    assert [f["quote"] for f in card["facts"]] == ['HyID adds MFA - "for legacy apps".', "1000+ | Organisations"], card["facts"]
+    assert log and log[0]["quote"] == "2000+ Organisations", log
+    assert tag("Accops HyID with iris scanning", load_terms()["product"]) == ["HyID"]
+    print("selftest ok")
+
+
 # ------------------------------------------------------------------ main
 def raw_path(url: str) -> Path:
     return RAW / (hashlib.sha1(url.encode()).hexdigest()[:16] + ".json")
@@ -325,7 +340,10 @@ def main():
     ap.add_argument("--apply", metavar="NOTES.json",
                     help="merge Claude-written {url: {summary, facts, questions_answered[, page_type, products, industries]}} "
                          "into the card files, then rebuild offline so every quote is re-checked")
+    ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args()
+    if a.selftest:
+        return selftest()
     if a.apply:
         notes = json.loads(Path(a.apply).read_text(encoding="utf-8"))
         for name in ("pages-accops-com.json", "pages-citrix-lp.json"):
