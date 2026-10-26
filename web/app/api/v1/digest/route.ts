@@ -8,6 +8,7 @@ import { cardedSince, cardingQueue, changedSince, familyRows, lastFlowWrite, syn
 import { cardsReady, cardCacheState } from "@/lib/cards-cache";
 import { loadRatings } from "@/lib/feedback";
 import { jobHealth, jobStates, logRun, recentRuns } from "@/lib/ops";
+import { websiteDigest } from "@/lib/web-dashboard";
 
 export const maxDuration = 30;
 export const dynamic = "force-dynamic";
@@ -57,7 +58,7 @@ export async function GET(req: Request) {
   };
 
   const users = testUsers();
-  const [all, gapEvents, changes, queue, carded, usage, usagePrev, flow, sync, , whatsapp, ratings, ops] = await Promise.all([
+  const [all, gapEvents, changes, queue, carded, usage, usagePrev, flow, sync, , whatsapp, ratings, ops, website] = await Promise.all([
     safe("content requests", listRequests({ statuses: ALL })),
     safe("content gaps", recentEvents(1000, `kind=eq.gap&created_at=gte.${encodeURIComponent(new Date(t - 7 * 86_400_000).toISOString())}&${realOnly()}`)),
     safe("SharePoint changes", changedSince(since)),
@@ -72,6 +73,7 @@ export async function GET(req: Request) {
     // ?test=1 lets the ratings section include test traffic, to check it end to end from local dev.
     safe("ratings", loadRatings({ from: since, real: new URL(req.url).searchParams.get("test") !== "1", limit: 500 })),
     safe("scheduled job log", recentRuns()),
+    safe("website chatbot", websiteDigest(now)),
   ]);
 
   // Families of what arrived: a new version of an existing document is reported apart from new content,
@@ -87,6 +89,7 @@ export async function GET(req: Request) {
     cardCount: cardCacheState().count, failed: [...new Set(failed)], whatsapp, ratings, families,
     // The digest itself is running, so it is left out of its own job check.
     jobs: ops ? jobHealth(jobStates(ops.runs, now, ops.since).filter(j => j.job !== "digest")) : null,
+    website,
   });
 
   // One run per fetch: the Power Automate flow calls this once a morning, so its absence is visible.

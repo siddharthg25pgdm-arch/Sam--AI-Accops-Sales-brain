@@ -1,0 +1,45 @@
+{
+  "about": "Visitor eval for the website chatbot, stage 1 (plan 8.1). 30 Citrix-LP questions: 10 cost/renewal, 6 migration/risk, 6 compatibility, 4 security/compliance, 4 general; 17 are not in the bank (paraphrases or new; in_bank false); 3 are traps. Run: node web/scripts/web-eval.mjs <base> (live, x-sam-eval) or --dry (in-process, network stubbed). `accept`: what counts as a correct answer, judged on the FIRST block that identifies a record: a qa id, `url:<prefix>` for a page fact or page card, `@fallback` / `@guard` for an honest non-answer. A later block in `accept` scores 'partly'. `forbid`: regexes (case-insensitive) that must not appear anywhere in the answer; a hit counts as an invented claim. Written without looking at what the pipeline returns.",
+  "page": "https://accops-citrix-lp.vercel.app/",
+  "cases": [
+    { "id": "c01", "cat": "cost", "in_bank": true,  "q": "How much does Accops cost compared with Citrix?", "accept": ["lp-21"] },
+    { "id": "c02", "cat": "cost", "in_bank": false, "q": "Our Citrix renewal quote just went up a lot. What can we do?", "accept": ["lp-21", "lp-24", "lp-32", "lp-01"] },
+    { "id": "c03", "cat": "cost", "in_bank": true,  "q": "What licensing models are available?", "accept": ["lp-23"] },
+    { "id": "c04", "cat": "cost", "in_bank": false, "q": "Can we buy perpetual licences instead of a subscription?", "accept": ["lp-23", "lp-24"] },
+    { "id": "c05", "cat": "cost", "in_bank": true,  "q": "How do we know Accops won't raise prices at renewal too?", "accept": ["lp-24"] },
+    { "id": "c06", "cat": "cost", "in_bank": true,  "q": "What savings have customers reported?", "accept": ["lp-22"] },
+    { "id": "c07", "cat": "cost", "in_bank": false, "q": "Is Accops cheaper than Citrix for 500 users?", "accept": ["lp-21", "lp-22"] },
+    { "id": "c08", "cat": "cost", "in_bank": false, "q": "Do you license by concurrent users or named users?", "accept": ["lp-23"] },
+    { "id": "c09", "cat": "cost", "in_bank": false, "trap": "tco", "q": "What's the TCO saving if we switch?", "accept": ["lp-21", "lp-22", "@fallback", "@guard"],
+      "forbid": ["\\$\\s?(220|132)\\b", "\\b40\\s?%", "\\b10\\s?x\\b", "\\b4\\s?x\\b", "illustrative", "placeholder"],
+      "note": "The LP's TCO rates and headline tiles are blocked; only figures published in a case study may show." },
+    { "id": "c10", "cat": "cost", "in_bank": false, "q": "Which Citrix components would we stop paying for?", "accept": ["lp-02", "lp-03"] },
+
+    { "id": "m01", "cat": "migration", "in_bank": true,  "q": "Can we migrate off Citrix without downtime?", "accept": ["lp-05"] },
+    { "id": "m02", "cat": "migration", "in_bank": true,  "q": "How long does a Citrix to Accops migration take?", "accept": ["lp-06", "lp-05"] },
+    { "id": "m03", "cat": "migration", "in_bank": false, "q": "Can we do a proof of concept before we commit?", "accept": ["lp-07"] },
+    { "id": "m04", "cat": "migration", "in_bank": false, "q": "Will our users have to learn a new tool?", "accept": ["lp-08"] },
+    { "id": "m05", "cat": "migration", "in_bank": true,  "q": "Do we have to replace our hypervisor, Active Directory or file servers?", "accept": ["lp-09"] },
+    { "id": "m06", "cat": "migration", "in_bank": false, "q": "What if something goes wrong halfway through the move off Citrix?", "accept": ["lp-05", "lp-07", "@fallback"] },
+
+    { "id": "p01", "cat": "compatibility", "in_bank": true,  "q": "Does Accops run on Nutanix AHV?", "accept": ["lp-10", "lp-12"] },
+    { "id": "p02", "cat": "compatibility", "in_bank": false, "q": "Can we keep our VMware vSphere hosts?", "accept": ["lp-09", "lp-12"] },
+    { "id": "p03", "cat": "compatibility", "in_bank": false, "q": "Is Microsoft Hyper-V supported?", "accept": ["lp-12", "lp-09"] },
+    { "id": "p04", "cat": "compatibility", "in_bank": true,  "q": "Does Accops work with Azure Virtual Desktop?", "accept": ["lp-14"] },
+    { "id": "p05", "cat": "compatibility", "in_bank": false, "q": "Will our existing thin clients work with Accops?", "accept": ["@fallback", "url:https://www.accops.com/"],
+      "note": "No bank pair covers thin clients: the honest answer is the fallback, or a public accops.com fact about endpoints." },
+    { "id": "p06", "cat": "compatibility", "in_bank": true,  "q": "Does Accops support Proxmox?", "accept": ["lp-11", "lp-12"] },
+
+    { "id": "s01", "cat": "security", "in_bank": true,  "q": "Is Accops ISO 27001 certified?", "accept": ["lp-17"] },
+    { "id": "s02", "cat": "security", "in_bank": false, "trap": "soc2", "q": "Are you SOC 2 Type II certified?", "accept": ["lp-17", "@fallback"],
+      "forbid": ["soc\\s?-?2"], "note": "Only ISO 27001:2022 is held; no answer may claim SOC 2." },
+    { "id": "s03", "cat": "security", "in_bank": true,  "q": "Can Accops replace NetScaler / Citrix Gateway for remote access?", "accept": ["lp-19"] },
+    { "id": "s04", "cat": "security", "in_bank": false, "q": "Do you help banks with RBI and CERT-In compliance?", "accept": ["lp-18"] },
+
+    { "id": "g01", "cat": "general", "in_bank": true,  "q": "Is Accops a real alternative to Citrix?", "accept": ["lp-01"] },
+    { "id": "g02", "cat": "general", "in_bank": false, "q": "Who owns Accops?", "accept": ["lp-31"] },
+    { "id": "g03", "cat": "general", "in_bank": false, "q": "Do you have customers in the Middle East?", "accept": ["lp-30", "lp-26"] },
+    { "id": "g04", "cat": "general", "in_bank": false, "trap": "gartner", "q": "Are you a Gartner leader?", "accept": ["@fallback", "@guard", "lp-28", "lp-25"],
+      "forbid": ["gartner", "magic\\s+quadrant"], "note": "Gartner wording awaits legal; it is a blocked pattern." }
+  ]
+}

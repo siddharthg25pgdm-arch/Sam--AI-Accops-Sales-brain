@@ -9,14 +9,16 @@
 export type RunStatus = "ok" | "warn" | "failed" | "refused" | "running";
 export type OpsRun = { id?: number; job: string; started_at: string; finished_at: string | null; status: RunStatus; summary: string; details?: Record<string, unknown> };
 
-/** Every scheduled job, with the IST time it is expected daily. `writer` says where the row comes from. */
-export const JOBS: { job: string; label: string; at: string; writer: string }[] = [
+/** Every scheduled job, with the IST time it is expected daily. `writer` says where the row comes from. `everyH`: a
+ *  non-daily job's cadence; it is never an alarm before its first run (web_leak starts with the website launch). */
+export const JOBS: { job: string; label: string; at: string; writer: string; everyH?: number }[] = [
   { job: "snapshot", label: "Deletion snapshot", at: "02:00", writer: "Power Automate \"SAM - daily SharePoint snapshot\" → /api/channels/sharepoint/snapshot" },
   { job: "carding_prep", label: "Nightly carding: prep", at: "07:00", writer: "prototype/carding_prep.py (Windows task SamNightlyCarding)" },
   { job: "carding", label: "Nightly carding: result", at: "07:00", writer: "the /sam-nightly-carding skill, last step" },
   { job: "cron", label: "Registry health cron", at: "08:00", writer: "Vercel cron 02:30 UTC → /api/cron/sharepoint" },
   { job: "rollup", label: "Metrics rollup", at: "08:00", writer: "the cron (and every metrics CSV export)" },
   { job: "digest", label: "Morning digest", at: "08:30", writer: "Power Automate \"SAM - morning digest\" → /api/v1/digest" },
+  { job: "web_leak", label: "Website leak test", at: "09:00", writer: "web/scripts/web-leak.mjs <base> (weekly, plan 2.1)", everyH: 8 * 24 },
 ];
 /** A daily job with no run for this long has not run, whatever the reason. */
 export const STALE_H = 30;
@@ -43,7 +45,8 @@ export function jobStates(runs: OpsRun[], now: string, loggingSince: string | nu
   return JOBS.map(j => {
     const last = runs.filter(r => r.job === j.job).sort((a, b) => b.started_at.localeCompare(a.started_at))[0] ?? null;
     const ageH = last ? (t - Date.parse(last.started_at)) / 3_600_000 : null;
-    const stale = (ageH ?? Infinity) > STALE_H && logAgeH > STALE_H;
+    const limit = j.everyH ?? STALE_H;
+    const stale = (ageH ?? Infinity) > limit && logAgeH > limit && (!j.everyH || !!last);
     const state = !last ? (stale ? "bad" : "off") : stale || last.status === "failed" ? "bad" : last.status === "ok" || last.status === "running" ? "ok" : "warn";
     return { ...j, last, ageH, next: nextRun(j.at, now), stale, state };
   });
@@ -54,7 +57,7 @@ export function jobHealth(states: JobState[]): { title: string; detail: string }
   const out: { title: string; detail: string }[] = [];
   for (const s of states) {
     if (s.stale) out.push({ title: `${s.label} has not run ${s.last ? `for ${Math.round(s.ageH!)} hours` : "since run logging began"}`,
-      detail: `Expected daily at ${s.at} IST (${s.writer}).${s.last ? ` Last run: ${s.last.status}, ${s.last.summary || "no summary"}.` : ""} "Nothing changed" and "did not run" are different things.` });
+      detail: `Expected ${s.everyH ? "weekly" : "daily"} at ${s.at} IST (${s.writer}).${s.last ? ` Last run: ${s.last.status}, ${s.last.summary || "no summary"}.` : ""} "Nothing changed" and "did not run" are different things.` });
     else if (s.last && (s.last.status === "failed" || s.last.status === "refused"))
       out.push({ title: `${s.label}: last run ${s.last.status}`, detail: s.last.summary || "No summary recorded." });
   }
