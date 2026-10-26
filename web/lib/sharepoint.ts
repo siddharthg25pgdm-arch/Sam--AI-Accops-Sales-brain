@@ -600,7 +600,7 @@ export function planSnapshot(rows: SnapRow[], snap: Snapshot, roots: IngestRoot[
     const listed = new Map(files.map(f => [num(f.id)!, f]));
     const behind = mine.filter(r => !r.deleted && r.list_item_id != null && listed.get(r.list_item_id)?.modified).flatMap(r => {
       const f = listed.get(r.list_item_id!)!, w = at.get(r.list_item_id!)!;
-      const newer = Date.parse(f.modified!) - Date.parse(r.modified_at ?? "1970-01-01") > 60_000;
+      const newer = isNewer(f.modified!, r.modified_at);
       return newer || w.filename !== r.filename || w.folder !== r.folder ? [{ ...r, to: { modified_at: newer ? f.modified! : r.modified_at!, folder: w.folder, filename: w.filename } }] : [];
     });
     // Unknown means unknown anywhere: a file another root's row holds is a move, not a new file.
@@ -608,6 +608,14 @@ export function planSnapshot(rows: SnapRow[], snap: Snapshot, roots: IngestRoot[
       diff: { ...d, tombstone: d.tombstone.filter(r => !at.has(r.list_item_id!)), unknown: d.unknown.filter(f => !known.has(num(f.id)!)) } });
   }
   return { refused: null, outside, roots: out };
+}
+
+/** SharePoint's Modified is later than the registry's by more than a minute. The registry's bulk-seeded
+ *  rows hold a date with no time (exactly 00:00:00 UTC); for those only a later DAY counts, or every
+ *  seeded file reads as hours newer (found 26 Oct 2026: 862 of 878 false "missed edits"). */
+export function isNewer(sp: string, reg: string | null | undefined): boolean {
+  const r = Date.parse(reg ?? "1970-01-01"), dateOnly = r % 86_400_000 === 0;
+  return Date.parse(sp) - r > (dateOnly ? 86_400_000 : 60_000);
 }
 
 /** A registry row for a file the registry has never seen, from the snapshot's own fields, tagged as

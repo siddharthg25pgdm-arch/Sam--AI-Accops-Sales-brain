@@ -6,7 +6,7 @@ import { createJiti } from "jiti";
 import { fileURLToPath } from "node:url";
 
 const web = fileURLToPath(new URL("..", import.meta.url));
-const { diffSnapshot } = await createJiti(import.meta.url, { alias: { "@": web } }).import("./sharepoint.ts");
+const { diffSnapshot, isNewer } = await createJiti(import.meta.url, { alias: { "@": web } }).import("./sharepoint.ts");
 
 // 100 live rows with list item ids 1..100, one tombstoned row (id 500), one row the flow never gave an id.
 const rows = Array.from({ length: 100 }, (_, i) => ({ item_id: `g${i + 1}`, list_item_id: i + 1, folder: "F", filename: `f${i + 1}.pdf`, deleted: false }));
@@ -156,5 +156,12 @@ assert.ok(!r.ok && !r.applied && /sales-enablement REFUSED/.test(r.result), r.re
 const sync = calls.filter(c => c.url.includes("sam_sharepoint_sync")).at(-1);
 assert.ok(!("last_run" in sync.body), "a refused root holds last_run back, so the 36-hour banner keeps firing");
 assert.match(r.result, /^snapshot write: 0 tombstoned/, "the healthy root's totals are still reported");
+
+// Date-only registry values (bulk-seeded at 00:00 UTC) are not edits when SharePoint has the time of day.
+assert.equal(isNewer("2021-07-16T12:38:08Z", "2021-07-16T00:00:00+00:00"), false, "same day, date-only registry");
+assert.equal(isNewer("2021-07-16T23:30:00Z", "2021-07-16T00:00:00+00:00"), false, "within 24 h of a date-only value");
+assert.equal(isNewer("2021-07-18T09:00:00Z", "2021-07-16T00:00:00+00:00"), true, "a later day is an edit");
+assert.equal(isNewer("2026-10-21T09:55:00Z", "2026-10-21T09:53:01+00:00"), true, "precise values: over a minute is an edit");
+assert.equal(isNewer("2026-10-21T09:53:30Z", "2026-10-21T09:53:01+00:00"), false, "precise values: under a minute is not");
 
 console.log("snapshot.check: ok");
