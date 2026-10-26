@@ -1,0 +1,239 @@
+{
+  "when": "2026-10-26T19:10:28.451Z",
+  "sizes": {
+    "loader_gzip": 4468,
+    "widget_own_js_gzip": 8252,
+    "widget_plus_react_dom_gzip": 68205,
+    "css_gzip": 5008
+  },
+  "results": {
+    "1280: loader adds no layout shift (CLS)": {
+      "ok": true,
+      "detail": {
+        "with": 0.0015946039617061615,
+        "without": 0.0030370633363723757
+      }
+    },
+    "1280: no iframe before interaction": {
+      "ok": true
+    },
+    "1280: popup_shown after the teaser delay": {
+      "ok": true
+    },
+    "1280: still no iframe while the teaser shows": {
+      "ok": true
+    },
+    "1280: keyboard: the launcher is reachable with Tab and Enter opens it": {
+      "ok": true
+    },
+    "1280: iframe created on the first click": {
+      "ok": true
+    },
+    "1280: keyboard: focus lands in the question box": {
+      "ok": true
+    },
+    "1280: 3-column comparison renders as stacked cards in the panel": {
+      "ok": true,
+      "detail": "grid"
+    },
+    "1280: no sideways scroll in any comparison": {
+      "ok": true
+    },
+    "1280: collapsed row details stay hidden": {
+      "ok": true
+    },
+    "1280: every Text and Stat shows a visible source pill": {
+      "ok": true
+    },
+    "1280: hs, parent, ms_since_render, recent_ms sent correctly": {
+      "ok": true,
+      "detail": [
+        {
+          "turn": "click",
+          "parent": true,
+          "ms": 831,
+          "recent": 1,
+          "prev": false
+        },
+        {
+          "turn": "click",
+          "parent": true,
+          "ms": 1872,
+          "recent": 2,
+          "prev": false
+        },
+        {
+          "turn": "typed",
+          "parent": true,
+          "ms": 3429,
+          "recent": 3,
+          "prev": false
+        },
+        {
+          "turn": "click",
+          "parent": true,
+          "ms": 4477,
+          "recent": 4,
+          "prev": false
+        },
+        {
+          "turn": "typed",
+          "parent": true,
+          "ms": 5549,
+          "recent": 5,
+          "prev": true
+        }
+      ]
+    },
+    "1280: dataLayer sam_chat events carry no text": {
+      "ok": true,
+      "detail": [
+        "popup_shown:lp-01",
+        "chat_opened",
+        "question_clicked:lp-01/root",
+        "answer_shown:lp-01/bank",
+        "question_clicked:lp-03/chip",
+        "answer_shown:lp-03/bank",
+        "answer_shown/intent",
+        "question_clicked:lp-19/picker",
+        "answer_shown:lp-19/bank",
+        "answer_shown/model"
+      ]
+    },
+    "1280: event route never receives text": {
+      "ok": true
+    },
+    "1280: foreign-origin / foreign-window postMessage ignored": {
+      "ok": true
+    },
+    "1280: Esc closes; focus back on the launcher": {
+      "ok": true
+    },
+    "375: loader adds no layout shift (CLS)": {
+      "ok": true,
+      "detail": {
+        "with": 0,
+        "without": 0
+      }
+    },
+    "375: no iframe before interaction": {
+      "ok": true
+    },
+    "375: popup_shown after the teaser delay": {
+      "ok": true
+    },
+    "375: still no iframe while the teaser shows": {
+      "ok": true
+    },
+    "375: iframe created on the first click": {
+      "ok": true
+    },
+    "375: page scroll locked while the sheet is open": {
+      "ok": true
+    },
+    "375: 3-column comparison renders as stacked cards in the panel": {
+      "ok": true,
+      "detail": "grid"
+    },
+    "375: no sideways scroll in any comparison": {
+      "ok": true
+    },
+    "375: collapsed row details stay hidden": {
+      "ok": true
+    },
+    "375: every Text and Stat shows a visible source pill": {
+      "ok": true
+    },
+    "375: hs, parent, ms_since_render, recent_ms sent correctly": {
+      "ok": true,
+      "detail": [
+        {
+          "turn": "click",
+          "parent": true,
+          "ms": 720,
+          "recent": 1,
+          "prev": false
+        },
+        {
+          "turn": "click",
+          "parent": true,
+          "ms": 1826,
+          "recent": 2,
+          "prev": false
+        },
+        {
+          "turn": "typed",
+          "parent": true,
+          "ms": 3356,
+          "recent": 3,
+          "prev": false
+        },
+        {
+          "turn": "click",
+          "parent": true,
+          "ms": 4349,
+          "recent": 4,
+          "prev": false
+        },
+        {
+          "turn": "typed",
+          "parent": true,
+          "ms": 5441,
+          "recent": 5,
+          "prev": true
+        }
+      ]
+    },
+    "375: dataLayer sam_chat events carry no text": {
+      "ok": true,
+      "detail": [
+        "popup_shown:lp-01",
+        "chat_opened",
+        "question_clicked:lp-01/root",
+        "answer_shown:lp-01/bank",
+        "question_clicked:lp-03/chip",
+        "answer_shown:lp-03/bank",
+        "answer_shown/intent",
+        "question_clicked:lp-19/picker",
+        "answer_shown:lp-19/bank",
+        "answer_shown/model"
+      ]
+    },
+    "375: event route never receives text": {
+      "ok": true
+    },
+    "375: foreign-origin / foreign-window postMessage ignored": {
+      "ok": true
+    },
+    "375: Esc closes; focus back on the launcher": {
+      "ok": true
+    },
+    "reduced motion: panel opens": {
+      "ok": true
+    }
+  },
+  "shots": [
+    "docs/plans/shots/web-widget-1280-1-launcher.png",
+    "docs/plans/shots/web-widget-1280-2-teaser.png",
+    "docs/plans/shots/web-widget-1280-3-open.png",
+    "docs/plans/shots/web-widget-1280-4-answer-root.png",
+    "docs/plans/shots/web-widget-1280-5-compare.png",
+    "docs/plans/shots/web-widget-1280-6-compare-detail.png",
+    "docs/plans/shots/web-widget-1280-7-picker.png",
+    "docs/plans/shots/web-widget-1280-8-doc.png",
+    "docs/plans/shots/web-widget-1280-9-thinking.png",
+    "docs/plans/shots/web-widget-1280-10-stat.png",
+    "docs/plans/shots/web-widget-1280-11-closed.png",
+    "docs/plans/shots/web-widget-375-1-launcher.png",
+    "docs/plans/shots/web-widget-375-2-teaser.png",
+    "docs/plans/shots/web-widget-375-3-open.png",
+    "docs/plans/shots/web-widget-375-4-answer-root.png",
+    "docs/plans/shots/web-widget-375-5-compare.png",
+    "docs/plans/shots/web-widget-375-6-compare-detail.png",
+    "docs/plans/shots/web-widget-375-7-picker.png",
+    "docs/plans/shots/web-widget-375-8-doc.png",
+    "docs/plans/shots/web-widget-375-9-thinking.png",
+    "docs/plans/shots/web-widget-375-10-stat.png",
+    "docs/plans/shots/web-widget-375-11-closed.png"
+  ]
+}
