@@ -64,6 +64,9 @@ export const classify: Classify = async (req, ctx) => {
     if (v.isBot || v.isVerifiedBot) bot.push(v.isVerifiedBot ? "botid_verified_bot" : "botid");
   } catch { suspect.push("botid_error"); }
 
+  // TODO(web-s1 contract notes, "labels are not sticky across turns"): this labels one turn only. A bot or suspect
+  // conversation's next clean-looking turn is human again (the log keeps the highest label, but nothing reads it back
+  // here). Needs a Stream A read RPC for the conversation's highest label; escalate to it before returning.
   const label: Label = bot.length ? "bot" : suspect.length ? "suspect" : "human";
   return { label, signals: [...bot, ...suspect] };
 };
