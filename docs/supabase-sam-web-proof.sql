@@ -57,7 +57,7 @@ where n.nspname in ('public', 'core') and c.relkind in ('r', 'p', 'v', 'm', 'f')
 insert into _probe
 select 'reader execute ' || p.proname,
   case when p.proname in ('sam_web_qa_rows', 'sam_web_page_rows', 'sam_web_asset_rows', 'sam_web_page_group', 'sam_web_roots',
-                          'sam_web_children', 'sam_web_search', 'sam_web_admit', 'sam_web_take_model_slot', 'sam_web_cache_get',
+                          'sam_web_children', 'sam_web_search', 'sam_web_settings', 'sam_web_admit', 'sam_web_take_model_slot', 'sam_web_cache_get',
                           'sam_web_cache_put', 'sam_web_log_message', 'sam_web_log_event', 'sam_v1_public_asset_rows')
        then 'granted' else 'denied' end,
   case when has_function_privilege('sam_web_reader', p.oid, 'execute') then 'granted' else 'denied' end
@@ -79,7 +79,8 @@ declare t text; n bigint; ms numeric; worst numeric := 0; t0 timestamptz; ok boo
   qh text := repeat('a', 64);
   expected text[] := array[
     -- The approved public asset list (sam_v1_public_assets minus Regulation / Third-Party Research, minus titles
-    -- carrying a blocked claim). The PRD's count of 11 was taken 26 Sep; 11 case studies were published since.
+    -- carrying a blocked claim), as read on 26 Oct 2026. The PRD's count of 11 was taken 26 Sep; case studies were
+    -- published since. Left out by the blocked patterns: "Food Processing Firm ... (50% Lower TCO)".
     -- Any change shows up below as missing/extra: update this list deliberately.
     'A Leading BPO Delivers Seamless Customer Service with Wire-Speed VoIP for Work-from-Home Users',
     'A Major Indian E-commerce Firm Eliminates Data Security Concerns Using Accops Application Access Gateway',
@@ -94,7 +95,6 @@ declare t text; n bigint; ms numeric; worst numeric := 0; t0 timestamptz; ok boo
     'Accops Nano: Compliant BYOD Access from a USB Stick',
     'Alphasure Adopts DaaS to Enable Work from Anywhere, Records 70% Drop in Attrition and Saves 50% on Office Rent',
     'City Pharmacy Replaces Citrix XenApp with Accops HyWorks for ERP Virtualisation',
-    'Deutsche Bank Fortifies Vendor Access to Internal Applications with Accops HySecure and HyWorks',
     'Kalupur Bank Switches to ZTNA-Based Remote Access, Cuts Support Resolution Time 45x',
     'Major Indian DTH and OTT Platform: Secure Remote Access for 300+ Vendors',
     'Maveric Wins New Customers and Optimises OpEx by 20% Using Accops Secure Remote Access',
@@ -138,13 +138,17 @@ begin
     perform sam_web_take_model_slot('openai');
     perform sam_web_cache_put(qh, 'general', '{"blocks":[],"chips":[]}', 'model');
     j := sam_web_cache_get(qh);
-    mid := sam_web_log_message('proof_conversation', 'v_proof', 'https://accops-citrix-lp.vercel.app/', 'citrix-lp', 'IN', 'human',
-                               '{}', true, 'typed', null, 'proof', qh, 'model', 'none', '{}', '{}', 'proof', 0, 1, null);
-    perform sam_web_log_event('proof_conversation', 'v_proof', 'https://accops-citrix-lp.vercel.app/', 'chat_opened');
-    insert into _probe values ('reader RPCs (roots, children, page_group, admit, slot, cache put/get, log message/event)', 'callable',
-                               case when j is not null and mid is not null then 'callable' else 'callable but cache/log returned null' end);
+    perform sam_web_log_message(jsonb_build_object('id', 'f0f0f0f0-0000-4000-8000-000000000001', 'conversation_id', 'proof_conversation',
+      'visitor_id', 'v_proof', 'page', 'https://accops-citrix-lp.vercel.app/', 'page_group', 'citrix-lp', 'country', 'IN', 'label', 'human',
+      'signals', '[]'::jsonb, 'is_test', true, 'turn_kind', 'typed', 'question', 'proof', 'q_hash', qh, 'source', 'guard',
+      'guard_reason', 'proof', 'refs', '[]'::jsonb, 'candidates', 0, 'tokens', 0, 'latency_ms', 1));
+    perform sam_web_log_event(jsonb_build_object('conversation_id', 'proof_conversation', 'visitor_id', 'v_proof',
+      'page', 'https://accops-citrix-lp.vercel.app/', 'name', 'chat_opened', 'country', 'IN'));
+    j := j || jsonb_build_object('settings', sam_web_settings());
+    insert into _probe values ('reader RPCs (settings, roots, children, page_group, admit, slot, cache put/get, log message/event)', 'callable',
+                               case when j ? 'blocks' and j -> 'settings' ? 'cta_url' then 'callable' else 'callable but cache/settings returned null' end);
   exception when others then
-    insert into _probe values ('reader RPCs (roots, children, page_group, admit, slot, cache put/get, log message/event)', 'callable', 'ERROR: ' || sqlerrm);
+    insert into _probe values ('reader RPCs (settings, roots, children, page_group, admit, slot, cache put/get, log message/event)', 'callable', 'ERROR: ' || sqlerrm);
   end;
   foreach t in array array['select sam_web_dashboard(30, false)', 'select sam_web_purge(180)', 'select sam_dashboard(30, false, array[''x''], ''Asia/Kolkata'')'] loop
     begin

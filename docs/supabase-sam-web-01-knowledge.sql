@@ -66,7 +66,13 @@ create table if not exists sam_web_pages (
   needs_recard       boolean not null default false,
   thumb_url          text,
   fetched_at         timestamptz,
-  updated_at         timestamptz not null default now()
+  updated_at         timestamptz not null default now(),
+  -- What a visitor may see, derived by the stamp trigger below from sam_web_blocked_patterns (never written by the
+  -- loader). Filtering at write time keeps sam_web_search free of ~3,000 regex checks per question.
+  title_blocked      boolean not null default false,
+  summary_public     text,                                                  -- summary minus sentences with a blocked claim
+  facts_public       jsonb not null default '[]',                           -- facts minus any with a blocked claim
+  questions_public   text[] not null default '{}'
 );
 create index if not exists sam_web_pages_text_trgm on sam_web_pages using gin ((title || ' ' || coalesce(summary, '')) gin_trgm_ops);
 
@@ -83,10 +89,10 @@ insert into sam_web_page_rules (pattern, page_group, priority) values
 on conflict (pattern) do nothing;
 
 -- Owner rights: the rules table is closed to everyone else. Granted to sam_web_reader in 02.
-create or replace function sam_web_page_group(page_url text) returns text
+create or replace function sam_web_page_group(url text) returns text
 language sql stable security definer set search_path = public, pg_catalog as $$
   select coalesce((select r.page_group from sam_web_page_rules r
-                   where left(coalesce(sam_web_page_group.page_url, ''), 500) ~* r.pattern
+                   where left(coalesce(sam_web_page_group.url, ''), 500) ~* r.pattern
                    order by r.priority, r.pattern limit 1), 'general')
 $$;
 revoke execute on function sam_web_page_group(text) from public, anon, authenticated;
@@ -154,12 +160,34 @@ begin
   return new;
 end $$;
 
+-- Every blocked pattern OR-ed into one regex ('a^' never matches).
+create or replace function sam_web_blocked_rx() returns text
+language sql stable set search_path = public, pg_catalog as $$
+  select coalesce(string_agg('(' || pattern || ')', '|'), 'a^') from sam_web_blocked_patterns
+$$;
+
 create or replace function sam_web_pages_stamp() returns trigger
 language plpgsql set search_path = public, pg_catalog as $$
+declare rx text := sam_web_blocked_rx();
 begin
   new.page_group := sam_web_page_group(new.url);
   new.updated_at := now();
+  new.title_blocked := coalesce(new.title, '') ~* rx;
+  new.summary_public := (select string_agg(s, ' ' order by n)
+                         from regexp_split_to_table(new.summary, '(?<=[.!?])\s+') with ordinality t(s, n) where s !~* rx);
+  new.facts_public := coalesce((select jsonb_agg(jsonb_build_object('fact', f ->> 'fact', 'quote', f ->> 'quote') order by n)
+                                from jsonb_array_elements(new.facts) with ordinality e(f, n)
+                                where coalesce(f ->> 'fact', '') !~* rx and coalesce(f ->> 'quote', '') !~* rx), '[]'::jsonb);
+  new.questions_public := array(select x from unnest(new.questions_answered) x where x !~* rx);
   return new;
+end $$;
+
+-- A change to the blocked patterns or the page rules re-stamps every page (about 250 rows).
+create or replace function sam_web_restamp_pages() returns trigger
+language plpgsql set search_path = public, pg_catalog as $$
+begin
+  update sam_web_pages set url = url;
+  return null;
 end $$;
 
 drop trigger if exists sam_web_qa_touch on sam_web_qa;
@@ -180,6 +208,12 @@ create trigger sam_web_blocked_knowledge after insert or update or delete or tru
 drop trigger if exists sam_web_rules_knowledge on sam_web_page_rules;
 create trigger sam_web_rules_knowledge after insert or update or delete or truncate on sam_web_page_rules
   for each statement execute function sam_web_bump_knowledge();
+drop trigger if exists sam_web_blocked_restamp on sam_web_blocked_patterns;
+create trigger sam_web_blocked_restamp after insert or update or delete or truncate on sam_web_blocked_patterns
+  for each statement execute function sam_web_restamp_pages();
+drop trigger if exists sam_web_rules_restamp on sam_web_page_rules;
+create trigger sam_web_rules_restamp after insert or update or delete or truncate on sam_web_page_rules
+  for each statement execute function sam_web_restamp_pages();
 -- Cached answers carry the CTA, so a CTA change invalidates them too (no deploy needed to switch to #talk).
 drop trigger if exists sam_web_cta_knowledge on sam_web_settings;
 create trigger sam_web_cta_knowledge after update on sam_web_settings
@@ -195,5 +229,6 @@ alter table sam_web_blocked_patterns enable row level security;
 alter table sam_web_settings enable row level security;
 -- Supabase grants new objects to anon/authenticated by default: take that back.
 revoke all on sam_web_qa, sam_web_pages, sam_web_page_rules, sam_web_blocked_patterns, sam_web_settings from public, anon, authenticated;
+revoke execute on function sam_web_blocked_rx() from public, anon, authenticated;
 -- The loader and the admin tab use the service key.
 grant select, insert, update, delete on sam_web_qa, sam_web_pages, sam_web_page_rules, sam_web_blocked_patterns, sam_web_settings to service_role;

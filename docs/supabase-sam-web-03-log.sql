@@ -1,5 +1,5 @@
 -- SAM website chatbot, stage 1: conversation log, limits, model ceiling, answer cache. Migration name sam_web_03_log.
--- Needs 01 (settings) and 02 (sam_web_asset_rows is not used here; the cache checks sam_v1_public_asset_rows directly).
+-- Needs 01 (settings). The cache checks sam_v1_public_asset_rows (v1, applied 30 Sep) directly.
 -- NOT APPLIED. Awaiting Siddharth's approval (docs/plans/web-s1-a-APPROVAL.md). Record the date here when applied.
 -- Safe to run twice.
 --
@@ -17,8 +17,8 @@
 -- ---------------------------------------------------------------- tables
 
 create table if not exists sam_web_conversations (
-  id         text primary key check (id ~ '^[A-Za-z0-9_-]{8,64}$'),
-  visitor_id text not null check (char_length(visitor_id) <= 64),
+  id         text primary key check (id ~ '^[A-Za-z0-9_.:-]{1,80}$'),       -- the widget's id (ask route's Id rule)
+  visitor_id text not null check (char_length(visitor_id) <= 80),
   page       text check (char_length(page) <= 500),
   page_group text not null default 'general' check (char_length(page_group) <= 80),
   country    text check (char_length(country) <= 8),
@@ -30,7 +30,7 @@ create table if not exists sam_web_conversations (
 create index if not exists sam_web_conversations_started_idx on sam_web_conversations (started_at);
 
 create table if not exists sam_web_messages (
-  id              bigint generated always as identity primary key,
+  id              uuid primary key default gen_random_uuid(),            -- the ask route's message_id
   conversation_id text not null references sam_web_conversations (id) on delete cascade,
   turn_kind       text not null check (turn_kind in ('click', 'typed')),
   qa_id           text check (char_length(qa_id) <= 80),
@@ -39,11 +39,12 @@ create table if not exists sam_web_messages (
   source          text not null check (source in ('bank', 'intent', 'cache', 'model', 'fallback', 'guard', 'limited', 'repeat')),
   verdict         text check (verdict in ('answered', 'partial', 'none')),
   refs            text[] not null default '{}',
-  candidates      text[] not null default '{}',
+  candidates      int not null default 0,                                 -- how many candidates sam_web_search offered
   model           text,
   tokens          int not null default 0,
   latency_ms      int,
   error           text,
+  guard_reason    text,                                                   -- which pre-guard rule answered (source 'guard')
   created_at      timestamptz not null default now()
 );
 create index if not exists sam_web_messages_conversation_idx on sam_web_messages (conversation_id);
@@ -51,10 +52,11 @@ create index if not exists sam_web_messages_created_idx on sam_web_messages (cre
 
 create table if not exists sam_web_events (
   id              bigint generated always as identity primary key,
-  conversation_id text check (char_length(conversation_id) <= 64),
-  visitor_id      text not null check (char_length(visitor_id) <= 64),
+  conversation_id text check (char_length(conversation_id) <= 80),
+  visitor_id      text not null check (char_length(visitor_id) <= 80),
   page            text check (char_length(page) <= 500),
-  name            text not null check (name in ('chat_opened', 'chat_closed', 'popup_shown', 'popup_clicked', 'popup_dismissed',
+  country         text check (char_length(country) <= 8),
+  name           text not null check (name in ('chat_opened', 'chat_closed', 'popup_shown', 'popup_clicked', 'popup_dismissed',
                     'question_clicked', 'answer_shown', 'doc_opened', 'talk_to_sales_clicked', 'filter_used', 'step_viewed')),
   qa_id           text check (char_length(qa_id) <= 80),
   ref             text check (char_length(ref) <= 300),
@@ -172,37 +174,50 @@ returns void language sql volatile security definer set search_path = public, pg
     set page_group = excluded.page_group, answer = excluded.answer, source = excluded.source, created_at = excluded.created_at
 $$;
 
--- One message (and its conversation, created on first sight). The label only escalates human -> suspect -> bot;
--- signals accumulate. Tokens are added to today's usage. Returns the message id.
-create or replace function sam_web_log_message(
-  conversation_id text, visitor_id text, page text, page_group text, country text, label text, signals text[], is_test boolean,
-  turn_kind text, qa_id text, question text, q_hash text, source text, verdict text, refs text[], candidates text[],
-  model text, tokens int, latency_ms int, error text)
-returns bigint language sql volatile security definer set search_path = public, pg_catalog as $$
+-- A JSON array of strings -> text[] (first n items); anything else -> '{}'. Internal helper, not granted.
+create or replace function sam_web_text_array(j jsonb, n int) returns text[]
+language sql immutable set search_path = public, pg_catalog as $$
+  select case when jsonb_typeof(j) = 'array'
+              then (select coalesce(array_agg(left(x, 300) order by i), '{}') from jsonb_array_elements_text(j) with ordinality t(x, i) where i <= n)
+              else '{}'::text[] end
+$$;
+
+-- One message, m = the ask route's log object: {id, turn_kind, qa_id, question, q_hash, source, verdict, refs,
+-- candidates, model, tokens, latency_ms, error, guard_reason, conversation_id, visitor_id, page, page_group, country,
+-- label, signals, is_test}. Creates the conversation on first sight; its label only escalates human -> suspect -> bot
+-- and its signals accumulate. Tokens are added to today's usage. Unknown keys are ignored.
+create or replace function sam_web_log_message(m jsonb)
+returns void language plpgsql volatile security definer set search_path = public, pg_catalog as $$
+declare tok int := greatest(coalesce((m ->> 'tokens')::int, 0), 0);
+begin
   insert into sam_web_conversations as c (id, visitor_id, page, page_group, country, label, signals, is_test)
-  values ($1, left($2, 64), left($3, 500), left(coalesce($4, 'general'), 80), left($5, 8), coalesce($6, 'human'),
-          (coalesce($7, '{}'))[1:20], coalesce($8, false))
+  values (m ->> 'conversation_id', left(m ->> 'visitor_id', 80), left(m ->> 'page', 500), left(coalesce(m ->> 'page_group', 'general'), 80),
+          left(m ->> 'country', 8), coalesce(m ->> 'label', 'human'), sam_web_text_array(m -> 'signals', 20),
+          coalesce((m ->> 'is_test')::boolean, false))
   on conflict (id) do update set
     label   = case when array_position(array['human', 'suspect', 'bot'], excluded.label)
                       > array_position(array['human', 'suspect', 'bot'], c.label) then excluded.label else c.label end,
     signals = (select coalesce(array_agg(distinct x), '{}') from unnest(c.signals || excluded.signals) x)[1:20],
     is_test = c.is_test or excluded.is_test;
-  insert into sam_web_usage_daily as u (day, tokens)
-  select (now() at time zone 'Asia/Kolkata')::date, $18 where coalesce($18, 0) > 0
-  on conflict (day) do update set tokens = u.tokens + excluded.tokens;
-  insert into sam_web_messages (conversation_id, turn_kind, qa_id, question, q_hash, source, verdict, refs, candidates,
-                                model, tokens, latency_ms, error)
-  values ($1, $9, left($10, 80), left($11, 500), $12, $13, $14, (coalesce($15, '{}'))[1:12], (coalesce($16, '{}'))[1:12],
-          left($17, 60), greatest(coalesce($18, 0), 0), $19, left($20, 200))
-  returning id
-$$;
+  if tok > 0 then
+    insert into sam_web_usage_daily as u (day, tokens) values ((now() at time zone 'Asia/Kolkata')::date, tok)
+    on conflict (day) do update set tokens = u.tokens + excluded.tokens;
+  end if;
+  insert into sam_web_messages (id, conversation_id, turn_kind, qa_id, question, q_hash, source, verdict, refs, candidates,
+                                model, tokens, latency_ms, error, guard_reason)
+  values (coalesce((m ->> 'id')::uuid, gen_random_uuid()), m ->> 'conversation_id', m ->> 'turn_kind', left(m ->> 'qa_id', 80),
+          left(m ->> 'question', 500), m ->> 'q_hash', m ->> 'source', m ->> 'verdict', sam_web_text_array(m -> 'refs', 12),
+          coalesce((m ->> 'candidates')::int, 0), left(m ->> 'model', 60), tok, (m ->> 'latency_ms')::int,
+          left(m ->> 'error', 200), left(m ->> 'guard_reason', 80));
+end $$;
 
--- An allowlisted event (the table's check rejects any other name).
-create or replace function sam_web_log_event(conversation_id text, visitor_id text, page text, name text,
-                                             qa_id text default null, ref text default null, is_test boolean default false)
+-- One event, e = {conversation_id?, visitor_id, page, name, qa_id?, ref?, country?, is_test?}. The table's check
+-- rejects any name outside the allowlist.
+create or replace function sam_web_log_event(e jsonb)
 returns void language sql volatile security definer set search_path = public, pg_catalog as $$
-  insert into sam_web_events (conversation_id, visitor_id, page, name, qa_id, ref, is_test)
-  values (left($1, 64), left($2, 64), left($3, 500), $4, left($5, 80), left($6, 300), coalesce($7, false))
+  insert into sam_web_events (conversation_id, visitor_id, page, country, name, qa_id, ref, is_test)
+  values (left(e ->> 'conversation_id', 80), left(e ->> 'visitor_id', 80), left(e ->> 'page', 500), left(e ->> 'country', 8),
+          e ->> 'name', left(e ->> 'qa_id', 80), left(e ->> 'ref', 300), coalesce((e ->> 'is_test')::boolean, false))
 $$;
 
 -- ---------------------------------------------------------------- service-role only
@@ -279,13 +294,10 @@ grant select on sam_web_conversations, sam_web_messages, sam_web_events, sam_web
   to service_role;
 
 revoke execute on function sam_web_admit(text, text, text, text), sam_web_take_model_slot(text), sam_web_cache_get(text),
-  sam_web_cache_put(text, text, jsonb, text),
-  sam_web_log_message(text, text, text, text, text, text, text[], boolean, text, text, text, text, text, text, text[], text[], text, int, int, text),
-  sam_web_log_event(text, text, text, text, text, text, boolean), sam_web_dashboard(int, boolean, numeric), sam_web_purge(int)
+  sam_web_cache_put(text, text, jsonb, text), sam_web_log_message(jsonb), sam_web_log_event(jsonb), sam_web_text_array(jsonb, int),
+  sam_web_dashboard(int, boolean, numeric), sam_web_purge(int)
   from public, anon, authenticated;
 grant execute on function sam_web_admit(text, text, text, text), sam_web_take_model_slot(text), sam_web_cache_get(text),
-  sam_web_cache_put(text, text, jsonb, text),
-  sam_web_log_message(text, text, text, text, text, text, text[], boolean, text, text, text, text, text, text, text[], text[], text, int, int, text),
-  sam_web_log_event(text, text, text, text, text, text, boolean)
+  sam_web_cache_put(text, text, jsonb, text), sam_web_log_message(jsonb), sam_web_log_event(jsonb)
   to sam_web_reader, service_role;
 grant execute on function sam_web_dashboard(int, boolean, numeric), sam_web_purge(int) to service_role;

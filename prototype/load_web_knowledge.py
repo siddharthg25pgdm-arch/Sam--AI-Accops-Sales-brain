@@ -37,8 +37,10 @@ EXPECT_REF = "iwqhayuoxnrhqzozznes"
 PAGE_COLS = ["url", "title", "page_type", "products", "industries", "summary", "facts", "questions_answered", "cta",
              "lastmod", "needs_recard", "fetched_at"]
 QA_COLS = ["id", "question", "aliases", "answer", "visual", "visual_data", "pages", "parent_id", "nudge_weight",
-           "regions", "cta", "cta_url", "sources"]
+           "regions", "cta", "cta_url", "sources", "origin"]
 QA_RENAME = {"parent": "parent_id"}
+# Bank keys read by the mapping but not stored (the review sheet keeps evidence/notes; status is always 'draft' here).
+QA_READ = {"short_answer", "status"}
 VISUALS = {"text", "doc_card", "compare_table", "steps", "stat", "picker", "calculator", "cta"}
 MOJIBAKE = re.compile("â€|Ã[\u0080-¿]|â„")
 
@@ -135,11 +137,12 @@ def validate_qa(q: dict, ids: set[str], pages: dict[str, dict]) -> list[str]:
     else:
         errs += check_obj(v, data, "visual_data")
         if v == "stat" and isinstance(data, dict) and isinstance(data.get("value"), str):
-            page = pages.get(src[0]) if src else None
+            at = q.get("_stat_source") or (src[0] if src else "-")
+            page = pages.get(at)
             if page is None:
-                errs.append(f"stat: source page {src[0] if src else '-'} is not in the page cards")
+                errs.append(f"stat: source page {at} is not in the page cards")
             elif data["value"] not in page_text(page):
-                errs.append(f"stat: value {data['value']!r} is not on {src[0]}")
+                errs.append(f"stat: value {data['value']!r} is not on {at}")
         if v == "picker" and isinstance(data, dict):
             errs += [f"picker: option qa_id {o.get('qa_id')} not in the bank" for o in data.get("options") or []
                      if isinstance(o, dict) and o.get("qa_id") not in ids]
@@ -175,12 +178,63 @@ def map_page(p: dict) -> dict:
     return row
 
 
-def map_qa(q: dict) -> dict:
+CTA_LABEL = {"asset_pdf": "Open the PDF", "asset": "Read more"}   # fixed strings for the bank's cta: "asset"
+
+
+def bank_visual(q: dict, notes: list[str]) -> tuple[str | None, dict | None]:
+    """The web-knowledge bank's {type, data} visual -> (visual, visual_data) in block-contract props (one block).
+    The bank's cards/stats lists can hold several items; a pair carries ONE block, so the first is kept (noted)."""
+    v = q.get("visual") or {}
+    t, d = v.get("type"), v.get("data") or {}
+    title = q.get("question", "")[:80]
+    if t in (None, "text"):
+        return None, None
+    if t == "compare_table":
+        rows = [{"label": r[0], "cells": list(r[1:])} if isinstance(r, list) else r for r in d.get("rows") or []]
+        out = {"title": title, "columns": d.get("columns"), "rows": rows}
+        return t, {**out, **({"footnote": d["footnote"]} if d.get("footnote") else {})}
+    if t == "steps":
+        return t, {"title": title, "steps": [{"title": s.get("title"), **({"body": s["text"]} if s.get("text") else {})}
+                                            for s in d.get("steps") or []]}
+    if t == "doc_card":
+        cards = d.get("cards") or []
+        if len(cards) > 1:
+            notes.append(f"{q.get('id')}: doc_card keeps 1 of {len(cards)} cards")
+        c = cards[0] if cards else {}
+        pdf = bool(re.search(r"\.pdf($|\?)", c.get("url") or "", re.I))
+        return t, {"title": c.get("title"), "kind": "PDF" if pdf else "Page", "summary": c.get("blurb") or "",
+                   "url": c.get("url"), "action": "download" if pdf else "read"}
+    if t == "stat":
+        stats = d.get("stats") or []
+        if len(stats) > 1:
+            notes.append(f"{q.get('id')}: stat keeps 1 of {len(stats)} figures")
+        s = stats[0] if stats else {}
+        if s.get("source"):
+            q["_stat_source"] = s["source"]
+        return t, {"value": s.get("value"), "label": s.get("label")}
+    if t == "cta":
+        return t, {"label": d.get("label"), "action": "open_url", "url": d.get("url")}
+    return t, d   # picker / calculator / anything else: validated as given
+
+
+def map_qa(q: dict, notes: list[str] | None = None) -> dict:
     q = {QA_RENAME.get(k, k): v for k, v in q.items()}
+    if "short_answer" in q and "answer" not in q:                  # the web-knowledge bank's shape
+        q["answer"] = q["short_answer"]
+    if isinstance(q.get("visual"), dict):
+        q["visual"], q["visual_data"] = bank_visual(q, notes if notes is not None else [])
+    cta = q.get("cta")
+    if cta in ("talk_to_sales", "none", "asset"):                  # the bank's cta is an action, the column a label
+        q["cta"] = (CTA_LABEL["asset_pdf"] if re.search(r"\.pdf($|\?)", q.get("cta_url") or "", re.I)
+                    else CTA_LABEL["asset"]) if cta == "asset" else None
+        q["cta_url"] = None if cta == "none" else q.get("cta_url")
     row = {k: q.get(k) for k in QA_COLS}
     for k in ("aliases", "pages", "regions", "sources"):
         row[k] = row[k] or []
     row["nudge_weight"] = int(row["nudge_weight"] or 0)
+    row["origin"] = row["origin"] or "bank"
+    if q.get("_stat_source"):
+        row["_stat_source"] = q["_stat_source"]
     return row
 
 
@@ -232,7 +286,12 @@ class Db:
             self.url, self.key = base.rstrip("/"), "local"
             return
         url = key = ""
-        for line in ENV.read_text(encoding="utf-8").splitlines():
+        env = ENV
+        if not env.exists():   # a git worktree has no .env.local: use the main checkout's
+            common = subprocess.run(["git", "-C", str(REPO), "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                                    capture_output=True, text=True).stdout.strip()
+            env = Path(common).parent / "web" / ".env.local"
+        for line in env.read_text(encoding="utf-8").splitlines():
             if line.startswith("SUPABASE_URL="):
                 url = line.split("=", 1)[1].strip().strip('"').rstrip("/")
             elif line.startswith("SUPABASE_SERVICE_KEY="):
@@ -287,9 +346,13 @@ def main() -> None:
         print(f"  WARN {moj} facts carry mojibake (UTF-8 read as cp1252, e.g. 'â€™'); fix in the web-knowledge corpus")
 
     if raw_qa:
-        unknown = sorted({k for q in raw_qa for k in q} - set(QA_COLS) - set(QA_RENAME))
-        print(f"Q&A mapping: parent -> parent_id; ignored: {', '.join(unknown) or '-'}")
-    qa_rows = [map_qa(q) for q in raw_qa]
+        unknown = sorted({k for q in raw_qa for k in q} - set(QA_COLS) - set(QA_RENAME) - QA_READ)
+        print("Q&A mapping: short_answer -> answer, visual {type, data} -> visual + block props, cta action -> label; "
+              f"not stored: {', '.join(unknown) or '-'}")
+    notes: list[str] = []
+    qa_rows = [map_qa(q, notes) for q in raw_qa]
+    for n in notes:
+        print(f"  note {n}")
     ids = {q["id"] for q in qa_rows if q.get("id")}
     by_url = {p["url"]: p for p in raw_pages if p.get("url")}
     qa = []
@@ -297,6 +360,7 @@ def main() -> None:
         errs = validate_qa(q, ids, by_url)
         if errs:
             bad += 1; print(f"  REJECT qa {q.get('id')}: {'; '.join(errs)}"); continue
+        q.pop("_stat_source", None)
         qa.append(q)
     print(f"Q&A: {len(qa)} valid of {len(qa_rows)}" + ("" if raw_qa else " (no qa-*.json in the corpus yet)"))
 
@@ -318,7 +382,7 @@ def main() -> None:
     for i in range(0, len(up), 100):
         db.rest("sam_web_pages?on_conflict=url", "POST", up[i:i + 100], prefer="resolution=merge-duplicates,return=minimal")
     if ins:
-        db.rest("sam_web_qa?on_conflict=id", "POST", [{**r, "status": "draft", "origin": "bank"} for r in ins],
+        db.rest("sam_web_qa?on_conflict=id", "POST", [{**r, "status": "draft"} for r in ins],
                 prefer="resolution=ignore-duplicates,return=minimal")
     for r in patch:
         db.rest(f"sam_web_qa?id=eq.{urllib.parse.quote(r['id'])}&status=eq.draft", "PATCH",
@@ -399,6 +463,22 @@ def self_check() -> None:
     assert any("parent" in e for e in validate_qa(orphan, ids, by_url))
     assert any("sources" in e for e in validate_qa({**rows[3], "sources": []}, ids, by_url))
     assert map_qa({"id": "x", "parent": "y"})["parent_id"] == "y"
+    # the web-knowledge bank's shape -> contract props
+    notes: list[str] = []
+    b = map_qa({"id": "lp-x", "question": "Is Accops a real alternative to Citrix?", "short_answer": "Yes.", "status": "draft",
+                "cta": "asset", "cta_url": "https://downloads.accops.com/a.pdf", "sources": [LP + "#section-4"],
+                "visual": {"type": "compare_table", "data": {"columns": ["You need", "Accops"], "rows": [["VDI", "HyWorks"]]}}}, notes)
+    assert b["answer"] == "Yes." and b["cta"] == "Open the PDF" and b["visual"] == "compare_table"
+    assert b["visual_data"] == {"title": "Is Accops a real alternative to Citrix?", "columns": ["You need", "Accops"],
+                                "rows": [{"label": "VDI", "cells": ["HyWorks"]}]}
+    assert validate_qa(b, {"lp-x"}, by_url) == []
+    d = map_qa({"id": "lp-y", "question": "Docs?", "short_answer": "See.", "cta": "none", "cta_url": "https://x", "sources": [LP + "#faq"],
+                "visual": {"type": "doc_card", "data": {"cards": [{"title": "A", "url": "https://x/a.pdf", "blurb": "b"},
+                                                                  {"title": "B", "url": "https://x/b", "blurb": "c"}]}}}, notes)
+    assert d["cta"] is None and d["cta_url"] is None and d["visual_data"]["action"] == "download" and notes == ["lp-y: doc_card keeps 1 of 2 cards"]
+    s = map_qa({"id": "lp-z", "question": "Products?", "short_answer": "Fewer.", "sources": [LP + "#faq"],
+                "visual": {"type": "stat", "data": {"stats": [{"value": "8 → 1", "label": "Products", "source": LP + "#section-4"}]}}})
+    assert validate_qa(s, {"lp-z"}, by_url) == []                  # checked against the stat's own source page
 
     p = map_page(FIXTURE_PAGES[0])
     assert "words" not in p and "carded_by" not in p and p["products"] == [] and p["needs_recard"] is False

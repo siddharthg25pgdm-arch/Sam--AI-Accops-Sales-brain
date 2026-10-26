@@ -9,7 +9,8 @@
 --   sam_web_qa_public      approved, sourced, not past review_by, nothing blocked
 --   sam_web_pages_public   allowlisted hosts, not needs_recard, blocked facts removed, blocked summary sentences cut
 --   sam_web_assets_public  sam_v1_public_assets minus Regulation / Third-Party Research, blocked titles removed
---   sam_web_roots(page_url) / sam_web_children(qa_id) / sam_web_search(q, page_group, k)   read RPCs
+--   sam_web_settings() / sam_web_roots(page_url) / sam_web_children(qa_id) / sam_web_search(q, page_group, k)   read RPCs
+--   (sam_web_page_group(url) is defined in 01 and granted here)
 
 -- ---------------------------------------------------------------- row functions
 
@@ -30,19 +31,12 @@ create or replace function sam_web_page_rows()
 returns table (url text, title text, page_type text, page_group text, products text[], industries text[], summary text,
                facts jsonb, questions_answered text[], cta text, lastmod date, thumb_url text, updated_at timestamptz)
 language sql stable security definer set search_path = public, pg_catalog as $$
-  with b as (select coalesce(string_agg('(' || pattern || ')', '|'), 'a^') as rx from sam_web_blocked_patterns)
-  select p.url, p.title, p.page_type, p.page_group, p.products, p.industries,
-         (select string_agg(s, ' ' order by n) from regexp_split_to_table(p.summary, '(?<=[.!?])\s+') with ordinality t(s, n)
-          where s !~* b.rx),
-         coalesce((select jsonb_agg(jsonb_build_object('fact', f ->> 'fact', 'quote', f ->> 'quote') order by n)
-                   from jsonb_array_elements(p.facts) with ordinality e(f, n)
-                   where coalesce(f ->> 'fact', '') !~* b.rx and coalesce(f ->> 'quote', '') !~* b.rx), '[]'::jsonb),
-         array(select x from unnest(p.questions_answered) x where x !~* b.rx),
-         p.cta, p.lastmod, p.thumb_url, p.updated_at
-  from sam_web_pages p, b
-  where not p.needs_recard
+  -- The blocked filtering was done at write time (sam_web_pages_stamp in 01).
+  select p.url, p.title, p.page_type, p.page_group, p.products, p.industries, p.summary_public, p.facts_public,
+         p.questions_public, p.cta, p.lastmod, p.thumb_url, p.updated_at
+  from sam_web_pages p
+  where not p.needs_recard and not p.title_blocked
     and p.url ~* '^https://(www\.accops\.com|accops-citrix-lp\.vercel\.app)([/?#]|$)'
-    and p.title !~* b.rx
   order by p.url
 $$;
 
@@ -68,23 +62,34 @@ create or replace view sam_web_assets_public with (security_invoker = true) as s
 
 -- ---------------------------------------------------------------- read RPCs
 
--- Root questions for a page: its group's roots, or the 'general' roots when the group has none.
+-- The public subset of sam_web_settings (the reader has no grant on the table): {enabled, model_enabled, cta_url, cta_label}.
+create or replace function sam_web_settings() returns jsonb
+language sql stable security definer set search_path = public, pg_catalog as $$
+  select jsonb_build_object(
+    'enabled',       coalesce(max(value) filter (where key = 'enabled'), 'false') = 'true',
+    'model_enabled', coalesce(max(value) filter (where key = 'model_enabled'), 'false') = 'true',
+    'cta_url',       max(value) filter (where key = 'cta_url'),
+    'cta_label',     max(value) filter (where key = 'cta_label'))
+  from sam_web_settings
+$$;
+
+-- Root questions for a page, best first: its group's roots, or the 'general' roots when the group has none.
 create or replace function sam_web_roots(page_url text)
-returns table (id text, question text, nudge_weight int)
+returns table (id text, question text)
 language sql stable security definer set search_path = public, pg_catalog as $$
   with g as (select sam_web_page_group(sam_web_roots.page_url) as g),
   r as (select q.id, q.question, q.nudge_weight, q.pages from sam_web_qa_rows() q where q.parent_id is null),
-  own as (select r.* from r, g where g.g = any(r.pages))
-  select id, question, nudge_weight from own
-  union all
-  select r.id, r.question, r.nudge_weight from r where 'general' = any(r.pages) and not exists (select 1 from own)
-  order by nudge_weight desc, id
+  own as (select r.* from r, g where g.g = any(r.pages)),
+  pick as (select * from own
+           union all
+           select * from r where 'general' = any(r.pages) and not exists (select 1 from own))
+  select id, question from pick order by nudge_weight desc, id
 $$;
 
 create or replace function sam_web_children(qa_id text)
-returns table (id text, question text, nudge_weight int)
+returns table (id text, question text)
 language sql stable security definer set search_path = public, pg_catalog as $$
-  select q.id, q.question, q.nudge_weight from sam_web_qa_rows() q
+  select q.id, q.question from sam_web_qa_rows() q
   where q.parent_id = sam_web_children.qa_id
   order by q.nudge_weight desc, q.id
 $$;
@@ -95,7 +100,7 @@ $$;
 -- Score = full-text rank (any word) + trigram word similarity to the title (catches typos) + 0.1 for the page's
 -- own group. A row needs a word hit or a title similarity >= 0.5. text is cut to 300 chars.
 create or replace function sam_web_search(q text, page_group text default 'general', k int default 12)
-returns table (ref text, kind text, types text[], title text, text text, url text, score real)
+returns table (ref text, kind text, types text[], title text, text text, url text)
 language sql stable security definer set search_path = public, extensions, pg_catalog as $$
   with a as (
     select left(coalesce(sam_web_search.q, ''), 500) as q,
@@ -123,16 +128,16 @@ language sql stable security definer set search_path = public, extensions, pg_ca
            x.title || ' ' || x.asset_type || ' ' || coalesce(x.brief, '')
     from sam_web_asset_rows() x
   ),
+  v as (select c.*, to_tsvector('english', c.doc) as tsv from c),
   s as (
-    select c.*, coalesce(to_tsvector('english', c.doc) @@ a.tsq, false) as hit, word_similarity(a.q, c.title) as ws,
-           coalesce(ts_rank_cd(to_tsvector('english', c.doc), a.tsq), 0) as rank, a.g
-    from c, a
+    select v.*, coalesce(v.tsv @@ a.tsq, false) as hit, word_similarity(a.q, v.title) as ws,
+           coalesce(ts_rank_cd(v.tsv, a.tsq), 0) as rank, a.g
+    from v, a
   )
-  select s.ref, s.kind, s.types, s.title, left(s.body, 300), s.url,
-         (s.rank + s.ws + case when s.g = any(s.groups) then 0.1 else 0 end)::real as score
+  select s.ref, s.kind, s.types, s.title, left(s.body, 300), s.url
   from s
   where s.hit or s.ws >= 0.5
-  order by score desc, s.ref
+  order by s.rank + s.ws + case when s.g = any(s.groups) then 0.1 else 0 end desc, s.ref
   limit (select k from a)
 $$;
 
@@ -141,8 +146,8 @@ $$;
 revoke all on sam_web_qa_public, sam_web_pages_public, sam_web_assets_public from public, anon, authenticated;
 grant select on sam_web_qa_public, sam_web_pages_public, sam_web_assets_public to sam_web_reader, service_role;
 
-revoke execute on function sam_web_qa_rows(), sam_web_page_rows(), sam_web_asset_rows(), sam_web_roots(text),
+revoke execute on function sam_web_qa_rows(), sam_web_page_rows(), sam_web_asset_rows(), sam_web_settings(), sam_web_roots(text),
   sam_web_children(text), sam_web_search(text, text, int) from public, anon, authenticated;
 -- The views check the session's rights on their row functions, so the reader needs EXECUTE on those too.
-grant execute on function sam_web_qa_rows(), sam_web_page_rows(), sam_web_asset_rows(), sam_web_page_group(text),
+grant execute on function sam_web_qa_rows(), sam_web_page_rows(), sam_web_asset_rows(), sam_web_settings(), sam_web_page_group(text),
   sam_web_roots(text), sam_web_children(text), sam_web_search(text, text, int) to sam_web_reader, service_role;
