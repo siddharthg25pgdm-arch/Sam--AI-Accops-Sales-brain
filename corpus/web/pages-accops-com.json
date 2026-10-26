@@ -4519,48 +4519,42 @@
   "title": "Case Studies",
   "page_type": "case-study",
   "products": [
-   "HyLabs",
-   "Huddle",
+   "Browser Isolation",
    "Virtual Browser",
+   "AirBridge",
    "ZTNA",
-   "VDI",
-   "Browser Isolation"
+   "Huddle",
+   "HyLabs"
   ],
   "industries": [
    "Government",
-   "IT / ITeS",
    "Education",
+   "IT / ITeS",
    "E-commerce / Retail"
   ],
-  "summary": "Accops solutions help organizations of all sizes become more agile, efficient & secure than ever",
+  "summary": "Case study index. The server-rendered first page highlights six stories: a global IT services provider on Remote Browser Isolation, a power corporation on Virtual Browser and AirBridge, a government IT provider on ZTNA for 5,00,000+ users, a government agency on Huddle, a Japanese university on HyLabs, and an e-commerce giant with 25,000+ remote agents.",
   "facts": [
    {
-    "fact": "Accops solutions help organizations of all sizes become more agile, efficient & secure than ever",
-    "quote": "Accops solutions help organizations of all sizes become more agile, efficient & secure than ever"
-   },
-   {
-    "fact": "To enable safe access from customer-provided laptops, a leading IT services giant adopted Accops Remote Browser Isolation.",
-    "quote": "To enable safe access from customer-provided laptops, a leading IT services giant adopted Accops Remote Browser Isolation."
-   },
-   {
-    "fact": "The solution ensured compliance and cut costs, while securing HR and intranet access for 400,000+ users.",
+    "fact": "A leading IT services company secured HR and intranet access for 400,000+ users with Accops Remote Browser Isolation.",
     "quote": "The solution ensured compliance and cut costs, while securing HR and intranet access for 400,000+ users."
    },
    {
-    "fact": "The result: enhanced security, 50% lower IT overhead,seamless file transfers, &amp; improved user experience.",
-    "quote": "The result: enhanced security, 50% lower IT overhead,seamless file transfers, &amp; improved user experience."
-   },
-   {
-    "fact": "Scaling Secure Access for 5,00,000+ Government Users",
-    "quote": "Scaling Secure Access for 5,00,000+ Government Users"
-   },
-   {
-    "fact": "A leading government IT provider replaced legacy VPNs with Accops ZTNA to enable secure, agentless access to 700+ applications.",
+    "fact": "A leading government IT provider replaced legacy VPNs with Accops ZTNA for agentless access to 700+ applications (5,00,000+ government users).",
     "quote": "A leading government IT provider replaced legacy VPNs with Accops ZTNA to enable secure, agentless access to 700+ applications."
+   },
+   {
+    "fact": "A Japanese university gave 25,000+ students and faculty remote ICT lab access with HyLabs.",
+    "quote": "this Japanese University deployed Accops HyLabs—enabling 25,000+ students and faculty to access ICT labs remotely."
+   },
+   {
+    "fact": "An e-commerce giant secured access across warehouses and 25,000+ remote agents.",
+    "quote": "Accops enabled secure and seamless access across warehouses and 25,000+ remote agents."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Case Studies?"
+   "Do you have customer case studies?",
+   "Has Accops replaced a VPN at large scale?",
+   "Which large organisations use Accops?"
   ],
   "cta": null,
   "published": null,
@@ -4568,46 +4562,39 @@
   "fetched_at": "2026-10-26T09:52:35+00:00",
   "content_hash": "4374050dd406ca65",
   "words": 270,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/global-it-services-provider",
   "title": "Global IT Services Provider adopts Accops Remote Browser Isolation to enable secure agentless access to internal HRMS and intranet applications",
   "page_type": "case-study",
   "products": [
-   "ZTNA",
-   "MFA",
-   "Browser Isolation"
+   "Browser Isolation",
+   "MFA"
   ],
   "industries": [
    "IT / ITeS"
   ],
-  "summary": "Learn how a global IT services provider enabled secure, agentless HRMS and intranet access from customer-provided devices using Accops Remote Browser Isolation on Azure.",
+  "summary": "One of the world's largest IT services providers (about 600,000 employees) deployed Accops Remote Browser Isolation on Azure so staff on customer-provided laptops could reach HRMS and intranet apps without installing agents, logging in through Azure AD with MFA. It substantially reduced licensing costs versus the previous VDI-based remote browsing platform.",
   "facts": [
    {
-    "fact": "Global IT Services Provider adopts Accops Remote Browser Isolation to enable secure agentless access to internal HRMS and intranet applications",
-    "quote": "Global IT Services Provider adopts Accops Remote Browser Isolation to enable secure agentless access to internal HRMS and intranet applications"
-   },
-   {
-    "fact": "One of the world's largest IT services providers, with approximately 600,000 employees, needed to provide secure access to HRMS portals and other internal applications for employees using customer-provided laptops.",
-    "quote": "One of the world's largest IT services providers, with approximately 600,000 employees, needed to provide secure access to HRMS portals and other internal applications for employees using customer-provided laptops."
-   },
-   {
-    "fact": "Internal applications could not be directly exposed due to cyber risk, compliance and data protection concerns.",
-    "quote": "Internal applications could not be directly exposed due to cyber risk, compliance and data protection concerns."
-   },
-   {
-    "fact": "Accops Remote Browser Isolation was deployed on Azure to enable secure browser-based access without installing software on third-party devices.",
+    "fact": "Accops Remote Browser Isolation was deployed on Azure for browser-based access without installing software on third-party devices.",
     "quote": "Accops Remote Browser Isolation was deployed on Azure to enable secure browser-based access without installing software on third-party devices."
    },
    {
-    "fact": "Improved security and compliance by ensuring sensitive data does not reside on unmanaged devices.",
-    "quote": "Improved security and compliance by ensuring sensitive data does not reside on unmanaged devices."
+    "fact": "Substantially reduced licensing costs compared to the previous VDI-based remote browsing platform.",
+    "quote": "Substantially reduced licensing costs compared to the previous VDI-based remote browsing platform."
+   },
+   {
+    "fact": "The customer has approximately 600,000 employees.",
+    "quote": "One of the world's largest IT services providers, with approximately 600,000 employees"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Global IT Services Provider adopts Accops Remote Browser Isolation to enable secure agentless access to internal HRMS and intranet applications?"
+   "Can staff on customer-owned laptops reach our intranet without an agent?",
+   "Does Accops RBI run on Azure?",
+   "Can browser isolation replace a VDI-based browsing setup?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4618,26 +4605,31 @@
   "fetched_at": "2026-10-26T09:52:36+00:00",
   "content_hash": "f294bee664882496",
   "words": 179,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/Virtual%20Browsing%20for%20Air-Gapped%20Security%20at%20a%20Power%20Corp",
-  "title": "To comply with national cybersecurity mandates, the Power Corp replaced dual-PC setups with Accops’ Virtual Browser and Airbridge solutions. The result: enhanced security, 50% lower IT overhead,seamless file transfers, &amp; improved user experience.",
+  "title": "Virtual Browsing for Air-Gapped Security at a Power Corp",
   "page_type": "case-study",
   "products": [
-   "Virtual Browser"
+   "Virtual Browser",
+   "AirBridge",
+   "Browser Isolation"
   ],
-  "industries": [],
-  "summary": "Learn how a power corporation improved air-gapped security using Accops Virtual Browser and Airbridge, reducing IT costs and strengthening data protection.",
+  "industries": [
+   "Government"
+  ],
+  "summary": "A power corporation replaced dual-PC setups with Accops Virtual Browser and AirBridge to meet national cybersecurity mandates, reporting 50% lower IT overhead. The full story is in the downloadable PDF.",
   "facts": [
    {
-    "fact": "The result: enhanced security, 50% lower IT overhead,seamless file transfers, &amp; improved user experience.",
-    "quote": "The result: enhanced security, 50% lower IT overhead,seamless file transfers, &amp; improved user experience."
+    "fact": "The Power Corp replaced dual-PC setups with Accops Virtual Browser and AirBridge, with 50% lower IT overhead.",
+    "quote": "To comply with national cybersecurity mandates, the Power Corp replaced dual-PC setups with Accops’ Virtual Browser and Airbridge solutions. The result: enhanced security, 50% lower IT overhead,seamless file transfers"
    }
   ],
   "questions_answered": [
-   "What does Accops say about To comply with national cybersecurity mandates, the Power Corp replaced dual-PC setups with Accops’ Virtual Browser and Airbridge solutions. The result?"
+   "Can Accops replace dual-PC setups for air-gapped networks?",
+   "How do we move files safely into an air-gapped network?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4648,12 +4640,12 @@
   "fetched_at": "2026-10-26T09:52:36+00:00",
   "content_hash": "e3696b59010035f7",
   "words": 36,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/Secure%20IT%20Helpdesk%20for%20Critical%20Government%20Infrastructure",
-  "title": "With remote desktop tools restricted by cybersecurity mandates, a major government agency deployed Accops Huddle to deliver secure, compliant IT support across thousands of endpoints—without internet dependency or third-party risk.",
+  "title": "Secure IT Helpdesk for Critical Government Infrastructure",
   "page_type": "case-study",
   "products": [
    "Huddle"
@@ -4661,15 +4653,16 @@
   "industries": [
    "Government"
   ],
-  "summary": "With remote desktop tools restricted by cybersecurity mandates, a major government agency deployed Accops Huddle to deliver secure, compliant IT support across thousands of endpoints—without internet dependency or third-party risk.",
+  "summary": "A major government agency, barred from using remote desktop tools, deployed Accops Huddle for compliant IT support across thousands of endpoints without internet dependency. Details are in the PDF.",
   "facts": [
    {
-    "fact": "With remote desktop tools restricted by cybersecurity mandates, a major government agency deployed Accops Huddle to deliver secure, compliant IT support across thousands of endpoints—without internet dependency or third-party risk.",
-    "quote": "With remote desktop tools restricted by cybersecurity mandates, a major government agency deployed Accops Huddle to deliver secure, compliant IT support across thousands of endpoints—without internet dependency or third-party risk."
+    "fact": "A government agency deployed Accops Huddle for compliant IT support across thousands of endpoints without internet dependency.",
+    "quote": "a major government agency deployed Accops Huddle to deliver secure, compliant IT support across thousands of endpoints—without internet dependency or third-party risk."
    }
   ],
   "questions_answered": [
-   "What does Accops say about With remote desktop tools restricted by cybersecurity mandates, a major government agency deployed Accops Huddle to deliver secure, compliant IT support across thousands of endpoints—without internet dependency or third-party risk.?"
+   "Is there a secure remote support tool for air-gapped government networks?",
+   "What is Accops Huddle?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4680,12 +4673,12 @@
   "fetched_at": "2026-10-26T09:52:36+00:00",
   "content_hash": "7adb03648c9409cd",
   "words": 33,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/kyoto-university",
-  "title": "To tackle underutilised labs and high IT costs, this Japanese University deployed Accops HyLabs—enabling 25,000+ students and faculty to access ICT labs remotely. The self-service VDI platform cut costs and optimised resource use.",
+  "title": "Japanese University Modernises ICT Labs with VDI",
   "page_type": "case-study",
   "products": [
    "HyLabs",
@@ -4694,15 +4687,16 @@
   "industries": [
    "Education"
   ],
-  "summary": "Explore Kyoto University’s VDI case study featuring Accops HyLabs, delivering secure, flexible, and scalable virtual desktop access for education.",
+  "summary": "A Japanese university deployed Accops HyLabs so 25,000+ students and faculty could access ICT labs remotely, cutting costs and improving resource use. The page body does not name the university; the URL and meta description do.",
   "facts": [
    {
-    "fact": "To tackle underutilised labs and high IT costs, this Japanese University deployed Accops HyLabs—enabling 25,000+ students and faculty to access ICT labs remotely.",
-    "quote": "To tackle underutilised labs and high IT costs, this Japanese University deployed Accops HyLabs—enabling 25,000+ students and faculty to access ICT labs remotely."
+    "fact": "HyLabs enabled 25,000+ students and faculty to access ICT labs remotely.",
+    "quote": "this Japanese University deployed Accops HyLabs—enabling 25,000+ students and faculty to access ICT labs remotely."
    }
   ],
   "questions_answered": [
-   "What does Accops say about To tackle underutilised labs and high IT costs, this Japanese University deployed Accops HyLabs—enabling 25,000+ students and faculty to access ICT labs remotely. The self-service VDI platform cut costs and optimised resource use.?"
+   "Does Accops have customers in Japan?",
+   "How many students can HyLabs serve?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4713,24 +4707,30 @@
   "fetched_at": "2026-10-26T09:52:36+00:00",
   "content_hash": "cf4418a9c8d33dcb",
   "words": 36,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/Secure%20Remote%20Operations%20for%20India%E2%80%99s%20Top%20E-Commerce%20Giant",
-  "title": "Accops enabled secure and seamless access across warehouses and 25,000+ remote agents. With device binding, kiosk mode, and Linux/Chrome OS support, the company cut costs, boosted security, and scaled effortlessly during peak seasons.",
+  "title": "Secure Remote Operations for India's Top E-Commerce Giant",
   "page_type": "case-study",
-  "products": [],
-  "industries": [],
-  "summary": "Accops enabled secure and seamless access across warehouses and 25,000+ remote agents. With device binding, kiosk mode, and Linux/Chrome OS support, the company cut costs, boosted security, and scaled effortlessly during peak seasons.",
+  "products": [
+   "HySecure",
+   "ZTNA"
+  ],
+  "industries": [
+   "E-commerce / Retail"
+  ],
+  "summary": "An Indian e-commerce giant secured access across warehouses and 25,000+ remote agents with device binding, kiosk mode and Linux/Chrome OS support, scaling for peak seasons.",
   "facts": [
    {
-    "fact": "Accops enabled secure and seamless access across warehouses and 25,000+ remote agents.",
-    "quote": "Accops enabled secure and seamless access across warehouses and 25,000+ remote agents."
+    "fact": "Secure access across warehouses and 25,000+ remote agents with device binding, kiosk mode and Linux/Chrome OS support.",
+    "quote": "Accops enabled secure and seamless access across warehouses and 25,000+ remote agents. With device binding, kiosk mode, and Linux/Chrome OS support"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Accops enabled secure and seamless access across warehouses and 25,000+ remote agents. With device binding, kiosk mode, and Linux/Chrome OS support, the company cut costs, boosted security, and scaled effortlessly during peak seasons.?"
+   "Can Accops scale for seasonal peaks?",
+   "Does Accops support Chrome OS and Linux endpoints?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4741,31 +4741,32 @@
   "fetched_at": "2026-10-26T09:52:36+00:00",
   "content_hash": "18229eb5814e973d",
   "words": 36,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/Securing%20Remote%20Access%20for%20India%E2%80%99s%20Top%20Private%20Banks",
-  "title": "Accops enabled two leading private banks to securely connect 120,000+ users—vendors, employees, and developers—with Zero Trust Access, VDI, and biometric authentication. The solution cut costs, ensured compliance, and simplified legacy integration.",
+  "title": "Securing Remote Access for India's Top Private Banks",
   "page_type": "case-study",
   "products": [
+   "ZTNA",
+   "VDI",
    "BioAuth",
-   "VDI"
+   "MFA"
   ],
-  "industries": [],
-  "summary": "Accops enabled two leading private banks to securely connect 120,000+ users—vendors, employees, and developers—with Zero Trust Access, VDI, and biometric authentication. The solution cut costs, ensured compliance, and simplified legacy integration.",
+  "industries": [
+   "BFSI"
+  ],
+  "summary": "Two leading Indian private banks connected 120,000+ users (vendors, employees and developers) with Accops zero trust access, VDI and biometric authentication, cutting costs and simplifying legacy integration.",
   "facts": [
    {
-    "fact": "Accops enabled two leading private banks to securely connect 120,000+ users—vendors, employees, and developers—with Zero Trust Access, VDI, and biometric authentication.",
+    "fact": "Two leading private banks securely connected 120,000+ users with Zero Trust Access, VDI and biometric authentication.",
     "quote": "Accops enabled two leading private banks to securely connect 120,000+ users—vendors, employees, and developers—with Zero Trust Access, VDI, and biometric authentication."
-   },
-   {
-    "fact": "The solution cut costs, ensured compliance, and simplified legacy integration.",
-    "quote": "The solution cut costs, ensured compliance, and simplified legacy integration."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Accops enabled two leading private banks to securely connect 120,000+ users—vendors, employees, and developers—with Zero Trust Access, VDI, and biometric authentication. The solution cut costs, ensured compliance, and simplified legacy integration.?"
+   "Which banks use Accops at scale?",
+   "Can Accops handle 100,000+ users?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4776,34 +4777,31 @@
   "fetched_at": "2026-10-26T09:52:37+00:00",
   "content_hash": "aab80a1d3d00b909",
   "words": 34,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/Scalable%20Secure%20Access%20for%20a%20Leading%20Private%20Bank",
-  "title": "Faced with a surge in remote work, the bank scaled from 500 to 30,000+ users with Accops ZTNA, VDI, and biometric authentication. The result: secure access for vendors, IT teams, and developers—plus reduced costs, enhanced compliance, and optimized resource usage.",
+  "title": "Scalable Secure Access for a Leading Private Bank",
   "page_type": "case-study",
   "products": [
-   "BioAuth",
    "ZTNA",
-   "VDI"
+   "VDI",
+   "BioAuth"
   ],
   "industries": [
    "BFSI"
   ],
-  "summary": "Faced with a surge in remote work, the bank scaled from 500 to 30,000+ users with Accops ZTNA, VDI, and biometric authentication. The result: secure access for vendors, IT teams, and developers—plus reduced costs, enhanced compliance, and optimized resource usage.",
+  "summary": "A leading private bank scaled from 500 to 30,000+ remote users with Accops ZTNA, VDI and biometric authentication for vendors, IT teams and developers.",
   "facts": [
    {
-    "fact": "Faced with a surge in remote work, the bank scaled from 500 to 30,000+ users with Accops ZTNA, VDI, and biometric authentication.",
-    "quote": "Faced with a surge in remote work, the bank scaled from 500 to 30,000+ users with Accops ZTNA, VDI, and biometric authentication."
-   },
-   {
-    "fact": "The result: secure access for vendors, IT teams, and developers—plus reduced costs, enhanced compliance, and optimized resource usage.",
-    "quote": "The result: secure access for vendors, IT teams, and developers—plus reduced costs, enhanced compliance, and optimized resource usage."
+    "fact": "The bank scaled from 500 to 30,000+ users with Accops ZTNA, VDI and biometric authentication.",
+    "quote": "the bank scaled from 500 to 30,000+ users with Accops ZTNA, VDI, and biometric authentication."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Faced with a surge in remote work, the bank scaled from 500 to 30,000+ users with Accops ZTNA, VDI, and biometric authentication. The result?"
+   "How fast can Accops scale remote access?",
+   "Has a bank scaled to 30,000 users on Accops?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4814,32 +4812,31 @@
   "fetched_at": "2026-10-26T09:52:37+00:00",
   "content_hash": "7b86477bbc0d3188",
   "words": 43,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/MFA%20Without%20Disruption%20for%20India%E2%80%99s%20Largest%20Private%20Bank",
-  "title": "To meet RBI mandates and secure vendor access, the bank used Accops solution to implement MFA across legacy apps—without app changes or costly Azure AD licenses. Result: 20,000+ users secured, compliance achieved, and vendor onboarding streamlined.",
+  "title": "MFA Without Disruption for India's Largest Private Bank",
   "page_type": "case-study",
   "products": [
-   "MFA"
+   "MFA",
+   "HyID",
+   "ZTNA"
   ],
   "industries": [
    "BFSI"
   ],
-  "summary": "To meet RBI mandates and secure vendor access, the bank used Accops solution to implement MFA across legacy apps—without app changes or costly Azure AD licenses. Result: 20,000+ users secured, compliance achieved, and vendor onboarding streamlined.",
+  "summary": "To meet RBI mandates for vendor access, India's largest private bank added MFA to legacy apps with Accops without changing the apps or buying Azure AD licences, securing 20,000+ users.",
   "facts": [
    {
-    "fact": "To meet RBI mandates and secure vendor access, the bank used Accops solution to implement MFA across legacy apps—without app changes or costly Azure AD licenses.",
-    "quote": "To meet RBI mandates and secure vendor access, the bank used Accops solution to implement MFA across legacy apps—without app changes or costly Azure AD licenses."
-   },
-   {
-    "fact": "Result: 20,000+ users secured, compliance achieved, and vendor onboarding streamlined.",
-    "quote": "Result: 20,000+ users secured, compliance achieved, and vendor onboarding streamlined."
+    "fact": "MFA across legacy apps without app changes or Azure AD licences; 20,000+ users secured to meet RBI mandates.",
+    "quote": "To meet RBI mandates and secure vendor access, the bank used Accops solution to implement MFA across legacy apps—without app changes or costly Azure AD licenses. Result: 20,000+ users secured"
    }
   ],
   "questions_answered": [
-   "What does Accops say about To meet RBI mandates and secure vendor access, the bank used Accops solution to implement MFA across legacy apps—without app changes or costly Azure AD licenses. Result?"
+   "Can we add MFA to legacy apps for RBI compliance?",
+   "Do we need Azure AD licences for vendor MFA?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4850,21 +4847,30 @@
   "fetched_at": "2026-10-26T09:52:37+00:00",
   "content_hash": "ca3671d3aecb58a2",
   "words": 39,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/IndiaFirst%20Life",
-  "title": "IndiaFirst Life opted for Accops' end-user computing virtualization solution, integrated with their preferred HCI vendor, for secure app access for BPO users, choosing it over alternatives like VMware due to its superior features, integrations, and support.",
+  "title": "IndiaFirst Life: EUC virtualisation for BPO users",
   "page_type": "case-study",
-  "products": [],
-  "industries": [
-   "IT / ITeS"
+  "products": [
+   "VDI",
+   "HyWorks"
   ],
-  "summary": "IndiaFirst Life opted for Accops' end-user computing virtualization solution, integrated with their preferred HCI vendor, for secure app access for BPO users, choosing it over alternatives like VMware due to its superior features, integrations, and support.",
-  "facts": [],
+  "industries": [
+   "BFSI"
+  ],
+  "summary": "IndiaFirst Life chose Accops end-user computing virtualisation, integrated with its preferred HCI vendor, for secure app access by BPO users, over alternatives such as VMware.",
+  "facts": [
+   {
+    "fact": "IndiaFirst Life chose Accops EUC virtualisation, integrated with its HCI vendor, over alternatives like VMware.",
+    "quote": "IndiaFirst Life opted for Accops' end-user computing virtualization solution, integrated with their preferred HCI vendor, for secure app access for BPO users, choosing it over alternatives like VMware due to its superior features, integrations, and support."
+   }
+  ],
   "questions_answered": [
-   "What does Accops say about IndiaFirst Life opted for Accops' end-user computing virtualization solution, integrated with their preferred HCI vendor, for secure app access for BPO users, choosing it over alternatives like VMware due to its superior features, integrations, and support.?"
+   "Has an insurer chosen Accops over VMware?",
+   "Does Accops integrate with HCI platforms?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4875,34 +4881,32 @@
   "fetched_at": "2026-10-26T09:52:37+00:00",
   "content_hash": "798dc29ffc842818",
   "words": 39,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/mirae",
   "title": "Mirae Asset enhances business agility with Accops solutions, achieving secure remote work, operational efficiency, and regulatory compliance while maintaining service excellence during challenging times.",
   "page_type": "case-study",
   "products": [
+   "ZTNA",
+   "HyID",
+   "BioAuth",
    "DLP"
   ],
-  "industries": [],
-  "summary": "Mirae Asset enhances business agility with Accops solutions, achieving secure remote work, operational efficiency, and regulatory compliance while maintaining service excellence during challenging times.",
+  "industries": [
+   "BFSI"
+  ],
+  "summary": "Mirae Asset India (asset management) used an Accops zero trust gateway, facial authentication in IAM, DLP and endpoint controls to secure its mobile workforce and keep business running through COVID-19.",
   "facts": [
    {
-    "fact": "Mirae Asset enhances business agility with Accops solutions, achieving secure remote work, operational efficiency, and regulatory compliance while maintaining service excellence during challenging times.",
-    "quote": "Mirae Asset enhances business agility with Accops solutions, achieving secure remote work, operational efficiency, and regulatory compliance while maintaining service excellence during challenging times."
-   },
-   {
-    "fact": "Their expertise extends to Mutual Funds, along with alternate investment funds and advisory services.",
-    "quote": "Their expertise extends to Mutual Funds, along with alternate investment funds and advisory services."
-   },
-   {
-    "fact": "Assured business continuity amid COVID-19 with smooth remote work transition.",
-    "quote": "Assured business continuity amid COVID-19 with smooth remote work transition."
+    "fact": "Zero trust gateway allows access only from authorised devices, with facial authentication integrated in IAM.",
+    "quote": "Zero trust-based gateway allows access solely from authorized devices. | Integrated facial authentication within identity and access management."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Mirae Asset enhances business agility with Accops solutions, achieving secure remote work, operational efficiency, and regulatory compliance while maintaining service excellence during challenging times.?"
+   "Do asset managers use Accops?",
+   "Can Accops add facial authentication?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4913,24 +4917,26 @@
   "fetched_at": "2026-10-26T09:52:40+00:00",
   "content_hash": "b8ebec517f1b3b1e",
   "words": 225,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/Sriram%20Capital",
-  "title": "Shriram Capital adopts Accops solutions for secure remote connectivity to reduce costs, improve productivity, enhance security, and ensure compliance for their users.",
+  "title": "Shriram Capital: secure remote connectivity",
   "page_type": "case-study",
   "products": [],
-  "industries": [],
-  "summary": "Shriram Capital adopts Accops solutions for secure remote connectivity to reduce costs, improve productivity, enhance security, and ensure compliance for their users.",
+  "industries": [
+   "BFSI"
+  ],
+  "summary": "Shriram Capital adopted Accops for secure remote connectivity to reduce costs, improve productivity and support compliance. Details are in the PDF.",
   "facts": [
    {
-    "fact": "Shriram Capital adopts Accops solutions for secure remote connectivity to reduce costs, improve productivity, enhance security, and ensure compliance for their users.",
+    "fact": "Shriram Capital adopted Accops for secure remote connectivity.",
     "quote": "Shriram Capital adopts Accops solutions for secure remote connectivity to reduce costs, improve productivity, enhance security, and ensure compliance for their users."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Shriram Capital adopts Accops solutions for secure remote connectivity to reduce costs, improve productivity, enhance security, and ensure compliance for their users.?"
+   "Do NBFCs use Accops?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4941,19 +4947,29 @@
   "fetched_at": "2026-10-26T09:52:39+00:00",
   "content_hash": "7eddd318378ba49b",
   "words": 25,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/Ecom%20Express",
-  "title": "Accops empowers Ecom Express with a Zero Trust-based security solution for seamless access to cloud applications in their existing infrastructure, enabling secure remote access and endpoint connectivity for their users.",
+  "title": "Ecom Express: zero trust access to cloud apps",
   "page_type": "case-study",
-  "products": [],
-  "industries": [],
-  "summary": "Accops empowers Ecom Express with a Zero Trust-based security solution for seamless access to cloud applications in their existing infrastructure, enabling secure remote access and endpoint connectivity for their users.",
-  "facts": [],
+  "products": [
+   "HySecure",
+   "ZTNA"
+  ],
+  "industries": [
+   "E-commerce / Retail"
+  ],
+  "summary": "Ecom Express uses an Accops zero trust solution for access to cloud applications in its existing infrastructure and secure remote access for its users. Details are in the PDF.",
+  "facts": [
+   {
+    "fact": "Accops gives Ecom Express zero trust access to cloud applications in its existing infrastructure.",
+    "quote": "Accops empowers Ecom Express with a Zero Trust-based security solution for seamless access to cloud applications in their existing infrastructure"
+   }
+  ],
   "questions_answered": [
-   "What does Accops say about Accops empowers Ecom Express with a Zero Trust-based security solution for seamless access to cloud applications in their existing infrastructure, enabling secure remote access and endpoint connectivity for their users.?"
+   "Do logistics companies use Accops ZTNA?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -4964,8 +4980,8 @@
   "fetched_at": "2026-10-26T09:52:40+00:00",
   "content_hash": "7460f9dc6dbca3ee",
   "words": 33,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/city-pharmacy",
@@ -4978,19 +4994,34 @@
   "industries": [
    "Pharma / Healthcare"
   ],
-  "summary": "Learn how City Pharmacy safeguarded patient data, improved efficiency, and enabled secure remote access with Accops’ advanced IT solutions.",
+  "summary": "City Pharmacy, a UAE pharmaceutical and medical equipment distributor, replaced Citrix XenApp with Accops HyWorks to virtualise its Orion ERP client after its previous VDI lacked flexibility and renewal costs were high. Universal printer drivers fixed dot-matrix invoice printing, and implementation was swift.",
   "facts": [
    {
-    "fact": "City Pharmacy replaces Citrix XenApp by Accops HyWorks for ERP virtualization to ensure seamless access & compliance",
+    "fact": "City Pharmacy replaced Citrix XenApp with Accops HyWorks for ERP virtualization.",
     "quote": "City Pharmacy replaces Citrix XenApp by Accops HyWorks for ERP virtualization to ensure seamless access & compliance"
    },
    {
-    "fact": "Dr Abdulrahman Almahmeed incorporated it in 1967.",
-    "quote": "Dr Abdulrahman Almahmeed incorporated it in 1967."
+    "fact": "The previous VDI vendor lacked flexibility and customisation for Orion ERP access.",
+    "quote": "Productivity took a hit as remote users could not access Orion ERP since the existing VDI vendor could not achieve desired results due to lack of flexibility & customization."
+   },
+   {
+    "fact": "High IT infrastructure and licence renewal costs were a challenge.",
+    "quote": "High IT infrastructure and license renewal costs."
+   },
+   {
+    "fact": "Universal printer drivers resolved invoice printing issues.",
+    "quote": "Universal printer drivers to resolve invoice printing issues."
+   },
+   {
+    "fact": "Swift implementation and onboarding gave faster ROI.",
+    "quote": "Swift implementation and onboarding ensure faster ROI."
    }
   ],
   "questions_answered": [
-   "What does Accops say about City Pharmacy replaces Citrix XenApp by Accops HyWorks for ERP virtualization to ensure seamless access & compliance?"
+   "Has anyone replaced Citrix with Accops?",
+   "Can Accops virtualise our ERP client?",
+   "Does Accops fix printing problems we had on Citrix?",
+   "Do you have customers in the UAE?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5001,49 +5032,36 @@
   "fetched_at": "2026-10-26T09:52:39+00:00",
   "content_hash": "3b95dd738053182a",
   "words": 208,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/zulekha-hospital",
   "title": "Zulekha Hospital relies on Accops to provide secure remote connectivity",
   "page_type": "case-study",
   "products": [
-   "MFA",
-   "VDI"
+   "Digital Workspace",
+   "VDI",
+   "HySecure",
+   "MFA"
   ],
   "industries": [
    "Pharma / Healthcare"
   ],
-  "summary": "Zulekha Hospital relies on Accops to provide secure remote connectivity Zulekha Hospital was established in Sharjah in 1992 by Dr. Zulekha Daud.",
+  "summary": "Zulekha Healthcare Group (UAE) gave doctors secure access to medical records from any device using an Accops digital workspace with sandboxed office PC and VDI access, a secure gateway, MFA and device entry control.",
   "facts": [
    {
-    "fact": "Zulekha Hospital was established in Sharjah in 1992 by Dr.",
-    "quote": "Zulekha Hospital was established in Sharjah in 1992 by Dr."
+    "fact": "Doctors can access medical records from anywhere, on any device.",
+    "quote": "Improved patient care as doctors can now access medical records from anywhere, using any device"
    },
    {
-    "fact": "What started off as a 30-bed set-up with basic facilities for gynaecology, obstetrics, surgery, medicine and paediatrics in the 90s, today boasts 185 beds sprawled over an area of 290,000 square feet.",
-    "quote": "What started off as a 30-bed set-up with basic facilities for gynaecology, obstetrics, surgery, medicine and paediatrics in the 90s, today boasts 185 beds sprawled over an area of 290,000 square feet."
-   },
-   {
-    "fact": "Zulekha Healthcare Group includes two multidisciplinary hospitals in Dubai and Sharjah, three UAE medical centres and three pharmacies, providing specialized treatments in over 30 disciplines.",
-    "quote": "Zulekha Healthcare Group includes two multidisciplinary hospitals in Dubai and Sharjah, three UAE medical centres and three pharmacies, providing specialized treatments in over 30 disciplines."
-   },
-   {
-    "fact": "With more than 3,000 personnel, including over 300 qualified doctors, staff nurses and a host of paramedical staff, the group represents comprehensive healthcare accessible to anyone in need of medical attention.",
-    "quote": "With more than 3,000 personnel, including over 300 qualified doctors, staff nurses and a host of paramedical staff, the group represents comprehensive healthcare accessible to anyone in need of medical attention."
-   },
-   {
-    "fact": "Concerns over regulatory compliances as out-of-duty doctors needed to access medical records for reference in case of emergency",
-    "quote": "Concerns over regulatory compliances as out-of-duty doctors needed to access medical records for reference in case of emergency"
-   },
-   {
-    "fact": "Enhanced monitoring & risk profiling with 360-degree visibility and control over apps, data & endpoints",
-    "quote": "Enhanced monitoring & risk profiling with 360-degree visibility and control over apps, data & endpoints"
+    "fact": "Zulekha Healthcare Group has more than 3,000 personnel.",
+    "quote": "With more than 3,000 personnel, including over 300 qualified doctors, staff nurses and a host of paramedical staff"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Zulekha Hospital relies on Accops to provide secure remote connectivity?"
+   "Do hospitals in the Middle East use Accops?",
+   "Can doctors access records remotely and securely?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5054,38 +5072,32 @@
   "fetched_at": "2026-10-26T09:52:43+00:00",
   "content_hash": "3b5d4c1b2715e067",
   "words": 290,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/food-processing-company",
   "title": "Food processing firm adopts Accops Digital Workspace for secure work from home",
   "page_type": "case-study",
   "products": [
-   "Digital Workspace"
+   "Digital Workspace",
+   "VDI",
+   "ZTNA",
+   "Nano"
   ],
-  "industries": [],
-  "summary": "Food processing firm adopts Accops Digital Workspace for secure work from home It is a food manufacturing company established in the year 1962. With its extensive range of quality products, it is among India’s fastest-growing processed food companies widely preferred and trusted by Indian consumers and several food companies.",
+  "industries": [
+   "Manufacturing"
+  ],
+  "summary": "An Indian processed-food manufacturer moved office and factory users to work from home with Accops app and desktop virtualisation, zero trust access, DLP and a read-only USB OS for BYOD, at 50% lower TCO than competitive solutions.",
   "facts": [
    {
-    "fact": "It is a food manufacturing company established in the year 1962.",
-    "quote": "It is a food manufacturing company established in the year 1962."
-   },
-   {
-    "fact": "Security and compliance concerns associated with allowing the office and factory users to work from their homes",
-    "quote": "Security and compliance concerns associated with allowing the office and factory users to work from their homes"
-   },
-   {
-    "fact": "TCO is 50% less compared to competitive solutions",
+    "fact": "TCO is 50% less compared to competitive solutions.",
     "quote": "TCO is 50% less compared to competitive solutions"
-   },
-   {
-    "fact": "Mitigation of all security and compliance concerns associated with WFH",
-    "quote": "Mitigation of all security and compliance concerns associated with WFH"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Food processing firm adopts Accops Digital Workspace for secure work from home?"
+   "Do manufacturers use Accops for remote work?",
+   "How does Accops TCO compare with competitors?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5096,34 +5108,35 @@
   "fetched_at": "2026-10-26T09:52:43+00:00",
   "content_hash": "8fb42788d3919ff2",
   "words": 245,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/leading-textile-manufacturer",
   "title": "Textile maker switches to thin clients to boost efficiency on shop floors & reduce cost of endpoint computing",
   "page_type": "case-study",
   "products": [
-   "Thin Clients"
+   "VDI",
+   "Thin Clients",
+   "HyDesk"
   ],
-  "industries": [],
-  "summary": "Textile maker switches to thin clients to boost efficiency on shop floors & reduce cost of endpoint computing This textile manufacturer is a part of a global conglomerate and is among the top publicly listed companies in India. Incorporated in 1940s, it started as a textiles manufacturer and has steadily evolved into a leading diversified player with a leading presence across many sectors.",
+  "industries": [
+   "Manufacturing"
+  ],
+  "summary": "A textile manufacturer in a large Indian conglomerate replaced failure-prone shop-floor PCs with rugged thin clients and app and desktop virtualisation, managing endpoints centrally and cutting power use.",
   "facts": [
    {
-    "fact": "Incorporated in 1940s, it started as a textiles manufacturer and has steadily evolved into a leading diversified player with a leading presence across many sectors.",
-    "quote": "Incorporated in 1940s, it started as a textiles manufacturer and has steadily evolved into a leading diversified player with a leading presence across many sectors."
-   },
-   {
-    "fact": "It aims to create sustainable value for its 24,000+ employees, 230,000+ shareholders, society, and customers.",
-    "quote": "It aims to create sustainable value for its 24,000+ employees, 230,000+ shareholders, society, and customers."
-   },
-   {
-    "fact": "Reduced OpEx due to increased hardware lifecycle & 70% lesser power consumption by thin clients",
+    "fact": "Reduced OpEx from longer hardware life and 70% lower thin client power consumption.",
     "quote": "Reduced OpEx due to increased hardware lifecycle & 70% lesser power consumption by thin clients"
+   },
+   {
+    "fact": "Installs, upgrades and OS patching done from a central console without local IT.",
+    "quote": "Improved IT team's efficiency as installations, upgradations, OS patching can all be done from a centralized console without IT admins' presence locally"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Textile maker switches to thin clients to boost efficiency on shop floors & reduce cost of endpoint computing?"
+   "Do thin clients work in harsh factory conditions?",
+   "Do manufacturers use Accops thin clients?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5134,44 +5147,35 @@
   "fetched_at": "2026-10-26T09:52:44+00:00",
   "content_hash": "5835bec4f5fd6ad5",
   "words": 255,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/kalupur-bank",
   "title": "Kalupur Bank switches to ZTNA-based solution for remote access, cheers customers with 45x improvement in resolution time",
   "page_type": "case-study",
   "products": [
+   "HySecure",
+   "ZTNA",
    "DLP"
   ],
   "industries": [
    "BFSI"
   ],
-  "summary": "Learn how Accops enabled Kalupur Bank to enhance security and efficiency with seamless remote access solutions, ensuring compliance and business continuity.",
+  "summary": "Kalupur Commercial Co-operative Bank replaced VPN-style remote access with an Accops zero trust application access gateway, DLP and device entry control so staff and vendors could work from home on CBS apps, cutting support resolution time 45x.",
   "facts": [
    {
-    "fact": "Kalupur Bank switches to ZTNA-based solution for remote access, cheers customers with 45x improvement in resolution time",
-    "quote": "Kalupur Bank switches to ZTNA-based solution for remote access, cheers customers with 45x improvement in resolution time"
-   },
-   {
-    "fact": "Established in 1970, the Kalupur Commercial Co-operative Bank is headquartered in Ahmedabad, Gujarat, and generated a gross income of Rs. 854.58 crores in the financial year 2019-20.",
-    "quote": "Established in 1970, the Kalupur Commercial Co-operative Bank is headquartered in Ahmedabad, Gujarat, and generated a gross income of Rs. 854.58 crores in the financial year 2019-20."
-   },
-   {
-    "fact": "Increased business uptime for the bank, leading to happier customers",
-    "quote": "Increased business uptime for the bank, leading to happier customers"
-   },
-   {
-    "fact": "Compliance concerns are addressed by ZTNA-based remote access to CBS & other critical apps",
-    "quote": "Compliance concerns are addressed by ZTNA-based remote access to CBS & other critical apps"
-   },
-   {
-    "fact": "Support resolution time reduced 45x as IT staff can now work from home",
+    "fact": "Support resolution time reduced 45x.",
     "quote": "Support resolution time reduced 45x as IT staff can now work from home"
+   },
+   {
+    "fact": "ZTNA-based remote access to CBS and critical apps addressed compliance concerns.",
+    "quote": "Compliance concerns are addressed by ZTNA-based remote access to CBS & other critical apps"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Kalupur Bank switches to ZTNA-based solution for remote access, cheers customers with 45x improvement in resolution time?"
+   "Do co-operative banks use Accops?",
+   "Can Accops replace a bank's VPN?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5182,36 +5186,33 @@
   "fetched_at": "2026-10-26T09:52:44+00:00",
   "content_hash": "92edbd79eb008850",
   "words": 223,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/alphasure-accountants",
   "title": "Alphasure adopts DaaS to enable work from anywhere, records 70% drop in attrition & saves 50% on office rent",
   "page_type": "case-study",
   "products": [
-   "DaaS"
+   "DaaS",
+   "VDI",
+   "Accops Managed Desktops"
   ],
-  "industries": [
-   "IT / ITeS"
-  ],
-  "summary": "Discover how Alphasure Accountants secured their client data, improved productivity, and streamlined remote work with Accops’ secure access technology.",
+  "industries": [],
+  "summary": "Alphasure Accountants moved to Accops-managed DaaS (cloud app and desktop virtualisation as a fully managed service) to work from anywhere, recording a 70% drop in attrition and 50% savings on office rent with no CapEx.",
   "facts": [
    {
-    "fact": "Alphasure adopts DaaS to enable work from anywhere, records 70% drop in attrition & saves 50% on office rent",
+    "fact": "70% drop in attrition and 50% saving on office rent.",
     "quote": "Alphasure adopts DaaS to enable work from anywhere, records 70% drop in attrition & saves 50% on office rent"
    },
    {
-    "fact": "Their services help businesses to be statutorily compliant with the required filings and audits, such as GST, TDS, etc.",
-    "quote": "Their services help businesses to be statutorily compliant with the required filings and audits, such as GST, TDS, etc."
-   },
-   {
-    "fact": "Business benefits from a 70% dip in attrition rate & reduced cost of hiring",
-    "quote": "Business benefits from a 70% dip in attrition rate & reduced cost of hiring"
+    "fact": "Digital transformation without CapEx.",
+    "quote": "Rapid digital transformation without any CapEx investment"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Alphasure adopts DaaS to enable work from anywhere, records 70% drop in attrition & saves 50% on office rent?"
+   "Can a small firm use Accops as a managed service?",
+   "Is there a DaaS case study?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5222,32 +5223,29 @@
   "fetched_at": "2026-10-26T09:52:45+00:00",
   "content_hash": "47987af37f0ebcb4",
   "words": 208,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/a-prominent-it-services-provider",
   "title": "One of India's leading IT Services Providers uses Accops DaaS to reduce OpEx by 25% and ensures BAU during Covid-19 crisis",
   "page_type": "case-study",
   "products": [
-   "DaaS"
+   "DaaS",
+   "VDI"
   ],
   "industries": [
    "IT / ITeS"
   ],
-  "summary": "See how a leading IT services provider enhanced remote working capabilities, improved security, and ensured compliance with Accops.",
+  "summary": "A leading Indian IT services provider used Accops DaaS for app and desktop virtualisation and compliant BYOD access, reducing OpEx by about 25% and keeping business running during Covid.",
   "facts": [
    {
-    "fact": "One of India's leading IT Services Providers uses Accops DaaS to reduce OpEx by 25% and ensures BAU during Covid-19 crisis",
-    "quote": "One of India's leading IT Services Providers uses Accops DaaS to reduce OpEx by 25% and ensures BAU during Covid-19 crisis"
-   },
-   {
-    "fact": "They have more than 60 offices spread across the globe with delivery centers in India, China, Australia, Japan, North America and Europe.",
-    "quote": "They have more than 60 offices spread across the globe with delivery centers in India, China, Australia, Japan, North America and Europe."
+    "fact": "Reduced OpEx by about 25%.",
+    "quote": "Reduced OpEx by about 25%"
    }
   ],
   "questions_answered": [
-   "What does Accops say about One of India's leading IT Services Providers uses Accops DaaS to reduce OpEx by 25% and ensures BAU during Covid-19 crisis?"
+   "Has an IT services firm saved money with Accops DaaS?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5258,33 +5256,37 @@
   "fetched_at": "2026-10-26T09:52:45+00:00",
   "content_hash": "1df42c1bba0cd34e",
   "words": 182,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/maveric-systems",
   "title": "Maveric, a renowned Bank Tech specialist wins new customers & optimizes OpEx by 20% using Accops’ secure & simple remote access solution",
   "page_type": "case-study",
   "products": [
-   "Thin Clients",
-   "VDI"
+   "HyWorks",
+   "HySecure",
+   "VDI",
+   "ZTNA",
+   "Thin Clients"
   ],
   "industries": [
-   "BFSI"
+   "IT / ITeS"
   ],
-  "summary": "Maveric, a renowned Bank Tech specialist wins new customers & optimizes OpEx by 20% using Accops’ secure & simple remote access solution Maveric Systems is a niche, domain-led, Bank Tech specialist, partnering with global banks to solve their business challenges through emerging technology. Over the years, Maveric has established itself as a “trusted partner” to deliver digital transformation for ",
+  "summary": "Maveric Systems, a bank-tech specialist, replaced an unreliable VDI with Accops app and desktop virtualisation, a zero trust gateway and thin clients, cleared client security checks and VAPT, and optimised OpEx by 20%.",
   "facts": [
    {
-    "fact": "Maveric, a renowned Bank Tech specialist wins new customers & optimizes OpEx by 20% using Accops’ secure & simple remote access solution",
-    "quote": "Maveric, a renowned Bank Tech specialist wins new customers & optimizes OpEx by 20% using Accops’ secure & simple remote access solution"
+    "fact": "The existing VDI suffered frequent connection loss and downtime.",
+    "quote": "Productivity hampered due to frequent connection loss and downtime while using the existing VDI solution"
    },
    {
-    "fact": "Won trust of its customers by clearing all security checks and VAPT test",
-    "quote": "Won trust of its customers by clearing all security checks and VAPT test"
+    "fact": "OpEx optimised by 20%; cleared client security checks and VAPT.",
+    "quote": "Won trust of its customers by clearing all security checks and VAPT test | Easy, centralized management reducing burden on IT teams | OpEx was optimized by 20%"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Maveric, a renowned Bank Tech specialist wins new customers & optimizes OpEx by 20% using Accops’ secure & simple remote access solution?"
+   "Has anyone replaced an unreliable VDI with Accops?",
+   "Will Accops pass our clients' security audits?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5295,21 +5297,35 @@
   "fetched_at": "2026-10-26T09:52:45+00:00",
   "content_hash": "38d9a2e3b2b34ad3",
   "words": 183,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/an-e-commerce-major",
   "title": "A major e-commerce firm in India eliminates data security concerns using Accops’ Application Access Gateway",
   "page_type": "case-study",
-  "products": [],
+  "products": [
+   "HySecure",
+   "ZTNA",
+   "DLP"
+  ],
   "industries": [
    "E-commerce / Retail"
   ],
-  "summary": "A major e-commerce firm in India eliminates data security concerns using Accops’ Application Access Gateway Being one of the most successful e-commerce companies of India, the company sells across the whole spectrum of consumer goods through its online marketplace, right from mobile and electronics, fashion apparels, home essentials, to groceries and lifestyle products. It also owns an e-wallet pr",
-  "facts": [],
+  "summary": "A major Indian e-commerce firm used the Accops zero trust application access gateway for vendors and delivery executives, with contextual access, copy-paste and screenshot blocking, and MPLS-to-internet failover.",
+  "facts": [
+   {
+    "fact": "Auto-failover from MPLS to internet and back.",
+    "quote": "Auto-failover from MPLS to Internet & vice-versa"
+   },
+   {
+    "fact": "Support calls reduced as the solution performed well over low bandwidth.",
+    "quote": "Support calls reduced as the solution performed well over low bandwidth networks as well"
+   }
+  ],
   "questions_answered": [
-   "What does Accops say about A major e-commerce firm in India eliminates data security concerns using Accops’ Application Access Gateway?"
+   "How do e-commerce firms secure vendor and delivery staff access?",
+   "Does Accops work over low bandwidth?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5320,49 +5336,42 @@
   "fetched_at": "2026-10-26T09:52:45+00:00",
   "content_hash": "bde5bdc8ec673ca5",
   "words": 200,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/third-largest-psb",
   "title": "The third largest PSB of India adopts Digital Workspace to enable compliant access to SWIFT & CBS applications from office as well as home",
   "page_type": "case-study",
   "products": [
-   "BioAuth",
-   "Thin Clients",
-   "VDI",
    "Digital Workspace",
-   "DLP"
+   "VDI",
+   "ZTNA",
+   "Thin Clients",
+   "BioAuth"
   ],
   "industries": [
-   "BFSI",
-   "Government"
+   "BFSI"
   ],
-  "summary": "Learn how India’s third-largest public sector bank enhanced security, compliance, and operational efficiency using Accops’ secure access solutions.",
+  "summary": "India's third largest public sector bank adopted Accops Digital Workspace (VDI, a SWIFT jump server per RBI compliance, zero trust access limited to approved devices, DLP, thin clients) so treasury users could reach SWIFT and CBS from one PC and from home, at 50% lower TCO than competitive solutions.",
   "facts": [
    {
-    "fact": "The third largest PSB of India adopts Digital Workspace to enable compliant access to SWIFT & CBS applications from office as well as home",
-    "quote": "The third largest PSB of India adopts Digital Workspace to enable compliant access to SWIFT & CBS applications from office as well as home"
-   },
-   {
-    "fact": "Risk of security breach & non-compliance with RBI regulations",
-    "quote": "Risk of security breach & non-compliance with RBI regulations"
-   },
-   {
-    "fact": "Jump server implementation for SWIFT as per RBI compliance",
+    "fact": "Jump server implementation for SWIFT as per RBI compliance.",
     "quote": "Jump server implementation for SWIFT as per RBI compliance"
    },
    {
-    "fact": "Strict compliance through biometric authentication and DLP features",
-    "quote": "Strict compliance through biometric authentication and DLP features"
+    "fact": "Users now use one PC to access both SWIFT and CBS.",
+    "quote": "Productivity improved as users can now use one PC to access both SWIFT & CBS applications"
    },
    {
-    "fact": "50% lesser TCO compared to competitive solutions",
+    "fact": "50% lesser TCO compared to competitive solutions.",
     "quote": "50% lesser TCO compared to competitive solutions"
    }
   ],
   "questions_answered": [
-   "What does Accops say about The third largest PSB of India adopts Digital Workspace to enable compliant access to SWIFT & CBS applications from office as well as home?"
+   "Do public sector banks use Accops?",
+   "Can SWIFT and CBS be accessed from one PC securely?",
+   "How does Accops help with RBI compliance for SWIFT?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5373,36 +5382,36 @@
   "fetched_at": "2026-10-26T09:52:46+00:00",
   "content_hash": "fe45773f874a8dfb",
   "words": 236,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/a-renowned-bpo",
   "title": "A globally leading BPO delivers seamless customer services with wire-speed VoIP traffic for work from home users",
   "page_type": "case-study",
   "products": [
-   "VDI"
+   "VDI",
+   "ZTNA",
+   "HyID",
+   "Nano"
   ],
   "industries": [
    "IT / ITeS"
   ],
-  "summary": "Accops helped a leading BPO maintain productivity, enhance customer experience, ensure data privacy, and reduce TCO by 50% with secure work-from-home solutions.",
+  "summary": "A global BPO delivered wire-speed VoIP and client data to work-from-home agents using Accops VDI, a zero trust gateway, IAM and a hardened USB live OS, keeping productivity at pre-Covid levels and reducing TCO by about 50%.",
   "facts": [
    {
-    "fact": "Concerns about regulatory compliance & data privacy as client data had to be delivered to WFH users",
-    "quote": "Concerns about regulatory compliance & data privacy as client data had to be delivered to WFH users"
-   },
-   {
-    "fact": "Met regulatory compliance and ensured data privacy",
-    "quote": "Met regulatory compliance and ensured data privacy"
-   },
-   {
-    "fact": "Reduced TCO by about 50% & optimized OpEx",
+    "fact": "Reduced TCO by about 50%.",
     "quote": "Reduced TCO by about 50% & optimized OpEx"
+   },
+   {
+    "fact": "User productivity maintained at pre-Covid levels.",
+    "quote": "User productivity was maintained at pre-Covid levels"
    }
   ],
   "questions_answered": [
-   "What does Accops say about A globally leading BPO delivers seamless customer services with wire-speed VoIP traffic for work from home users?"
+   "Can BPO agents work from home on Accops?",
+   "Is there a BPO case study?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5413,32 +5422,31 @@
   "fetched_at": "2026-10-26T09:52:46+00:00",
   "content_hash": "e13b374a79c362db",
   "words": 193,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/abp-group",
   "title": "ABP, a leading Indian media conglomerate, delivers Digital Workspace solution for graphics-intense & data-heavy applications to enable secure work from home",
   "page_type": "case-study",
   "products": [
-   "MFA",
+   "Digital Workspace",
    "VDI",
-   "Digital Workspace"
+   "MFA"
   ],
-  "industries": [],
-  "summary": "ABP, a leading Indian media conglomerate, delivers Digital Workspace solution for graphics-intense & data-heavy applications to enable secure work from home",
+  "industries": [
+   "Media"
+  ],
+  "summary": "ABP Group, a Kolkata-based media conglomerate, used the Accops digital workspace (sandboxed office PC and VDI access, secure gateway, MFA, device entry control) to keep 24x7 news operations running from home with graphics-heavy applications.",
   "facts": [
    {
-    "fact": "Established in 1922, ABP Group today has evolved into a media conglomerate that has eleven premier publications, six 24 x 7 national TV news channels, one leading book publishing business and other digital properties as well.",
-    "quote": "Established in 1922, ABP Group today has evolved into a media conglomerate that has eleven premier publications, six 24 x 7 national TV news channels, one leading book publishing business and other digital properties as well."
-   },
-   {
-    "fact": "Inability to efficiently scale up the existing solution during Covid-19 mandated lockdown",
-    "quote": "Inability to efficiently scale up the existing solution during Covid-19 mandated lockdown"
+    "fact": "Productivity improved to pre-Covid levels with 24x7 news operations.",
+    "quote": "Productivity improved to pre-Covid levels | 24x7 news operations"
    }
   ],
   "questions_answered": [
-   "What does Accops say about ABP, a leading Indian media conglomerate, delivers Digital Workspace solution for graphics-intense & data-heavy applications to enable secure work from home?"
+   "Do media companies use Accops?",
+   "Can Accops handle graphics-heavy work from home?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5449,24 +5457,28 @@
   "fetched_at": "2026-10-26T09:52:46+00:00",
   "content_hash": "90556a22fabf1bdd",
   "words": 185,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/rnd-agency",
   "title": "A renowned R&D agency enables secure, compliant remote access to all users, while reducing costs and simplifying management",
   "page_type": "case-study",
-  "products": [],
+  "products": [
+   "VDI",
+   "Thin Clients",
+   "HyDesk"
+  ],
   "industries": [],
-  "summary": "A renowned R&D agency enables secure, compliant remote access to all users, while reducing costs and simplifying management",
+  "summary": "A renowned R&D agency deployed Accops end-user computing virtualisation and energy-efficient thin clients for secure access from any device, lowering TCO and carbon footprint.",
   "facts": [
    {
-    "fact": "A renowned R&D agency enables secure, compliant remote access to all users, while reducing costs and simplifying management",
-    "quote": "A renowned R&D agency enables secure, compliant remote access to all users, while reducing costs and simplifying management"
+    "fact": "Hybrid, energy-efficient thin clients replaced legacy PCs.",
+    "quote": "Hybrid, energy-efficient thin clients were used to replace legacy PC-based computing"
    }
   ],
   "questions_answered": [
-   "What does Accops say about A renowned R&D agency enables secure, compliant remote access to all users, while reducing costs and simplifying management?"
+   "Do research organisations use Accops?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5477,21 +5489,28 @@
   "fetched_at": "2026-10-26T09:52:46+00:00",
   "content_hash": "2758b049bc3f90c1",
   "words": 146,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/thermax",
   "title": "The leading energy and environmental engineering firm empowers its distributed workforce with on-demand, secure access to critical business applications",
   "page_type": "case-study",
   "products": [
-   "MFA"
+   "HySecure",
+   "MFA",
+   "DLP"
   ],
   "industries": [],
-  "summary": "The leading energy and environmental engineering firm empowers its distributed workforce with on-demand, secure access to critical business applications",
-  "facts": [],
+  "summary": "Thermax, a Pune-based energy and environmental engineering firm, delivers business apps to vendors, BYOD and mobile users through an Accops application access gateway with MFA and DLP.",
+  "facts": [
+   {
+    "fact": "Secure app delivery through an application access gateway to vendors, BYOD and mobile users with MFA.",
+    "quote": "Secure delivery of business applications through application access gateway to vendors, BYOD & mobile users."
+   }
+  ],
   "questions_answered": [
-   "What does Accops say about The leading energy and environmental engineering firm empowers its distributed workforce with on-demand, secure access to critical business applications?"
+   "Do engineering firms use Accops?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5502,26 +5521,35 @@
   "fetched_at": "2026-10-26T09:52:47+00:00",
   "content_hash": "7a3ec63f30a56670",
   "words": 153,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/polycab",
   "title": "Polycab India, a leading wires and cables manufacturer deploys an end-to-end VDI solution to improve customer serviceability and optimize costs",
   "page_type": "case-study",
   "products": [
-   "VDI"
+   "VDI",
+   "HyWorks",
+   "Thin Clients"
   ],
-  "industries": [],
-  "summary": "Polycab India, a leading wires and cables manufacturer deploys an end-to-end VDI solution to improve customer serviceability and optimize costs",
+  "industries": [
+   "Manufacturing"
+  ],
+  "summary": "Polycab India replaced its existing VDI with an end-to-end Accops desktop and app virtualisation solution including thin clients, streamlining support with a single vendor and lowering TCO.",
   "facts": [
    {
-    "fact": "Incorporated as ‘Polycab Wires Private Limited’ on January 10, 1996 as a private limited company, Polycab is now a globally renowned brand.",
-    "quote": "Incorporated as ‘Polycab Wires Private Limited’ on January 10, 1996 as a private limited company, Polycab is now a globally renowned brand."
+    "fact": "The existing VDI had high maintenance costs and below-par service quality.",
+    "quote": "High maintenance costs and below par service quality of existing VDI solution"
+   },
+   {
+    "fact": "The single-vendor scenario streamlined VDI support.",
+    "quote": "The single-vendor scenario helped Polycab streamline their VDI support"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Polycab India, a leading wires and cables manufacturer deploys an end-to-end VDI solution to improve customer serviceability and optimize costs?"
+   "Has anyone switched VDI vendors to Accops?",
+   "Does one vendor for VDI and thin clients help?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5532,42 +5560,31 @@
   "fetched_at": "2026-10-26T09:52:47+00:00",
   "content_hash": "ad75a064a26b6153",
   "words": 178,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/life-insurer",
   "title": "A leading life insurance provider implements a comprehensive Digital Workspace solution to provide secure, compliant, cost-effective remote access",
   "page_type": "case-study",
   "products": [
-   "MFA",
-   "Digital Workspace"
+   "Digital Workspace",
+   "VDI",
+   "MFA"
   ],
   "industries": [
-   "BFSI",
-   "E-commerce / Retail"
+   "BFSI"
   ],
-  "summary": "Discover how a leading life insurer streamlined operations, ensured secure access, and boosted productivity with Accops’ IT solutions.",
+  "summary": "A large Indian life insurer virtualised critical apps and delivered them to work-from-home, branch and vendor users with integrated MFA, while supporting legacy Windows servers and applications.",
   "facts": [
    {
-    "fact": "A leading life insurance provider implements a comprehensive Digital Workspace solution to provide secure, compliant, cost-effective remote access",
-    "quote": "A leading life insurance provider implements a comprehensive Digital Workspace solution to provide secure, compliant, cost-effective remote access"
-   },
-   {
-    "fact": "One of the largest long-term life insurance providers in India with a strong presence in almost 1000 cities and towns across India, has numerous branches and additional distribution touchpoints through several partnerships.",
-    "quote": "One of the largest long-term life insurance providers in India with a strong presence in almost 1000 cities and towns across India, has numerous branches and additional distribution touchpoints through several partnerships."
-   },
-   {
-    "fact": "Ensuring compliance while providing secure, seamless remote access",
-    "quote": "Ensuring compliance while providing secure, seamless remote access"
-   },
-   {
-    "fact": "360-degrees visibility and control on enterprise applications",
-    "quote": "360-degrees visibility and control on enterprise applications"
+    "fact": "Saved upgrade costs by supporting legacy platforms.",
+    "quote": "Save on upgradation costs by supporting legacy platforms"
    }
   ],
   "questions_answered": [
-   "What does Accops say about A leading life insurance provider implements a comprehensive Digital Workspace solution to provide secure, compliant, cost-effective remote access?"
+   "Can Accops support legacy Windows servers and apps?",
+   "Do insurers use Accops?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5578,36 +5595,35 @@
   "fetched_at": "2026-10-26T09:52:47+00:00",
   "content_hash": "6f1cf4dabbbf43d3",
   "words": 170,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/hpcl",
   "title": "HPCL, a global Fortune 500 company, virtualizes critical business applications for enhanced security and reduced downtime",
   "page_type": "case-study",
   "products": [
+   "HyWorks",
+   "HySecure",
    "VDI"
   ],
   "industries": [
    "Government"
   ],
-  "summary": "Discover how Accops improved HPCL's remote access with enhanced security, streamlining operations and ensuring safe, efficient connectivity across their workforce.",
+  "summary": "HPCL, a Government of India oil enterprise, deployed Accops VDI with an application access gateway for fast, secure access to apps and desktops, reducing IT costs by 25% with robust disaster recovery.",
   "facts": [
    {
-    "fact": "HPCL, a global Fortune 500 company, virtualizes critical business applications for enhanced security and reduced downtime",
-    "quote": "HPCL, a global Fortune 500 company, virtualizes critical business applications for enhanced security and reduced downtime"
+    "fact": "Reduced IT costs by 25%.",
+    "quote": "Reduced IT costs by 25%"
    },
    {
-    "fact": "HPCL is a Government of India enterprise listed among Forbes 2000 and Global Fortune 500 companies.",
-    "quote": "HPCL is a Government of India enterprise listed among Forbes 2000 and Global Fortune 500 companies."
-   },
-   {
-    "fact": "HPCL has the second largest share of product pipelines in India with a pipeline network of more than 3370 kms and a vast marketing network consisting of 13 zonal offices and 106 regional offices",
-    "quote": "HPCL has the second largest share of product pipelines in India with a pipeline network of more than 3370 kms and a vast marketing network consisting of 13 zonal offices and 106 regional offices"
+    "fact": "Robust and comprehensive disaster recovery.",
+    "quote": "Robust & comprehensive disaster recovery"
    }
   ],
   "questions_answered": [
-   "What does Accops say about HPCL, a global Fortune 500 company, virtualizes critical business applications for enhanced security and reduced downtime?"
+   "Do PSUs use Accops VDI?",
+   "Does Accops support disaster recovery?"
   ],
   "cta": null,
   "published": null,
@@ -5615,28 +5631,35 @@
   "fetched_at": "2026-10-26T09:52:47+00:00",
   "content_hash": "01e2eb7c97aab59b",
   "words": 180,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/deutsche-bank",
   "title": "One of India's most respected financial services providers, Deutsche Bank, secures and improves back-office operations with a quick, simple, cost-effective solution",
   "page_type": "case-study",
-  "products": [],
-  "industries": [
-   "BFSI",
-   "IT / ITeS",
-   "E-commerce / Retail"
+  "products": [
+   "HyWorks",
+   "HySecure",
+   "VDI"
   ],
-  "summary": "Explore how Accops enabled secure operations for Deutsche Bank, providing a robust solution for enhancing security, efficiency, and compliance.",
+  "industries": [
+   "BFSI"
+  ],
+  "summary": "Deutsche Bank AG, India uses Accops application and desktop virtualisation with encrypted delivery so vendors on unmanaged devices can work on back-office apps with zero endpoint management.",
   "facts": [
    {
-    "fact": "Device authorization & audit control to ensure complete security compliance",
-    "quote": "Device authorization & audit control to ensure complete security compliance"
+    "fact": "Zero endpoint management; access from unmanaged devices.",
+    "quote": "Zero endpoint management | Access from any unmanaged device without any security concerns"
+   },
+   {
+    "fact": "Exemplary product support.",
+    "quote": "Exemplary product support"
    }
   ],
   "questions_answered": [
-   "What does Accops say about One of India's most respected financial services providers, Deutsche Bank, secures and improves back-office operations with a quick, simple, cost-effective solution?"
+   "Do global banks use Accops?",
+   "Can vendors use unmanaged devices safely?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5647,26 +5670,29 @@
   "fetched_at": "2026-10-26T09:52:48+00:00",
   "content_hash": "719d1e9fd0b9fafe",
   "words": 164,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/aditya-birla",
   "title": "One of India's leading life insurance companies, ABSLI, ensures security and cost optimization while providing remote access to third-party consultants",
   "page_type": "case-study",
-  "products": [],
+  "products": [
+   "VDI",
+   "HySecure"
+  ],
   "industries": [
    "BFSI"
   ],
-  "summary": "Explore how Aditya Birla Group transformed its business operations by implementing secure access solutions from Accops, ensuring seamless efficiency.",
+  "summary": "Aditya Birla Sun Life Insurance gives third-party consultants secure access from unmanaged devices using app virtualisation and an SSL VPN application access gateway.",
   "facts": [
    {
-    "fact": "It was incorporated on August 4th, 2000 and their operations commenced on January 17th, 2001.",
-    "quote": "It was incorporated on August 4th, 2000 and their operations commenced on January 17th, 2001."
+    "fact": "Secure end-user computing with app virtualization and SSL VPN.",
+    "quote": "A secure end-user computing solution was deployed with app virtualization and SSL VPN"
    }
   ],
   "questions_answered": [
-   "What does Accops say about One of India's leading life insurance companies, ABSLI, ensures security and cost optimization while providing remote access to third-party consultants?"
+   "How do insurers give consultants secure access?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5677,26 +5703,31 @@
   "fetched_at": "2026-10-26T09:52:48+00:00",
   "content_hash": "cb6cf059b4e6b7c6",
   "words": 166,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/wockhardt",
   "title": "Globally renowned Indian pharmaceutical company, Wockhardt, achieves IT consolidation & centralization and provides faster remote access",
   "page_type": "case-study",
   "products": [
-   "VDI"
+   "VDI",
+   "HyWorks",
+   "HyDesk"
   ],
-  "industries": [],
-  "summary": "Globally renowned Indian pharmaceutical company, Wockhardt, achieves IT consolidation & centralization and provides faster remote access.",
+  "industries": [
+   "Pharma / Healthcare"
+  ],
+  "summary": "Wockhardt, an Indian pharmaceutical company with branches in 20 countries, centralised IT with Accops VDI compressed for low-bandwidth branches, leaving no data on endpoints.",
   "facts": [
    {
-    "fact": "Wockhardt is one of the leading Indian pharmaceuticals companies with branch offices spread across 20 countries.",
-    "quote": "Wockhardt is one of the leading Indian pharmaceuticals companies with branch offices spread across 20 countries."
+    "fact": "VDI data was compressed for speedy access at low bandwidth.",
+    "quote": "VDI data was further compressed to ensure speedy access at low bandwidth"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Globally renowned Indian pharmaceutical company, Wockhardt, achieves IT consolidation & centralization and provides faster remote access?"
+   "Do pharma companies use Accops?",
+   "Does Accops VDI work over low-bandwidth branch links?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5707,34 +5738,34 @@
   "fetched_at": "2026-10-26T09:52:48+00:00",
   "content_hash": "af85afd091b9eb1f",
   "words": 148,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/lic",
   "title": "The Indian state-owned insurance and investment corporation, LIC, enables secure access from outside corporate network to internal business applications",
   "page_type": "case-study",
-  "products": [],
+  "products": [
+   "HySecure",
+   "ZTNA"
+  ],
   "industries": [
    "BFSI"
   ],
-  "summary": "Life Insurance Corporation of India is a 60-year-old Indian state-owned insurance and investment corporation",
+  "summary": "LIC (about 2,000 branches) enabled secure access to internal apps from outside its network with an Accops application access gateway, TLS-encrypted connectivity and SPAN technology, including Linux devices and MPLS-down fallback.",
   "facts": [
    {
-    "fact": "Life Insurance Corporation of India is a 60-year-old Indian state-owned insurance and investment corporation.",
-    "quote": "Life Insurance Corporation of India is a 60-year-old Indian state-owned insurance and investment corporation."
-   },
-   {
-    "fact": "LIC is one of the most trusted brands in India, and has approximately 2000 branches spread all across the country.There are as much as 1.5 lakh agents on the payroll of the company.",
-    "quote": "LIC is one of the most trusted brands in India, and has approximately 2000 branches spread all across the country.There are as much as 1.5 lakh agents on the payroll of the company."
-   },
-   {
-    "fact": "TLS 1.2 encrypted remote connectivity was enabled using application access gateway",
+    "fact": "TLS 1.2 encrypted remote connectivity via the application access gateway.",
     "quote": "TLS 1.2 encrypted remote connectivity was enabled using application access gateway"
+   },
+   {
+    "fact": "LIC has approximately 2000 branches.",
+    "quote": "LIC is one of the most trusted brands in India, and has approximately 2000 branches spread all across the country."
    }
   ],
   "questions_answered": [
-   "What does Accops say about The Indian state-owned insurance and investment corporation, LIC, enables secure access from outside corporate network to internal business applications?"
+   "Does LIC use Accops?",
+   "Can Accops support Linux end devices?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5745,29 +5776,34 @@
   "fetched_at": "2026-10-26T09:52:48+00:00",
   "content_hash": "9b984dd8c807fef7",
   "words": 165,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/lnt",
   "title": "The renowned Indian conglomerate, L&T, seamlessly provides secure SAP access to branch office users",
   "page_type": "case-study",
   "products": [
-   "MFA",
-   "VDI"
+   "VDI",
+   "HyWorks",
+   "HySecure",
+   "HyID",
+   "MFA"
   ],
-  "industries": [
-   "BFSI"
-  ],
-  "summary": "The renowned Indian conglomerate, L&T, seamlessly provides secure SAP access to branch office users.",
+  "industries": [],
+  "summary": "L&T virtualised SAP with Accops VDI and delivered it to branch offices through an application access gateway with MFA, restricting access to trusted devices and by geography.",
   "facts": [
    {
-    "fact": "Geographical restriction of access to ensure compliance",
-    "quote": "Geographical restriction of access to ensure compliance"
+    "fact": "The SAP application was virtualised and accessed through the application access gateway.",
+    "quote": "VDI solution was deployed and SAP application was virtualized"
+   },
+   {
+    "fact": "Access restricted to trusted devices and by geography.",
+    "quote": "Restricting access to trusted devices only | Geographical restriction of access to ensure compliance"
    }
   ],
   "questions_answered": [
-   "What does Accops say about The renowned Indian conglomerate, L&T, seamlessly provides secure SAP access to branch office users?"
+   "Can Accops deliver SAP securely to branches?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5778,19 +5814,31 @@
   "fetched_at": "2026-10-26T09:52:48+00:00",
   "content_hash": "bedf6275954d659f",
   "words": 157,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/case-studies/rgcirc",
   "title": "One of Asia's largest cancer treatment facilities, RGCIRC, improves accessibility of critical applications for optimized operational performance",
   "page_type": "case-study",
-  "products": [],
-  "industries": [],
-  "summary": "One of Asia's largest cancer treatment facilities, RGCIRC, improves accessibility of critical applications for optimized operational performance",
-  "facts": [],
+  "products": [
+   "VDI",
+   "HyWorks",
+   "HyDesk",
+   "Thin Clients"
+  ],
+  "industries": [
+   "Pharma / Healthcare"
+  ],
+  "summary": "RGCIRC, one of Asia's leading cancer institutes, deployed Accops VDI with thin clients for centralised desktop management and better access to critical clinical applications.",
+  "facts": [
+   {
+    "fact": "VDI with thin clients for centralised management and cost effectiveness.",
+    "quote": "To ensure operational efficiency and cost effectiveness, thin clients were also deployed"
+   }
+  ],
   "questions_answered": [
-   "What does Accops say about One of Asia's largest cancer treatment facilities, RGCIRC, improves accessibility of critical applications for optimized operational performance?"
+   "Do hospitals in India use Accops VDI?"
   ],
   "cta": {
    "label": "Download Case Study",
@@ -5801,8 +5849,8 @@
   "fetched_at": "2026-10-26T09:52:49+00:00",
   "content_hash": "00679e9c2a1dcc5d",
   "words": 160,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/webinars-on-demand",
@@ -7048,10 +7096,10 @@
   "page_type": "solution",
   "products": [],
   "industries": [],
-  "summary": "",
+  "summary": "Industry solutions index; its listing renders client-side, so the crawler sees only the heading.",
   "facts": [],
   "questions_answered": [
-   "What does Accops say about Solutions?"
+   "Which industries does Accops serve?"
   ],
   "cta": null,
   "published": null,
@@ -7059,49 +7107,50 @@
   "fetched_at": "2026-10-26T09:53:02+00:00",
   "content_hash": "05b004a92e5eda3e",
   "words": 1,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/industry-solutions/bfsi",
   "title": "BFSI",
   "page_type": "industry",
   "products": [
-   "BioAuth",
-   "MFA"
+   "Digital Workspace",
+   "HyWorks",
+   "HySecure",
+   "HyID",
+   "MFA",
+   "ZTNA",
+   "VDI",
+   "Browser Isolation"
   ],
   "industries": [
    "BFSI"
   ],
-  "summary": "Protect modern and legacy applications and secure BFSI IT infrastructure with Accops banking secure solutions—Zero Trust access, MFA, and audit-ready compliance.",
+  "summary": "Accops for banks, insurers and financial services: EUC virtualisation, an application access gateway and identity and access management on one platform, with zero trust access, MFA, device entry control and audit trails. It cites GDPR, RBI guidelines, GLBA and PCI DSS, and customer stories from Deutsche Bank, LIC, ABSLI and a life insurer.",
   "facts": [
    {
-    "fact": "Complex, Distributed Access and Compliance Needs",
-    "quote": "Complex, Distributed Access and Compliance Needs"
+    "fact": "Accops brings EUC virtualisation, an application access gateway and IAM together on one platform for BFSI.",
+    "quote": "Accops delivers banking secure solutions that help BFSI enterprises accelerate digital transformation, bringing End User Computing (EUC) virtualisation, Application Access Gateway, and Identity & Access Management together on one integrated platform."
    },
    {
-    "fact": "BFSI organisations must securely support branch staff, agents, vendors and consultants across locations, while meeting strict regulatory and compliance requirements.",
-    "quote": "BFSI organisations must securely support branch staff, agents, vendors and consultants across locations, while meeting strict regulatory and compliance requirements."
+    "fact": "Helps meet mandates such as GDPR, RBI guidelines, GLBA and PCI DSS.",
+    "quote": "Meet regulatory and industry mandates like GDPR, RBI guidelines, GLBA and PCI DSS, strengthen endpoint security through centralised device management, and upgrade Windows OS without new hardware."
    },
    {
-    "fact": "Full visibility and audit trails to support regulatory compliance",
-    "quote": "Full visibility and audit trails to support regulatory compliance"
+    "fact": "LIC rolled out HySecure for agents and branch users to reach regional data centres over the internet.",
+    "quote": "The state-owned insurance corporation rolled out Accops HySecure to enable its agents and branch office users to securely access regional data centres over internet."
    },
    {
-    "fact": "The result: Secure access from anywhere, on any device, giving organisations greater agility, productivity and cost efficiency, without losing control over their data, devices, users or networks.",
-    "quote": "The result: Secure access from anywhere, on any device, giving organisations greater agility, productivity and cost efficiency, without losing control over their data, devices, users or networks."
-   },
-   {
-    "fact": "Endpoint device scanning to allow access only from compliant and uncompromised devices.",
-    "quote": "Endpoint device scanning to allow access only from compliant and uncompromised devices."
-   },
-   {
-    "fact": "Tracks user activity, login times, and application usage for auditing and compliance.",
-    "quote": "Tracks user activity, login times, and application usage for auditing and compliance."
+    "fact": "Deutsche Bank uses HyWorks and HySecure to deliver apps and desktops to vendors.",
+    "quote": "The Germany-based multinational investment bank adopted Accops HyWorks and HySecure to securely deliver business applications & desktops to vendors."
    }
   ],
   "questions_answered": [
-   "Ready to Strengthen Your BFSI Security Posture?"
+   "Does Accops work for banks and insurers?",
+   "Does Accops help with RBI compliance?",
+   "Which banks use Accops?",
+   "How does Accops secure vendor access at a bank?"
   ],
   "cta": null,
   "published": null,
@@ -7109,8 +7158,8 @@
   "fetched_at": "2026-10-26T09:53:02+00:00",
   "content_hash": "9a163d461dd4f6ec",
   "words": 692,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/industry-solutions/education",
@@ -7118,20 +7167,31 @@
   "page_type": "industry",
   "products": [
    "HyLabs",
+   "VDI",
    "MFA"
   ],
   "industries": [
    "Education"
   ],
-  "summary": "Create, manage, and monitor virtual ICT labs with Accops. Give teachers and students secure, self-service lab access from anywhere, on any device.",
+  "summary": "Accops for schools, colleges and universities: virtual ICT labs that faculty can schedule and refresh themselves, with secure web access for students from any device, MFA, and usage analytics. Customer story: Japan's 2nd largest university on HyLabs.",
   "facts": [
    {
-    "fact": "Japan’s 2nd largest university adopted Accops HyLabs to improve its IT infrastructure with an objective to get a self-sufficient system.",
+    "fact": "Institutes can provide schedule-based access to existing physical labs as well as virtual labs.",
+    "quote": "With Accops solutions, educational institutes can provide schedule-based access to existing physical labs as well."
+   },
+   {
+    "fact": "Faculty can build, customise and refresh lab environments in minutes without IT.",
+    "quote": "Faculty and departments can independently build, customise, and refresh lab environments in minutes, for anything from routine lectures to hackathons, without depending on IT."
+   },
+   {
+    "fact": "Japan's 2nd largest university adopted HyLabs.",
     "quote": "Japan’s 2nd largest university adopted Accops HyLabs to improve its IT infrastructure with an objective to get a self-sufficient system."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Education?"
+   "Can Accops virtualise university ICT labs?",
+   "Can students access labs from home?",
+   "Which universities use Accops?"
   ],
   "cta": null,
   "published": null,
@@ -7139,51 +7199,41 @@
   "fetched_at": "2026-10-26T09:53:02+00:00",
   "content_hash": "2566c74dd00e9bfa",
   "words": 450,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/industry-solutions/healthcare",
   "title": "Healthcare",
   "page_type": "industry",
   "products": [
+   "Digital Workspace",
    "HyWorks",
    "HyDesk",
-   "Digital Workspace",
    "DLP"
   ],
   "industries": [
    "Pharma / Healthcare"
   ],
-  "summary": "Secure patient data, enable remote care, and simplify compliance with Accops Digital Workspace—centralised security, DLP, and identity access for healthcare.",
+  "summary": "Accops Digital Workspace for hospitals and healthcare providers: contextual access, DLP and integrated IAM to protect patient data, secure telehealth and BYOD access, and secure access to legacy applications. Cites HIPAA, GDPR and India's DPDP Act; customer stories RGCIRC and Wockhardt.",
   "facts": [
    {
-    "fact": "Secure patient data, enable remote care, and simplify compliance, all from one centralised platform.",
-    "quote": "Secure patient data, enable remote care, and simplify compliance, all from one centralised platform."
-   },
-   {
-    "fact": "Cyberattacks are increasingly targeting sensitive patient information and valuable research data, putting healthcare organisations at greater risk than ever.",
-    "quote": "Cyberattacks are increasingly targeting sensitive patient information and valuable research data, putting healthcare organisations at greater risk than ever."
-   },
-   {
-    "fact": "Legacy applications and systems are no longer equipped to handle the modern-day security threats facing healthcare organisations today.",
-    "quote": "Legacy applications and systems are no longer equipped to handle the modern-day security threats facing healthcare organisations today."
-   },
-   {
-    "fact": "By centralising IT administration and delivering resources from a single datacentre, Accops helps healthcare providers simplify management while supporting strict regulatory compliance.",
-    "quote": "By centralising IT administration and delivering resources from a single datacentre, Accops helps healthcare providers simplify management while supporting strict regulatory compliance."
-   },
-   {
-    "fact": "The result: A secure, centralised Digital Workspace that lets healthcare organisations spend less time on security and compliance, and more time on patient care.",
-    "quote": "The result: A secure, centralised Digital Workspace that lets healthcare organisations spend less time on security and compliance, and more time on patient care."
-   },
-   {
-    "fact": "Meet regulatory norms including HIPAA, GDPR, India's DPDP Act and similar guidelines.",
+    "fact": "Supports compliance with HIPAA, GDPR, India's DPDP Act and similar.",
     "quote": "Meet regulatory norms including HIPAA, GDPR, India's DPDP Act and similar guidelines."
+   },
+   {
+    "fact": "Secure access to unsupported legacy applications without upgrading them.",
+    "quote": "Give secure access to unsupported legacy applications without upgrading or replacing them."
+   },
+   {
+    "fact": "RGCIRC adopted HyWorks and HyDesk for application and desktop virtualization.",
+    "quote": "One of the leading cancer research institutes in Asia adopted Accops HyWorks and HyDesk to achieve application and desktop virtualization for seamless user experience."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Healthcare?"
+   "Does Accops work for hospitals?",
+   "Can Accops help with HIPAA or DPDP compliance?",
+   "Can clinicians access records remotely and securely?"
   ],
   "cta": null,
   "published": null,
@@ -7191,52 +7241,43 @@
   "fetched_at": "2026-10-26T09:53:03+00:00",
   "content_hash": "d58ff67d067bda64",
   "words": 484,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/industry-solutions/it-and-ites",
   "title": "IT & ITeS",
   "page_type": "industry",
   "products": [
+   "Digital Workspace",
+   "HyWorks",
    "HySecure",
    "HyID",
-   "HyWorks",
-   "MFA",
-   "Digital Workspace"
+   "ZTNA",
+   "MFA"
   ],
   "industries": [
    "IT / ITeS"
   ],
-  "summary": "Simplify device and application management while strengthening security for your distributed IT workforce with Accops Digital Workspace.",
+  "summary": "Accops Digital Workspace for IT and ITeS firms with distributed delivery teams: zero trust access, MFA, device entry control, kiosk-based access and audit logs, plus a BYOD sandbox that blocks printing, screenshots and file saving. Customer stories L&T and a renowned BPO.",
   "facts": [
    {
-    "fact": "Security remains the leading concern for remote and hybrid environments, with device compliance and access control the hardest to enforce.",
-    "quote": "Security remains the leading concern for remote and hybrid environments, with device compliance and access control the hardest to enforce."
+    "fact": "MFA via SMS, email, mobile app, PC software tokens or biometrics.",
+    "quote": "Strong authentication via SMS, email, mobile app, PC software tokens or biometrics."
    },
    {
-    "fact": "Unmonitored remote access raises productivity and compliance risks, with proxy logins and unauthorised device use going undetected across distributed teams.",
-    "quote": "Unmonitored remote access raises productivity and compliance risks, with proxy logins and unauthorised device use going undetected across distributed teams."
+    "fact": "BYOD sessions run in a sandbox restricting printing, screenshots, recording, file saving and internet access.",
+    "quote": "Contain BYOD sessions in a secure sandbox that restricts printing, screenshots, session recording, file saving and internet access to prevent data leakage."
    },
    {
-    "fact": "The Accops Digital Workspace solution helps IT and ITeS organisations gain a competitive edge by simplifying how IT teams manage and secure apps, and devices.",
-    "quote": "The Accops Digital Workspace solution helps IT and ITeS organisations gain a competitive edge by simplifying how IT teams manage and secure apps, and devices."
-   },
-   {
-    "fact": "Organisations can provide safe, seamless access to all tools for employees and vendors working from different locations, while centralised endpoint management makes it easy to control every device and application, freeing the workforce to focus on core business activities.",
-    "quote": "Organisations can provide safe, seamless access to all tools for employees and vendors working from different locations, while centralised endpoint management makes it easy to control every device and application, freeing the workforce to focus on core business activities."
-   },
-   {
-    "fact": "Accops helps IT and ITeS organisations achieve sustainable growth and build an agile IT infrastructure aligned to their business goals.",
-    "quote": "Accops helps IT and ITeS organisations achieve sustainable growth and build an agile IT infrastructure aligned to their business goals."
-   },
-   {
-    "fact": "Enable zero trust model-based remote access to ensure maximum network security and compliance.",
-    "quote": "Enable zero trust model-based remote access to ensure maximum network security and compliance."
+    "fact": "L&T adopted HyWorks, HySecure and HyID for secure SAP access at remote branch offices.",
+    "quote": "The leading Indian conglomerate adopted Accops HyWorks, HySecure & HyID to provide secure SAP access to users at its remote branch offices."
    }
   ],
   "questions_answered": [
-   "What does Accops say about IT & ITeS?"
+   "How do IT services firms use Accops?",
+   "Can Accops stop data leakage on BYOD devices?",
+   "Can we onboard remote users at scale?"
   ],
   "cta": null,
   "published": null,
@@ -7244,43 +7285,43 @@
   "fetched_at": "2026-10-26T09:53:03+00:00",
   "content_hash": "0476da173af38d86",
   "words": 485,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/industry-solutions/energy-and-petrochemical",
   "title": "Energy & Petrochemical",
   "page_type": "industry",
   "products": [
-   "HySecure",
-   "HyWorks",
    "Thin Clients",
-   "MFA"
+   "MFA",
+   "HyWorks",
+   "HySecure"
   ],
-  "industries": [
-   "Government"
-  ],
-  "summary": "Secure, on-demand access to critical resources for your dispersed energy and petrochemical workforce with Accops digital workspace solutions.",
+  "industries": [],
+  "summary": "Accops for energy, oil and gas and petrochemical companies with dispersed workforces: remote access, MFA, device entry control and rugged Linux thin clients for refineries and shop floors, available on-premises or from the cloud. Customer stories Thermax and HPCL.",
   "facts": [
-   {
-    "fact": "Scan endpoints before granting access, so only compliant, uncompromised devices can reach corporate applications and data.",
-    "quote": "Scan endpoints before granting access, so only compliant, uncompromised devices can reach corporate applications and data."
-   },
    {
     "fact": "Thin clients reduce TCO by up to 40% compared to desktops.",
     "quote": "Thin clients reduce TCO by up to 40% compared to desktops."
    },
    {
-    "fact": "User activity reports on who accessed what, when, where and how ensure detailed auditing and compliance.",
-    "quote": "User activity reports on who accessed what, when, where and how ensure detailed auditing and compliance."
+    "fact": "Rugged thin clients have an average lifespan of 7 to 12 years.",
+    "quote": "Deploy highly rugged thin clients, with an average lifespan of 7 to 12 years, built for harsh environments such as refineries, warehouse floors and shop floors."
    },
    {
-    "fact": "Deploy highly rugged thin clients, with an average lifespan of 7 to 12 years, built for harsh environments such as refineries, warehouse floors and shop floors.",
-    "quote": "Deploy highly rugged thin clients, with an average lifespan of 7 to 12 years, built for harsh environments such as refineries, warehouse floors and shop floors."
+    "fact": "Available on-premises and from cloud.",
+    "quote": "Accops solution is available both on-premises and from cloud, giving the flexibility the sector needs."
+   },
+   {
+    "fact": "HPCL reduced IT costs by 25%.",
+    "quote": "Reduced IT costs by 25%"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Energy & Petrochemical?"
+   "Does Accops work for oil and gas companies?",
+   "Can thin clients survive refinery or shop-floor conditions?",
+   "Which energy companies use Accops?"
   ],
   "cta": null,
   "published": null,
@@ -7288,53 +7329,48 @@
   "fetched_at": "2026-10-26T09:53:05+00:00",
   "content_hash": "08f493aca0d54b06",
   "words": 501,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/industry-solutions/government-institutions",
   "title": "Government Institutions",
   "page_type": "industry",
   "products": [
-   "BioAuth",
-   "Nano",
-   "Thin Clients",
-   "MFA",
+   "ZTNA",
    "VDI",
+   "MFA",
+   "Thin Clients",
+   "Nano",
    "Password-less"
   ],
   "industries": [
    "Government"
   ],
-  "summary": "Enable secure access to government data and applications from anywhere, on any device with Accops zero trust and digital workspace solutions.",
+  "summary": "Accops for central, state and PSU institutions: zero trust access to e-governance apps and office PCs, VDI for air-gap security, MFA, thin clients and device binding. It cites CERT-In, MeitY and DPDP requirements and says Accops holds Make-in-India platform status.",
   "facts": [
    {
-    "fact": "Compliance and data protection mandates require institutes to meet CERT-In and MeitY guidelines while safeguarding national data, defence IP and sensitive citizen records.",
-    "quote": "Compliance and data protection mandates require institutes to meet CERT-In and MeitY guidelines while safeguarding national data, defence IP and sensitive citizen records."
+    "fact": "Accops holds Make-in-India platform status.",
+    "quote": "Accops holds Make-in-India platform status, aligned with Digital India and Aatmanirbhar Bharat goals, which helps institutions meet indigenous-sourcing expectations alongside their security requirements."
    },
    {
-    "fact": "Virtualises end-user computing via VDI, isolating endpoints from government networks for air-gap security.",
-    "quote": "Virtualises end-user computing via VDI, isolating endpoints from government networks for air-gap security."
+    "fact": "Helps meet MeitY, CERT-In and DPDP Act requirements.",
+    "quote": "Meet MeitY, CERT-In and DPDP Act requirements via contextual access and audit logs, blocking copy-paste, downloads and unauthorised USB use, and isolating workloads in air-gapped zones for data residency."
    },
    {
-    "fact": "Endpoint device scanning to allow access only from compliant and uncompromised devices.",
-    "quote": "Endpoint device scanning to allow access only from compliant and uncompromised devices."
-   },
-   {
-    "fact": "Customisable thin and zero clients cut ICT costs, reducing TCO by up to 40% versus desktops.",
+    "fact": "Thin and zero clients reduce TCO by up to 40% versus desktops.",
     "quote": "Customisable thin and zero clients cut ICT costs, reducing TCO by up to 40% versus desktops."
    },
    {
-    "fact": "Reports on who accessed what, when, where and how, ensuring detailed compliance auditing.",
-    "quote": "Reports on who accessed what, when, where and how, ensuring detailed compliance auditing."
-   },
-   {
-    "fact": "Consolidate applications and data in a centralised datacentre, isolate critical apps from devices and networks, and enable safe internet browsing to prevent cyberattacks.",
-    "quote": "Consolidate applications and data in a centralised datacentre, isolate critical apps from devices and networks, and enable safe internet browsing to prevent cyberattacks."
+    "fact": "Access to eOffice, HRMS and portals from remote villages and talukas over low bandwidth.",
+    "quote": "Empower government employees, field officers and contract staff with anywhere, anytime access to mission-critical apps, eOffice, HRMS and internal portals, including from remote villages and talukas over low-bandwidth networks, using their own devices, thin clients or Accops Nano OS."
    }
   ],
   "questions_answered": [
-   "Ready to modernise your government IT infrastructure?"
+   "Is Accops Make in India?",
+   "Does Accops meet CERT-In and MeitY guidelines?",
+   "Can Accops secure e-governance and eOffice access?",
+   "Which government bodies use Accops?"
   ],
   "cta": null,
   "published": null,
@@ -7342,49 +7378,40 @@
   "fetched_at": "2026-10-26T09:53:04+00:00",
   "content_hash": "19e9d14b648550fc",
   "words": 739,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/industry-solutions/bpo",
   "title": "BPO",
   "page_type": "industry",
   "products": [
+   "HySecure",
    "MFA",
    "DLP"
   ],
   "industries": [
    "IT / ITeS"
   ],
-  "summary": "Accops offers secure and compliant remote access solutions for BPOs. Ensure robust data security with cutting-edge solutions. Secure your operations effectively today!",
+  "summary": "Accops for BPOs and contact centres: business apps over a Layer-7 tunnel and voice over a Layer-3 tunnel for work-from-anywhere agents, with MFA, DLP, device binding and audit logs. Customer story: a renowned BPO that reduced TCO by about 50%.",
   "facts": [
    {
-    "fact": "While voice traffic goes through a Layer-3 tunnel, this hybrid solution delivers business apps & data over a Layer-7 tunnel.",
+    "fact": "Voice goes through a Layer-3 tunnel while business apps go over a Layer-7 tunnel.",
     "quote": "While voice traffic goes through a Layer-3 tunnel, this hybrid solution delivers business apps & data over a Layer-7 tunnel."
    },
    {
-    "fact": "With integrated features like strong MFA, DLP features, device ID check, and contextual access, Accops enables BPO firms to comply with compliance requirements, while keeping up with the growing business needs or seasonal spike in demand.",
-    "quote": "With integrated features like strong MFA, DLP features, device ID check, and contextual access, Accops enables BPO firms to comply with compliance requirements, while keeping up with the growing business needs or seasonal spike in demand."
+    "fact": "Users can be bound to one authorised device using login time, location and fingerprint.",
+    "quote": "Use multiple parameters, like log-in time, device location, device fingerprint, etc., to bind the user to an authorized device."
    },
    {
-    "fact": "Create a secure sandbox to block printing, desktop session recording, USB devices for ensuring strict compliance.",
-    "quote": "Create a secure sandbox to block printing, desktop session recording, USB devices for ensuring strict compliance."
-   },
-   {
-    "fact": "User activity reports on who accessed what, when, where and how ensures detailed auditing and compliance.",
-    "quote": "User activity reports on who accessed what, when, where and how ensures detailed auditing and compliance."
-   },
-   {
-    "fact": "Ensured strict regulatory compliance and data privacy",
-    "quote": "Ensured strict regulatory compliance and data privacy"
-   },
-   {
-    "fact": "Reduced TCO by about 50% & optimized OpEx",
+    "fact": "A renowned BPO reduced TCO by about 50%.",
     "quote": "Reduced TCO by about 50% & optimized OpEx"
    }
   ],
   "questions_answered": [
-   "What does Accops say about BPO?"
+   "Can work-from-home call centre agents use VoIP securely with Accops?",
+   "How does Accops help BPO compliance?",
+   "Can we bind an agent to one device?"
   ],
   "cta": null,
   "published": null,
@@ -7392,8 +7419,8 @@
   "fetched_at": "2026-10-26T09:53:06+00:00",
   "content_hash": "7821312f95a20257",
   "words": 486,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions",
@@ -7401,10 +7428,10 @@
   "page_type": "solution",
   "products": [],
   "industries": [],
-  "summary": "",
+  "summary": "Technical solutions index; its listing renders client-side, so the crawler sees only the heading.",
   "facts": [],
   "questions_answered": [
-   "What does Accops say about Solutions?"
+   "What solutions does Accops offer?"
   ],
   "cta": null,
   "published": null,
@@ -7412,49 +7439,40 @@
   "fetched_at": "2026-10-26T09:53:06+00:00",
   "content_hash": "05b004a92e5eda3e",
   "words": 1,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/byod",
   "title": "Bring Your Own Device",
   "page_type": "solution",
   "products": [
+   "HyWorks",
    "HySecure",
    "HyID",
-   "HyWorks",
-   "Nano"
+   "Nano",
+   "MFA"
   ],
   "industries": [],
-  "summary": "Accops BYOD solution enables secure bring your own device access with zero data footprint, strong identity assurance, and centrally governed digital workspaces.",
+  "summary": "Accops' BYOD solution moves security and execution off the personal device into a centrally governed workspace: HyWorks virtual apps and desktops, HySecure, HyID, and Accops Nano for unmanaged devices. Data stays off the endpoint and controls block local storage, printing and capture.",
   "facts": [
    {
-    "fact": "Work extends beyond traditional offices and corporate devices as employees, contractors, and vendors expect flexible, fast access while organisations aim to reduce endpoint costs.",
-    "quote": "Work extends beyond traditional offices and corporate devices as employees, contractors, and vendors expect flexible, fast access while organisations aim to reduce endpoint costs."
+    "fact": "Delivers virtual apps and desktops to user-owned devices without exposing corporate data to the endpoint.",
+    "quote": "Delivering virtual applications and desktops securely to user-owned devices without exposing corporate data to the endpoint."
    },
    {
-    "fact": "Organisations struggle to balance flexible user productivity with strict compliance and corporate security.",
-    "quote": "Organisations struggle to balance flexible user productivity with strict compliance and corporate security."
+    "fact": "Enterprise data never resides locally.",
+    "quote": "Ensuring enterprise data never resides locally, with access governed through strong authentication, device posture validation and policy-driven controls."
    },
    {
-    "fact": "Providing a secure, containerised workspace that isolates corporate activity from the personal environment on the device.",
-    "quote": "Providing a secure, containerised workspace that isolates corporate activity from the personal environment on the device."
-   },
-   {
-    "fact": "Enabling organisations to support work-from-anywhere models with confidence, without expanding their attack surface or complicating compliance.",
-    "quote": "Enabling organisations to support work-from-anywhere models with confidence, without expanding their attack surface or complicating compliance."
-   },
-   {
-    "fact": "Met regulatory compliance and ensured data privacy",
-    "quote": "Met regulatory compliance and ensured data privacy"
-   },
-   {
-    "fact": "Reduced TCO by about 50% & optimized OpEx",
-    "quote": "Reduced TCO by about 50% & optimized OpEx"
+    "fact": "Accops Nano gives hardened Linux execution via USB without agents.",
+    "quote": "Accops Nano delivers hardened, Linux-based execution via USB without agents."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Bring Your Own Device?"
+   "How does Accops secure BYOD?",
+   "Does data stay on personal devices?",
+   "Do we need an agent on personal laptops?"
   ],
   "cta": null,
   "published": null,
@@ -7462,42 +7480,42 @@
   "fetched_at": "2026-10-26T09:53:07+00:00",
   "content_hash": "d50c9796a0a542fc",
   "words": 609,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/monitor-and-secure-vendor-access",
   "title": "Secure Vendor Access",
   "page_type": "solution",
   "products": [
-   "HySecure",
    "HyWorks",
-   "MFA",
+   "HySecure",
+   "HyID",
    "Digital Workspace",
-   "DLP"
+   "MFA",
+   "DLP",
+   "Browser Isolation"
   ],
   "industries": [],
-  "summary": "Discover Accops solutions for securing and monitoring vendor access. Boost your security with our innovative, all-in-one remote work solution.",
+  "summary": "Secure vendor access through centrally governed workspaces: HyWorks, HySecure and HyID give vendors only their assigned apps, with in-session controls on copy-paste, recording and downloads. Vendors are authenticated with local MFA-bound identities, without being onboarded into Active Directory.",
   "facts": [
    {
-    "fact": "Browser isolation enables task-specific internet access only when needed, preventing uncontrolled data exposure.",
-    "quote": "Browser isolation enables task-specific internet access only when needed, preventing uncontrolled data exposure."
+    "fact": "Vendors are authenticated without being onboarded into AD and get access only to assigned applications.",
+    "quote": "Vendors are authenticated without being onboarded into AD, provisioned as locally managed users or groups, and granted access only to assigned applications."
    },
    {
-    "fact": "Every session is logged in detail, providing clear, defensible audit trails for compliance.",
-    "quote": "Every session is logged in detail, providing clear, defensible audit trails for compliance."
+    "fact": "In-session controls restrict copy-paste, recording and downloads.",
+    "quote": "Embedded, on-demand controls restrict copy-paste, recording, and downloads, keeping data protected throughout sessions."
    },
    {
-    "fact": "A leading life insurance provider implements the comprehensive Accops Digital Workspace solution to provide secure, compliant, cost-effective remote access.",
-    "quote": "A leading life insurance provider implements the comprehensive Accops Digital Workspace solution to provide secure, compliant, cost-effective remote access."
-   },
-   {
-    "fact": "360-degrees visibility and control on enterprise applications",
-    "quote": "360-degrees visibility and control on enterprise applications"
+    "fact": "MFA can be bound to a registered device, with fingerprint or face authentication.",
+    "quote": "MFA can be bound to a registered device and, where applicable, fingerprint or face authentication to reduce credential sharing or delegated access."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Secure Vendor Access?"
+   "How can we give vendors secure access without a VPN?",
+   "Do vendors need to be in our Active Directory?",
+   "Can we stop vendors copying or recording data?"
   ],
   "cta": null,
   "published": null,
@@ -7505,52 +7523,34 @@
   "fetched_at": "2026-10-26T09:53:07+00:00",
   "content_hash": "ed1be3e55633f7b9",
   "words": 785,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/on-demand-secure-remote-access",
   "title": "On-demand Secure Remote Access",
   "page_type": "solution",
   "products": [
-   "HySecure",
    "HyWorks",
+   "HySecure",
+   "HyID",
    "MFA"
   ],
-  "industries": [
-   "BFSI",
-   "Pharma / Healthcare",
-   "IT / ITeS"
-  ],
-  "summary": "Secure remote access with Accops advanced solutions. Ensure seamless, safe access to business apps and data anytime, anywhere with top-tier security and control.",
+  "industries": [],
+  "summary": "On-demand secure remote access for third-party vendors and consultants: apps and data stay in the data centre while vendors work from their own devices, with kiosk-based access, zero trust, MFA, device entry control and audit logs. It cites RBI, GLBA and FFIEC guidelines.",
   "facts": [
    {
-    "fact": "Vendor devices with access to critical business apps and data make organizations vulnerable to data breaches or cyber threats.",
-    "quote": "Vendor devices with access to critical business apps and data make organizations vulnerable to data breaches or cyber threats."
-   },
-   {
-    "fact": "Using Accops' secure and compliant solution, enterprises can enable instant vendor access without having to worry about data protection.",
-    "quote": "Using Accops' secure and compliant solution, enterprises can enable instant vendor access without having to worry about data protection."
-   },
-   {
-    "fact": "Enable zero trust model-based remote access to ensure maximum network security and compliance.",
-    "quote": "Enable zero trust model-based remote access to ensure maximum network security and compliance."
-   },
-   {
-    "fact": "Endpoint device scanning to allow access only from compliant and uncompromised devices.",
-    "quote": "Endpoint device scanning to allow access only from compliant and uncompromised devices."
-   },
-   {
-    "fact": "User activity reports on who accessed what, when, where and how ensures detailed auditing and compliance.",
-    "quote": "User activity reports on who accessed what, when, where and how ensures detailed auditing and compliance."
-   },
-   {
-    "fact": "Comply with RBI, GLBA, FFIEC & other guidelines by providing contextual and risk-based remote access to users.",
+    "fact": "Helps comply with RBI, GLBA, FFIEC and other guidelines.",
     "quote": "Comply with RBI, GLBA, FFIEC & other guidelines by providing contextual and risk-based remote access to users."
+   },
+   {
+    "fact": "Blocks download, copy-paste, print-screen, screen recording and printing.",
+    "quote": "Block data download, copy-paste, print-screen, screen recording, printing features and control users' internet access."
    }
   ],
   "questions_answered": [
-   "What does Accops say about On-demand Secure Remote Access?"
+   "How can contractors access our apps from their own devices?",
+   "Can Accops help with RBI vendor access guidelines?"
   ],
   "cta": null,
   "published": null,
@@ -7558,8 +7558,8 @@
   "fetched_at": "2026-10-26T09:53:08+00:00",
   "content_hash": "1fdd9786e760191d",
   "words": 702,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/multi-factor-authentication",
@@ -7567,43 +7567,35 @@
   "page_type": "solution",
   "products": [
    "HyID",
-   "BioAuth",
-   "ZTNA",
    "MFA",
-   "VDI",
-   "Digital Workspace",
+   "BioAuth",
    "Password-less"
   ],
   "industries": [],
-  "summary": "Secure identity access across legacy, cloud, and endpoint environments with context-aware MFA from Accops HyID within the Accops Digital Workspace.",
+  "summary": "Context-aware MFA anchored by HyID, enforced across gateways, app delivery, desktops, servers and legacy systems, deployable fully on-premises, in private cloud or as a managed service. It covers biometrics, hardware tokens, offline and mobile-free options, and vendors without Azure AD.",
   "facts": [
    {
-    "fact": "Organisations still depend heavily on passwords and siloed controls across on-premises systems, cloud platforms, remote access gateways, desktops, and servers.",
-    "quote": "Organisations still depend heavily on passwords and siloed controls across on-premises systems, cloud platforms, remote access gateways, desktops, and servers."
+    "fact": "Deployment options include fully on-premises, private cloud and managed service.",
+    "quote": "Deployment options include fully on-premises, private cloud, and managed service models, supporting data residency, regulatory, and hybrid-environment requirements."
    },
    {
-    "fact": "The third largest public bank of India adopts Accops Digital Workspace to enable compliant access to SWIFT & CBS applications from office as well as home.",
-    "quote": "The third largest public bank of India adopts Accops Digital Workspace to enable compliant access to SWIFT & CBS applications from office as well as home."
+    "fact": "MFA across Windows, Linux, network devices and legacy systems.",
+    "quote": "Enforce multi factor authentication solutions across Windows, Linux, network devices, and legacy systems."
    },
    {
-    "fact": "Strict compliance through biometric authentication and DLP features",
-    "quote": "Strict compliance through biometric authentication and DLP features"
+    "fact": "Biometric login and offline support without mobile devices.",
+    "quote": "This secure MFA solution delivers biometric login and offline support without mobile devices."
    },
    {
-    "fact": "50% lesser TCO compared to competitive solutions",
-    "quote": "50% lesser TCO compared to competitive solutions"
-   },
-   {
-    "fact": "The global pharmaceutical major consolidated its IT infrastructure with Accops HyWorks and HyDesk to ensure strict security compliance.",
-    "quote": "The global pharmaceutical major consolidated its IT infrastructure with Accops HyWorks and HyDesk to ensure strict security compliance."
-   },
-   {
-    "fact": "Single deployment for multiple organizations",
-    "quote": "Single deployment for multiple organizations"
+    "fact": "Vendor MFA without mandatory reliance on Azure AD.",
+    "quote": "Provide secure access for external users without mandatory reliance on Azure AD or central enterprise directories, using Accops MFA solution to support local identity management, high user churn, and simplified onboarding while retaining control over identities and access paths."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Multi-Factor Authentication?"
+   "Can Accops MFA run fully on-premises?",
+   "Can we add MFA to legacy apps and server logons?",
+   "Is there MFA that works without a mobile phone?",
+   "Can vendors use MFA without Azure AD licences?"
   ],
   "cta": null,
   "published": null,
@@ -7611,8 +7603,8 @@
   "fetched_at": "2026-10-26T09:53:08+00:00",
   "content_hash": "21e495cd95a1f774",
   "words": 779,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/secure-saas-access",
@@ -7621,29 +7613,32 @@
   "products": [
    "HySecure",
    "HyID",
-   "Enterprise Browser",
    "Vajra Browser",
+   "Enterprise Browser",
+   "SSO",
    "MFA",
    "FIDO"
   ],
   "industries": [],
-  "summary": "Access cloud applications with secure remote access and streamline your Office 365 experience using Accops' solutions for enhanced security and seamless connectivity.",
+  "summary": "Secure SaaS access using the HySecure gateway with the Vajra secure enterprise browser for unmanaged devices, or HyID SSO and MFA for identity-led control. Browser policies can block copy-paste, downloads, screenshots and printing without a VPN.",
   "facts": [
    {
-    "fact": "As usage expands across distributed teams and unmanaged environments, organisations struggle to maintain consistent identity enforcement, access policies, and visibility into post-login activity.",
-    "quote": "As usage expands across distributed teams and unmanaged environments, organisations struggle to maintain consistent identity enforcement, access policies, and visibility into post-login activity."
-   },
-   {
-    "fact": "HySecure Zero Trust Access Gateway with Vajra Secure Enterprise Browser: Used when organisations must govern secure SaaS access, especially from BYOD, unmanaged endpoints, or third-party environments.",
+    "fact": "HySecure with the Vajra secure enterprise browser governs SaaS access from BYOD and unmanaged endpoints.",
     "quote": "HySecure Zero Trust Access Gateway with Vajra Secure Enterprise Browser: Used when organisations must govern secure SaaS access, especially from BYOD, unmanaged endpoints, or third-party environments."
    },
    {
-    "fact": "Centralised logging of access activity supports governance, compliance reporting, and audit readiness across distributed users.",
-    "quote": "Centralised logging of access activity supports governance, compliance reporting, and audit readiness across distributed users."
+    "fact": "Browser-level policies restrict copy paste, printing, screenshots, recording and downloads.",
+    "quote": "Browser-level policies restrict actions such as copy paste, printing, screenshots, screen recording, and file downloads"
+   },
+   {
+    "fact": "HyID MFA options include biometrics, FIDO keys, QR login, Windows Hello and OTP.",
+    "quote": "Including MFA options such as biometrics, FIDO security keys, QR code login, Windows Hello, and OTP to regulate who can log in, from where, and under what conditions."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Secure SaaS Access?"
+   "Can Accops control Microsoft 365 or SaaS access from personal devices?",
+   "What is the Vajra browser?",
+   "Can we block downloads from SaaS apps?"
   ],
   "cta": null,
   "published": null,
@@ -7651,8 +7646,8 @@
   "fetched_at": "2026-10-26T09:53:11+00:00",
   "content_hash": "1f0c4360a9da11bb",
   "words": 529,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/switch-to-thinclient-computing",
@@ -7663,40 +7658,30 @@
    "Thin Clients",
    "VDI"
   ],
-  "industries": [
-   "BFSI",
-   "Pharma / Healthcare",
-   "IT / ITeS"
-  ],
-  "summary": "Thin Client computing made easy with Accops' advanced solutions. Experience enhanced efficiency and security. Switch to a smarter, streamlined approach now!",
+  "industries": [],
+  "summary": "Accops HyDesk thin clients as low-power, centrally managed, non-persistent endpoints replacing desktops in BFSI, healthcare, ITeS and industrial sites. The page estimates about 156 kWh a year for a desktop against about 21 kWh for a thin client.",
   "facts": [
    {
-    "fact": "Secure, low-power thin client solutions for controlled, scalable computing across organisations.",
-    "quote": "Secure, low-power thin client solutions for controlled, scalable computing across organisations."
-   },
-   {
-    "fact": "Traditional desktop computing was built around decentralised usage, local processing, and manual administration, assumptions that no longer align with compliance-driven operations, remote access models, and sustainability goals.",
-    "quote": "Traditional desktop computing was built around decentralised usage, local processing, and manual administration, assumptions that no longer align with compliance-driven operations, remote access models, and sustainability goals."
-   },
-   {
-    "fact": "Under standard office usage (8 hours per day, 260 days per year), a desktop consumes roughly 156 kWh annually, compared to about 21 kWh for a thin client, reflecting the impact of lower power draw at the endpoint.",
+    "fact": "Under standard office use a desktop consumes roughly 156 kWh a year versus about 21 kWh for a thin client.",
     "quote": "Under standard office usage (8 hours per day, 260 days per year), a desktop consumes roughly 156 kWh annually, compared to about 21 kWh for a thin client, reflecting the impact of lower power draw at the endpoint."
    },
    {
-    "fact": "Low-power, long-life thin clients save ₹6–13 lakhs annually across 500–1,000 endpoints.",
+    "fact": "Thin clients save ₹6-13 lakhs annually across 500-1,000 endpoints.",
     "quote": "Low-power, long-life thin clients save ₹6–13 lakhs annually across 500–1,000 endpoints."
    },
    {
-    "fact": "Configurations and updates enforced centrally, ensuring consistent security and compliance at scale.",
-    "quote": "Configurations and updates enforced centrally, ensuring consistent security and compliance at scale."
+    "fact": "Thin clients cut power use by 70%.",
+    "quote": "Energy-efficient, long-life endpoints cut power use by 70%, reducing carbon footprint and e-waste."
    },
    {
-    "fact": "Energy-efficient, long-life endpoints cut power use by 70%, reducing carbon footprint and e-waste.",
-    "quote": "Energy-efficient, long-life endpoints cut power use by 70%, reducing carbon footprint and e-waste."
+    "fact": "Thin clients store no local data.",
+    "quote": "Thin clients store no local data; malware impact resolves with a simple reboot."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Thin Client Computing?"
+   "Should we replace PCs with thin clients?",
+   "How much power and money do thin clients save?",
+   "Are thin clients more secure than PCs?"
   ],
   "cta": {
    "label": "Contact Sales",
@@ -7707,24 +7692,33 @@
   "fetched_at": "2026-10-26T09:53:11+00:00",
   "content_hash": "97303208792b0fd9",
   "words": 797,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/graphics-workstation",
   "title": "Graphics Workstation",
   "page_type": "solution",
   "products": [
-   "HySecure",
-   "HyID",
    "VDI",
-   "Digital Workspace"
+   "HySecure",
+   "HyID"
   ],
   "industries": [],
-  "summary": "Enable secure remote access to Graphics Workstation workloads with real-time, lossless performance and strong data protection beyond traditional VPN and VDI models.",
-  "facts": [],
+  "summary": "Secure remote access to graphics workstations (engineering, media, imaging, geospatial) using Accops VDI with adaptive display protocols and UDP transport, governed by HySecure zero trust and HyID. Only encrypted pixels leave the data centre.",
+  "facts": [
+   {
+    "fact": "UDP-based transport for high-fidelity graphics over low-bandwidth networks.",
+    "quote": "UDP-based transport ensures high-fidelity graphics performance over low-bandwidth networks."
+   },
+   {
+    "fact": "Encrypted pixel-only display streams keep IP inside the enterprise.",
+    "quote": "Encrypted pixel-only display streams ensure sensitive intellectual property never leaves enterprise environments."
+   }
+  ],
   "questions_answered": [
-   "What does Accops say about Graphics Workstation?"
+   "Can Accops deliver graphics-heavy workstations remotely?",
+   "Does Accops support CAD or media workloads?"
   ],
   "cta": null,
   "published": null,
@@ -7732,48 +7726,35 @@
   "fetched_at": "2026-10-26T09:53:13+00:00",
   "content_hash": "87b5ce7e02c7b4fd",
   "words": 474,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/voip",
   "title": "Secure, jitter-free voice over internet",
   "page_type": "solution",
   "products": [
-   "MFA"
+   "HySecure",
+   "MFA",
+   "DLP"
   ],
   "industries": [
    "IT / ITeS"
   ],
-  "summary": "Accops provides secure, encrypted VoIP access to CRM and contact center apps over low bandwidth, ensuring seamless work-from-anywhere for VoIP users.",
+  "summary": "Secure, jitter-free VoIP plus CRM and contact-centre app access for remote BPO users over low bandwidth, with MFA, device binding and DLP to meet DoT and data-security rules.",
   "facts": [
    {
-    "fact": "Accops solutions follow latest security standards and practices to ensure strict compliance.",
-    "quote": "Accops solutions follow latest security standards and practices to ensure strict compliance."
+    "fact": "Encrypted wire-speed voice and CRM access over low bandwidth.",
+    "quote": "Accops solution provides encrypted wire-speed voice traffic and secure access to CRM and contact centre applications over low bandwidth, enabling workforce to work smoothly from anywhere."
    },
    {
-    "fact": "Customer service executives work under strict supervision to protect customer privacy and ensure compliance with data regulatory norms.",
-    "quote": "Customer service executives work under strict supervision to protect customer privacy and ensure compliance with data regulatory norms."
-   },
-   {
-    "fact": "What organizations need is a secure and reliable solution with superlative performance to support their customer services and ensure continued business operations even in a pandemic or disaster recovery scenario.",
-    "quote": "What organizations need is a secure and reliable solution with superlative performance to support their customer services and ensure continued business operations even in a pandemic or disaster recovery scenario."
-   },
-   {
-    "fact": "The out-of-the-box multi-factor authentication, dynamic risk assessment and device entry control features help organizations to bind individual users to a single compliant device.",
-    "quote": "The out-of-the-box multi-factor authentication, dynamic risk assessment and device entry control features help organizations to bind individual users to a single compliant device."
-   },
-   {
-    "fact": "Data leakage prevention features mitigate challenges arising out of work-from-home/anywhere scenario and ensure compliance with DoT regulations and other data security guidelines.",
+    "fact": "Helps ensure compliance with DoT regulations.",
     "quote": "Data leakage prevention features mitigate challenges arising out of work-from-home/anywhere scenario and ensure compliance with DoT regulations and other data security guidelines."
-   },
-   {
-    "fact": "Create a secure sandbox to block printing, desktop session recording, USB devices for ensuring strict compliance.",
-    "quote": "Create a secure sandbox to block printing, desktop session recording, USB devices for ensuring strict compliance."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Secure, jitter-free voice over internet?"
+   "Can remote agents take calls securely over the internet?",
+   "Does Accops help with DoT compliance for remote agents?"
   ],
   "cta": null,
   "published": null,
@@ -7781,51 +7762,46 @@
   "fetched_at": "2026-10-26T09:53:13+00:00",
   "content_hash": "638b233d4eb40d2c",
   "words": 511,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/avd",
   "title": "Accops for Microsoft AVD",
   "page_type": "solution",
   "products": [
-   "Thin Clients",
-   "MFA",
+   "Digital Workspace",
    "VDI",
    "DaaS",
-   "Digital Workspace",
-   "DLP"
+   "MFA",
+   "DLP",
+   "Thin Clients"
   ],
   "industries": [],
-  "summary": "Enterprise-grade Microsoft AVD for secure, compliant, and scalable remote work. Accops extends AVD with Zero Trust access, MFA, DLP, and cost-saving power management.",
+  "summary": "Accops extends Microsoft Azure Virtual Desktop with zero trust access, MFA, DLP, power management, Teams optimisation and Linux thin client access. The page describes Accops as a Microsoft Gold partner.",
   "facts": [
    {
-    "fact": "Enterprise-grade Microsoft AVD for secure, compliant, and scalable remote work.",
-    "quote": "Enterprise-grade Microsoft AVD for secure, compliant, and scalable remote work."
+    "fact": "Accops describes itself as a Microsoft Gold partner delivering solutions powered by Microsoft AVD.",
+    "quote": "Accops, a Microsoft Gold partner, provides secure and comprehensive work-from-anywhere solutions powered by Microsoft AVD, to businesses of any size.",
+    "caveat": "Microsoft retired the Gold partner designation in 2022; claim may be stale"
    },
    {
-    "fact": "Organisations deploying Microsoft AVD at enterprise scale require completely managed virtual apps and desktop as a service, with contextual Zero Trust access, integrated MFA, and data leakage prevention to ensure compliance.",
-    "quote": "Organisations deploying Microsoft AVD at enterprise scale require completely managed virtual apps and desktop as a service, with contextual Zero Trust access, integrated MFA, and data leakage prevention to ensure compliance."
+    "fact": "Power management shuts idle and pooled VMs on schedules.",
+    "quote": "Shuts idle and pooled VMs; scheduled workday, weekend, and holiday power plans reduce costs."
    },
    {
-    "fact": "With out-of-the-box contextual Zero Trust access and strong MFA, Accops' Digital Workspace enables organisations to simplify their remote work infrastructure.",
-    "quote": "With out-of-the-box contextual Zero Trust access and strong MFA, Accops' Digital Workspace enables organisations to simplify their remote work infrastructure."
-   },
-   {
-    "fact": "Azure cost saving, productivity monitoring, endpoint compliance checks, and web-based granular management to reduce costs per user",
-    "quote": "Azure cost saving, productivity monitoring, endpoint compliance checks, and web-based granular management to reduce costs per user"
-   },
-   {
-    "fact": "Compliant access from Linux-based thin clients, with driver-less printing, USB redirection, data copy control, and contextual access with granular and flexible device policies",
-    "quote": "Compliant access from Linux-based thin clients, with driver-less printing, USB redirection, data copy control, and contextual access with granular and flexible device policies"
-   },
-   {
-    "fact": "Seamlessly integrates with Linux thin clients and zero clients, reducing TCO by ~40%.",
+    "fact": "Linux thin client integration reduces TCO by ~40%.",
     "quote": "Seamlessly integrates with Linux thin clients and zero clients, reducing TCO by ~40%."
+   },
+   {
+    "fact": "Supports the latest Microsoft Teams audio and video optimisations.",
+    "quote": "The latest Microsoft Teams audio and video optimisations"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Accops for Microsoft AVD?"
+   "Does Accops work with Azure Virtual Desktop?",
+   "How does Accops reduce AVD costs?",
+   "Can thin clients connect to AVD through Accops?"
   ],
   "cta": {
    "label": "Contact Sales",
@@ -7836,8 +7812,8 @@
   "fetched_at": "2026-10-26T09:53:13+00:00",
   "content_hash": "ec571ffa10f413d1",
   "words": 383,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/ztna",
@@ -7846,23 +7822,34 @@
   "products": [
    "HySecure",
    "ZTNA",
-   "MFA",
-   "SSO"
+   "SSO",
+   "MFA"
   ],
   "industries": [],
-  "summary": "Securely connect users to private applications and desktops with Accops ZTNA—contextual policies, least-privilege access, and application-scoped connectivity from any device.",
+  "summary": "Accops ZTNA (HySecure) keeps internal apps hidden, brokers per-application access with least privilege and continuous validation, and adds web application protection and session controls. Four deployment options: on-premises or cloud, each direct-connect or reverse-connect with no inbound ports.",
   "facts": [
    {
-    "fact": "Allow, restrict, step-up, or deny access based on endpoint compliance signals.",
-    "quote": "Allow, restrict, step-up, or deny access based on endpoint compliance signals."
+    "fact": "Keeps internal applications hidden by default and brokers per-application connectivity.",
+    "quote": "Keeps internal applications hidden by default."
    },
    {
-    "fact": "Maintain centralised visibility across all access activity with comprehensive logs of who accessed what, when, and from where to support compliance and governance.",
-    "quote": "Maintain centralised visibility across all access activity with comprehensive logs of who accessed what, when, and from where to support compliance and governance."
+    "fact": "Reverse-connect deployment uses outbound tunnels via Edge and App Connectors without opening inbound ports.",
+    "quote": "The solution is deployed on-premises and uses outbound-initiated tunnels via Edge and App Connectors to securely enable external access without opening inbound ports."
+   },
+   {
+    "fact": "Cloud/as-a-service deployment is available.",
+    "quote": "The solution is cloud-hosted, and users connect directly to it over the internet."
+   },
+   {
+    "fact": "Allow, restrict, step-up or deny based on endpoint posture.",
+    "quote": "Allow, restrict, step-up, or deny access based on endpoint compliance signals."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Zero Trust Network Access?"
+   "What is Accops ZTNA?",
+   "Can ZTNA replace our VPN?",
+   "Can we deploy ZTNA without opening inbound firewall ports?",
+   "Is Accops ZTNA available as a service?"
   ],
   "cta": null,
   "published": null,
@@ -7870,52 +7857,38 @@
   "fetched_at": "2026-10-26T09:53:13+00:00",
   "content_hash": "874dc784fc2a3348",
   "words": 564,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/work-from-anywhere",
   "title": "Work From Anywhere",
   "page_type": "solution",
   "products": [
+   "HyWorks",
    "HySecure",
    "HyID",
-   "HyWorks",
    "Nano",
+   "DaaS",
    "Thin Clients",
-   "MFA",
-   "DaaS"
+   "ZTNA",
+   "VDI"
   ],
   "industries": [],
-  "summary": "Enable secure, seamless work from anywhere with Accops zero-trust-based access, multi-factor authentication, and VDS for business continuity.",
+  "summary": "Work from anywhere on one integrated architecture: ZTNA gateway, app and desktop virtualisation, IAM and thin client/endpoint controls, with Accops Nano, Accops Virtual Office and Accops DaaS as delivery options. It argues against stitching VPN, MFA and VDI from separate vendors.",
   "facts": [
    {
-    "fact": "Deliver secure, scalable, and compliant remote access with enterprise-grade Zero Trust and unconstrained operational agility.",
-    "quote": "Deliver secure, scalable, and compliant remote access with enterprise-grade Zero Trust and unconstrained operational agility."
+    "fact": "Applications and desktops stay in controlled datacentre or cloud environments.",
+    "quote": "Instead of extending the network outward, Accops keeps applications and desktops within controlled datacentre or cloud environments and delivers them through secure pathways."
    },
    {
-    "fact": "As organisations operate across multiple locations and device types, the limitations of legacy access models become unavoidable.",
-    "quote": "As organisations operate across multiple locations and device types, the limitations of legacy access models become unavoidable."
-   },
-   {
-    "fact": "Secure execution isolates all activity, enabling full device flexibility without compromising data protection.",
-    "quote": "Secure execution isolates all activity, enabling full device flexibility without compromising data protection."
-   },
-   {
-    "fact": "Accops enables organisations to operationalise Work from Anywhere with clarity, consistency and security across user groups, devices and locations.",
-    "quote": "Accops enables organisations to operationalise Work from Anywhere with clarity, consistency and security across user groups, devices and locations."
-   },
-   {
-    "fact": "Met regulatory compliance and ensured data privacy despite work from anywhere",
-    "quote": "Met regulatory compliance and ensured data privacy despite work from anywhere"
-   },
-   {
-    "fact": "Reduced TCO by about 50% & optimized OpEx due to WFH policy",
-    "quote": "Reduced TCO by about 50% & optimized OpEx due to WFH policy"
+    "fact": "The consolidated design removes multi-vendor complexity.",
+    "quote": "This consolidated design removes multi-vendor complexity and creates a secure, standardised access layer that supports distributed work at scale."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Work From Anywhere?"
+   "How does Accops support work from anywhere?",
+   "Can one vendor replace our VPN, MFA and VDI products?"
   ],
   "cta": null,
   "published": null,
@@ -7923,8 +7896,8 @@
   "fetched_at": "2026-10-26T09:53:14+00:00",
   "content_hash": "1ab54aeb77d4dd56",
   "words": 873,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/virtual-desktop-infrastructure-vdi-solutions",
@@ -7933,38 +7906,30 @@
   "products": [
    "HyWorks",
    "VDI",
+   "Thin Clients",
    "DLP"
   ],
   "industries": [],
-  "summary": "Accops enterprise VDI solutions deliver secure centralised end-user computing with application & desktop virtualization, compliance, and lower TCO.",
+  "summary": "Accops VDI (HyWorks) centralises desktops, apps and OS in a data centre or cloud, with built-in controls on copy/paste, USB, screen capture and session recording. Deployment can be on-premises, cloud VDI or hybrid; use cases include vendors, privileged admins and regulated workloads.",
   "facts": [
    {
-    "fact": "Eliminate endpoint risks, ensure compliance, and enable secure remote access",
-    "quote": "Eliminate endpoint risks, ensure compliance, and enable secure remote access"
+    "fact": "Supports on-premises, cloud VDI and hybrid deployment.",
+    "quote": "Supporting flexible deployment models, including on-premises, Cloud VDI, and hybrid environments for an optimal security–performance balance"
    },
    {
-    "fact": "Traditional endpoint and remote access models expose organisations to persistent security gaps and operational complexity.",
-    "quote": "Traditional endpoint and remote access models expose organisations to persistent security gaps and operational complexity."
+    "fact": "Built-in controls restrict copy/paste, USB, screen capture and session recording.",
+    "quote": "Enforcing built-in security controls such as restricted copy/paste, USB access, screen capture, and session recording to prevent data exfiltration"
    },
    {
-    "fact": "Establishing predictable, auditable workspaces aligned with regulatory compliance requirements",
-    "quote": "Establishing predictable, auditable workspaces aligned with regulatory compliance requirements"
-   },
-   {
-    "fact": "Policy-driven, auditable workspaces with isolated desktops for privileged users.",
-    "quote": "Policy-driven, auditable workspaces with isolated desktops for privileged users."
-   },
-   {
-    "fact": "Isolated desktops for administrators accessing sensitive IT infrastructure.",
-    "quote": "Isolated desktops for administrators accessing sensitive IT infrastructure."
-   },
-   {
-    "fact": "Dedicated virtual desktops for DPDPA/GDPR-mandated workloads.",
-    "quote": "Dedicated virtual desktops for DPDPA/GDPR-mandated workloads."
+    "fact": "The 3rd largest PSB of India: 50% lesser TCO compared to competitive solutions.",
+    "quote": "50% lesser TCO compared to competitive solutions"
    }
   ],
   "questions_answered": [
-   "What does Accops say about Virtual Desktop Infrastructure?"
+   "What is Accops VDI?",
+   "Can Accops VDI run on-premises, in the cloud or hybrid?",
+   "How does Accops VDI prevent data leakage?",
+   "Who uses Accops VDI?"
   ],
   "cta": null,
   "published": null,
@@ -7972,8 +7937,8 @@
   "fetched_at": "2026-10-26T09:53:14+00:00",
   "content_hash": "616594f983066005",
   "words": 496,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/hymobile",
@@ -7982,42 +7947,18 @@
   "products": [
    "HyMobile",
    "MDM",
-   "DLP"
+   "UEM"
   ],
   "industries": [],
-  "summary": "Accops HyMobile provides secure mobile device management with advanced features for iOS, Android, macOS, and Windows, enhancing productivity and compliance.",
+  "summary": "Duplicate of the HyMobile product page under technical solutions: MDM/UEM for Android, iOS, Windows, macOS and signage with app, content and email management.",
   "facts": [
    {
-    "fact": "Manage mobility devices for secure, compliant last-mile connectivity",
-    "quote": "Manage mobility devices for secure, compliant last-mile connectivity"
-   },
-   {
-    "fact": "It helps organisations manage endpoints -- Android, iOS, Windows, macOS, and digital signages -- along with applications, content, and emails through a unified dashboard.",
+    "fact": "Manages Android, iOS, Windows, macOS and digital signage.",
     "quote": "It helps organisations manage endpoints -- Android, iOS, Windows, macOS, and digital signages -- along with applications, content, and emails through a unified dashboard."
-   },
-   {
-    "fact": "Enforces DLP policies, password controls and detects compliance violations.",
-    "quote": "Enforces DLP policies, password controls and detects compliance violations."
-   },
-   {
-    "fact": "01 What is MDM, and why is it important for businesses?",
-    "quote": "01 What is MDM, and why is it important for businesses?"
-   },
-   {
-    "fact": "MDM enables businesses to manage, secure, and monitor employee mobile devices -- enhancing security, reducing downtime, improving user experience, and ensuring regulatory compliance.",
-    "quote": "MDM enables businesses to manage, secure, and monitor employee mobile devices -- enhancing security, reducing downtime, improving user experience, and ensuring regulatory compliance."
-   },
-   {
-    "fact": "02 What types of devices and endpoints can HyMobile manage?",
-    "quote": "02 What types of devices and endpoints can HyMobile manage?"
    }
   ],
   "questions_answered": [
-   "01 What is MDM, and why is it important for businesses?",
-   "02 What types of devices and endpoints can HyMobile manage?",
-   "03 How does HyMobile enhance security for mobile devices and endpoints?",
-   "04 Can HyMobile help businesses achieve compliance with industry regulations?",
-   "05 What deployment options are available for HyMobile?"
+   "Does Accops offer mobile device management?"
   ],
   "cta": null,
   "published": null,
@@ -8025,8 +7966,8 @@
   "fetched_at": "2026-10-26T09:53:14+00:00",
   "content_hash": "a51c01d75613fcf0",
   "words": 529,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/technical-solutions/single-sign-on-solution",
@@ -8037,19 +7978,20 @@
    "SSO"
   ],
   "industries": [],
-  "summary": "Streamline SaaS access and eliminate authentication friction with Accops HyID Single Sign-On. Standards-based SAML 2.0 and OAuth 2.0 federation for Microsoft 365, Salesforce, Google Workspace, and more.",
+  "summary": "HyID single sign-on: SAML 2.0 and OAuth 2.0 federation for Microsoft 365, Salesforce, Google Workspace and other SaaS, an identity broker for portal-led journeys, IdP- and SP-initiated flows, and central policy enforcement.",
   "facts": [
    {
-    "fact": "Access must span SaaS platforms and security mediators, not just isolated applications.",
-    "quote": "Access must span SaaS platforms and security mediators, not just isolated applications."
+    "fact": "SAML 2.0 and OAuth 2.0 federation for Microsoft 365, Salesforce, Google Workspace and other SaaS.",
+    "quote": "Standards-based SAML 2.0 and OAuth 2.0 federation for Microsoft 365, Salesforce, Google Workspace, and other SaaS applications."
    },
    {
-    "fact": "Standards-based SAML 2.0 and OAuth 2.0 federation for Microsoft 365, Salesforce, Google Workspace, and other SaaS applications.",
-    "quote": "Standards-based SAML 2.0 and OAuth 2.0 federation for Microsoft 365, Salesforce, Google Workspace, and other SaaS applications."
+    "fact": "Supports IdP- and SP-initiated flows.",
+    "quote": "IdP- and SP-initiated flows maintain a trusted sign-in path from every entry point."
    }
   ],
   "questions_answered": [
-   "What does Accops say about Single Sign On Solution?"
+   "Does Accops offer SSO for Microsoft 365 and Salesforce?",
+   "Does HyID support SAML and OAuth?"
   ],
   "cta": null,
   "published": null,
@@ -8057,8 +7999,8 @@
   "fetched_at": "2026-10-26T09:53:14+00:00",
   "content_hash": "394483d0d90b50d0",
   "words": 408,
-  "carded_by": "auto",
-  "needs_recard": true
+  "carded_by": "claude",
+  "needs_recard": false
  },
  {
   "url": "https://www.accops.com/solution-documents",
