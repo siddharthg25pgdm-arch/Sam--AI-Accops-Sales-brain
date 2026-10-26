@@ -314,27 +314,33 @@ def score(m: Matcher, rows: list[dict], ms: float, mg: float) -> dict:
 
 
 def calibrate(m: Matcher, tune: list[dict]) -> tuple[float, float]:
-    """Highest recall with tune precision >= TUNE_PRECISION; among ties the strictest (highest) thresholds."""
+    """Highest recall with tune precision >= TUNE_PRECISION; among ties the strictest (highest) thresholds.
+    Precision counts the labelled eval rows only. The bank's own phrases always come back to their pair, so with them in
+    the denominator a bigger bank bought errors on real questions (27 Oct, 78 pairs: min_score slid to 0.39 and
+    "send me the citrix battlecard" matched). Bank phrases still count towards recall."""
     ranked = []  # rank once per row; each threshold pair is then just a comparison
     for r in tune:
         _, rk = m.rank(r["q"], r["group"])
+        bank = r.get("kind") == "bank"
         if rk:
             top, n = rk[0]
             second = rk[1][0] if len(rk) > 1 else 0.0
-            ranked.append((r["expect"], m.ix["intents"][n]["qa_id"], top, (top - second) / top))
+            ranked.append((r["expect"], m.ix["intents"][n]["qa_id"], top, (top - second) / top, bank))
         else:
-            ranked.append((r["expect"], None, 0.0, 0.0))
+            ranked.append((r["expect"], None, 0.0, 0.0, bank))
     pos = sum(e is not None for e, *_ in ranked)
     best = None
     for i in range(20, 96):
         ms = i / 100
         for j in range(5, 51):  # margin >= 0.05: an exact tie never answers
             mg = j / 100
-            tp = fp = 0
-            for e, got, sc, g in ranked:
+            tp = etp = efp = 0
+            for e, got, sc, g, bank in ranked:
                 if got and sc >= ms and g >= mg:
-                    tp, fp = (tp + 1, fp) if got == e else (tp, fp + 1)
-            prec = tp / (tp + fp) if tp + fp else 1.0
+                    tp += got == e
+                    if not bank:
+                        etp, efp = (etp + 1, efp) if got == e else (etp, efp + 1)
+            prec = etp / (etp + efp) if etp + efp else 1.0
             if prec >= TUNE_PRECISION and (best is None or (tp / pos, ms, mg) > best[0]):
                 best = ((tp / pos, ms, mg), ms, mg)
     if best is None:

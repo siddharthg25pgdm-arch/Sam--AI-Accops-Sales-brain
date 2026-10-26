@@ -1,7 +1,7 @@
 {
  "version": 1,
- "built_at": "2026-10-26T12:18:35+00:00",
- "knowledge_version": "draft:2fe91025cd03",
+ "built_at": "2026-10-26T23:36:09+00:00",
+ "knowledge_version": "draft:a2981753c752",
  "source": "draft-corpus",
  "stop": [
   "0",
@@ -775,23 +775,29 @@
   ]
  },
  "vocab": [
+  "10",
   "2",
   "27001",
   "365",
+  "4g",
   "a",
   "about",
   "access",
   "accops",
   "accopsnext",
+  "act",
   "active",
   "ad",
   "adc",
+  "add",
   "adfs",
   "admin",
   "africa",
   "after",
+  "agents",
   "agnostic",
   "ahv",
+  "air",
   "airbridge",
   "akamai",
   "alibaba",
@@ -803,46 +809,79 @@
   "ammyy",
   "an",
   "analyst",
+  "analytics",
   "and",
   "another",
+  "antivirus",
   "anunta",
+  "any",
   "anyconnect",
   "anydesk",
   "anyone",
+  "anywhere",
   "apache",
+  "apne",
+  "app",
   "appgate",
+  "appi",
+  "applications",
   "apporto",
+  "approach",
   "apps",
+  "architecture",
   "are",
   "array",
   "as",
+  "assess",
+  "assessment",
   "at",
   "atsg",
-  "australia",
+  "attach",
   "auth0",
+  "authentication",
   "authenticator",
   "automotive",
+  "availability",
   "available",
   "avaya",
   "avd",
+  "avoid",
+  "award",
+  "awards",
   "aws",
   "azure",
+  "bade",
+  "balancer",
+  "bandwidth",
   "bank",
   "banking",
   "banks",
+  "based",
+  "batao",
+  "be",
   "before",
+  "benefits",
   "better",
   "bfsi",
   "big",
+  "bina",
+  "binding",
   "bioauth",
   "biometric",
+  "block",
   "book",
   "bpm",
   "bpo",
+  "bpos",
+  "bring",
   "broadcast",
   "broadcom",
+  "brochure",
   "browser",
+  "browsing",
+  "business",
   "by",
+  "byod",
   "cad",
   "call",
   "calls",
@@ -850,91 +889,155 @@
   "capital",
   "casb",
   "case",
+  "cases",
   "central",
+  "centre",
   "cert",
   "certificate",
   "certification",
   "certifications",
   "certified",
+  "chalega",
   "change",
   "cheaper",
   "check",
   "checkpoint",
+  "checks",
   "choice",
+  "chrome",
   "cisco",
   "citrix",
   "client",
+  "clientless",
   "clients",
   "cloud",
   "cloudbrink",
   "clouds",
   "cms",
+  "code",
+  "colleges",
   "commerce",
   "committing",
+  "companies",
   "company",
   "compare",
   "compared",
   "comparison",
   "compliance",
   "components",
+  "computer",
   "concept",
   "concurrent",
   "conferencing",
+  "connect",
+  "connection",
+  "connector",
   "consulting",
   "contact",
   "content",
+  "continuity",
+  "contract",
+  "control",
+  "copy",
   "cost",
   "count",
   "countries",
+  "cover",
   "curve",
   "customer",
   "customers",
   "cvad",
   "daas",
   "data",
+  "database",
   "dataless",
+  "datasheet",
+  "deepfake",
   "defence",
   "defense",
+  "dein",
+  "delivery",
   "dell",
   "demo",
+  "department",
+  "deploy",
   "deployment",
   "desktop",
   "desktops",
+  "detection",
+  "developer",
+  "developers",
+  "development",
+  "device",
+  "devices",
+  "did",
+  "different",
   "dincloud",
   "director",
   "directory",
+  "disaster",
+  "discovery",
   "displacement",
   "display",
   "dizzion",
   "dlp",
+  "dmz",
   "do",
+  "documentation",
   "does",
+  "download",
   "downtime",
   "dpdp",
+  "dr",
+  "drivers",
+  "drop",
+  "dsci",
   "dspm",
   "dss",
+  "dubai",
   "duo",
   "e",
+  "each",
   "east",
   "ecommerce",
   "edtech",
   "education",
+  "end",
+  "endpoint",
+  "endpoints",
   "engineer",
   "enterprise",
+  "enterprises",
   "entertainment",
   "entra",
+  "environment",
+  "eol",
   "ericom",
   "estate",
+  "estates",
   "europe",
+  "examples",
   "existing",
+  "exit",
   "experience",
+  "expert",
   "f5",
+  "face",
+  "factor",
   "fast",
   "feature",
+  "features",
+  "few",
+  "fewer",
+  "fido",
+  "fido2",
   "file",
   "files",
   "finacle",
   "financial",
+  "fingerprint",
+  "firewall",
+  "fit",
   "flexxible",
   "flow",
   "for",
@@ -942,12 +1045,20 @@
   "forgerock",
   "fortinet",
   "frame",
+  "free",
+  "from",
+  "fslogix",
   "fujitsu",
+  "fully",
+  "gapped",
   "gartner",
   "gateway",
   "gcc",
   "gcp",
+  "gdpr",
   "genesys",
+  "get",
+  "give",
   "glassfence",
   "global",
   "go",
@@ -957,19 +1068,32 @@
   "govt",
   "gpu",
   "graphics",
+  "guidelines",
+  "hai",
+  "hain",
+  "handle",
+  "hardware",
   "has",
   "hat",
+  "hatana",
   "have",
   "hdx",
+  "headquarters",
   "healthcare",
   "help",
+  "high",
   "hikvision",
   "hipaa",
+  "home",
   "horizon",
   "hospital",
+  "hospitals",
   "hosted",
+  "hota",
+  "house",
   "how",
   "hp",
+  "html5",
   "huawei",
   "huddle",
   "hydesk",
@@ -986,51 +1110,97 @@
   "hyworks",
   "i",
   "ibm",
+  "ict",
   "id",
   "idemia",
   "identity",
   "in",
+  "inbound",
   "included",
   "increase",
   "india",
   "indian",
+  "industry",
   "infosys",
   "infrastructure",
   "innopia",
+  "instead",
   "insurance",
+  "insurers",
   "international",
+  "internet",
   "inuvika",
   "iris",
   "ironorbit",
   "is",
   "iso",
+  "isolate",
+  "isolated",
+  "isolation",
   "it",
   "ites",
   "ivanti",
   "japan",
+  "japanese",
   "jio",
   "jiobook",
   "jiopc",
+  "just",
+  "ka",
+  "kaam",
+  "kahan",
+  "kaise",
+  "kam",
+  "karein",
+  "karte",
+  "karti",
+  "kaunse",
+  "ke",
   "keep",
+  "key",
+  "keys",
+  "ki",
+  "kitna",
   "know",
+  "ko",
+  "kya",
+  "lab",
+  "labs",
+  "lakhs",
+  "laptop",
   "large",
   "latency",
   "launchpad",
+  "layers",
   "leafos",
+  "leakage",
   "learning",
-  "leave",
+  "least",
   "leaving",
+  "legacy",
   "less",
   "licence",
+  "licences",
   "licensing",
   "life",
+  "lifecycle",
+  "links",
   "live",
+  "load",
+  "local",
+  "location",
   "lock",
+  "login",
   "logistics",
+  "logon",
   "long",
-  "made",
+  "low",
+  "ltsr",
   "magic",
+  "make",
   "managed",
+  "management",
+  "mandate",
   "manufacturing",
   "many",
   "markets",
@@ -1038,17 +1208,25 @@
   "me",
   "media",
   "meity",
+  "mena",
+  "methods",
   "mfa",
   "microsoft",
   "middle",
   "migrate",
   "migration",
+  "milega",
   "model",
   "models",
+  "monitor",
+  "monitoring",
+  "monthly",
   "morpho",
   "move",
+  "moved",
+  "moving",
   "much",
-  "multimedia",
+  "multi",
   "named",
   "nano",
   "nanoos",
@@ -1058,75 +1236,132 @@
   "net",
   "netscaler",
   "netskope",
+  "network",
   "networks",
   "neurotechnology",
+  "new",
+  "no",
+  "notice",
   "number",
   "nutanix",
   "oci",
   "oem",
   "of",
   "off",
+  "offer",
+  "office",
+  "offline",
+  "offshore",
   "okta",
+  "old",
   "omnissa",
   "on",
   "one",
   "oneclick",
   "onelogin",
   "onespan",
+  "only",
   "open",
   "openshift",
   "openstack",
   "optimisation",
+  "options",
   "or",
   "oracle",
   "organisations",
+  "other",
   "our",
+  "ourselves",
   "outside",
+  "outsourced",
+  "over",
+  "overview",
+  "own",
   "ownership",
   "owns",
   "palo",
   "parallels",
+  "parent",
   "parity",
   "partner",
+  "partners",
+  "party",
   "password",
+  "passwordless",
+  "paste",
+  "patient",
+  "pay",
   "pc",
   "pci",
+  "pcs",
+  "pdf",
+  "pdpl",
+  "pe",
   "per",
+  "performance",
   "perpetual",
+  "personal",
   "pharma",
+  "phase",
   "photon",
   "pilot",
   "ping",
+  "platform",
   "platforms",
   "poc",
   "point",
+  "policy",
+  "poor",
+  "ports",
+  "posture",
+  "power",
+  "prem",
+  "premise",
+  "premises",
+  "prevent",
+  "prevention",
   "price",
+  "priced",
   "prices",
   "pricing",
+  "print",
+  "printer",
+  "printing",
   "prism",
   "private",
+  "privilege",
+  "product",
   "products",
+  "profile",
+  "profiles",
   "proof",
   "protection",
   "protocol",
   "provider",
+  "provides",
   "proxmox",
   "psu",
+  "psus",
   "public",
   "pulse",
+  "qr",
   "quadrant",
+  "quality",
   "raise",
+  "range",
   "ras",
   "rbi",
   "real",
   "recognition",
+  "recovery",
   "red",
-  "reduce",
   "reduction",
   "reference",
   "references",
-  "regulated",
+  "refresh",
+  "regulations",
   "regulatory",
+  "release",
   "reliance",
   "remote",
   "renewal",
@@ -1136,46 +1371,83 @@
   "replaces",
   "reported",
   "reporting",
+  "requirement",
+  "results",
   "retail",
+  "retire",
   "retraining",
-  "review",
+  "reuse",
+  "reverse",
+  "rid",
   "right",
   "rip",
+  "risky",
+  "roaming",
   "roi",
   "rsa",
+  "rules",
   "run",
+  "saas",
+  "safe",
   "safran",
   "sales",
+  "salesforce",
+  "sarkari",
+  "save",
   "savings",
+  "scalability",
+  "scale",
   "scalefusion",
   "scaler",
   "sciences",
+  "screenshots",
+  "scvmm",
+  "se",
   "seats",
   "sector",
   "secure",
   "secureauth",
+  "securely",
   "security",
+  "seen",
+  "sell",
+  "send",
+  "separate",
   "server",
   "servers",
   "service",
   "services",
+  "session",
+  "sessions",
   "should",
+  "side",
+  "sign",
+  "single",
+  "site",
   "sla",
+  "slow",
   "soc",
   "someone",
   "sonicwall",
-  "source",
+  "sovereign",
   "speak",
   "spectra",
   "sql",
   "sse",
+  "ssl",
   "sso",
   "stability",
+  "staff",
   "stay",
   "still",
+  "stop",
   "storefront",
+  "stories",
+  "structure",
+  "students",
   "study",
   "subscription",
+  "success",
   "support",
   "supported",
   "supports",
@@ -1189,23 +1461,35 @@
   "team",
   "teams",
   "teamviewer",
+  "technical",
   "telco",
   "telecom",
+  "tens",
   "teradici",
   "thales",
+  "than",
   "the",
   "thin",
+  "third",
+  "thousands",
   "time",
   "timeline",
   "to",
+  "today",
   "too",
+  "tool",
   "training",
   "trial",
+  "trust",
   "turbo",
   "uae",
+  "universal",
+  "universities",
   "university",
+  "unmanaged",
+  "up",
+  "upgrade",
   "us",
-  "usa",
   "use",
   "user",
   "users",
@@ -1219,27 +1503,34 @@
   "vdi",
   "ve",
   "vendor",
+  "vendors",
   "video",
   "virtual",
   "vmware",
+  "voip",
   "vpn",
   "vs",
   "watchguard",
   "we",
   "web",
   "webex",
+  "websites",
   "weeks",
   "well",
   "what",
   "when",
+  "where",
   "which",
   "who",
   "will",
   "windows",
+  "winning",
+  "wins",
   "with",
   "without",
   "won",
   "work",
+  "works",
   "workspaces",
   "workspot",
   "workstation",
@@ -1248,6 +1539,8 @@
   "xenapp",
   "xendesktop",
   "you",
+  "your",
+  "zero",
   "zettagrid",
   "zscaler",
   "ztna"
@@ -1265,25 +1558,27 @@
    ],
    "allow": [
     "Citrix",
-    "HyID",
     "HySecure",
     "HyWorks"
    ],
    "keywords": {
-    "altern": 4.8726,
-    "citrix": 2.4944,
-    "compar": 4.0355,
-    "real": 5.2756,
-    "replac": 2.9276
+    "altern": 4.9836,
+    "citrix": 2.5461,
+    "compar": 4.0141,
+    "differ": 5.3868,
+    "real": 5.3868,
+    "replac": 2.8753
    },
    "phrases": [
-    "is accops a real alternative to citrix",
+    "how is accops different from citrix",
+    "accops vs citrix",
     "citrix alternative",
     "replace citrix",
-    "accops vs citrix",
-    "what replaces citrix"
+    "is accops a real alternative to citrix",
+    "what replaces citrix",
+    "citrix ka alternative"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-02",
@@ -1297,25 +1592,27 @@
     "Citrix"
    ],
    "keywords": {
-    "citrix": 2.4944,
-    "compon": 4.5875,
-    "direct": 4.5875,
-    "many": 3.7892,
-    "netsca": 4.5875,
-    "produc": 4.3669,
-    "replac": 2.9276,
-    "server": 4.3669,
-    "sql": 5.2756,
-    "storef": 5.9661
+    "citrix": 2.5461,
+    "compon": 4.6982,
+    "direct": 4.4773,
+    "drop": 6.0776,
+    "estat": 4.6982,
+    "many": 3.7955,
+    "produc": 4.0141,
+    "replac": 2.8753,
+    "retir": 6.0776,
+    "storef": 6.0776
    },
    "phrases": [
     "which citrix components does accops replace",
-    "do we still need netscaler",
+    "what does accops replace in a citrix estate",
     "citrix components",
-    "storefront director sql server",
-    "how many products"
+    "which citrix products can we drop",
+    "how many products do we need",
+    "storefront and director replacement",
+    "citrix products we can retire"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-03",
@@ -1329,19 +1626,21 @@
     "Citrix"
    ],
    "keywords": {
-    "citrix": 2.4944,
-    "compar": 4.0355,
-    "featur": 5.2756,
-    "parity": 5.9661,
-    "tabl": 5.9661
+    "citrix": 2.5461,
+    "compar": 4.0141,
+    "featur": 4.2973,
+    "parity": 6.0776,
+    "side": 5.3868,
+    "tabl": 6.0776
    },
    "phrases": [
     "how does accops compare with citrix feature by feature",
     "feature comparison",
     "feature parity",
-    "accops citrix comparison table"
+    "accops citrix comparison table",
+    "compare accops and citrix side by side"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-04",
@@ -1355,21 +1654,23 @@
     "Citrix"
    ],
    "keywords": {
-    "better": 5.9661,
-    "choic": 5.9661,
-    "citrix": 2.4944,
-    "estat": 4.8726,
-    "larg": 4.5875,
-    "right": 4.8726,
-    "stay": 4.8726
+    "better": 6.0776,
+    "choic": 6.0776,
+    "citrix": 2.5461,
+    "estat": 4.6982,
+    "fit": 5.3868,
+    "larg": 4.4773,
+    "right": 4.9836,
+    "stay": 4.9836
    },
    "phrases": [
     "when is citrix still the better choice",
     "should we stay on citrix",
-    "is accops right for us",
-    "large estate"
+    "is accops the right fit for us",
+    "large citrix estate",
+    "is citrix better for large estates"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-05",
@@ -1383,22 +1684,27 @@
     "Citrix"
    ],
    "keywords": {
-    "citrix": 2.4944,
-    "downti": 5.2756,
-    "migrat": 4.0355,
-    "move": 4.5875,
-    "replac": 2.9276,
-    "rip": 5.9661,
-    "withou": 3.6864
+    "approa": 4.6982,
+    "citrix": 2.5461,
+    "downti": 5.3868,
+    "migrat": 3.8986,
+    "move": 4.6982,
+    "replac": 2.8753,
+    "rip": 6.0776,
+    "run": 3.2805,
+    "side": 5.3868,
+    "withou": 3.468
    },
    "phrases": [
     "can we migrate off citrix without downtime",
     "migration downtime",
     "move off citrix",
-    "citrix migration",
-    "rip and replace"
+    "citrix migration approach",
+    "rip and replace",
+    "run citrix and accops side by side",
+    "citrix se migrate kaise karein bina downtime"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-06",
@@ -1412,15 +1718,15 @@
     "Citrix"
    ],
    "keywords": {
-    "citrix": 2.4944,
-    "deploy": 4.1871,
-    "fast": 4.3669,
-    "long": 4.3669,
-    "many": 3.7892,
-    "migrat": 4.0355,
-    "move": 4.5875,
-    "take": 4.8726,
-    "timeli": 5.9661
+    "citrix": 2.5461,
+    "deploy": 3.8986,
+    "fast": 4.4773,
+    "long": 4.2973,
+    "many": 3.7955,
+    "migrat": 3.8986,
+    "move": 4.6982,
+    "take": 4.9836,
+    "timeli": 6.0776
    },
    "phrases": [
     "how long does a citrix to accops migration take",
@@ -1429,7 +1735,7 @@
     "deployment time",
     "how fast can we move"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-07",
@@ -1441,23 +1747,27 @@
     "Citrix"
    ],
    "keywords": {
-    "befor": 5.9661,
-    "commit": 5.9661,
-    "concep": 5.9661,
-    "pilot": 5.2756,
-    "poc": 5.2756,
-    "proof": 5.9661,
-    "run": 3.5091,
-    "trial": 5.9661
+    "befor": 4.9836,
+    "commit": 6.0776,
+    "concep": 6.0776,
+    "few": 6.0776,
+    "free": 6.0776,
+    "pilot": 5.3868,
+    "poc": 5.3868,
+    "proof": 6.0776,
+    "run": 3.2805,
+    "trial": 6.0776,
+    "user": 3.4012
    },
    "phrases": [
     "can we run a pilot or poc before committing",
     "poc",
     "proof of concept",
     "trial",
-    "pilot"
+    "pilot with a few users",
+    "free trial"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-08",
@@ -1469,23 +1779,25 @@
     "Citrix"
    ],
    "keywords": {
-    "admin": 5.2756,
-    "chang": 4.1871,
-    "curv": 5.9661,
-    "experi": 4.5875,
-    "learn": 5.9661,
-    "team": 4.5875,
-    "train": 4.8726,
-    "user": 3.5091
+    "admin": 5.3868,
+    "chang": 4.1454,
+    "curv": 6.0776,
+    "experi": 4.9836,
+    "learn": 6.0776,
+    "notic": 6.0776,
+    "team": 4.6982,
+    "train": 4.9836,
+    "user": 3.4012
    },
    "phrases": [
     "will our it team and users need retraining",
     "training",
     "learning curve",
     "admin training",
+    "will users notice a change",
     "user experience change"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-09",
@@ -1503,31 +1815,33 @@
     "VMware"
    ],
    "keywords": {
-    "activ": 4.8726,
-    "agnost": 5.9661,
-    "direct": 4.5875,
-    "exist": 4.8726,
-    "file": 5.2756,
-    "hyperv": 4.0355,
-    "infras": 4.5875,
-    "keep": 5.2756,
-    "replac": 2.9276,
-    "server": 4.3669,
-    "vmwar": 4.5875
+    "activ": 4.9836,
+    "agnost": 6.0776,
+    "direct": 4.4773,
+    "exist": 4.9836,
+    "file": 5.3868,
+    "hyperv": 4.2973,
+    "infras": 4.6982,
+    "keep": 5.3868,
+    "replac": 2.8753,
+    "server": 4.2973,
+    "vmwar": 4.4773
    },
    "phrases": [
-    "do we have to replace our hypervisor active directory or file servers",
+    "do we have to replace our hypervisor or active directory",
     "existing infrastructure",
     "keep vmware",
     "keep active directory",
+    "keep file servers",
     "hypervisor agnostic"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-10",
    "groups": [
     "citrix-lp",
+    "general",
     "product:hyworks"
    ],
    "must": [
@@ -1541,26 +1855,29 @@
     "Thin Clients"
    ],
    "keywords": {
-    "ahv": 5.2756,
-    "centra": 5.2756,
-    "nutani": 4.8726,
-    "prism": 5.2756,
-    "run": 3.5091,
-    "suppor": 2.6367
+    "ahv": 5.3868,
+    "centra": 5.3868,
+    "nutani": 4.9836,
+    "prism": 5.3868,
+    "run": 3.2805,
+    "suppor": 2.5215,
+    "vdi": 2.7726
    },
    "phrases": [
     "does accops run on nutanix ahv",
-    "nutanix",
     "ahv",
     "prism central",
-    "nutanix support"
+    "nutanix support",
+    "does accops support nutanix",
+    "nutanix ahv vdi"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-11",
    "groups": [
     "citrix-lp",
+    "general",
     "product:hyworks"
    ],
    "must": [
@@ -1570,34 +1887,33 @@
    "allow": [
     "Citrix",
     "HyDesk",
-    "HySecure",
     "HyWorks",
     "Proxmox",
     "Thin Clients",
     "VMware"
    ],
    "keywords": {
-    "hyperv": 4.0355,
-    "leav": 4.3669,
-    "open": 4.8726,
-    "proxmo": 5.9661,
-    "sourc": 5.9661,
-    "suppor": 2.6367,
-    "vmwar": 4.5875
+    "moving": 6.0776,
+    "proxmo": 6.0776,
+    "suppor": 2.5215,
+    "vdi": 2.7726,
+    "vmwar": 4.4773
    },
    "phrases": [
     "does accops support proxmox",
     "proxmox",
     "proxmox ve",
-    "open source hypervisor",
-    "leave vmware"
+    "is proxmox supported",
+    "proxmox vdi",
+    "moving from vmware to proxmox"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-12",
    "groups": [
     "citrix-lp",
+    "general",
     "product:hyworks"
    ],
    "must": [],
@@ -1613,31 +1929,33 @@
     "VMware"
    ],
    "keywords": {
-    "aws": 5.9661,
-    "azur": 3.6864,
-    "cloud": 4.1871,
-    "gcp": 5.9661,
-    "hyperv": 4.0355,
-    "oci": 5.9661,
-    "opensh": 5.2756,
-    "openst": 5.9661,
-    "platfo": 4.8726,
-    "suppor": 2.6367
+    "aws": 6.0776,
+    "azur": 3.7955,
+    "cloud": 4.1454,
+    "gcp": 6.0776,
+    "hyperv": 4.2973,
+    "oci": 6.0776,
+    "opensh": 4.9836,
+    "openst": 6.0776,
+    "platfo": 4.4773,
+    "public": 4.9836,
+    "suppor": 2.5215
    },
    "phrases": [
     "which hypervisors and clouds does accops support",
     "supported platforms",
     "aws azure gcp oci",
-    "openshift",
-    "openstack",
-    "cloud support"
+    "supported hypervisors",
+    "openshift openstack support",
+    "which public clouds"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-13",
    "groups": [
     "citrix-lp",
+    "general",
     "product:daas"
    ],
    "must": [],
@@ -1646,14 +1964,13 @@
     "Citrix"
    ],
    "keywords": {
-    "daas": 3.5091,
-    "deskto": 3.5936,
-    "host": 5.2756,
-    "manag": 3.7892,
-    "run": 3.5091,
-    "servic": 4.1871,
-    "subscr": 5.2756,
-    "vdi": 2.9276
+    "daas": 3.4012,
+    "deskto": 3.2805,
+    "host": 4.9836,
+    "manag": 3.6177,
+    "run": 3.2805,
+    "servic": 4.1454,
+    "vdi": 2.7726
    },
    "phrases": [
     "can accops run it for us as a managed service daas",
@@ -1661,14 +1978,16 @@
     "managed desktops",
     "desktop as a service",
     "hosted vdi",
-    "subscription service"
+    "managed vdi service",
+    "accops managed desktops"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-14",
    "groups": [
     "citrix-lp",
+    "general",
     "solution:avd"
    ],
    "must": [
@@ -1677,25 +1996,27 @@
    "allow": [
     "Azure Virtual Desktop",
     "Citrix",
+    "HyWorks",
     "Thin Clients"
    ],
    "keywords": {
-    "avd": 4.5875,
-    "azur": 3.6864,
-    "deskto": 3.5936,
-    "micros": 4.5875,
-    "virtua": 3.7892,
-    "work": 2.5485,
-    "wvd": 5.9661
+    "avd": 4.6982,
+    "azur": 3.7955,
+    "deskto": 3.2805,
+    "micros": 4.4773,
+    "virtua": 3.5398,
+    "work": 2.4298,
+    "wvd": 6.0776
    },
    "phrases": [
     "does accops work with azure virtual desktop",
     "avd",
     "azure virtual desktop",
     "wvd",
-    "microsoft avd"
+    "microsoft avd",
+    "accops for avd"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-15",
@@ -1711,24 +2032,23 @@
     "Photon"
    ],
    "keywords": {
-    "displa": 4.5875,
-    "experi": 4.5875,
-    "good": 5.2756,
-    "hdx": 4.8726,
-    "latenc": 5.9661,
-    "photon": 5.2756,
-    "protoc": 4.8726,
-    "user": 3.5091
+    "displa": 4.6982,
+    "good": 5.3868,
+    "hdx": 4.9836,
+    "latenc": 6.0776,
+    "perfor": 6.0776,
+    "photon": 5.3868,
+    "protoc": 4.9836
    },
    "phrases": [
     "is the accops display protocol as good as hdx",
     "hdx",
-    "protocol",
-    "user experience",
+    "display protocol",
+    "protocol performance",
     "latency",
-    "photon"
+    "photon display protocol"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-16",
@@ -1740,22 +2060,21 @@
    "allow": [
     "Azure Virtual Desktop",
     "Citrix",
-    "HyWorks",
-    "Media"
+    "HyWorks"
    ],
    "keywords": {
-    "cad": 5.2756,
-    "call": 4.3669,
-    "confer": 5.9661,
-    "gpu": 5.9661,
-    "graphi": 4.5875,
-    "multim": 5.9661,
-    "optimi": 5.9661,
-    "team": 4.5875,
-    "video": 5.2756,
-    "well": 5.9661,
-    "work": 2.5485,
-    "workst": 5.2756
+    "cad": 5.3868,
+    "call": 4.4773,
+    "confer": 6.0776,
+    "gpu": 6.0776,
+    "graphi": 4.6982,
+    "optimi": 6.0776,
+    "qualit": 6.0776,
+    "team": 4.6982,
+    "video": 5.3868,
+    "well": 6.0776,
+    "work": 2.4298,
+    "workst": 5.3868
    },
    "phrases": [
     "will teams calls video and graphics work well",
@@ -1764,14 +2083,15 @@
     "gpu",
     "cad",
     "graphics workstation",
-    "multimedia"
+    "teams call quality"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-17",
    "groups": [
     "citrix-lp",
+    "general",
     "home"
    ],
    "must": [],
@@ -1779,12 +2099,12 @@
     "Citrix"
    ],
    "keywords": {
-    "27001": 5.2756,
-    "certif": 5.2756,
-    "compli": 3.9045,
-    "iso": 5.2756,
-    "securi": 4.5875,
-    "soc": 5.9661
+    "27001": 5.3868,
+    "certif": 4.9836,
+    "compli": 3.7955,
+    "iso": 5.3868,
+    "securi": 4.0141,
+    "soc": 6.0776
    },
    "phrases": [
     "is accops iso 27001 certified",
@@ -1792,9 +2112,10 @@
     "certifications",
     "security certification",
     "compliance certificate",
-    "soc 2"
+    "soc 2",
+    "iso certified hai kya"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-18",
@@ -1810,28 +2131,29 @@
     "Government"
    ],
    "keywords": {
-    "cert": 5.2756,
-    "compli": 3.9045,
-    "dpdp": 4.8726,
-    "dss": 5.9661,
-    "help": 3.5936,
-    "hipaa": 5.2756,
-    "meity": 5.2756,
-    "pci": 5.9661,
-    "rbi": 3.7892,
-    "regula": 5.2756
+    "act": 4.9836,
+    "cert": 5.3868,
+    "compli": 3.7955,
+    "dpdp": 4.9836,
+    "dss": 6.0776,
+    "guidel": 4.9836,
+    "help": 3.6177,
+    "india": 3.7955,
+    "meity": 5.3868,
+    "pci": 6.0776,
+    "rbi": 3.7955,
+    "regula": 5.3868
    },
    "phrases": [
     "does accops help with rbi cert in or dpdp compliance",
-    "rbi",
+    "rbi guidelines",
     "cert in",
-    "dpdp",
+    "dpdp act",
     "meity",
-    "regulatory compliance",
-    "pci dss",
-    "hipaa"
+    "regulatory compliance india",
+    "pci dss"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-19",
@@ -1847,25 +2169,23 @@
     "HySecure"
    ],
    "keywords": {
-    "access": 3.1184,
-    "adc": 5.9661,
-    "citrix": 2.4944,
-    "gatewa": 5.2756,
-    "netsca": 4.5875,
-    "remot": 3.1184,
-    "replac": 2.9276,
-    "vpn": 3.9045,
-    "ztna": 4.0355
+    "adc": 6.0776,
+    "balanc": 6.0776,
+    "citrix": 2.5461,
+    "gatewa": 4.9836,
+    "load": 6.0776,
+    "netsca": 4.9836,
+    "replac": 2.8753
    },
    "phrases": [
-    "can accops replace netscaler citrix gateway for remote access",
+    "can accops replace netscaler or citrix gateway",
     "netscaler",
     "citrix gateway",
     "citrix adc",
-    "vpn replacement",
-    "ztna gateway"
+    "do we still need netscaler",
+    "load balancer replacement"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-20",
@@ -1883,26 +2203,26 @@
     "Okta"
    ],
    "keywords": {
-    "anoth": 5.9661,
-    "duo": 5.9661,
-    "hyid": 4.0355,
-    "identi": 5.9661,
-    "includ": 4.8726,
-    "mfa": 3.5091,
-    "okta": 5.9661,
-    "provid": 5.2756,
-    "sso": 4.5875,
-    "vendor": 3.2313
+    "anoth": 6.0776,
+    "duo": 6.0776,
+    "identi": 5.3868,
+    "includ": 4.9836,
+    "mfa": 3.3389,
+    "okta": 6.0776,
+    "provid": 4.9836,
+    "separa": 4.9836,
+    "sso": 4.2973,
+    "vendor": 3.2255
    },
    "phrases": [
-    "are mfa and sso included or do we need another identity vendor",
+    "are mfa and sso included or do we need another vendor",
     "mfa included",
     "sso included",
-    "hyid",
-    "identity provider",
-    "duo okta"
+    "separate identity vendor",
+    "do we need okta or duo",
+    "identity provider"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-21",
@@ -1916,27 +2236,26 @@
     "Citrix"
    ],
    "keywords": {
-    "cheap": 5.2756,
-    "citrix": 2.4944,
-    "compar": 4.0355,
-    "cost": 4.3669,
-    "licens": 3.5091,
-    "per": 5.9661,
-    "pric": 4.3669,
-    "tco": 4.5875,
-    "user": 3.5091
+    "batao": 6.0776,
+    "cheap": 5.3868,
+    "citrix": 2.5461,
+    "compar": 4.0141,
+    "cost": 4.1454,
+    "licens": 3.5398,
+    "per": 5.3868,
+    "pric": 4.2973,
+    "user": 3.4012
    },
    "phrases": [
     "how much does accops cost compared with citrix",
-    "price",
     "pricing",
-    "cost",
+    "how much does it cost",
     "per user cost",
-    "how much cheaper",
+    "how much cheaper than citrix",
     "licence cost",
-    "tco"
+    "accops ki pricing batao"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-22",
@@ -1951,25 +2270,25 @@
     "Government"
    ],
    "keywords": {
-    "case": 4.1871,
-    "cost": 4.3669,
-    "custom": 3.6864,
-    "reduct": 5.9661,
-    "report": 5.9661,
-    "roi": 5.9661,
-    "saving": 5.2756,
-    "study": 4.3669,
-    "tco": 4.5875
+    "cost": 4.1454,
+    "custom": 3.468,
+    "exampl": 6.0776,
+    "reduct": 6.0776,
+    "report": 6.0776,
+    "roi": 6.0776,
+    "save": 5.3868,
+    "saving": 4.9836,
+    "tco": 4.9836
    },
    "phrases": [
     "what savings have customers reported",
     "roi",
-    "savings",
+    "customer savings",
     "tco reduction",
-    "cost reduction",
-    "case study savings"
+    "cost savings examples",
+    "how much did customers save"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-23",
@@ -1981,24 +2300,25 @@
     "Citrix"
    ],
    "keywords": {
-    "availa": 4.1871,
-    "concur": 5.9661,
-    "licens": 3.5091,
-    "model": 4.8726,
-    "named": 5.9661,
-    "perpet": 4.5875,
-    "subscr": 5.2756,
-    "user": 3.5091
+    "availa": 4.1454,
+    "concur": 6.0776,
+    "licens": 3.5398,
+    "model": 4.6982,
+    "named": 6.0776,
+    "option": 4.6982,
+    "perpet": 4.6982,
+    "subscr": 6.0776,
+    "user": 3.4012
    },
    "phrases": [
     "what licensing models are available",
     "perpetual licence",
-    "subscription",
+    "subscription licence",
     "concurrent users",
     "named users",
-    "licensing"
+    "licensing options"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-24",
@@ -2010,24 +2330,26 @@
     "Citrix"
    ],
    "keywords": {
-    "increa": 4.5875,
-    "lock": 5.9661,
-    "pric": 4.3669,
-    "protec": 4.8726,
-    "rais": 5.2756,
-    "reduc": 4.5875,
-    "renewa": 4.3669,
-    "seat": 5.2756,
-    "won": 4.8726
+    "fewer": 6.0776,
+    "go": 4.6982,
+    "increa": 4.6982,
+    "lock": 6.0776,
+    "pric": 4.2973,
+    "protec": 4.6982,
+    "rais": 5.3868,
+    "renewa": 4.6982,
+    "seat": 5.3868,
+    "won": 4.6982
    },
    "phrases": [
     "how do we know accops won t raise prices at renewal too",
     "renewal price increase",
     "price protection",
     "price lock",
-    "reduce seats at renewal"
+    "will the price go up at renewal",
+    "fewer seats at renewal"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-25",
@@ -2043,34 +2365,35 @@
     "HyWorks"
    ],
    "keywords": {
-    "anyon": 4.3669,
-    "case": 4.1871,
-    "citrix": 2.4944,
-    "custom": 3.6864,
-    "displa": 4.5875,
-    "refer": 5.2756,
-    "replac": 2.9276,
-    "study": 4.3669
+    "anyon": 4.4773,
+    "case": 4.0141,
+    "citrix": 2.5461,
+    "custom": 3.468,
+    "displa": 4.6982,
+    "migrat": 3.8986,
+    "moved": 6.0776,
+    "replac": 2.8753,
+    "study": 4.6982
    },
    "phrases": [
     "has anyone replaced citrix with accops",
-    "citrix customer",
+    "citrix customer moved",
     "citrix displacement",
-    "reference customer",
-    "case study citrix"
+    "citrix migration case study",
+    "who moved off citrix"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-26",
    "groups": [
     "citrix-lp",
+    "general",
     "industry:bfsi",
     "case-studies"
    ],
    "must": [
-    "BFSI",
-    "Government"
+    "BFSI"
    ],
    "allow": [
     "BFSI",
@@ -2078,25 +2401,25 @@
     "Government"
    ],
    "keywords": {
-    "bank": 3.5091,
-    "bfsi": 4.8726,
-    "custom": 3.6864,
-    "govern": 4.1871,
-    "insura": 5.9661,
-    "organi": 4.1871,
-    "refer": 5.2756,
-    "regula": 5.2756,
-    "use": 2.3502
+    "bank": 3.6177,
+    "bfsi": 4.9836,
+    "client": 3.2805,
+    "custom": 3.468,
+    "insur": 4.4773,
+    "insura": 6.0776,
+    "kauns": 5.3868,
+    "refer": 4.6982,
+    "use": 2.3278
    },
    "phrases": [
-    "which banks and regulated organisations use accops",
+    "which banks and insurers use accops",
     "bank customers",
     "bfsi references",
     "insurance customers",
-    "government customers",
-    "who uses accops"
+    "banking clients",
+    "kaunse bank use karte hain"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-27",
@@ -2109,12 +2432,12 @@
     "Citrix"
    ],
    "keywords": {
-    "analys": 5.9661,
-    "daas": 3.5091,
-    "gartn": 4.1871,
-    "magic": 4.3669,
-    "quadra": 4.3669,
-    "recogn": 5.9661
+    "analys": 6.0776,
+    "daas": 3.4012,
+    "gartn": 4.2973,
+    "magic": 4.4773,
+    "quadra": 4.4773,
+    "recogn": 5.3868
    },
    "phrases": [
     "is accops in the gartner magic quadrant",
@@ -2123,72 +2446,83 @@
     "analyst recognition",
     "gartner daas"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-28",
    "groups": [
     "citrix-lp",
+    "general",
     "home"
    ],
    "must": [],
    "allow": [
     "BFSI",
-    "Citrix"
+    "Citrix",
+    "Government",
+    "IT / ITeS",
+    "Manufacturing",
+    "Pharma / Healthcare"
    ],
    "keywords": {
-    "big": 5.9661,
-    "count": 5.9661,
-    "countr": 5.2756,
-    "custom": 3.6864,
-    "many": 3.7892,
-    "number": 5.9661,
-    "organi": 4.1871,
-    "use": 2.3502
+    "big": 6.0776,
+    "compan": 3.6177,
+    "count": 6.0776,
+    "countr": 5.3868,
+    "custom": 3.468,
+    "many": 3.7955,
+    "number": 6.0776,
+    "organi": 4.2973,
+    "partn": 3.6177,
+    "use": 2.3278
    },
    "phrases": [
     "how many organisations use accops",
     "customer count",
-    "how big is accops",
+    "how big is accops as a company",
     "number of customers",
-    "countries"
+    "how many countries",
+    "how many partners"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-29",
    "groups": [
     "citrix-lp",
-    "contact"
+    "general"
    ],
    "must": [],
    "allow": [
     "Citrix"
    ],
    "keywords": {
-    "after": 4.8726,
-    "go": 5.2756,
-    "live": 5.2756,
-    "model": 4.8726,
-    "oem": 5.9661,
-    "partn": 3.6864,
-    "sla": 5.9661,
-    "suppor": 2.6367
+    "after": 4.9836,
+    "go": 4.6982,
+    "live": 5.3868,
+    "model": 4.6982,
+    "oem": 6.0776,
+    "partn": 3.6177,
+    "provid": 4.9836,
+    "sla": 6.0776,
+    "suppor": 2.5215,
+    "techni": 6.0776
    },
    "phrases": [
     "who supports us after go live accops or a partner",
-    "support",
-    "who supports",
+    "technical support",
+    "who provides support",
     "oem support",
     "support model",
-    "sla"
+    "support sla"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-30",
    "groups": [
     "citrix-lp",
+    "general",
     "partners"
    ],
    "must": [],
@@ -2196,39 +2530,34 @@
     "Citrix"
    ],
    "keywords": {
-    "africa": 4.5875,
-    "austra": 5.9661,
-    "east": 4.3669,
-    "europ": 5.2756,
-    "global": 4.8726,
-    "india": 3.7892,
-    "intern": 4.5875,
-    "japan": 4.8726,
-    "middl": 4.5875,
-    "organi": 4.1871,
-    "outsid": 5.2756,
-    "suppor": 2.6367,
-    "uae": 4.8726,
-    "usa": 5.9661
+    "africa": 4.6982,
+    "east": 4.2973,
+    "europ": 5.3868,
+    "india": 3.7955,
+    "intern": 4.2973,
+    "middl": 4.4773,
+    "organi": 4.2973,
+    "outsid": 5.3868,
+    "suppor": 2.5215,
+    "uae": 4.9836,
+    "work": 2.4298
    },
    "phrases": [
     "do you support organisations outside india",
     "international",
     "middle east",
     "uae",
-    "japan",
-    "australia",
-    "usa",
     "europe",
     "africa",
-    "global"
+    "do you work outside india"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-31",
    "groups": [
     "citrix-lp",
+    "general",
     "home"
    ],
    "must": [],
@@ -2237,26 +2566,29 @@
     "Reliance Jio"
    ],
    "keywords": {
-    "compan": 3.9045,
-    "india": 3.7892,
-    "indian": 4.8726,
-    "jio": 5.2756,
-    "made": 5.9661,
-    "owners": 5.9661,
-    "owns": 5.2756,
-    "relian": 5.2756,
-    "stabil": 5.9661,
-    "vendor": 3.2313
+    "compan": 3.6177,
+    "headqu": 5.3868,
+    "indian": 4.9836,
+    "jio": 5.3868,
+    "locati": 6.0776,
+    "owners": 6.0776,
+    "owns": 5.3868,
+    "parent": 6.0776,
+    "relian": 5.3868,
+    "stabil": 6.0776,
+    "struct": 6.0776,
+    "vendor": 3.2255
    },
    "phrases": [
     "who owns accops and is it an indian company",
     "reliance jio",
-    "ownership",
-    "made in india",
-    "vendor stability",
-    "indian company"
+    "accops ownership structure",
+    "is accops an indian company",
+    "accops headquarters location",
+    "accops parent company",
+    "vendor stability"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
   },
   {
    "qa_id": "lp-32",
@@ -2264,38 +2596,1662 @@
     "citrix-lp",
     "general"
    ],
-   "must": [
-    "Citrix"
-   ],
+   "must": [],
    "allow": [
     "Citrix"
    ],
    "keywords": {
-    "book": 5.2756,
-    "call": 4.3669,
-    "citrix": 2.4944,
-    "contac": 5.2756,
-    "demo": 5.2756,
-    "engin": 5.2756,
-    "leav": 4.3669,
-    "renewa": 4.3669,
-    "review": 5.9661,
-    "sale": 4.8726,
-    "someon": 4.8726,
-    "speak": 5.9661,
-    "talk": 4.8726
+    "book": 5.3868,
+    "citrix": 2.5461,
+    "contac": 4.9836,
+    "demo": 5.3868,
+    "engin": 5.3868,
+    "expert": 5.3868,
+    "leav": 4.2973,
+    "sale": 4.9836,
+    "someon": 4.9836,
+    "speak": 6.0776,
+    "talk": 4.9836
    },
    "phrases": [
-    "how do i talk to an engineer about leaving citrix",
+    "how do i talk to an accops engineer",
     "talk to sales",
     "book a demo",
-    "contact",
+    "contact accops sales",
     "speak to someone",
-    "renewal review",
-    "call me"
+    "talk to an expert",
+    "talk to an engineer about leaving citrix"
    ],
-   "min_score": 0.54
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-33",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "home"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "HyID",
+    "HySecure",
+    "HyWorks",
+    "Thin Clients"
+   ],
+   "keywords": {
+    "kauns": 5.3868,
+    "overvi": 5.3868,
+    "platfo": 4.4773,
+    "produc": 4.0141,
+    "rang": 6.0776,
+    "sell": 4.4773
+   },
+   "phrases": [
+    "what is accops",
+    "accops overview",
+    "what products does accops sell",
+    "accops platform overview",
+    "accops product range",
+    "accops ke products kaunse hain"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-34",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hyworks"
+   ],
+   "must": [
+    "HyWorks"
+   ],
+   "allow": [
+    "AWS",
+    "Citrix",
+    "Google",
+    "HyWorks",
+    "Microsoft Hyper-V",
+    "Nutanix",
+    "Thin Clients",
+    "VMware"
+   ],
+   "keywords": {
+    "app": 4.6982,
+    "case": 4.0141,
+    "deliv": 4.4773,
+    "deskto": 3.2805,
+    "featur": 4.2973,
+    "hywork": 3.5398,
+    "use": 2.3278,
+    "vdi": 2.7726,
+    "virtua": 3.5398
+   },
+   "phrases": [
+    "what is hyworks vdi",
+    "hyworks app delivery",
+    "hyworks virtual desktops",
+    "hyworks use cases",
+    "hyworks features",
+    "hyworks vdi kya hai"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-35",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hysecure"
+   ],
+   "must": [
+    "HySecure"
+   ],
+   "allow": [
+    "Citrix",
+    "HySecure"
+   ],
+   "keywords": {
+    "access": 2.8753,
+    "app": 4.6982,
+    "case": 4.0141,
+    "featur": 4.2973,
+    "gatewa": 4.9836,
+    "hysecu": 3.7955,
+    "privat": 6.0776,
+    "trust": 4.2973,
+    "use": 2.3278,
+    "zero": 4.1454,
+    "ztna": 3.8986
+   },
+   "phrases": [
+    "what is the hysecure ztna gateway",
+    "hysecure zero trust access",
+    "hysecure private app access",
+    "hysecure use cases",
+    "hysecure gateway features",
+    "hysecure ztna gateway kya hai"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-36",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hyid"
+   ],
+   "must": [
+    "HyID"
+   ],
+   "allow": [
+    "Azure AD",
+    "BioAuth",
+    "Citrix",
+    "HyID"
+   ],
+   "keywords": {
+    "authen": 4.4773,
+    "case": 4.0141,
+    "factor": 4.9836,
+    "featur": 4.2973,
+    "handl": 4.6982,
+    "hyid": 4.1454,
+    "identi": 5.3868,
+    "manag": 3.6177,
+    "mfa": 3.3389,
+    "multi": 4.9836,
+    "sign": 5.3868,
+    "singl": 6.0776,
+    "sso": 4.2973,
+    "use": 2.3278
+   },
+   "phrases": [
+    "how does hyid handle mfa and sso",
+    "hyid multi factor authentication",
+    "hyid single sign on",
+    "hyid use cases",
+    "hyid features",
+    "hyid identity management"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-37",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hydesk"
+   ],
+   "must": [
+    "HyDesk",
+    "Thin Clients"
+   ],
+   "allow": [
+    "Citrix",
+    "HyDesk",
+    "Thin Clients"
+   ],
+   "keywords": {
+    "client": 3.2805,
+    "deskto": 3.2805,
+    "devic": 3.468,
+    "hydesk": 4.4773,
+    "low": 4.6982,
+    "milega": 6.0776,
+    "offer": 4.0141,
+    "power": 4.6982,
+    "replac": 2.8753,
+    "thin": 3.6177,
+    "zero": 4.1454
+   },
+   "phrases": [
+    "do you offer thin clients",
+    "thin client",
+    "hydesk zero client",
+    "hydesk devices",
+    "replace desktops with thin clients",
+    "low power thin clients",
+    "thin client milega kya"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-38",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hyworks"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "HyWorks"
+   ],
+   "keywords": {
+    "app": 4.6982,
+    "attach": 6.0776,
+    "citrix": 2.5461,
+    "fslogi": 4.9836,
+    "manag": 3.6177,
+    "profil": 6.0776,
+    "replac": 2.8753,
+    "roam": 6.0776,
+    "suppor": 2.5215,
+    "user": 3.4012
+   },
+   "phrases": [
+    "do you support fslogix and app attach",
+    "fslogix",
+    "app attach",
+    "user profile management",
+    "roaming profiles",
+    "replacement for citrix profile management"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-39",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hylabs",
+    "industry:education"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "Education",
+    "HyLabs"
+   ],
+   "keywords": {
+    "colleg": 6.0776,
+    "comput": 4.9836,
+    "educat": 6.0776,
+    "home": 4.2973,
+    "hylab": 4.2973,
+    "ict": 4.9836,
+    "lab": 6.0776,
+    "labs": 4.6982,
+    "studen": 4.9836,
+    "univer": 4.4773,
+    "vdi": 2.7726,
+    "virtua": 3.5398
+   },
+   "phrases": [
+    "do you have virtual labs for colleges",
+    "hylabs virtual labs",
+    "virtual ict labs",
+    "computer labs for universities",
+    "vdi for education",
+    "lab for students from home"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-40",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hysecure"
+   ],
+   "must": [],
+   "allow": [
+    "BFSI",
+    "Citrix",
+    "Government",
+    "HySecure"
+   ],
+   "keywords": {
+    "hatana": 6.0776,
+    "instea": 6.0776,
+    "replac": 2.8753,
+    "rid": 6.0776,
+    "ssl": 6.0776,
+    "vpn": 4.0141,
+    "ztna": 3.8986
+   },
+   "phrases": [
+    "can accops replace our vpn",
+    "vpn replacement",
+    "replace ssl vpn",
+    "ztna instead of vpn",
+    "get rid of our vpn",
+    "vpn hatana hai"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-41",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:nano"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "Nano"
+   ],
+   "keywords": {
+    "access": 2.8753,
+    "bring": 6.0776,
+    "byod": 4.6982,
+    "devic": 3.468,
+    "kaam": 6.0776,
+    "laptop": 4.6982,
+    "nano": 4.6982,
+    "own": 4.4773,
+    "person": 4.2973,
+    "secur": 3.0336,
+    "staff": 4.6982,
+    "unmana": 5.3868,
+    "work": 2.4298
+   },
+   "phrases": [
+    "can staff work securely from personal devices",
+    "byod",
+    "bring your own device",
+    "personal laptop access",
+    "unmanaged devices",
+    "accops nano",
+    "apne laptop se kaam"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-42",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hylite"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "HyLite",
+    "HySecure",
+    "HyWorks"
+   ],
+   "keywords": {
+    "access": 2.8753,
+    "based": 4.9836,
+    "brows": 3.8986,
+    "chrom": 5.3868,
+    "client": 3.2805,
+    "connec": 4.4773,
+    "deskto": 3.2805,
+    "html5": 6.0776,
+    "hylit": 4.6982,
+    "remot": 3.078,
+    "user": 3.4012
+   },
+   "phrases": [
+    "can users connect from just a browser",
+    "html5 access",
+    "clientless access",
+    "hylite browser access",
+    "access from chrome browser",
+    "browser based remote desktop"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-43",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:bioauth"
+   ],
+   "must": [
+    "BioAuth"
+   ],
+   "allow": [
+    "BioAuth",
+    "Citrix",
+    "HyID",
+    "HySecure"
+   ],
+   "keywords": {
+    "authen": 4.4773,
+    "bioaut": 4.6982,
+    "biomet": 5.3868,
+    "deepfa": 6.0776,
+    "detect": 5.3868,
+    "face": 5.3868,
+    "finger": 5.3868,
+    "login": 4.9836,
+    "mfa": 3.3389,
+    "suppor": 2.5215
+   },
+   "phrases": [
+    "do you support biometric or face login",
+    "biometric authentication",
+    "biometric face authentication",
+    "biometric fingerprint login",
+    "bioauth biometric mfa",
+    "bioauth deepfake detection"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-44",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hyid",
+    "industry:bfsi"
+   ],
+   "must": [],
+   "allow": [
+    "BFSI",
+    "Citrix",
+    "HyID"
+   ],
+   "keywords": {
+    "add": 4.2973,
+    "applic": 4.4773,
+    "apps": 4.0141,
+    "chang": 4.1454,
+    "code": 5.3868,
+    "legacy": 4.2973,
+    "logon": 5.3868,
+    "mandat": 6.0776,
+    "mfa": 3.3389,
+    "old": 4.9836,
+    "rbi": 3.7955,
+    "window": 4.9836,
+    "withou": 3.468
+   },
+   "phrases": [
+    "can you add mfa to legacy apps and windows logon",
+    "mfa for legacy apps",
+    "mfa without code change",
+    "windows logon mfa",
+    "mfa on old applications",
+    "rbi mfa mandate"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-45",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hyid",
+    "product:hysecure"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "Enterprise Browser",
+    "Google",
+    "HyID",
+    "HySecure",
+    "Vajra Browser"
+   ],
+   "keywords": {
+    "365": 4.9836,
+    "access": 2.8753,
+    "apps": 4.0141,
+    "brows": 3.8986,
+    "contro": 5.3868,
+    "enterp": 4.6982,
+    "micros": 4.4773,
+    "offic": 4.9836,
+    "other": 6.0776,
+    "saas": 4.9836,
+    "salesf": 5.3868,
+    "secur": 3.0336,
+    "securi": 4.0141,
+    "sso": 4.2973,
+    "vajra": 5.3868
+   },
+   "phrases": [
+    "can accops secure microsoft 365 and other saas apps",
+    "microsoft 365 security",
+    "saas access control",
+    "office 365 sso",
+    "salesforce sso",
+    "enterprise browser",
+    "vajra browser"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-46",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "home"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "IT / ITeS"
+   ],
+   "keywords": {
+    "award": 5.3868,
+    "dsci": 6.0776,
+    "indust": 4.2973,
+    "recogn": 5.3868,
+    "winn": 6.0776,
+    "won": 4.6982
+   },
+   "phrases": [
+    "has accops won any awards",
+    "accops awards",
+    "dsci award",
+    "industry awards",
+    "award winning",
+    "accops recognition"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-47",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "E-commerce / Retail"
+   ],
+   "keywords": {
+    "4g": 6.0776,
+    "bandwi": 4.9836,
+    "connec": 4.4773,
+    "intern": 4.2973,
+    "kam": 6.0776,
+    "link": 5.3868,
+    "low": 4.6982,
+    "networ": 4.1454,
+    "poor": 6.0776,
+    "slow": 6.0776,
+    "work": 2.4298
+   },
+   "phrases": [
+    "does accops work over slow or low bandwidth links",
+    "low bandwidth",
+    "slow internet",
+    "poor network connection",
+    "works on 4g",
+    "kam bandwidth pe chalega"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-48",
+   "groups": [
+    "citrix-lp"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix"
+   ],
+   "keywords": {
+    "assess": 6.0776,
+    "befor": 4.9836,
+    "cover": 6.0776,
+    "discov": 6.0776,
+    "migrat": 3.8986,
+    "phas": 6.0776
+   },
+   "phrases": [
+    "what does the migration assessment cover",
+    "migration assessment",
+    "assessment phase",
+    "discovery phase",
+    "what do you assess before migration"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-49",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "BFSI",
+    "Citrix"
+   ],
+   "keywords": {
+    "avoid": 6.0776,
+    "end": 4.1454,
+    "endpoi": 4.6982,
+    "eol": 5.3868,
+    "hardwa": 5.3868,
+    "life": 4.9836,
+    "new": 5.3868,
+    "old": 4.9836,
+    "pcs": 4.9836,
+    "refres": 6.0776,
+    "reus": 6.0776,
+    "upgrad": 6.0776,
+    "window": 4.9836,
+    "withou": 3.468
+   },
+   "phrases": [
+    "can we reuse old windows 10 pcs as endpoints",
+    "windows 10 end of life",
+    "windows 10 eol",
+    "reuse old pcs",
+    "avoid hardware refresh",
+    "upgrade windows without new pcs"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-50",
+   "groups": [
+    "citrix-lp"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "HyWorks"
+   ],
+   "keywords": {
+    "cost": 4.1454,
+    "databa": 5.3868,
+    "licens": 3.5398,
+    "requir": 4.9836,
+    "server": 4.2973,
+    "site": 5.3868,
+    "sql": 5.3868
+   },
+   "phrases": [
+    "do we still need sql server licences",
+    "sql server licence",
+    "do we need sql",
+    "site database",
+    "database requirement",
+    "sql licence cost"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-51",
+   "groups": [
+    "citrix-lp"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "HyLite"
+   ],
+   "keywords": {
+    "deskto": 3.2805,
+    "driver": 6.0776,
+    "local": 5.3868,
+    "print": 5.3868,
+    "server": 4.2973,
+    "suppor": 2.5215,
+    "univer": 4.4773,
+    "vdi": 2.7726,
+    "virtua": 3.5398,
+    "withou": 3.468,
+    "work": 2.4298
+   },
+   "phrases": [
+    "how does printing work without universal print server",
+    "printing from virtual desktops",
+    "universal print server",
+    "printer drivers",
+    "print from vdi",
+    "local printer support"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-52",
+   "groups": [
+    "citrix-lp"
+   ],
+   "must": [
+    "Citrix"
+   ],
+   "allow": [
+    "Citrix",
+    "HyWorks"
+   ],
+   "keywords": {
+    "analyt": 6.0776,
+    "citrix": 2.5461,
+    "direct": 4.4773,
+    "monito": 5.3868,
+    "replac": 2.8753,
+    "sessio": 5.3868,
+    "tool": 5.3868,
+    "vdi": 2.7726
+   },
+   "phrases": [
+    "what replaces citrix director for monitoring",
+    "citrix director",
+    "monitoring",
+    "session analytics",
+    "vdi monitoring tool",
+    "how do we monitor sessions"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-53",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "home"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "HyID"
+   ],
+   "keywords": {
+    "certif": 4.9836,
+    "featur": 4.2973,
+    "layer": 6.0776,
+    "overvi": 5.3868,
+    "platfo": 4.4773,
+    "secur": 3.0336,
+    "securi": 4.0141
+   },
+   "phrases": [
+    "is accops secure and certified",
+    "accops security overview",
+    "security features",
+    "how secure is the platform",
+    "accops security layers",
+    "kitna secure hai platform"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-54",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hysecure"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "HyID",
+    "HySecure"
+   ],
+   "keywords": {
+    "access": 2.8753,
+    "archit": 5.3868,
+    "least": 6.0776,
+    "privil": 6.0776,
+    "trust": 4.2973,
+    "work": 2.4298,
+    "zero": 4.1454,
+    "ztna": 3.8986
+   },
+   "phrases": [
+    "how does accops do zero trust",
+    "zero trust",
+    "ztna",
+    "how does ztna work",
+    "zero trust architecture",
+    "least privilege access"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-55",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hysecure"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "HySecure"
+   ],
+   "keywords": {
+    "connec": 4.4773,
+    "dmz": 6.0776,
+    "firewa": 5.3868,
+    "inboun": 5.3868,
+    "open": 4.9836,
+    "port": 5.3868,
+    "requir": 4.9836,
+    "revers": 6.0776,
+    "rule": 4.4773
+   },
+   "phrases": [
+    "do we need to open inbound firewall ports",
+    "inbound ports",
+    "firewall ports",
+    "reverse connect",
+    "no inbound firewall rules",
+    "dmz requirement"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-56",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix"
+   ],
+   "keywords": {
+    "access": 2.8753,
+    "antivi": 6.0776,
+    "befor": 4.9836,
+    "bind": 5.3868,
+    "check": 6.0776,
+    "compli": 3.7955,
+    "devic": 3.468,
+    "endpoi": 4.6982,
+    "login": 4.9836,
+    "postur": 6.0776,
+    "run": 3.2805
+   },
+   "phrases": [
+    "what device checks run before access",
+    "device posture",
+    "endpoint compliance check",
+    "device binding",
+    "check antivirus before login",
+    "posture check"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-57",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "Thin Clients"
+   ],
+   "keywords": {
+    "block": 5.3868,
+    "copy": 5.3868,
+    "data": 3.8986,
+    "dlp": 6.0776,
+    "downlo": 4.6982,
+    "leakag": 4.9836,
+    "leav": 4.2973,
+    "past": 6.0776,
+    "preven": 5.3868,
+    "screen": 6.0776,
+    "sessio": 5.3868,
+    "stop": 4.9836
+   },
+   "phrases": [
+    "can we stop data leaving the session",
+    "dlp",
+    "data leakage prevention",
+    "block copy paste",
+    "stop screenshots",
+    "prevent data download"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-58",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "BFSI",
+    "Citrix",
+    "HySecure",
+    "HyWorks"
+   ],
+   "keywords": {
+    "access": 2.8753,
+    "contra": 5.3868,
+    "dein": 6.0776,
+    "give": 4.4773,
+    "outsou": 6.0776,
+    "party": 6.0776,
+    "secur": 3.0336,
+    "staff": 4.6982,
+    "third": 6.0776,
+    "vendor": 3.2255
+   },
+   "phrases": [
+    "how do we give vendors secure access",
+    "vendor access",
+    "third party access",
+    "contract staff access",
+    "outsourced staff access",
+    "vendors ko access kaise dein"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-59",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:browser-isolation"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "IT / ITeS",
+    "Virtual Browser"
+   ],
+   "keywords": {
+    "brows": 3.8986,
+    "intern": 4.2973,
+    "isolat": 4.1454,
+    "networ": 4.1454,
+    "remot": 3.078,
+    "risky": 6.0776,
+    "safe": 6.0776,
+    "virtua": 3.5398,
+    "websit": 6.0776
+   },
+   "phrases": [
+    "can you isolate risky websites from our network",
+    "browser isolation",
+    "remote browser isolation",
+    "virtual browser",
+    "isolate internet browsing",
+    "safe browsing"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-60",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "industry:healthcare"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "HyMobile",
+    "Pharma / Healthcare"
+   ],
+   "keywords": {
+    "appi": 6.0776,
+    "compli": 3.7955,
+    "data": 3.8986,
+    "gdpr": 6.0776,
+    "global": 4.9836,
+    "help": 3.6177,
+    "hipaa": 5.3868,
+    "japan": 4.6982,
+    "pdpl": 6.0776,
+    "protec": 4.6982,
+    "regula": 5.3868
+   },
+   "phrases": [
+    "does accops help with hipaa and gdpr",
+    "hipaa",
+    "gdpr",
+    "global compliance",
+    "data protection regulations",
+    "pdpl",
+    "appi japan"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-61",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "home"
+   ],
+   "must": [],
+   "allow": [
+    "AWS",
+    "Azure Virtual Desktop",
+    "Citrix",
+    "Google",
+    "Microsoft Hyper-V",
+    "Nutanix",
+    "Oracle",
+    "Proxmox",
+    "VMware"
+   ],
+   "keywords": {
+    "cloud": 4.1454,
+    "deploy": 3.8986,
+    "host": 4.9836,
+    "hota": 6.0776,
+    "model": 4.6982,
+    "option": 4.6982,
+    "prem": 5.3868,
+    "premis": 4.1454,
+    "run": 3.2805
+   },
+   "phrases": [
+    "where does accops run on prem or cloud",
+    "deployment options",
+    "accops deployment models",
+    "where can accops be hosted",
+    "cloud or on premise",
+    "kahan deploy hota hai"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-62",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hyworks"
+   ],
+   "must": [
+    "Microsoft Hyper-V",
+    "VMware"
+   ],
+   "allow": [
+    "Citrix",
+    "HyDesk",
+    "HyWorks",
+    "Microsoft Hyper-V",
+    "Thin Clients",
+    "VMware"
+   ],
+   "keywords": {
+    "connec": 4.4773,
+    "exit": 6.0776,
+    "hyper": 5.3868,
+    "leav": 4.2973,
+    "opensh": 4.9836,
+    "option": 4.6982,
+    "scvmm": 5.3868,
+    "suppor": 2.5215,
+    "v": 5.3868,
+    "vmwar": 4.4773,
+    "withou": 3.468
+   },
+   "phrases": [
+    "does accops support hyper v and openshift",
+    "hyper v without scvmm",
+    "hyper v connector",
+    "hyper v and openshift support",
+    "leaving vmware",
+    "vmware exit options"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-63",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:daas"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix"
+   ],
+   "keywords": {
+    "cost": 4.1454,
+    "daas": 3.4012,
+    "deskto": 3.2805,
+    "go": 4.6982,
+    "monthl": 6.0776,
+    "pay": 6.0776,
+    "per": 5.3868,
+    "pric": 4.2973,
+    "vdi": 2.7726
+   },
+   "phrases": [
+    "how is accops daas priced",
+    "daas pricing",
+    "daas cost",
+    "price per desktop",
+    "pay as you go vdi",
+    "daas monthly cost"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-64",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:daas",
+    "case-studies"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "IT / ITeS"
+   ],
+   "keywords": {
+    "benefi": 6.0776,
+    "custom": 3.468,
+    "daas": 3.4012,
+    "result": 6.0776,
+    "saving": 4.9836,
+    "seen": 6.0776,
+    "stori": 5.3868,
+    "succes": 5.3868
+   },
+   "phrases": [
+    "what results have daas customers seen",
+    "daas results",
+    "daas success stories",
+    "daas benefits",
+    "daas savings",
+    "daas customer stories"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-65",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:daas",
+    "product:hyworks"
+   ],
+   "must": [
+    "Accops Managed Desktops",
+    "HyWorks"
+   ],
+   "allow": [
+    "Accops Managed Desktops",
+    "Citrix",
+    "HyWorks"
+   ],
+   "keywords": {
+    "compar": 4.0141,
+    "daas": 3.4012,
+    "deskto": 3.2805,
+    "hous": 6.0776,
+    "hywork": 3.5398,
+    "manag": 3.6177,
+    "oursel": 6.0776,
+    "run": 3.2805,
+    "use": 2.3278
+   },
+   "phrases": [
+    "should we run hyworks ourselves or use accops daas",
+    "hyworks or daas",
+    "hyworks vs accops managed desktops",
+    "run hyworks in house or daas",
+    "should we use daas or hyworks"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-66",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "Government",
+    "HyID"
+   ],
+   "keywords": {
+    "air": 4.6982,
+    "deploy": 3.8986,
+    "fully": 5.3868,
+    "gapp": 4.6982,
+    "isolat": 4.1454,
+    "networ": 4.1454,
+    "offlin": 6.0776,
+    "only": 5.3868,
+    "premis": 4.1454,
+    "run": 3.2805,
+    "sover": 6.0776
+   },
+   "phrases": [
+    "can accops run fully on premises or air gapped",
+    "on premise only",
+    "air gapped network",
+    "fully offline deployment",
+    "isolated network",
+    "sovereign deployment"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-67",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "BFSI",
+    "Citrix",
+    "HyWorks"
+   ],
+   "keywords": {
+    "availa": 4.1454,
+    "busin": 4.4773,
+    "contin": 5.3868,
+    "disast": 5.3868,
+    "dr": 6.0776,
+    "high": 6.0776,
+    "multi": 4.9836,
+    "recov": 5.3868,
+    "site": 5.3868,
+    "suppor": 2.5215
+   },
+   "phrases": [
+    "does accops support disaster recovery",
+    "disaster recovery",
+    "dr site",
+    "high availability",
+    "multi site",
+    "business continuity"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-68",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "home"
+   ],
+   "must": [],
+   "allow": [
+    "BFSI",
+    "Citrix",
+    "Education",
+    "Government",
+    "IT / ITeS",
+    "Manufacturing",
+    "Pharma / Healthcare"
+   ],
+   "keywords": {
+    "bade": 6.0776,
+    "compan": 3.6177,
+    "custom": 3.468,
+    "enterp": 4.6982,
+    "indust": 4.2973,
+    "organi": 4.2973,
+    "refer": 4.6982,
+    "today": 5.3868,
+    "use": 2.3278
+   },
+   "phrases": [
+    "which organisations use accops",
+    "who uses accops today",
+    "accops reference customers by industry",
+    "which enterprises use accops",
+    "bade bade companies accops use karti hain"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-69",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "industry:bfsi"
+   ],
+   "must": [],
+   "allow": [
+    "BFSI",
+    "BioAuth",
+    "Citrix",
+    "Government"
+   ],
+   "keywords": {
+    "deploy": 3.8986,
+    "enterp": 4.6982,
+    "lakh": 6.0776,
+    "larg": 4.4773,
+    "many": 3.7955,
+    "scal": 4.1454,
+    "scalab": 6.0776,
+    "suppor": 2.5215,
+    "tens": 6.0776,
+    "thousa": 6.0776,
+    "user": 3.4012
+   },
+   "phrases": [
+    "can accops scale to tens of thousands of users",
+    "scalability",
+    "how many users can it support",
+    "large deployment",
+    "enterprise scale",
+    "lakhs of users"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-70",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "industry:it-and-ites",
+    "industry:bpo"
+   ],
+   "must": [
+    "IT / ITeS"
+   ],
+   "allow": [
+    "Citrix",
+    "IT / ITeS"
+   ],
+   "keywords": {
+    "agent": 4.0141,
+    "bpo": 4.6982,
+    "bpos": 6.0776,
+    "call": 4.4773,
+    "centr": 4.9836,
+    "compan": 3.6177,
+    "contac": 4.9836,
+    "home": 4.2973,
+    "ites": 6.0776,
+    "remot": 3.078,
+    "servic": 4.1454,
+    "voip": 5.3868,
+    "work": 2.4298
+   },
+   "phrases": [
+    "does accops work for it services and bpos",
+    "bpo",
+    "bpo call centre",
+    "it services company",
+    "ites",
+    "bpo voip for remote agents",
+    "bpo contact centre work from home"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-71",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "BFSI",
+    "Citrix",
+    "HyID",
+    "IT / ITeS"
+   ],
+   "keywords": {
+    "access": 2.8753,
+    "anywh": 5.3868,
+    "centr": 4.9836,
+    "develo": 5.3868,
+    "enviro": 5.3868,
+    "gcc": 6.0776,
+    "offsho": 6.0776,
+    "remot": 3.078,
+    "secur": 3.0336,
+    "work": 2.4298
+   },
+   "phrases": [
+    "can our developers work securely from anywhere",
+    "developer access",
+    "secure development environment",
+    "remote developers",
+    "offshore development centre",
+    "gcc developers"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-72",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "industry:government-institutions"
+   ],
+   "must": [
+    "Government"
+   ],
+   "allow": [
+    "Citrix",
+    "Government"
+   ],
+   "keywords": {
+    "access": 2.8753,
+    "depart": 6.0776,
+    "e": 4.9836,
+    "govern": 4.2973,
+    "govt": 6.0776,
+    "india": 3.7955,
+    "make": 4.9836,
+    "offic": 4.9836,
+    "psu": 6.0776,
+    "psus": 5.3868,
+    "public": 4.9836,
+    "sarkar": 6.0776,
+    "sector": 5.3868,
+    "vendor": 3.2255,
+    "work": 2.4298
+   },
+   "phrases": [
+    "do you work with government and psus",
+    "government",
+    "psu",
+    "public sector",
+    "government e office access",
+    "make in india vendor for government",
+    "sarkari govt department"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-73",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "industry:healthcare"
+   ],
+   "must": [
+    "Pharma / Healthcare"
+   ],
+   "allow": [
+    "Citrix",
+    "HyWorks",
+    "Pharma / Healthcare"
+   ],
+   "keywords": {
+    "compan": 3.6177,
+    "data": 3.8986,
+    "health": 5.3868,
+    "hospit": 4.6982,
+    "patien": 5.3868,
+    "pharma": 5.3868,
+    "securi": 4.0141,
+    "use": 2.3278,
+    "work": 2.4298
+   },
+   "phrases": [
+    "do you work with hospitals and healthcare",
+    "healthcare",
+    "hospitals",
+    "pharma companies",
+    "healthcare patient data security",
+    "which hospitals use accops"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-74",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "Government"
+   ],
+   "keywords": {
+    "custom": 3.468,
+    "dubai": 6.0776,
+    "east": 4.2973,
+    "mena": 6.0776,
+    "middl": 4.4773,
+    "refer": 4.6982,
+    "wins": 6.0776
+   },
+   "phrases": [
+    "do you have customers in the middle east",
+    "middle east customers",
+    "mena references",
+    "mena customer wins",
+    "dubai references"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-75",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "Education",
+    "HyLabs"
+   ],
+   "keywords": {
+    "custom": 3.468,
+    "japan": 4.6982,
+    "partn": 3.6177,
+    "refer": 4.6982
+   },
+   "phrases": [
+    "do you have customers in japan",
+    "japan customers",
+    "japanese references",
+    "accops japan",
+    "japan partner"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-76",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "HySecure"
+   ],
+   "keywords": {
+    "end": 4.1454,
+    "eol": 5.3868,
+    "life": 4.9836,
+    "lifecy": 6.0776,
+    "long": 4.2973,
+    "ltsr": 6.0776,
+    "policy": 4.9836,
+    "produc": 4.0141,
+    "releas": 4.4773,
+    "suppor": 2.5215
+   },
+   "phrases": [
+    "how long is each accops release supported",
+    "ltsr",
+    "product lifecycle",
+    "end of life policy",
+    "support lifecycle",
+    "eol policy"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-77",
+   "groups": [
+    "citrix-lp",
+    "general"
+   ],
+   "must": [],
+   "allow": [
+    "Citrix",
+    "HyDesk",
+    "HySecure",
+    "Nano"
+   ],
+   "keywords": {
+    "brochu": 6.0776,
+    "datash": 6.0776,
+    "docum": 4.9836,
+    "downlo": 4.6982,
+    "pdf": 6.0776,
+    "produc": 4.0141,
+    "send": 6.0776
+   },
+   "phrases": [
+    "do you have a brochure or datasheet",
+    "brochure",
+    "datasheet",
+    "send me a pdf",
+    "product brochure",
+    "documentation download"
+   ],
+   "min_score": 0.43
+  },
+  {
+   "qa_id": "lp-78",
+   "groups": [
+    "citrix-lp",
+    "general",
+    "product:hyid"
+   ],
+   "must": [],
+   "allow": [
+    "BioAuth",
+    "Citrix",
+    "HyID"
+   ],
+   "keywords": {
+    "code": 5.3868,
+    "fido": 6.0776,
+    "fido2": 6.0776,
+    "key": 4.9836,
+    "keys": 6.0776,
+    "login": 4.9836,
+    "method": 6.0776,
+    "mfa": 3.3389,
+    "option": 4.6982,
+    "passwo": 6.0776,
+    "qr": 6.0776,
+    "securi": 4.0141,
+    "sign": 5.3868,
+    "suppor": 2.5215
+   },
+   "phrases": [
+    "do you support passwordless login",
+    "passwordless sign in options",
+    "fido keys",
+    "fido2 security key login",
+    "qr code login",
+    "passwordless mfa methods"
+   ],
+   "min_score": 0.43
   }
  ],
- "margin": 0.13
+ "margin": 0.05
 }

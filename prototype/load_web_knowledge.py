@@ -216,11 +216,12 @@ def bank_visual(q: dict, notes: list[str]) -> tuple[str | None, dict | None]:
         return None, None
     if t == "compare_table":
         rows = [{"label": r[0], "cells": list(r[1:])} if isinstance(r, list) else r for r in d.get("rows") or []]
-        out = {"title": title, "columns": d.get("columns"), "rows": rows}
-        return t, {**out, **({"footnote": d["footnote"]} if d.get("footnote") else {})}
+        out = {"title": d.get("title") or title, "columns": d.get("columns"), "rows": rows}
+        return t, {**out, **{k: d[k] for k in ("filters", "footnote") if d.get(k)}}
     if t == "steps":
-        return t, {"title": title, "steps": [{"title": s.get("title"), **({"body": s["text"]} if s.get("text") else {})}
-                                            for s in d.get("steps") or []]}
+        return t, {"title": d.get("title") or title,
+                   "steps": [{"title": s.get("title"), **({"body": s["text"]} if s.get("text") else {}),
+                              **({"need": s["need"]} if s.get("need") else {})} for s in d.get("steps") or []]}
     if t == "doc_card":
         cards = d.get("cards") or []
         if len(cards) > 1:
@@ -236,9 +237,10 @@ def bank_visual(q: dict, notes: list[str]) -> tuple[str | None, dict | None]:
         s = stats[0] if stats else {}
         if s.get("source"):
             q["_stat_source"] = s["source"]
-        return t, {"value": s.get("value"), "label": s.get("label")}
+        return t, {"value": s.get("value"), "label": s.get("label"), **({"context": s["context"]} if s.get("context") else {})}
     if t == "cta":
-        return t, {"label": d.get("label"), "action": "open_url", "url": d.get("url")}
+        return t, {"label": d.get("label"), "action": d.get("action") or "open_url", "url": d.get("url"),
+                   **({"sub": d["sub"]} if d.get("sub") else {})}
     return t, d   # picker / calculator / anything else: validated as given
 
 
@@ -497,6 +499,16 @@ def self_check() -> None:
     assert b["visual_data"] == {"title": "Is Accops a real alternative to Citrix?", "columns": ["You need", "Accops"],
                                 "rows": [{"label": "VDI", "cells": ["HyWorks"]}]}
     assert validate_qa(b, {"lp-x"}, by_url) == []
+    # 27 Oct bank: its own title, filters, step needs, stat context and the CTA action pass through to the block
+    k = map_qa({"id": "lp-k", "question": "Why?", "short_answer": "A.", "sources": [LP + "#faq"], "visual": {"type": "compare_table", "data": {
+        "title": "T", "columns": ["a", "b"], "rows": [{"label": "x", "cells": ["y"], "group": "g", "accent": 1}], "filters": ["g"]}}})
+    assert k["visual_data"]["title"] == "T" and k["visual_data"]["filters"] == ["g"] and validate_qa(k, {"lp-k"}, by_url) == []
+    k = map_qa({"id": "lp-k", "question": "Why?", "short_answer": "A.", "sources": [LP + "#faq"],
+                "visual": {"type": "steps", "data": {"steps": [{"title": "a", "need": ["n"]}, {"title": "b", "text": "t"}]}}})
+    assert k["visual_data"]["steps"] == [{"title": "a", "need": ["n"]}, {"title": "b", "body": "t"}] and validate_qa(k, {"lp-k"}, by_url) == []
+    k = map_qa({"id": "lp-k", "question": "Why?", "short_answer": "A.", "visual": {"type": "cta", "data": {
+        "label": "Talk", "action": "talk_to_sales", "url": "https://x", "sub": "s"}}})
+    assert k["visual_data"] == {"label": "Talk", "action": "talk_to_sales", "url": "https://x", "sub": "s"}
     d = map_qa({"id": "lp-y", "question": "Docs?", "short_answer": "See.", "cta": "none", "cta_url": "https://x", "sources": [LP + "#faq"],
                 "visual": {"type": "doc_card", "data": {"cards": [{"title": "A", "url": "https://x/a.pdf", "blurb": "b"},
                                                                   {"title": "B", "url": "https://x/b", "blurb": "c"}]}}}, notes)

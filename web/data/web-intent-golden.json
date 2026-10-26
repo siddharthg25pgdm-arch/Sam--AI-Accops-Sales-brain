@@ -41,8 +41,8 @@
    "entities": [
     "Citrix"
    ],
-   "expect": null,
-   "score": null
+   "expect": "lp-19",
+   "score": 0.7088433968890083
   },
   {
    "q": "feature comparison between accops and citrix",
@@ -58,7 +58,7 @@
     "Citrix"
    ],
    "expect": "lp-03",
-   "score": 0.7412873741547075
+   "score": 0.7261506265676708
   },
   {
    "q": "featur parity with citirx",
@@ -89,7 +89,7 @@
     "Citrix"
    ],
    "expect": "lp-04",
-   "score": 0.865031670221396
+   "score": 0.87131132650117
   },
   {
    "q": "can we run citrix and accops side by side while migrating",
@@ -106,7 +106,7 @@
     "Citrix"
    ],
    "expect": "lp-05",
-   "score": 0.5402404670458492
+   "score": 0.7742384969704974
   },
   {
    "q": "how long will it take to migrate from citrix",
@@ -146,7 +146,7 @@
    ],
    "entities": [],
    "expect": "lp-07",
-   "score": 0.6225248246893619
+   "score": 0.6228528876385901
   },
   {
    "q": "do end users need to be retrained",
@@ -159,7 +159,7 @@
    ],
    "entities": [],
    "expect": "lp-08",
-   "score": 0.6901773427154467
+   "score": 0.8015003750937735
   },
   {
    "q": "do we need to change our active directory",
@@ -172,7 +172,7 @@
    ],
    "entities": [],
    "expect": "lp-09",
-   "score": 0.6727079314933033
+   "score": 0.6720779189542787
   },
   {
    "q": "does accops support nutanix",
@@ -256,7 +256,7 @@
     "Azure Virtual Desktop"
    ],
    "expect": "lp-14",
-   "score": 0.7317715995574061
+   "score": 0.7227962416760422
   },
   {
    "q": "avd ke saath kaam karta hai",
@@ -270,7 +270,7 @@
     "Azure Virtual Desktop"
    ],
    "expect": "lp-14",
-   "score": 0.6033368669500948
+   "score": 0.6615972828003489
   },
   {
    "q": "tell me about the photon protocol",
@@ -284,7 +284,7 @@
     "Photon"
    ],
    "expect": "lp-15",
-   "score": 1.0
+   "score": 0.8752850297970614
   },
   {
    "q": "can we run cad and gpu workloads",
@@ -298,7 +298,7 @@
    ],
    "entities": [],
    "expect": "lp-16",
-   "score": 0.6846006004232077
+   "score": 0.6882759950212269
   },
   {
    "q": "what security certifications does accops have",
@@ -323,7 +323,7 @@
    ],
    "entities": [],
    "expect": "lp-18",
-   "score": 1.0
+   "score": 0.80776955480071
   },
   {
    "q": "regulatory compliance for banks",
@@ -338,7 +338,7 @@
     "BFSI"
    ],
    "expect": "lp-18",
-   "score": 0.834074646155786
+   "score": 0.7134359237746382
   },
   {
    "q": "can hysecure replace our citrix adc",
@@ -355,7 +355,7 @@
     "Citrix"
    ],
    "expect": "lp-19",
-   "score": 0.7359775780894664
+   "score": 0.8511033378011704
   },
   {
    "q": "does accops include sso",
@@ -393,7 +393,7 @@
    ],
    "entities": [],
    "expect": "lp-22",
-   "score": 0.7113433485739169
+   "score": 0.766593271544882
   },
   {
    "q": "do you offer perpetual licenses",
@@ -406,7 +406,7 @@
    ],
    "entities": [],
    "expect": "lp-23",
-   "score": 0.6849953800800787
+   "score": 0.8034247190277586
   },
   {
    "q": "named user vs concurrent",
@@ -420,7 +420,7 @@
    ],
    "entities": [],
    "expect": "lp-23",
-   "score": 0.8756828637147787
+   "score": 0.8769341611098338
   },
   {
    "q": "how do i know you won't hike the renewal",
@@ -432,8 +432,8 @@
     "renewa"
    ],
    "entities": [],
-   "expect": null,
-   "score": null
+   "expect": "lp-24",
+   "score": 0.5015217569053514
   },
   {
    "q": "do you have a reference customer that moved off citrix",
@@ -442,14 +442,14 @@
    "tokens": [
     "refer",
     "custom",
-    "move",
+    "moved",
     "citrix"
    ],
    "entities": [
     "Citrix"
    ],
    "expect": "lp-25",
-   "score": 0.828439469206365
+   "score": 0.8321062067076039
   },
   {
    "q": "insurance companies using accops",
@@ -464,7 +464,7 @@
     "BFSI"
    ],
    "expect": "lp-26",
-   "score": 0.8083022388059702
+   "score": 0.6741390347884714
   },
   {
    "q": "gartner recognition",
@@ -488,7 +488,7 @@
    ],
    "entities": [],
    "expect": "lp-28",
-   "score": 0.7527645687645688
+   "score": 0.8047968488641882
   },
   {
    "q": "who provides support after deployment",
@@ -502,7 +502,7 @@
    ],
    "entities": [],
    "expect": "lp-29",
-   "score": 0.6654713646005185
+   "score": 0.8572577544806038
   },
   {
    "q": "support model after go live",
@@ -528,8 +528,8 @@
     "japan"
    ],
    "entities": [],
-   "expect": "lp-30",
-   "score": 0.6115188018883282
+   "expect": "lp-75",
+   "score": 0.6040536823360793
   },
   {
    "q": "  Why did my CITRIX renewal go UP?! ",
@@ -543,8 +543,8 @@
    "entities": [
     "Citrix"
    ],
-   "expect": null,
-   "score": null
+   "expect": "lp-24",
+   "score": 0.7465557229415507
   },
   {
    "q": "ＨｙＳｅｃｕｒｅ　vs\tCitrix\n\nNetScaler",
@@ -560,8 +560,8 @@
     "HySecure",
     "Citrix"
    ],
-   "expect": null,
-   "score": null
+   "expect": "lp-19",
+   "score": 0.6945258258199527
   },
   {
    "q": "hy​secure‍﻿ pri\u0007ce",
@@ -574,8 +574,8 @@
    "entities": [
     "HySecure"
    ],
-   "expect": null,
-   "score": null
+   "expect": "lp-35",
+   "score": 0.4311605464114058
   },
   {
    "q": "“Zero trust” isn’t ‘magic’",
@@ -588,8 +588,8 @@
     "magic"
    ],
    "entities": [],
-   "expect": null,
-   "score": null
+   "expect": "lp-54",
+   "score": 0.6298751157176309
   },
   {
    "q": "Does Accops run on Nutanix AHV ?",
@@ -617,7 +617,7 @@
    ],
    "entities": [],
    "expect": "lp-09",
-   "score": 0.8139530167999919
+   "score": 1.0
   },
   {
    "q": "सिट्रिक्स से माइग्रेशन",

@@ -184,7 +184,7 @@ const view = (o = {}) => renderToStaticMarkup(React.createElement(V.WebsiteView,
   configured: true, chatOn: false, modelOffEnv: false, ok: "", err: "", back: "tab=website", href, dash: null, dashError: null, rows: null, rowsError: null,
   bank: null, bankError: null, settings: F.SETTINGS, index: intentIndex, leak: null, leakReadable: true, oldest: null, ...o } }));
 let h = view({ dash: e0, rows: [], bank: items(bank0) });
-ok(h.includes("Nothing is public yet: 31 draft pairs wait") && h.includes("No messages in this period.") && h.includes("No questions in this period."), "analytics renders with 0 rows");
+ok(h.includes(`Nothing is public yet: ${bank0.length} draft pairs wait`) && h.includes("No messages in this period.") && h.includes("No questions in this period."), "analytics renders with 0 rows");
 h = view({ view: "conversations", rows: [] });
 ok(h.includes("No conversations"), "conversations render with 0 rows");
 h = view({ view: "approve", bank: [] });
@@ -199,7 +199,7 @@ h = view({ view: "approve", bank: items(bank0) });
 const lp03 = bank0.find(q => q.id === "lp-03");
 ok(h.includes('id="qa-lp-03"') && h.includes(lp03.answer.replace(/'/g, "&#x27;").replace(/&/g, "&amp;").slice(0, 40)) && h.includes("sb-answer") && h.includes("Needs your sign-off"), "approval card: answer, preview drawn with C's blocks, sign-off reason");
 ok(items(bank0).every(i => !("error" in i.preview)), `every draft previews cleanly: ${items(bank0).filter(i => "error" in i.preview).map(i => `${i.id} ${i.preview.error}`)}`);
-ok((h.match(/class="wt-qa /g) ?? []).length === 31, "31 drafts waiting");
+ok((h.match(/class="wt-qa /g) ?? []).length === bank0.length, `${bank0.length} drafts waiting (the loaded bank)`);
 h = view({ view: "approve", qaf: "approved", bank: items(F.bankRows(["lp-22"]), new Set()) });
 ok(h.includes("Approved, but not public") && h.includes("TCO"), "approved but held back shows the blocked claim");
 

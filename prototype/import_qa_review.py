@@ -5,7 +5,7 @@
   python prototype/import_qa_review.py FILE.xlsx --by siddharth
   python prototype/import_qa_review.py --self-check       # offline asserts, no network
 
-Default file: ~/Downloads/SAM-Website-Bot-QA-Review-2026-10-26.xlsx, sheet "Q&A review". Columns are found by their
+Default file: ~/Downloads/SAM-Website-Bot-QA-Review-2026-10-27.xlsx, sheet "Q&A review". Columns are found by their
 header, in any order: ID, Question, Answer the bot shows, Visual, Needs your sign-off because, Evidence, Source pages,
 Decision, Your edit / comment.
 
@@ -34,7 +34,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 REPO = HERE.parent
 ENV = REPO / "web" / ".env.local"
-DEFAULT_XLSX = Path.home() / "Downloads" / "SAM-Website-Bot-QA-Review-2026-10-26.xlsx"
+DEFAULT_XLSX = Path.home() / "Downloads" / "SAM-Website-Bot-QA-Review-2026-10-27.xlsx"
 SHEET = "Q&A review"
 MAX_WORDS, MAX_CHARS, REVIEW_MONTHS = 80, 600, 12
 IST = timezone(timedelta(hours=5, minutes=30))

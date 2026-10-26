@@ -10,9 +10,9 @@
 
     ["which parts of our citrix stack does accops replace", "lp-02", "para"],
     ["do we still need storefront and director with accops", "lp-02", "para"],
-    ["will we still need netscaler if we move to accops", "lp-02", "para"],
+    ["will we still need netscaler if we move to accops", "lp-19", "para"],
     ["what citrix components can accops get rid of", "lp-02", "para"],
-    ["do we need a separate sql server licence with accops", "lp-02", "para"],
+    ["do we need a separate sql server licence with accops", "lp-50", "para"],
     ["how many products do we need to replace citrix", "lp-02", "para"],
 
     ["feature comparison between accops and citrix", "lp-03", "para"],
@@ -116,7 +116,7 @@
     ["netscaler replacement", "lp-19", "para"],
     ["do you have a ztna gateway instead of netscaler", "lp-19", "para"],
     ["can hysecure replace our citrix adc", "lp-19", "para"],
-    ["we want to replace our vpn for remote access", "lp-19", "para"],
+    ["we want to replace our vpn for remote access", "lp-40", "para"],
 
     ["is mfa included or do we need okta", "lp-20", "para"],
     ["do we need a separate identity provider", "lp-20", "para"],
@@ -155,7 +155,7 @@
     ["which banks use accops", "lp-26", "para"],
     ["do you have bfsi customers", "lp-26", "para"],
     ["insurance companies using accops", "lp-26", "para"],
-    ["government customers", "lp-26", "para"],
+    ["government customers", "lp-72", "para"],
     ["who uses accops in banking", "lp-26", "para"],
 
     ["are you in gartner magic quadrant", "lp-27", "para"],
@@ -178,7 +178,7 @@
     ["do you support customers in the uae", "lp-30", "para"],
     ["are you available in europe", "lp-30", "para"],
     ["do you work with companies outside india", "lp-30", "para"],
-    ["any presence in japan", "lp-30", "para"],
+    ["any presence in japan", "lp-75", "para"],
     ["do you have partners in africa", "lp-30", "para"],
 
     ["who owns accops", "lp-31", "para"],
@@ -197,7 +197,7 @@
     ["is accops in the gartner magic quadrant", "lp-27", "para", "home"],
     ["how do i book a demo", "lp-32", "para", "general"],
     ["how long does a citrix migration take", null, "other", "home"],
-    ["are you iso 27001 certified", null, "other", "general"],
+    ["are you iso 27001 certified", "lp-17", "para", "general"],
     ["can we migrate without downtime", null, "other", "product:hysecure"],
 
     ["what is the weather in pune today", null, "offtopic"],
@@ -255,8 +255,8 @@
     ["are there any job openings", null, "other"],
     ["how do i install the hyworks client on a mac", null, "other"],
     ["is there a linux client", null, "other"],
-    ["which hospitals use accops", null, "other"],
-    ["what is zero trust", null, "other"],
+    ["which hospitals use accops", "lp-73", "para"],
+    ["what is zero trust", "lp-54", "para"],
     ["what is the roadmap for photon", null, "other"]
   ]
 }
