@@ -12,7 +12,7 @@
 const DOC_EXT = new Set(["pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "txt", "md", "rtf"]);
 /** This tenant z-prefixes dead folders so they sort to the bottom: zArchive, zzzArchive,
  *  "zCase Studies (Archive_DONOTUSE)". Treat that convention as the exclusion rule. */
-const DEAD = /(z*archie?ve|do ?not ?use|donotuse|obsolete|deprecated|backup|to[ _-]?(be[ _-]?)?delet(e|ed)|for[ _-]?deletion|(^|[ _/(-])(old|wip|draft|drafts|temp|tmp|raw)([ _/)-]|$))/i;
+const DEAD = /(z*archie?ve|do ?not ?use|donotuse|obsolete|deprecated|backup|needs? ?update|to[ _-]?(be[ _-]?)?delet(e|ed)|for[ _-]?deletion|(^|[ _/(-])(old|wip|draft|drafts|temp|tmp|raw)([ _/)-]|$))/i;
 
 export type IncomingFile = {
   event?: "created" | "modified" | "deleted";
@@ -83,28 +83,66 @@ export type Tags = {
   team: string; status: "active" | "archived";
 };
 
-/** Scope roots, as Power Automate reports them. The trigger's {Path} is LIBRARY-relative
- *  ("Shared Documents/Sales/Sales Collateral/Competition/..."), while the registry stores folders
- *  relative to the scope root ("Competition/..."), because sp_seed_registry.py builds them from
- *  Graph's item hierarchy. Two sources, two meanings, one column - so normalise on the way in or
- *  the same folder arrives under two names and the catalogue facets split in half. */
-const SCOPE_ROOTS: Record<string, string[]> = {
-  sales: ["Shared Documents/Sales/Sales Collateral", "Sales/Sales Collateral"],
-  marketing: ["Shared Documents/Marketing 2.0", "Marketing 2.0"],
+/** An ingestion root: one SharePoint folder SAM reads, with everything below it
+ *  (docs/supabase-sam-ingest-roots.sql, table sam_ingest_roots). Adding a folder is a row there, plus
+ *  the Power Automate and OneDrive steps in docs/plans/2026-10-26-ingestion-roots-and-hardening.md.
+ *  The registry's `folder` is relative to its row's root, as it always was for Sales Collateral. */
+export type IngestRoot = {
+  key: string; label: string;
+  /** Library-relative, as Power Automate's {Path} reports it: "Shared Documents/Sales/Sales Collateral". */
+  library_path: string;
+  /** The folder's name under the OneDrive - Accops root on the carding laptop (carding_prep.py). */
+  onedrive_folder: string | null;
+  /** False when the files' SharePoint dates are copy dates, not edit dates (a folder bulk-uploaded in
+   *  one go). Then only a year read from the document body can make a file eligible for answers. */
+  trust_file_dates: boolean;
+  /** Changes and snapshots under a disabled root are ignored. Rows already registered stay as they are. */
+  enabled: boolean;
 };
+export const DEFAULT_ROOT = "sales-collateral";
+/** Until sam_ingest_roots exists, or when it cannot be read: today's one root, so a missing or broken
+ *  table can never stop Sales Collateral. */
+export const FALLBACK_ROOTS: IngestRoot[] = [{ key: DEFAULT_ROOT, label: "Sales Collateral",
+  library_path: "Shared Documents/Sales/Sales Collateral", onedrive_folder: "Company - Sales Collateral", trust_file_dates: true, enabled: true }];
 
-/** Strip the scope root and any surrounding slashes, so a Power Automate {Path} and a Graph-derived
- *  path both land on the same value. Case-insensitive: SharePoint paths are not case-stable. */
-export function scopeRelative(path: string, scope = "sales"): string {
-  let p = (path ?? "").replace(/^\/+|\/+$/g, "");
-  for (const root of SCOPE_ROOTS[scope] ?? []) {
-    if (p.toLowerCase() === root.toLowerCase()) return "";
-    if (p.toLowerCase().startsWith(root.toLowerCase() + "/")) {
-      p = p.slice(root.length + 1);
-      break;
+const gRoots = globalThis as unknown as { __samRoots?: { at: number; v: IngestRoot[] } };
+/** Every configured root, enabled or not. Cached five minutes; a failed read keeps the last good list. */
+export async function ingestRoots(): Promise<IngestRoot[]> {
+  const c = gRoots.__samRoots;
+  if (c && Date.now() - c.at < 5 * 60_000) return c.v;
+  if (!configured()) return FALLBACK_ROOTS;
+  try {
+    const v = ((await rest("sam_ingest_roots?select=key,label,library_path,onedrive_folder,trust_file_dates,enabled&order=key")) as IngestRoot[] ?? [])
+      .filter(r => r?.key && r.library_path);
+    gRoots.__samRoots = { at: Date.now(), v: v.length ? v : FALLBACK_ROOTS };
+  } catch (e) {
+    console.error("sam_ingest_roots unreadable, using the built-in root", e);
+    return c?.v ?? FALLBACK_ROOTS;
+  }
+  return gRoots.__samRoots.v;
+}
+
+const trimSlashes = (p: string) => (p ?? "").replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+/** Which enabled root a SharePoint path is under, and the folder inside it, or null when it is under
+ *  none. Accepts a library-relative path (Power Automate's {Path}, "Shared Documents/Sales/..."), the
+ *  same without the library ("Sales/Sales Collateral/..."), or a server-relative FileDirRef
+ *  ("/sites/Company/Shared Documents/..."). Case-insensitive: SharePoint paths are not case-stable.
+ *  The longest root wins, so a root inside another root is honoured. Pure: the checks call it. */
+export function rootOf(path: string, roots: IngestRoot[]): { root: string; folder: string } | null {
+  const p = trimSlashes(path).replace(/^sites\/[^/]+\//i, "");
+  const lower = p.toLowerCase();
+  let best: { root: string; folder: string; len: number } | null = null;
+  for (const r of roots) {
+    if (!r.enabled) continue;
+    const lib = trimSlashes(r.library_path);
+    for (const prefix of [lib, lib.split("/").slice(1).join("/")]) {
+      const l = prefix.toLowerCase();
+      if (!l || (best && best.len >= l.length)) continue;
+      if (lower === l) best = { root: r.key, folder: "", len: l.length };
+      else if (lower.startsWith(l + "/")) best = { root: r.key, folder: trimSlashes(p.slice(l.length + 1)), len: l.length };
     }
   }
-  return p.replace(/^\/+|\/+$/g, "");
+  return best && { root: best.root, folder: best.folder };
 }
 
 export function tagsFor(folder: string, filename: string, scope = "sales"): Tags {
@@ -182,10 +220,10 @@ async function applyDelete(f: IncomingFile): Promise<string> {
     if (hit) return hit;
   }
   const name = f.name ?? "";
-  if (name) {
-    const folder = scopeRelative(f.folder ?? "", f.scope ?? "sales");
+  const at = rootOf(f.folder ?? "", await ingestRoots());
+  if (name && at) {
     const hit = await mark(
-      `folder=eq.${encodeURIComponent(folder)}&filename=eq.${encodeURIComponent(name)}`,
+      `root=eq.${encodeURIComponent(at.root)}&folder=eq.${encodeURIComponent(at.folder)}&filename=eq.${encodeURIComponent(name)}`,
       "folder+filename");
     if (hit) return hit;
   }
@@ -205,7 +243,7 @@ function num(v: unknown): number | null {
 /** The item_id of the row this notification is about, or null if the file is new to SAM.
  *  Same key order as applyDelete: list_item_id is exact, (folder, filename) is unique across all
  *  874 seeded rows, and there is deliberately no filename-only fallback. */
-async function findRow(listItemId: number | null, folder: string, filename: string): Promise<string | null> {
+async function findRow(listItemId: number | null, root: string, folder: string, filename: string): Promise<string | null> {
   const one = async (filter: string) => {
     const rows = (await rest(`sam_sharepoint_files?${filter}&select=item_id&limit=2`)) as { item_id: string }[] | null;
     return rows && rows.length === 1 ? rows[0].item_id : null;
@@ -215,7 +253,7 @@ async function findRow(listItemId: number | null, folder: string, filename: stri
     if (hit) return hit;
   }
   if (!filename) return null;
-  return await one(`folder=eq.${encodeURIComponent(folder)}&filename=eq.${encodeURIComponent(filename)}`);
+  return await one(`root=eq.${encodeURIComponent(root)}&folder=eq.${encodeURIComponent(folder)}&filename=eq.${encodeURIComponent(filename)}`);
 }
 
 /** Record one change in SAM's registry. Touches nothing in SharePoint. */
@@ -224,7 +262,11 @@ export async function applyChange(f: IncomingFile): Promise<string> {
 
   if (f.event === "deleted") return await applyDelete(f);
 
-  const folder = scopeRelative(f.folder ?? "", f.scope ?? "sales");
+  // Only files under an enabled ingestion root. A path under none used to be stored as if it were a
+  // Sales Collateral folder; now it is refused, so a flow pointed at a wider folder cannot leak in.
+  const at = rootOf(f.folder ?? "", await ingestRoots());
+  if (!at) return `ignored: ${f.folder || "(no path)"} is under no enabled ingestion root`;
+  const folder = at.folder;
   const name = f.name ?? "";
   const ext = (name.split(".").pop() ?? "").toLowerCase();
   const t = tagsFor(folder, name, f.scope ?? "sales");
@@ -235,13 +277,13 @@ export async function applyChange(f: IncomingFile): Promise<string> {
   // would insert a second row for a file already in the registry, so match the seeded row first by
   // list_item_id, then by (folder, filename), exactly as deletion does. Only fall back to whatever
   // the trigger called an identifier when the file is genuinely new.
-  const existing = await findRow(listItemId, folder, name);
+  const existing = await findRow(listItemId, at.root, folder, name);
   const itemId = existing ?? f.itemId;
 
   await rest("sam_sharepoint_files?on_conflict=item_id", {
     method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
     body: JSON.stringify([{
-      item_id: itemId, drive_id: f.driveId ?? "", scope: f.scope ?? "sales", folder, filename: name,
+      item_id: itemId, drive_id: f.driveId ?? "", scope: f.scope ?? "sales", root: at.root, folder, filename: name,
       // Fills in as the modify flow sees each file; this is what makes deletion an exact match later.
       list_item_id: listItemId,
       // The trigger sends "" for a file with no size, and "" into a bigint is 22P02, which killed the
@@ -264,6 +306,8 @@ export type RegistryRow = {
   created_at: string | null; modified_at: string | null; modified_by: string | null;
   asset_type: string[]; industry: string[]; product: string[]; competitor: string[];
   status: string; deleted: boolean;
+  /** The ingestion root (sam_ingest_roots.key) this file is under; `folder` is relative to it. */
+  root?: string;
   /** Only ever written by the Power Automate flow - the seed cannot produce it, because Graph's
    *  delta does not return the SharePoint list item id. So a non-null value here is proof that a
    *  real notification arrived and the trigger's field mapping is correct. */
@@ -433,7 +477,13 @@ export async function syncStatus(scope = "sales"): Promise<SyncRow | null> {
  * rename and move - never filename), and a row that reappears is restored.
  * ------------------------------------------------------------------------------------------- */
 
-export type SnapshotFile = { id?: number | string; name?: string; path?: string; isFolder?: boolean | string };
+export type SnapshotFile = {
+  id?: number | string; name?: string; path?: string; isFolder?: boolean | string;
+  /** Optional, from the flow's widened $select (EncodedAbsUrl, Modified, Created, File_x0020_Size,
+   *  Editor/Title). With `url` present a file the registry does not know is added in write mode;
+   *  without it, it is only reported, as before. */
+  url?: string; modified?: string; created?: string; size?: number | string; editor?: string;
+};
 export type Snapshot = {
   scope?: string; mode?: "report" | "write";
   /** The flow sends empty(next): true only when paging reached the last page. Absent or false = refuse. */
@@ -443,7 +493,7 @@ export type Snapshot = {
   count?: number;
   files?: SnapshotFile[];
 };
-export type SnapRow = { item_id: string; list_item_id: number | null; folder: string; filename: string; deleted: boolean };
+export type SnapRow = { item_id: string; list_item_id: number | null; root?: string; folder: string; filename: string; deleted: boolean };
 export type SnapshotDiff = {
   refused: string | null;
   listed: number; live: number; matched: number; unverifiable: number;
@@ -498,53 +548,138 @@ export function diffSnapshot(rows: SnapRow[], snap: Snapshot): SnapshotDiff {
   return out;
 }
 
-const brief = (r: SnapRow) => ({ item_id: r.item_id, list_item_id: r.list_item_id, folder: r.folder, filename: r.filename });
+const brief = (r: SnapRow) => ({ item_id: r.item_id, list_item_id: r.list_item_id, root: r.root ?? DEFAULT_ROOT, folder: r.folder, filename: r.filename });
 
-/** Diff a snapshot against the registry and, in write mode with every guard passed, apply it.
+type Where = { root: string; folder: string; filename: string };
+/** One root's share of a snapshot: its diff, files that moved in from another root (re-filed, not
+ *  deleted), and where each unknown file sits inside the root (for seeding). */
+export type RootPlan = { root: string; diff: SnapshotDiff | null; skipped: string | null; moved: (SnapRow & { to: Where })[]; folderOf: Map<number, string> };
+export type SnapshotPlan = { refused: string | null; outside: number; roots: RootPlan[] };
+
+/** Pure: split a snapshot by ingestion root and diff each root against its own rows, so one root's
+ *  failed listing (a filter typo, a renamed folder) refuses that root alone and can never tombstone
+ *  another. Body-level guards (incomplete paging, a truncated body, the page cap, bad ids) still refuse
+ *  everything: a broken body says nothing about any root. Rows with no root are Sales Collateral's. */
+export function planSnapshot(rows: SnapRow[], snap: Snapshot, roots: IngestRoot[]): SnapshotPlan {
+  const body = diffSnapshot([], snap).refused;
+  if (body) return { refused: body, outside: 0, roots: [] };
+  const byRoot = new Map<string, SnapshotFile[]>(), at = new Map<number, Where>();
+  let outside = 0;
+  for (const f of snap.files ?? []) {
+    if (truthy(f.isFolder)) continue;
+    const r = rootOf(f.path ?? "", roots);
+    if (!r) { outside++; continue; }
+    byRoot.set(r.root, [...(byRoot.get(r.root) ?? []), f]);
+    at.set(num(f.id)!, { root: r.root, folder: r.folder, filename: f.name ?? "" });
+  }
+  const known = new Set(rows.map(r => r.list_item_id).filter((n): n is number => n != null));
+  const out: RootPlan[] = [];
+  for (const root of roots.filter(r => r.enabled)) {
+    const mine = rows.filter(r => (r.root ?? DEFAULT_ROOT) === root.key), files = byRoot.get(root.key) ?? [];
+    const folderOf = new Map(files.map(f => [num(f.id)!, at.get(num(f.id)!)!.folder]));
+    if (!files.length && !mine.some(r => !r.deleted)) { out.push({ root: root.key, diff: null, skipped: "nothing listed and nothing registered", moved: [], folderOf }); continue; }
+    const d = diffSnapshot(mine, { complete: true, count: files.length, files });
+    // Listed under another root: moved between roots, which the change flow should have recorded.
+    // Re-file it rather than tombstone it here and lose it there.
+    const moved = d.tombstone.filter(r => at.has(r.list_item_id!)).map(r => ({ ...r, to: at.get(r.list_item_id!)! }));
+    // Unknown means unknown anywhere: a file another root's row holds is a move, not a new file.
+    out.push({ root: root.key, skipped: null, moved, folderOf,
+      diff: { ...d, tombstone: d.tombstone.filter(r => !at.has(r.list_item_id!)), unknown: d.unknown.filter(f => !known.has(num(f.id)!)) } });
+  }
+  return { refused: null, outside, roots: out };
+}
+
+/** A registry row for a file the registry has never seen, from the snapshot's own fields, tagged as
+ *  applyChange tags. item_id `li:<list item id>`: there is no Graph id here, and the change flow finds
+ *  the row by list_item_id afterwards, as it does for every row. last_synced is the file's own date,
+ *  not now: lastFlowWrite() must keep measuring the CHANGE flow, or a seeded night would hide a dead one.
+ *  ponytail: one library (the flow's list GUID); key on the list as well if a second library is added. */
+export function seedRow(f: SnapshotFile, root: string, folder: string, scope: string) {
+  const name = f.name ?? "", ext = (name.split(".").pop() ?? "").toLowerCase(), t = tagsFor(folder, name, scope);
+  const when = f.modified || f.created || null;
+  return {
+    item_id: `li:${num(f.id)}`, drive_id: "", scope, root, folder, filename: name, list_item_id: num(f.id),
+    ext, size_bytes: num(f.size) ?? 0, web_url: f.url ?? "", created_at: f.created || null, modified_at: f.modified || null,
+    modified_by: f.editor || null, deleted: false, deleted_at: null,
+    asset_type: t.asset_type, industry: t.industry, product: t.product, competitor: t.competitor, team: t.team, status: t.status,
+    suggest_ingest: t.status === "active" && DOC_EXT.has(ext),
+    skip_reason: t.status === "archived" ? "archive/draft folder" : DOC_EXT.has(ext) ? null : "not a document",
+    ...(when ? { last_synced: when } : {}),
+  };
+}
+
+/** Diff a snapshot against the registry root by root and, in write mode, apply every root whose guards
+ *  passed: tombstone, restore, re-file moves between roots, and add files the registry never saw (only
+ *  when the flow sends their url - a row without a real link is worse than no row).
  *
  *  sam_sharepoint_sync is stamped on every run: last_result always (so a refusal is visible on the
- *  dashboard), last_run only when deletions were actually applied. last_run drives the "deletions
- *  not checked in 36 hours" banner, and a report-mode or refused run has not removed a single dead
- *  link - stamping it would be the green-but-broken signal this project keeps getting caught by. */
+ *  dashboard), last_run only when no root was refused. last_run drives the "deletions not checked in 36
+ *  hours" banner, and a report-mode or refused run has not removed a single dead link - stamping it would
+ *  be the green-but-broken signal this project keeps getting caught by. So one refused root keeps the
+ *  banner (and the 409) coming until it is fixed, while the healthy roots are still reconciled. */
 export async function applySnapshot(snap: Snapshot) {
   const scope = snap.scope || "sales";
   const mode = snap.mode === "write" ? "write" : "report";
   // Every row: a registry read that stopped at 1,000 would make the diff's coverage guards judge a
   // whole listing against part of the registry.
   const rows = await restAll<SnapRow>(`sam_sharepoint_files?scope=eq.${encodeURIComponent(scope)}` +
-    `&select=item_id,list_item_id,folder,filename,deleted&order=item_id`);
-  const d = diffSnapshot(rows ?? [], snap);
+    `&select=item_id,list_item_id,root,folder,filename,deleted&order=item_id`);
+  const plan = planSnapshot(rows ?? [], snap, await ingestRoots());
   const now = new Date().toISOString();
+  const sc = `scope=eq.${encodeURIComponent(scope)}`;
+  const idList = (xs: { list_item_id: number | null }[]) => xs.map(r => r.list_item_id).join(",");
 
-  let applied = false;
-  if (!d.refused && mode === "write") {
-    const idList = (xs: SnapRow[]) => xs.map(r => r.list_item_id).join(",");
-    if (d.tombstone.length) {
-      await rest(`sam_sharepoint_files?scope=eq.${encodeURIComponent(scope)}&deleted=is.false&list_item_id=in.(${idList(d.tombstone)})`, {
-        method: "PATCH", body: JSON.stringify({ deleted: true, deleted_at: now }),
-      });
+  type RootOutcome = { root: string; applied: boolean; seeded: number; skipped: string | null; refused: string | null; listed: number; tombstone: number;
+    restore: number; moved: number; unknown: number; tombstone_rows: ReturnType<typeof brief>[]; restore_rows: ReturnType<typeof brief>[]; unknown_files: SnapshotFile[] };
+  const roots: RootOutcome[] = [];
+  for (const p of plan.roots) {
+    const d = p.diff;
+    let applied = false, seeded = 0;
+    if (d && !d.refused && mode === "write") {
+      const rf = `${sc}&root=eq.${encodeURIComponent(p.root)}`;
+      if (d.tombstone.length) await rest(`sam_sharepoint_files?${rf}&deleted=is.false&list_item_id=in.(${idList(d.tombstone)})`, {
+        method: "PATCH", body: JSON.stringify({ deleted: true, deleted_at: now }) });
+      if (d.restore.length) await rest(`sam_sharepoint_files?${rf}&deleted=is.true&list_item_id=in.(${idList(d.restore)})`, {
+        method: "PATCH", body: JSON.stringify({ deleted: false, deleted_at: null }) });
+      for (const m of p.moved) await rest(`sam_sharepoint_files?item_id=eq.${encodeURIComponent(m.item_id)}`, {
+        method: "PATCH", body: JSON.stringify({ root: m.to.root, folder: m.to.folder, filename: m.to.filename }) });
+      const seeds = d.unknown.filter(f => f.url).map(f => seedRow(f, p.root, p.folderOf.get(num(f.id)!) ?? "", scope));
+      if (seeds.length) await rest("sam_sharepoint_files?on_conflict=item_id", {
+        method: "POST", headers: { Prefer: "resolution=ignore-duplicates,return=minimal" }, body: JSON.stringify(seeds) });
+      seeded = seeds.length;
+      applied = true;
     }
-    if (d.restore.length) {
-      await rest(`sam_sharepoint_files?scope=eq.${encodeURIComponent(scope)}&deleted=is.true&list_item_id=in.(${idList(d.restore)})`, {
-        method: "PATCH", body: JSON.stringify({ deleted: false, deleted_at: null }),
-      });
-    }
-    applied = true;
+    roots.push({ root: p.root, applied, seeded, skipped: p.skipped, refused: d?.refused ?? null,
+      // A refused root changes nothing, so it adds nothing to the totals; its would-be rows stay in tombstone_rows.
+      listed: d?.listed ?? 0, tombstone: d && !d.refused ? d.tombstone.length : 0, restore: d && !d.refused ? d.restore.length : 0,
+      moved: d && !d.refused ? p.moved.length : 0, unknown: d?.unknown.length ?? 0,
+      tombstone_rows: (d?.tombstone ?? []).slice(0, 100).map(brief), restore_rows: (d?.restore ?? []).slice(0, 100).map(brief),
+      unknown_files: (d?.unknown ?? []).slice(0, 50) });
   }
 
-  const result = d.refused
-    ? `snapshot ${mode} REFUSED: ${d.refused}`
-    : `snapshot ${mode}: ${d.tombstone.length} ${applied ? "tombstoned" : "would tombstone"}, ` +
-      `${d.restore.length} ${applied ? "restored" : "would restore"}, ${d.listed} listed, ${d.unknown.length} unknown`;
-  await rest(`sam_sharepoint_sync?scope=eq.${encodeURIComponent(scope)}`, {
+  const refusedRoots = roots.filter(r => r.refused);
+  const refused = plan.refused ?? (refusedRoots.length ? refusedRoots.map(r => `${r.root}: ${r.refused}`).join("; ") : null);
+  const applied = !refused && roots.some(r => r.applied);
+  const sum = (k: "listed" | "tombstone" | "restore" | "unknown" | "seeded" | "moved") => roots.reduce((n, r) => n + r[k], 0);
+  const w = (did: string, would: string) => (mode === "write" ? did : would);
+  // Same opening as the one-root text ("snapshot write: N tombstoned, N restored, N listed, N unknown"):
+  // the digest looks for "0 unknown" and the System tab shows it as is. Root detail follows " | ".
+  const totals = `${sum("tombstone")} ${w("tombstoned", "would tombstone")}, ${sum("restore")} ${w("restored", "would restore")}, ` +
+    `${sum("listed")} listed, ${sum("unknown")} unknown` + (sum("seeded") ? `, ${sum("seeded")} added` : "") +
+    (sum("moved") ? `, ${sum("moved")} ${w("moved between roots", "would move between roots")}` : "") +
+    (plan.outside ? `, ${plan.outside} outside every root` : "");
+  const detail = roots.length > 1 || refusedRoots.length ? " | " + roots.map(r => r.refused ? `${r.root} REFUSED: ${r.refused}`
+    : r.skipped ? `${r.root}: ${r.skipped}` : `${r.root}: ${r.listed} listed, ${r.tombstone} ${w("tombstoned", "would tombstone")}, ${r.unknown} unknown`).join(" | ") : "";
+  const result = plan.refused ? `snapshot ${mode} REFUSED: ${plan.refused}`
+    : refusedRoots.length && refusedRoots.length === roots.filter(r => !r.skipped).length ? `snapshot ${mode} REFUSED: ${refused}`
+    : `snapshot ${mode}: ${totals}${detail}`;
+  await rest(`sam_sharepoint_sync?${sc}`, {
     method: "PATCH", body: JSON.stringify(applied ? { last_run: now, last_result: result } : { last_result: result }),
   });
 
   return {
-    ok: !d.refused, mode, applied, refused: d.refused, result,
-    listed: d.listed, live: d.live, matched: d.matched, unverifiable: d.unverifiable,
-    tombstone_count: d.tombstone.length, tombstone: d.tombstone.slice(0, 100).map(brief),
-    restore_count: d.restore.length, restore: d.restore.slice(0, 100).map(brief),
-    unknown_count: d.unknown.length, unknown: d.unknown.slice(0, 50),
+    ok: !refused, mode, applied, refused, result, roots, outside: plan.outside,
+    listed: sum("listed"), tombstone_count: sum("tombstone"), restore_count: sum("restore"), unknown_count: sum("unknown"),
+    seeded: sum("seeded"), moved: sum("moved"),
   };
 }
