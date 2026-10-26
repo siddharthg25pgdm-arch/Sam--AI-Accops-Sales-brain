@@ -12,7 +12,7 @@
 const DOC_EXT = new Set(["pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "txt", "md", "rtf"]);
 /** This tenant z-prefixes dead folders so they sort to the bottom: zArchive, zzzArchive,
  *  "zCase Studies (Archive_DONOTUSE)". Treat that convention as the exclusion rule. */
-const DEAD = /(z*archie?ve|do ?not ?use|donotuse|obsolete|deprecated|backup|needs? ?update|to[ _-]?(be[ _-]?)?delet(e|ed)|for[ _-]?deletion|(^|[ _/(-])(old|wip|draft|drafts|temp|tmp|raw)([ _/)-]|$))/i;
+const DEAD = /(z*archie?ve|do ?not ?use|donotuse|obsolete|outdated|deprecated|backup|needs? ?update|to[ _-]?(be[ _-]?)?delet(e|ed)|for[ _-]?deletion|(^|[ _/(-])(old|wip|draft|drafts|temp|tmp|raw)([ _/)-]|$))/i;
 
 export type IncomingFile = {
   event?: "created" | "modified" | "deleted";
@@ -610,6 +610,12 @@ export function planSnapshot(rows: SnapRow[], snap: Snapshot, roots: IngestRoot[
   return { refused: null, outside, roots: out };
 }
 
+/** A move or rename the snapshot catches into an archive-like folder ("Outdated", "_to_delete") archives
+ *  the row, as applyChange does for live changes. Only ever toward archived: an admin's archive is never undone. */
+export function archivedIf(folder: string, filename: string): { status?: "archived" } {
+  return DEAD.test(`/${folder}/${filename}`) ? { status: "archived" } : {};
+}
+
 /** SharePoint's Modified is later than the registry's by more than a minute. The registry's bulk-seeded
  *  rows hold a date with no time (exactly 00:00:00 UTC); for those only a later DAY counts, or every
  *  seeded file reads as hours newer (found 26 Oct 2026: 862 of 878 false "missed edits"). */
@@ -671,11 +677,11 @@ export async function applySnapshot(snap: Snapshot) {
       if (d.restore.length) await rest(`sam_sharepoint_files?${rf}&deleted=is.true&list_item_id=in.(${idList(d.restore)})`, {
         method: "PATCH", body: JSON.stringify({ deleted: false, deleted_at: null }) });
       for (const m of p.moved) await rest(`sam_sharepoint_files?item_id=eq.${encodeURIComponent(m.item_id)}`, {
-        method: "PATCH", body: JSON.stringify({ root: m.to.root, folder: m.to.folder, filename: m.to.filename }) });
+        method: "PATCH", body: JSON.stringify({ root: m.to.root, folder: m.to.folder, filename: m.to.filename, ...archivedIf(m.to.folder, m.to.filename) }) });
       // Missed edits and in-place renames. last_synced is left alone: lastFlowWrite() measures the change flow.
       // ponytail: one PATCH per row; a capped count because hundreds at once means a date-format mismatch, not edits.
       if (p.behind.length <= MAX_BEHIND) for (const b of p.behind) await rest(`sam_sharepoint_files?item_id=eq.${encodeURIComponent(b.item_id)}`, {
-        method: "PATCH", body: JSON.stringify(b.to) });
+        method: "PATCH", body: JSON.stringify({ ...b.to, ...archivedIf(b.to.folder, b.to.filename) }) });
       const seeds = d.unknown.filter(f => f.url).map(f => seedRow(f, p.root, p.folderOf.get(num(f.id)!) ?? "", scope));
       if (seeds.length) await rest("sam_sharepoint_files?on_conflict=item_id", {
         method: "POST", headers: { Prefer: "resolution=ignore-duplicates,return=minimal" }, body: JSON.stringify(seeds) });

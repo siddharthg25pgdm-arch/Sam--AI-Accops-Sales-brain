@@ -6,7 +6,7 @@ import { createJiti } from "jiti";
 import { fileURLToPath } from "node:url";
 
 const web = fileURLToPath(new URL("..", import.meta.url));
-const { diffSnapshot, isNewer } = await createJiti(import.meta.url, { alias: { "@": web } }).import("./sharepoint.ts");
+const { diffSnapshot, isNewer, archivedIf } = await createJiti(import.meta.url, { alias: { "@": web } }).import("./sharepoint.ts");
 
 // 100 live rows with list item ids 1..100, one tombstoned row (id 500), one row the flow never gave an id.
 const rows = Array.from({ length: 100 }, (_, i) => ({ item_id: `g${i + 1}`, list_item_id: i + 1, folder: "F", filename: `f${i + 1}.pdf`, deleted: false }));
@@ -163,5 +163,10 @@ assert.equal(isNewer("2021-07-16T23:30:00Z", "2021-07-16T00:00:00+00:00"), false
 assert.equal(isNewer("2021-07-18T09:00:00Z", "2021-07-16T00:00:00+00:00"), true, "a later day is an edit");
 assert.equal(isNewer("2026-10-21T09:55:00Z", "2026-10-21T09:53:01+00:00"), true, "precise values: over a minute is an edit");
 assert.equal(isNewer("2026-10-21T09:53:30Z", "2026-10-21T09:53:01+00:00"), false, "precise values: under a minute is not");
+
+// Moves the change flow missed (26 Oct 2026: 6 Government decks into "Outdated", a bootcamp deck into "_to_delete").
+assert.deepEqual(archivedIf("Presentations/Industry Solutions Presentations/Government/Outdated", "Accops-POC-for-eOffice.pptx"), { status: "archived" });
+assert.deepEqual(archivedIf("Presentations/Event Presentations/Sales bootcamp/_to_delete", "deck.pptx"), { status: "archived" });
+assert.deepEqual(archivedIf("Presentations/Industry Solutions Presentations/Government", "Accops-Government-Presentation-Oct-2024.pptx"), {}, "a live folder never un-archives");
 
 console.log("snapshot.check: ok");
