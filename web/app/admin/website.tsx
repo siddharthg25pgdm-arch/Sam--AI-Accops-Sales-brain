@@ -158,6 +158,12 @@ export function WebsiteView({ d }: { d: WebsiteData }) {
         </nav>
         <span className="hint">The website chatbot on the Citrix LP. India time.</span>
       </div>
+      {d.view === "analytics" && (
+        <div className="wt-test">
+          <a className="btn-accent" href="/admin/website/test" target="_blank" rel="noopener">Test the bot</a>
+          <span className="hint">Only approved answers appear; drafts don&apos;t. Test chats are marked as tests.</span>
+        </div>
+      )}
       {d.ok && <p className="ok-note" role="status">{d.ok}</p>}
       {d.err && <div className="notice" role="alert">{d.err}</div>}
       {!d.configured ? <div className="notice">SUPABASE_URL and SUPABASE_SERVICE_KEY are not set, so the Website tab has nothing to read.</div> : (

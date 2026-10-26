@@ -15,6 +15,9 @@
 .wt-sub .seg a .n { font-variant-numeric: tabular-nums; color: var(--ink-3); font-weight: 500; margin-left: 5px; }
 .wt-sub .seg a .n.hot { color: #fff; background: var(--bad-mark); border-radius: 999px; padding: 0 6px; font-size: 11px; font-weight: 600; }
 .wt-sub .hint { font-size: 12.5px; color: var(--ink-3); }
+.wt-test { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: -8px 0 20px; }
+.wt-test .btn-accent { margin-top: 0; }
+.wt-test .hint { font-size: 12.5px; color: var(--ink-3); }
 
 .wt .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex: none; }
 .wt .s-bank { background: var(--t-bank); } .wt .s-intent { background: var(--t-intent); } .wt .s-cache { background: var(--t-cache); }

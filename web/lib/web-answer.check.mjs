@@ -16,7 +16,8 @@ export const admit = async (ctx, kind, h) => { S().admits.push([kind, h]); retur
 export const preGuard = t => S().guard(t);
 export const cacheGet = async h => S().cached;
 export const cachePut = async (h, g, a, src) => { S().puts.push({ h, g, a, src }); };
-export const intentMatch = t => S().intent;`);
+export const intentMatch = t => S().intent;
+export const isTestConv = (hs, c) => c.startsWith("t_") && hs === "hs-test"; // the real MAC check: web-widget.check`);
 const alias = { "@": web };
 for (const m of ["bot", "limits", "guard", "cache", "intent"]) alias[`@/lib/web/${m}`] = stub;
 const jiti = createJiti(import.meta.url, { alias });
@@ -24,7 +25,7 @@ const jiti = createJiti(import.meta.url, { alias });
 const SECRETS = { OPENAI_API_KEY: "sk-proj-CHECKSECRETopenai0000000000", OPENAI_COMPAT_API_KEY: "gsk_CHECKSECRETgroq00000000000",
   SAM_WEB_READER_JWT: "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoic2FtX3dlYl9yZWFkZXIifQ.CHECKSECRETsignature000" };
 const ENV = { ...SECRETS, WEB_CHAT_ENABLED: "1", SUPABASE_URL: "https://stub.supabase.co", SAM_WEB_SUPABASE_APIKEY: "sb_publishable_stub",
-  WEB_IP_SALT: "salt", OPENAI_COMPAT_BASE_URL: "https://api.groq.com/openai/v1", WEB_EMBED_ORIGINS: "https://accops-citrix-lp.vercel.app",
+  WEB_IP_SALT: "salt", OPENAI_COMPAT_BASE_URL: "https://api.groq.com/openai/v1", WEB_EMBED_ORIGINS: "https://accops-citrix-lp.vercel.app,https://sam.test",
   WEB_EVAL_TOKEN: "evaltok" };
 Object.assign(process.env, ENV);
 
@@ -245,6 +246,13 @@ fresh(); r = await run(typed("hello"), { "x-sam-eval": "wrong" });
 ok(r.status === 403, "no Origin and a wrong eval token -> 403");
 fresh({ S: { admit: "rate" } }); N.openai.push(groqOk); r = await run(typed("is hysecure certified"), { "x-sam-eval": "evaltok" });
 ok(r.body.source === "model" && globalThis.__S.admits.length === 0 && N.logs[0].is_test === true && N.slots.join() === "openai", "eval token: skips visitor limits, still takes the slot, is_test");
+// test chats (SAM's own "Test the bot" page): is_test from the signed "t_" conversation, never from the body alone
+fresh(); await run(click("lp-renewal-1"));
+ok(N.logs[0].is_test === false, "a visitor's chat: is_test false");
+fresh(); await run(click("lp-renewal-1", { conversation_id: "t_1", hs: "hs-test" }));
+ok(N.logs[0].is_test === true && N.logs[0].label === "human", "a signed test conversation: is_test, same guardrails");
+fresh(); await run(click("lp-renewal-1", { conversation_id: "t_1", hs: "forged" }));
+ok(N.logs[0].is_test === false, "a forged t_ id: not a test");
 
 // 7 + disabled/missing DB: harmless 503
 for (const [name, set] of [["flag off", () => delete process.env.WEB_CHAT_ENABLED], ["no reader JWT", () => delete process.env.SAM_WEB_READER_JWT]]) {
@@ -281,6 +289,15 @@ ok((await post({ ...EV, qa_id: "hello there" })).status === 400, "free text in q
 ok((await post("not json")).status === 400 && (await post(JSON.stringify(EV).padEnd(2100))).status === 400, "bad / oversized body rejected");
 ok((await post(EV, "https://evil.example")).status === 403, "foreign origin -> 403");
 ok(N.events.length === 2, "only valid events logged");
+ok(N.events.map(e => e.is_test).join() === "false,true", "is_test: LP beacon false, a beacon from SAM's own page true");
+fresh();
+await post({ ...EV, conversation_id: "c_1" }, "https://sam.test"); // the widget's own events come from SAM's origin
+await post({ ...EV, conversation_id: "t_1" }, "https://sam.test");
+await post({ ...EV, is_test: true }); // a client flag is rejected outright (strict schema)
+ok(N.events.map(e => e.is_test).join() === "false,true", "widget events: test only for a t_ conversation; body flag refused");
+process.env.WEB_EMBED_ORIGINS = "https://accops-citrix-lp.vercel.app";
+ok((await post(EV, "https://sam.test")).status === 403, "SAM's own origin only when WEB_EMBED_ORIGINS lists it");
+process.env.WEB_EMBED_ORIGINS = ENV.WEB_EMBED_ORIGINS;
 
 // 8. no key in any logged error
 fresh({ logFails: true }); N.openai.push(fails[429]); N.groq.push(() => { throw new Error(`socket closed, auth ${SECRETS.OPENAI_COMPAT_API_KEY}`); });

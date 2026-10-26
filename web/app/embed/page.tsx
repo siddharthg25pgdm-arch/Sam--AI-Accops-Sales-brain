@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Barlow } from "next/font/google";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import "@/components/blocks/blocks.css"; // the one import of the block styles (contract notes: the host owns it)
@@ -7,7 +8,7 @@ import "./embed.css";
 import { mintHs } from "@/lib/web/bot";
 import { roots, settings, webReady } from "@/lib/web/db";
 import { cleanPage } from "@/lib/web/fill";
-import { embedOrigins, ID } from "./bridge";
+import { embedOrigins, ID, selfFramed } from "./bridge";
 import Widget from "./Widget";
 
 // The iframe the loader opens on first interaction (plan 7.2). Server-rendered: the page's root questions and a
@@ -27,9 +28,15 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
 
   const sp = await searchParams;
   const one = (v: unknown) => (Array.isArray(v) ? v[0] : v);
-  const page = cleanPage(one(sp.page));
+  // SAM framing its own /embed (the admin-only "Test the bot" page), proven by the browser's Sec-Fetch headers: a test
+  // conversation ("t_", inside the hs MAC, so answer.ts logs is_test from it) and the only host whose `pg` page override
+  // is honoured. Any other host's `pg` is ignored.
+  // ponytail: no session check here (lib/auth is outside the web-guard boundary); a non-browser forging the headers
+  // gains only what it already has (any `page` in the ask body) plus hiding its own chats from the dashboard.
+  const test = selfFramed(await headers(), embedOrigins());
+  const page = (test && cleanPage(one(sp.pg))) || cleanPage(one(sp.page));
   const q = String(one(sp.q) ?? "");
-  const conversationId = `c_${randomUUID()}`;
+  const conversationId = `${test ? "t" : "c"}_${randomUUID()}`;
   const rows = await roots(page).catch(() => []);
 
   return (

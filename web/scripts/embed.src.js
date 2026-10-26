@@ -6,6 +6,8 @@
  * Tag:  <script src="https://sam-accops.vercel.app/embed.js" async data-teaser="15" data-avoid="[data-sticky]"></script>
  *   data-teaser  seconds of visible, engaged time before the teaser (0 = never); default: the config's after_s
  *   data-avoid   a bottom-fixed bar of the host page (CSS selector) that the launcher rises above while it shows
+ *   data-page    test only: answer as if on this page URL (SAM's "Test the bot" page uses the LP's). /embed honours it only
+ *                when SAM frames itself; on any other host it is ignored. Events always report the real page.
  * After load + idle it GETs /api/web/config: the kill switch (anything but enabled:true draws nothing).
  * The launcher and teaser live in a closed shadow root (no CSS leaks either way); the /embed iframe is created on the
  * first click only. The bridge takes messages only from that iframe's window AND origin, answers only to that origin
@@ -16,7 +18,7 @@
   var me = D.currentScript;
   if (!me || W.AccopsChat) return;
   W.AccopsChat = 1;
-  var base = new URL(me.src).origin, page = location.origin + location.pathname, K = "acc_chat_", DAY = 864e5;
+  var base = new URL(me.src).origin, page = location.origin + location.pathname, K = "acc_chat_", DAY = 864e5, pg = me.getAttribute("data-page");
   var ID = /^[\w.:-]{1,80}$/, EV = /^(question_clicked|answer_shown|doc_opened|filter_used|step_viewed)$/;
   var SRC = /^(bank|intent|cache|model|fallback|guard|limited|repeat|root|chip|picker|teaser)$/;
   var ok = function (re, v) { return typeof v === "string" && re.test(v) ? v : null; };
@@ -106,7 +108,7 @@
       hideT();
       if (!frame) {
         frame = D.createElement("iframe");
-        frame.src = base + "/embed?page=" + encodeURIComponent(page) + (qa ? "&q=" + encodeURIComponent(qa) : "");
+        frame.src = base + "/embed?page=" + encodeURIComponent(page) + (qa ? "&q=" + encodeURIComponent(qa) : "") + (pg ? "&pg=" + encodeURIComponent(pg) : "");
         frame.title = "Ask Accops";
         frame.setAttribute("allow", "");
         frame.setAttribute("referrerpolicy", "strict-origin");
@@ -213,7 +215,7 @@
   }
 
   function start() {
-    W.fetch(base + "/api/web/config?page=" + encodeURIComponent(page), { credentials: "omit" })
+    W.fetch(base + "/api/web/config?page=" + encodeURIComponent(pg || page), { credentials: "omit" }) // public roots, any page
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (c) { if (c && c.enabled === true) mount(c); })
       .catch(function () { });

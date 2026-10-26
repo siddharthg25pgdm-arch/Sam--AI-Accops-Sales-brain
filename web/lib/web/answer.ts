@@ -6,7 +6,7 @@ import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto
 import { z } from "zod";
 import { Answer } from "@/lib/blocks";
 import { redact } from "@/lib/redact";
-import { classify } from "@/lib/web/bot";
+import { classify, isTestConv } from "@/lib/web/bot";
 import { admit } from "@/lib/web/limits";
 import { preGuard } from "@/lib/web/guard";
 import { cacheGet, cachePut } from "@/lib/web/cache";
@@ -93,7 +93,7 @@ export async function ask(req: Request): Promise<Out> {
     if (!out.success) { m.error = "fill"; src = "fallback"; out = Answer.safeParse(await fallback()); }
     const answer = out.success ? out.data : { lead: LEAD.none, blocks: [], chips: [] };
     const log = { ...m, source: src, label, signals, conversation_id: ctx.conversation_id, visitor_id: ctx.visitor_id, page,
-      page_group, country: ctx.country, is_test: ev, latency_ms: Date.now() - t0 };
+      page_group, country: ctx.country, is_test: ev || isTestConv(ctx.hs, ctx.conversation_id), latency_ms: Date.now() - t0 };
     return { status, body: { message_id, source: src, ...answer },
       log: () => db.logMessage(log).then(() => undefined, e => console.warn(`web log: ${redact(e)}`)) };
   };

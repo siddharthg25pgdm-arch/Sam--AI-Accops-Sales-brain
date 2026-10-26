@@ -29,6 +29,14 @@ export function verifyHs(hs: string | null, conversation_id: string, now = Date.
   return age < HS_MIN_MS || age > HS_MAX_MS ? { bad: "hs_expired" } : { age };
 }
 
+/** A test conversation: /embed mints a "t_" id only when SAM frames itself for an admin (page.tsx). The id is inside
+ *  the handshake MAC, so a client cannot forge one; only the signature matters here, not the token's age. */
+export function isTestConv(hs: string | null, conversation_id: string) {
+  if (!conversation_id.startsWith("t_")) return false;
+  const v = verifyHs(hs, conversation_id);
+  return !("bad" in v) || v.bad === "hs_expired";
+}
+
 /** Typed sends: 4+ under 1.5 s apart, or near-identical spacing (sd < 100 ms). recent_ms holds the last <= 6 sends. */
 export function cadence(recent: number[]): string | null {
   const gaps = recent.slice(1).map((t, i) => t - recent[i]);

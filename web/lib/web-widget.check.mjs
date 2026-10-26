@@ -40,7 +40,7 @@ ok(!/innerHTML\s*=(?![^;]*CSS[^;]*HTML)/.test(src), "innerHTML only ever takes t
 const BASE = "https://sam-accops.vercel.app", LP = "https://accops-citrix-lp.vercel.app";
 class Store { constructor(o = {}) { this.m = { ...o }; } getItem(k) { return k in this.m ? this.m[k] : null; } setItem(k, v) { this.m[k] = String(v); } }
 
-function boot({ width = 1280, consent = false, teaser = "15", avoid = null, config = { enabled: true, teaser: { after_s: 15, qa_id: "lp-01", label: "Why did my Citrix renewal go up?" }, chips: [{ id: "lp-03", label: "Compare licensing" }, { id: "lp-05", label: "How does migration work?" }] },
+function boot({ width = 1280, consent = false, teaser = "15", avoid = null, pg = null, origin = LP, config = { enabled: true, teaser: { after_s: 15, qa_id: "lp-01", label: "Why did my Citrix renewal go up?" }, chips: [{ id: "lp-03", label: "Compare licensing" }, { id: "lp-05", label: "How does migration work?" }] },
   ss = new Store(), ls = new Store(), start = Date.UTC(2026, 9, 27), talk = false, avoidRect = null } = {}) {
   const t = { now: start, timers: new Map(), id: 0, posts: [], beacons: [], opened: [], fetches: [], ios: [], docL: {}, winL: {} };
   const on = (bag, k, f) => (bag[k] ||= []).push(f);
@@ -66,6 +66,7 @@ function boot({ width = 1280, consent = false, teaser = "15", avoid = null, conf
   script.src = `${BASE}/embed.js`;
   if (teaser !== null) script.attrs["data-teaser"] = teaser;
   if (avoid) script.attrs["data-avoid"] = avoid;
+  if (pg) script.attrs["data-page"] = pg;
   const talkEl = new El("section"), avoidEl = new El("div");
   avoidEl.rect = avoidRect;
   const body = new El("body"), html = new El("html");
@@ -74,7 +75,7 @@ function boot({ width = 1280, consent = false, teaser = "15", avoid = null, conf
     querySelector: s => (s === avoid ? avoidEl : null), addEventListener: (k, f) => on(t.docL, k, f) };
   const timer = every => (fn, ms = 0) => { const id = ++t.id; t.timers.set(id, { at: t.now + ms, fn, every: every ? ms : 0 }); return id; };
   const win = {
-    document: doc, location: { origin: LP, pathname: "/", href: `${LP}/` }, innerWidth: width, innerHeight: 800, SAM_CONSENT: consent,
+    document: doc, location: { origin, pathname: "/", href: `${origin}/` }, innerWidth: width, innerHeight: 800, SAM_CONSENT: consent,
     sessionStorage: ss, localStorage: ls, crypto: globalThis.crypto, URL, Blob, Promise,
     navigator: { sendBeacon: (u, b) => { t.beacons.push([u, b]); return true; } },
     fetch: async u => { t.fetches.push(u); return config ? { ok: true, json: async () => config } : { ok: false, json: async () => ({}) }; },
@@ -282,6 +283,17 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   c.fireDoc("keydown", { key: "Escape" });
   eq(c.sh(".f").className, "f", "Esc closes the chat");
 }
+// data-page (SAM's "Test the bot" page): /embed gets it as pg (honoured there only when SAM frames itself, section 5);
+// the teaser uses that page's public roots; events still report the real page
+{
+  const b = boot({ origin: BASE, pg: `${LP}/` });
+  await b.advance(10);
+  eq(b.t.fetches, [`${BASE}/api/web/config?page=${encodeURIComponent(`${LP}/`)}`], "data-page: config asked for that page's roots");
+  b.sh(".l").fire("click");
+  eq(b.sh(".f").children[0].src, `${BASE}/embed?page=${encodeURIComponent(`${BASE}/`)}&pg=${encodeURIComponent(`${LP}/`)}`, "data-page passed to /embed as pg, page stays the host's");
+  const j = JSON.parse(await b.t.beacons.at(-1)[1].text());
+  eq(j.page, `${BASE}/`, "beacons report the real host page, not data-page");
+}
 // the launcher rises above the page's sticky bar while it shows
 {
   const b = boot({ width: 375, avoid: "[data-sticky]", avoidRect: { top: 730, height: 70 } });
@@ -291,9 +303,9 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
 
 // ---------- 3-6: the iframe side (TypeScript via jiti) ----------
 const stub = path.join(mkdtempSync(path.join(tmpdir(), "web-widget-")), "stub.mjs");
-writeFileSync(stub, "export const Barlow = () => ({ variable: 'f' }); export default function Widget() { return null; }");
+writeFileSync(stub, "export const Barlow = () => ({ variable: 'f' }); export default function Widget() { return null; } export const headers = async () => new Headers(globalThis.__H ?? {});");
 const jiti = createJiti(import.meta.url, { alias: { "@": web }, jsx: { runtime: "automatic" } });
-const pj = createJiti(import.meta.url, { alias: { "next/font/google": stub, "@/components/blocks/blocks.css": stub, "./embed.css": stub, "./Widget": stub, "@": web }, jsx: { runtime: "automatic" } });
+const pj = createJiti(import.meta.url, { alias: { "next/font/google": stub, "next/headers": stub, "@/components/blocks/blocks.css": stub, "./embed.css": stub, "./Widget": stub, "@": web }, jsx: { runtime: "automatic" } });
 const Br = await jiti.import("@/app/embed/bridge.ts");
 
 // 3. bridge
@@ -312,17 +324,33 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   eq(Br.eventMessage("question_clicked", { qa_id: "my email is a@b.com", source: "typed" }), { t: "event", name: "question_clicked" }, "free text in ids/sources dropped");
   eq(Br.eventMessage("custom_text", {}), null, "unknown event names never leave");
   ok(!/postMessage\([^)]*["']\*["']/.test(read("app/embed/Widget.tsx")), "the widget never posts to *");
+  // SAM's own origin (the "Test the bot" page) is trusted only when WEB_EMBED_ORIGINS lists it; never a wildcard
+  const S = Br.embedOrigins(`${LP},${BASE}`);
+  ok(!A.includes(BASE) && S.includes(BASE) && !Br.embedOrigins("*").includes("*"), "SAM's origin only via WEB_EMBED_ORIGINS, no wildcard");
+  eq(Br.acceptInit({ origin: BASE, source: parentWin, data: { t: "init" } }, A, parentWin), null, "init from SAM refused when not listed");
+  eq(Br.acceptInit({ origin: BASE, source: parentWin, data: { t: "init" } }, S, parentWin)?.origin, BASE, "init from SAM accepted when listed");
+  const H = o => ({ get: k => o[k] ?? null });
+  const self = { "sec-fetch-site": "same-origin", "sec-fetch-dest": "iframe", referer: `${BASE}/` };
+  ok(Br.selfFramed(H(self), S), "selfFramed: SAM framing its own /embed, listed");
+  ok(!Br.selfFramed(H(self), A), "selfFramed: not when SAM's origin is not listed");
+  ok(!Br.selfFramed(H({ ...self, "sec-fetch-site": "cross-site", referer: `${LP}/` }), S), "selfFramed: the LP framing is not self");
+  ok(!Br.selfFramed(H({ ...self, "sec-fetch-site": "cross-site" }), S), "selfFramed: a foreign page claiming SAM's referer is still cross-site");
+  ok(!Br.selfFramed(H({ ...self, "sec-fetch-dest": "document" }), S) && !Br.selfFramed(H({ ...self, referer: null }), S), "selfFramed: iframe only, referer required");
+  // /api/web/event's is_test: server-side, from the origin (loader beacons) or the signed t_ conversation (widget events)
+  eq([Br.testEvent(BASE, "sam-accops.vercel.app"), Br.testEvent(LP, "sam-accops.vercel.app"), Br.testEvent(null, "sam-accops.vercel.app")], [true, false, false], "is_test from origin: SAM's own page only");
+  eq([Br.testEvent(BASE, "sam-accops.vercel.app", "c_1"), Br.testEvent(BASE, "sam-accops.vercel.app", "t_1")], [false, true], "widget events: test only for a t_ conversation");
 }
 
 // 4. frame-ancestors on /embed only, same list as the widget trusts
 {
   const cfg = (await jiti.import("@/next.config.ts")).default;
-  for (const env of [undefined, "https://accops-citrix-lp-git-x.vercel.app"]) {
+  for (const env of [undefined, "https://accops-citrix-lp-git-x.vercel.app", `${LP},${BASE}`]) {
     if (env) process.env.WEB_EMBED_ORIGINS = env; else delete process.env.WEB_EMBED_ORIGINS;
     const h = await cfg.headers();
     eq(h.map(r => r.source), ["/embed"], "headers() touches /embed only");
     const csp = h[0].headers.find(x => x.key === "Content-Security-Policy")?.value;
-    eq(csp, `frame-ancestors ${Br.embedOrigins(env).join(" ")}`, `frame-ancestors = the widget's origin list (env ${env ?? "unset"})`);
+    eq(csp, `frame-ancestors 'self' ${Br.embedOrigins(env).join(" ")}`, `frame-ancestors = 'self' + the widget's origin list (env ${env ?? "unset"})`);
+    ok(!csp.includes("*"), "frame-ancestors: no wildcard");
     ok(!h.flatMap(r => r.headers).some(x => /x-frame-options/i.test(x.key)), "no X-Frame-Options");
   }
   delete process.env.WEB_EMBED_ORIGINS;
@@ -334,7 +362,7 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   const ENV = { WEB_CHAT_ENABLED: "1", SUPABASE_URL: "https://stub.example.co", SAM_WEB_READER_JWT: "jwt.stub.sig", SAM_WEB_SUPABASE_APIKEY: "pub_stub",
     WEB_IP_SALT: "salt", WEB_HS_SECRET: "hs-secret-for-the-check" };
   const Page = (await pj.import("@/app/embed/page.tsx")).default;
-  const { verifyHs } = await jiti.import("@/lib/web/bot.ts");
+  const { verifyHs, mintHs } = await jiti.import("@/lib/web/bot.ts");
   const is404 = e => String(e?.digest).includes("404");
   await assert.rejects(() => Page({ searchParams: Promise.resolve({}) }), is404, "inert (no env): 404"); n++;
   Object.assign(process.env, ENV);
@@ -360,6 +388,23 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   const p2 = (await Page({ searchParams: Promise.resolve({ page: "javascript:alert(1)", q: "x y" }) })).props.children.props;
   eq([p2.page, p2.ask], ["", null], "a bad page or q is dropped, never reflected");
   ok(p2.hs !== p.hs, "hs minted per request");
+  // the "Test the bot" page: pg honoured and a test conversation only when SAM frames itself (Sec-Fetch, listed origin)
+  const { isTestConv } = await jiti.import("@/lib/web/bot.ts");
+  const SP = { page: `${BASE}/`, pg: "https://accops-citrix-lp.vercel.app/" };
+  const SELF = { "sec-fetch-site": "same-origin", "sec-fetch-dest": "iframe", referer: `${BASE}/` };
+  const embed = async h => { globalThis.__H = h; return (await Page({ searchParams: Promise.resolve(SP) })).props.children.props; };
+  process.env.WEB_EMBED_ORIGINS = `${LP},${BASE}`;
+  const pt = await embed(SELF);
+  ok(/^t_[0-9a-f-]{36}$/.test(pt.conversationId) && pt.page === SP.pg, "self-framed: a t_ conversation, answering as the LP page");
+  ok(isTestConv(pt.hs, pt.conversationId), "the t_ id verifies as a test conversation");
+  const pf = await embed({ "sec-fetch-site": "cross-site", "sec-fetch-dest": "iframe", referer: "https://evil.example/" });
+  ok(/^c_/.test(pf.conversationId) && pf.page === `${BASE}/`, "spoofed pg from a foreign origin: ignored, a normal conversation");
+  ok(!isTestConv(pf.hs, pf.conversationId) && !isTestConv(pf.hs, `t_${pf.conversationId.slice(2)}`) && !isTestConv(null, "t_x"), "a renamed or unsigned t_ id is not a test");
+  delete process.env.WEB_EMBED_ORIGINS;
+  const pn = await embed(SELF);
+  ok(/^c_/.test(pn.conversationId) && pn.page === `${BASE}/`, "SAM not in WEB_EMBED_ORIGINS: pg ignored, not a test");
+  ok(isTestConv(mintHs("t_old", Date.now() - 3 * 3600_000), "t_old"), "an expired but signed test hs is still a test");
+  delete globalThis.__H;
   for (const k of Object.keys(ENV)) delete process.env[k];
   const pageSrc = read("app/embed/page.tsx");
   eq((pageSrc.match(/blocks\/blocks\.css/g) || []).length, 1, "page.tsx imports blocks.css once");

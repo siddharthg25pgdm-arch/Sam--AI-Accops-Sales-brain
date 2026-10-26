@@ -12,6 +12,20 @@ export function embedOrigins(env = process.env.WEB_EMBED_ORIGINS): string[] {
   return [...new Set([...EMBED_ORIGINS, ...extra])];
 }
 
+/** /embed framed by SAM itself (the admin "Test the bot" page): the browser-set Sec-Fetch headers say the framing
+ *  page is our own origin, and that origin must be in the trusted list (WEB_EMBED_ORIGINS). A third-party page in a
+ *  browser is always cross-site here, whatever it puts in the URL. */
+export function selfFramed(h: { get(k: string): string | null }, allowed: string[]) {
+  const r = h.get("referer") ?? "";
+  return h.get("sec-fetch-site") === "same-origin" && h.get("sec-fetch-dest") === "iframe" && URL.canParse(r) && allowed.includes(new URL(r).origin);
+}
+
+/** /api/web/event's is_test, decided server-side, never by a body flag: a test chat's widget events ("t_" ids, which
+ *  /embed mints only when SAM frames itself) or the loader's own beacons (no conversation) from a page on SAM's own
+ *  host (the test page). A forged "t_" id can only hide the sender's own events. */
+export const testEvent = (origin: string | null, ownHost: string, conversation_id?: string) =>
+  conversation_id ? conversation_id.startsWith("t_") : !!origin && new URL(origin).host === ownHost;
+
 /** The loader's `init`: only from an allowed origin AND from the window that framed us. */
 export function acceptInit(e: { origin: string; source: unknown; data: unknown }, allowed: string[], parent: unknown) {
   const d = e.data as { t?: unknown; visitor_id?: unknown; consent?: unknown } | null;
