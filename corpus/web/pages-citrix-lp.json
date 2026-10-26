@@ -1,0 +1,574 @@
+[
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#section-1",
+  "title": "Hero: Citrix renewal, one platform, migration without rip-and-replace",
+  "page_type": "comparison",
+  "products": [
+   "HyWorks",
+   "HySecure",
+   "HyID",
+   "VDI",
+   "ZTNA",
+   "MFA",
+   "SSO",
+   "Nutanix"
+  ],
+  "industries": [],
+  "summary": "The hero frames three entry angles for Citrix customers: a renewal price increase, the number of separate components a Citrix estate needs, and a batch-by-batch migration. Accops positions itself as VDI, ZTNA gateway, MFA and SSO in one platform on infrastructure the customer already owns, deployable on-prem, hybrid or cloud. The renewal quote shown ($440,000 to $572,000) is labelled an illustrative example.",
+  "facts": [
+   {
+    "fact": "Accops runs Windows apps and desktops on infrastructure the customer already owns: VDI, ZTNA gateway, MFA and SSO in a single platform.",
+    "quote": "Accops runs your Windows apps and desktops on infrastructure you already own — VDI, ZTNA gateway, MFA and SSO in a single platform, with the licensing terms written into the contract."
+   },
+   {
+    "fact": "Deploy on-prem, hybrid or cloud.",
+    "quote": "Deploy on-prem, hybrid or cloud."
+   },
+   {
+    "fact": "Accops ships load balancing, monitoring, site database and printing as built-in components of one product, plus ZTNA, MFA and SSO.",
+    "quote": "A Citrix estate needs NetScaler for load balancing, Director for monitoring, SQL Server for the site database and Universal Print Server for printing. Accops ships those as built-in components of one product — plus ZTNA, MFA and SSO."
+   },
+   {
+    "fact": "Accops runs alongside the existing Citrix environment during pilot and rollout; both stay live until the customer switches off.",
+    "quote": "Accops runs alongside your existing Citrix environment during pilot and rollout, so users move in planned groups and both systems stay live until you decide to switch off."
+   },
+   {
+    "fact": "Hypervisor-agnostic: VMware, Nutanix, Hyper-V.",
+    "quote": "Hypervisor-agnostic — VMware, Nutanix, Hyper-V."
+   },
+   {
+    "fact": "The Accops equivalent of the Citrix stack is HyWorks (VDI and apps), HySecure (ZTNA) and HyID (MFA and SSO): one platform, one contract.",
+    "quote": "HyWorks — VDI & apps HySecure — ZTNA HyID — MFA & SSO | one platform · one contract"
+   },
+   {
+    "fact": "The first call offered is a 20-minute technical call with engineers, no obligation.",
+    "quote": "● 20-minute technical call ● No obligation ● Talk to engineers, not an SDR"
+   }
+  ],
+  "questions_answered": [
+   "Is Accops a Citrix alternative for VDI and app delivery?",
+   "Which Accops products replace which Citrix components?",
+   "Can Accops run on the infrastructure we already own?",
+   "Can we deploy on-prem, hybrid or in the cloud?",
+   "Do we have to switch off Citrix on day one?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "d9524301b6783c61",
+  "words": 274,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#section-2",
+  "title": "Trust strip: customers, countries, partners, ISO 27001",
+  "page_type": "comparison",
+  "products": [],
+  "industries": [
+   "BFSI",
+   "Government",
+   "Pharma / Healthcare",
+   "Manufacturing",
+   "IT / ITeS"
+  ],
+  "summary": "A row of headline numbers: 1000+ organisations running Accops, 12 countries, 200+ channel partners and ISO 27001:2022 certification. It names the sectors Accops is deployed in, including regulated banks and insurers in India and APAC.",
+  "facts": [
+   {
+    "fact": "1000+ organisations run Accops.",
+    "quote": "1000+ | Organisations running Accops"
+   },
+   {
+    "fact": "12 countries.",
+    "quote": "12 | Countries"
+   },
+   {
+    "fact": "200+ channel partners.",
+    "quote": "200+ | Channel partners"
+   },
+   {
+    "fact": "ISO 27001 certified (27001:2022).",
+    "quote": "ISO 27001 | Certified 27001:2022"
+   },
+   {
+    "fact": "Deployed across BFSI, government, healthcare, manufacturing and IT/ITeS, including regulated banks and insurers in India and APAC.",
+    "quote": "Deployed across BFSI, government, healthcare, manufacturing and IT/ITeS — including regulated banks and insurers in India and APAC."
+   }
+  ],
+  "questions_answered": [
+   "How many organisations use Accops?",
+   "Is Accops ISO 27001 certified?",
+   "Which industries use Accops?",
+   "How many channel partners does Accops have?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "85f497ec0202abd2",
+  "words": 31,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#section-3",
+  "title": "Renewal cost calculator and admin forum quotes",
+  "page_type": "comparison",
+  "products": [],
+  "industries": [],
+  "summary": "An interactive calculator for the cost of a Citrix renewal increase over three years, next to verbatim quotes from IT administrators in public forums about Citrix renewal pricing. The page itself says the quotes describe individual experiences, not published Citrix pricing; the calculator's Accops figure is a placeholder model on the live page and is not a claim.",
+  "facts": [
+   {
+    "fact": "The forum quotes are publicly posted accounts from IT administrators, 2024-2026, attributed by role; they describe individual experiences, not published Citrix pricing.",
+    "quote": "Publicly posted accounts from IT administrators in vendor-neutral community forums, 2024–2026, quoted verbatim and attributed by role rather than name. They describe individual customer experiences, not published Citrix pricing."
+   },
+   {
+    "fact": "An IT administrator with 5,500 CALs posted that their CAL price went up 50% at renewal (forum post, Oct 2025).",
+    "quote": "“Our renewal came along and our CAL price went up by 50%.” | IT administrator, 5,500 CALs · public forum post, Oct 2025",
+    "caveat": "third-party forum quote, not an Accops claim"
+   }
+  ],
+  "questions_answered": [
+   "How much is a Citrix renewal increase costing teams like ours?",
+   "Are the Citrix price-increase stories real?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "7ba14e8b1ee7dcad",
+  "words": 191,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#section-4",
+  "title": "Component teardown: Citrix estate vs Accops",
+  "page_type": "comparison",
+  "products": [
+   "HyWorks",
+   "HySecure",
+   "HyID"
+  ],
+  "industries": [],
+  "summary": "Compares a typical production Citrix estate with the Accops equivalent, component by component. It claims the count drops from 8 products to license and patch to 1, and from 4 vendors to escalate through to 1, with no separate SQL Server licences.",
+  "facts": [
+   {
+    "fact": "8 products to license and patch become 1.",
+    "quote": "8 → 1 | Products to license and patch"
+   },
+   {
+    "fact": "4 vendors to escalate through become 1.",
+    "quote": "4 → 1 | Vendors to escalate through"
+   },
+   {
+    "fact": "No separate SQL Server licences required.",
+    "quote": "0 | Separate SQL Server licences required"
+   },
+   {
+    "fact": "The licence line is rarely the whole cost.",
+    "quote": "The licence line is rarely the whole cost."
+   }
+  ],
+  "questions_answered": [
+   "How many components does Accops replace in a Citrix estate?",
+   "Do we need a separate SQL Server licence with Accops?",
+   "How many vendors would we deal with?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "8c8a03f1bc263f80",
+  "words": 106,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#section-5",
+  "title": "Migration planner",
+  "page_type": "comparison",
+  "products": [],
+  "industries": [],
+  "summary": "An interactive planner where the visitor picks estate size (under 500, 500-2,500, 2,500+ users) and application complexity to see an indicative migration plan. The week counts on the live page are marked as placeholder durations, so only the coexistence principle is a claim.",
+  "facts": [
+   {
+    "fact": "Both environments run at the same time; nothing is decommissioned until the customer decides.",
+    "quote": "Both environments run at the same time — nothing is decommissioned until you decide to decommission it."
+   }
+  ],
+  "questions_answered": [
+   "What would our Citrix migration look like?",
+   "How long does a Citrix to Accops migration take?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "343c2f1f56e337cf",
+  "words": 102,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#section-6",
+  "title": "Where Citrix is still the better choice",
+  "page_type": "comparison",
+  "products": [
+   "VDI",
+   "ZTNA"
+  ],
+  "industries": [],
+  "summary": "An honest-fit section: Citrix remains stronger for very large multi-region estates with deep HDX-specific dependencies, an established Citrix CoE or tooling built on Citrix APIs. Accops is the stronger fit for VDI, secure remote access and identity from one vendor on owned infrastructure with stable commercial terms.",
+  "facts": [
+   {
+    "fact": "Citrix can be the better choice for very large multi-region estates with deep HDX dependencies, an established Citrix CoE, or tooling built against Citrix APIs.",
+    "quote": "If you run a very large multi-region estate with deep dependencies on HDX-specific optimisations, an established Citrix CoE, or third-party tooling built directly against the Citrix APIs, that ecosystem maturity is real and hard to replicate."
+   },
+   {
+    "fact": "Teams heavily invested in Citrix-specific automation and certification often find switching costs outweigh the licensing saving.",
+    "quote": "Teams with heavy investment in Citrix-specific automation and staff certification often find the switching cost outweighs the licensing saving."
+   },
+   {
+    "fact": "Accops is the stronger fit for VDI, secure remote access and identity from one vendor on owned infrastructure, with commercial terms that hold for the contract.",
+    "quote": "Accops is the stronger fit where you want VDI, secure remote access and identity from one vendor, on infrastructure you already own, with commercial terms that hold for the life of the contract."
+   }
+  ],
+  "questions_answered": [
+   "When should we stay on Citrix?",
+   "Is Accops right for a very large multi-region Citrix estate?",
+   "Where is Accops the stronger fit?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "d460abe53d453c29",
+  "words": 125,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#section-7",
+  "title": "Three-year cost estimate and method",
+  "page_type": "comparison",
+  "products": [],
+  "industries": [],
+  "summary": "A seat-count calculator comparing three-year Citrix and Accops licensing, with its method stated. On the live page the per-seat rates are marked as placeholder rates, so no cost figure from it is a claim; only the method is.",
+  "facts": [
+   {
+    "fact": "Method: blended per-seat licensing over three years at the stated concurrency, excluding hardware, Windows Server and RDS CALs.",
+    "quote": "Blended per-seat licensing over a three-year term at the stated concurrency. Excludes hardware, Windows Server and RDS CALs, which are comparable across both platforms."
+   },
+   {
+    "fact": "Quoted pricing will vary by region, term and volume.",
+    "quote": "Your quoted pricing will vary by region, term and volume."
+   }
+  ],
+  "questions_answered": [
+   "How much cheaper is Accops than Citrix?",
+   "What does the cost comparison include and exclude?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "e3f33246ed2b351f",
+  "words": 97,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#comparison",
+  "title": "Accops vs Citrix on eight decision criteria",
+  "page_type": "comparison",
+  "products": [
+   "HySecure",
+   "HyID",
+   "ZTNA",
+   "MFA",
+   "SSO",
+   "VDI"
+  ],
+  "industries": [],
+  "summary": "A feature table comparing Accops and Citrix on gateway and load balancing, monitoring, site database, printing, ZTNA/MFA/SSO, protocol maturity, licensing model and support model. It concedes that HDX remains more mature for extreme-latency and specialist graphics cases, and states Citrix claims rest on public Citrix information.",
+  "facts": [
+   {
+    "fact": "Gateway and load balancing are built into the Accops platform; Citrix typically requires NetScaler/ADC, licensed separately.",
+    "quote": "Gateway & load balancing | Built into the platform | Typically requires NetScaler / ADC, licensed separately"
+   },
+   {
+    "fact": "Monitoring and session analytics are built in.",
+    "quote": "Monitoring & session analytics | Built in"
+   },
+   {
+    "fact": "Site database is bundled, with no separate SQL Server licence.",
+    "quote": "Site database | Bundled; no separate SQL Server licence"
+   },
+   {
+    "fact": "Driver-free universal printing is included.",
+    "quote": "Printing | Driver-free universal printing included"
+   },
+   {
+    "fact": "ZTNA, MFA and SSO are included: HySecure ZTNA and HyID MFA/SSO from the same vendor.",
+    "quote": "ZTNA, MFA and SSO | Included — HySecure ZTNA and HyID MFA/SSO, same vendor"
+   },
+   {
+    "fact": "Accops protocol is production-proven for mainstream workloads; HDX remains more mature for extreme-latency and specialist graphics cases.",
+    "quote": "Production-proven for mainstream workloads | HDX remains the more mature protocol for extreme-latency and specialist graphics cases"
+   },
+   {
+    "fact": "Accops licensing: perpetual or subscription, concurrent or named user. Citrix: subscription, perpetual withdrawn for new purchases.",
+    "quote": "Licensing model | Perpetual or subscription; concurrent or named user | Subscription; perpetual licensing withdrawn for new purchases"
+   },
+   {
+    "fact": "Accops support: direct OEM support with named engineers.",
+    "quote": "Support model | Direct OEM support; named engineers"
+   },
+   {
+    "fact": "Statements about Citrix are based on publicly available Citrix information.",
+    "quote": "Statements about Citrix products are based on publicly available information from Citrix documentation, product pages and licensing announcements, current as of the date below."
+   }
+  ],
+  "questions_answered": [
+   "How does Accops compare with Citrix feature by feature?",
+   "Do we need NetScaler with Accops?",
+   "Does Accops include MFA and SSO?",
+   "Is the Accops protocol as good as HDX?",
+   "Does Accops still sell perpetual licences?",
+   "Who supports us, Accops or a partner?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "06cdcf40e26fc42c",
+  "words": 263,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#proof",
+  "title": "Customer evidence: organisations that moved",
+  "page_type": "comparison",
+  "products": [
+   "HyWorks",
+   "HyID",
+   "VDI",
+   "Digital Workspace"
+  ],
+  "industries": [
+   "Pharma / Healthcare"
+  ],
+  "summary": "Three attributed quotes: City Pharmacy replaced Citrix XenApp with Accops HyWorks for ERP virtualisation, plus quotes from Indoco Remedies (Accops VDI) and Tejas Networks (HyID and digital workspace).",
+  "facts": [
+   {
+    "fact": "City Pharmacy replaced Citrix XenApp with Accops HyWorks for ERP virtualisation.",
+    "quote": "“City Pharmacy replaced Citrix XenApp with Accops HyWorks for ERP virtualisation, to ensure seamless access and compliance.”"
+   },
+   {
+    "fact": "Indoco Remedies (DGM Security & Infrastructure): Accops VDI improved infrastructure efficiency, data security and remote accessibility.",
+    "quote": "“Accops VDI improved our infrastructure efficiency, data security and remote accessibility, delivering consistent performance, centralised management and responsive support.” | Kamlesh Bhuva DGM Security & Infrastructure, Indoco Remedies"
+   },
+   {
+    "fact": "Tejas Networks (IT Manager): HyID strengthened access security and compliance for critical servers.",
+    "quote": "“Accops' HyID strengthened access security and compliance for our critical servers, while the digital workspace enabled secure, scalable development workspaces.” | Karthik IT Manager, Tejas Networks"
+   }
+  ],
+  "questions_answered": [
+   "Has anyone replaced Citrix with Accops?",
+   "Who uses Accops VDI?",
+   "Do you have a Citrix displacement case study?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "999567b5799204f3",
+  "words": 87,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#section-10",
+  "title": "Commercial commitments (pending sign-off)",
+  "page_type": "comparison",
+  "products": [],
+  "industries": [],
+  "summary": "Four commercial commitments answering 'how do we know you won't raise prices too': no mid-term repricing, seat reduction at renewal, perpetual licensing remaining available, and renewal pricing stated upfront. The live page's own note says these still need Sales leadership and Legal sign-off, so the bot must not state them until approved.",
+  "facts": [
+   {
+    "fact": "No mid-term repricing: per-seat price fixed for the contract term.",
+    "quote": "No mid-term repricing Your per-seat price is fixed for the contract term.",
+    "caveat": "page marks the commitments NEEDS SIGN-OFF (Sales leadership and Legal)"
+   },
+   {
+    "fact": "Seats can be reduced at renewal.",
+    "quote": "You can reduce seats at renewal If your headcount falls, your licence count and your bill can fall with it.",
+    "caveat": "page marks the commitments NEEDS SIGN-OFF (Sales leadership and Legal)"
+   },
+   {
+    "fact": "Perpetual licensing remains available.",
+    "quote": "Perpetual licensing remains available Buy perpetual or subscription.",
+    "caveat": "page marks the commitments NEEDS SIGN-OFF (Sales leadership and Legal)"
+   },
+   {
+    "fact": "Renewal pricing is stated before the first term is signed.",
+    "quote": "Renewal pricing stated upfront You see the renewal basis before you sign the first term, not at quote time.",
+    "caveat": "page marks the commitments NEEDS SIGN-OFF (Sales leadership and Legal)"
+   }
+  ],
+  "questions_answered": [
+   "How do we know Accops won't raise prices at renewal?",
+   "Can we reduce seats at renewal?",
+   "Is perpetual licensing still available?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "044ba5337ce31485",
+  "words": 123,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#migration",
+  "title": "Four-step migration alongside Citrix",
+  "page_type": "comparison",
+  "products": [],
+  "industries": [],
+  "summary": "The migration runs in four steps alongside the existing Citrix estate: assessment, pilot/POC, phased migration in batches, and go-live with direct OEM support. Nothing is switched off until the customer decides.",
+  "facts": [
+   {
+    "fact": "Nothing is switched off until the customer decides.",
+    "quote": "Nothing is switched off until you decide to switch it off."
+   },
+   {
+    "fact": "Assessment: Accops evaluates the Citrix environment, user profiles and application dependencies and designs a right-fit architecture.",
+    "quote": "We evaluate your current Citrix environment, user profiles and application dependencies, and design a right-fit architecture against what you actually run."
+   },
+   {
+    "fact": "Pilot/POC: a limited user group runs on Accops alongside the existing setup before any rollout commitment.",
+    "quote": "A limited user group runs on Accops alongside the existing setup, so your team gets hands-on experience before any commitment to roll out."
+   },
+   {
+    "fact": "Phased migration: users move in planned batches while both environments coexist.",
+    "quote": "Users move in planned batches. Both environments coexist throughout, so business operations continue uninterrupted."
+   },
+   {
+    "fact": "Go-live: full cutover with direct OEM support.",
+    "quote": "Full cutover with direct OEM support monitoring performance, security and cost outcomes after the transition."
+   }
+  ],
+  "questions_answered": [
+   "How does a migration from Citrix work?",
+   "Can we run a pilot or POC first?",
+   "Will our business be disrupted during migration?",
+   "What support do we get after go-live?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "e11daef2cc4a7f10",
+  "words": 105,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#talk",
+  "title": "Talk to an engineer",
+  "page_type": "comparison",
+  "products": [],
+  "industries": [],
+  "summary": "The call to action: a 20-minute call with an engineer to review a renewal quote, component list or migration constraints, with a reply promised within one business day. Note: on the live page the form has no endpoint wired yet (the page's own placeholder note says so), so the bot should send visitors to accops.com/schedule-a-free-demo until it is.",
+  "facts": [
+   {
+    "fact": "A 20-minute call with an engineer maps current spend against the equivalent Accops estate.",
+    "quote": "A 20-minute call with an engineer. We will map what you are paying for today against what the equivalent Accops estate looks like, and tell you plainly if the switch is not worth it for you."
+   },
+   {
+    "fact": "An engineer replies within one business day.",
+    "quote": "an engineer reviews your details and comes back within one business day."
+   },
+   {
+    "fact": "ISO 27001:2022 certified.",
+    "quote": "ISO 27001:2022 certified"
+   }
+  ],
+  "questions_answered": [
+   "How do I talk to someone about leaving Citrix?",
+   "How fast will Accops respond?",
+   "Will I be put into a marketing email sequence?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "6ee6af98be73a738",
+  "words": 215,
+  "carded_by": "claude",
+  "needs_recard": false
+ },
+ {
+  "url": "https://accops-citrix-lp.vercel.app/#faq",
+  "title": "FAQ: before you talk to us",
+  "page_type": "comparison",
+  "products": [
+   "VDI",
+   "ZTNA",
+   "MFA",
+   "SSO",
+   "Nutanix"
+  ],
+  "industries": [],
+  "summary": "Six FAQs: migrating without downtime, compatibility with existing infrastructure (VMware, Nutanix, Hyper-V; Azure, AWS, GCP, OCI; Active Directory stays), what replaces Citrix, training, licensing models, and price-rise protection.",
+  "facts": [
+   {
+    "fact": "Migration without downtime: Accops runs alongside Citrix and users move in batches while both stay live.",
+    "quote": "Yes. Accops runs alongside your existing Citrix environment during the pilot and phased rollout. Users are moved in batches while both environments stay live, so business continuity is maintained throughout."
+   },
+   {
+    "fact": "Hypervisor-agnostic (VMware, Nutanix, Hyper-V) and integrates with Azure, AWS, GCP and OCI.",
+    "quote": "Accops is hypervisor-agnostic — VMware, Nutanix and Hyper-V — and integrates with Azure, AWS, GCP and OCI."
+   },
+   {
+    "fact": "Existing Active Directory and file servers stay in place.",
+    "quote": "your existing Active Directory and file servers stay in place."
+   },
+   {
+    "fact": "For most mainstream Windows app and desktop workloads Accops covers the same ground; evaluate carefully for HDX-dependent extreme-latency or specialist graphics workloads.",
+    "quote": "For most mainstream Windows app and desktop delivery workloads, Accops covers the same ground with VDI, ZTNA gateway, MFA and SSO in a single platform."
+   },
+   {
+    "fact": "Training: minimal for end users; a genuine learning curve for administrators, scoped into the migration plan.",
+    "quote": "Minimal for end users, who see little change in day-to-day experience. For administrators there is a genuine learning curve moving from Citrix tooling, and we scope that into the migration plan rather than leaving it to documentation."
+   },
+   {
+    "fact": "Licensing: perpetual and subscription, concurrent or named user.",
+    "quote": "Perpetual and subscription, with concurrent or named-user options."
+   },
+   {
+    "fact": "Concurrent licensing suits shift-based and branch operations.",
+    "quote": "Concurrent licensing in particular tends to suit shift-based and branch operations where the named-user count is much higher than peak simultaneous usage."
+   }
+  ],
+  "questions_answered": [
+   "Can we migrate off Citrix without downtime?",
+   "Will Accops work with our existing infrastructure?",
+   "What replaces Citrix after the licensing changes?",
+   "Is training required?",
+   "What licensing models are available?"
+  ],
+  "cta": null,
+  "published": null,
+  "lastmod": null,
+  "fetched_at": "2026-10-26T09:53:35+00:00",
+  "content_hash": "b8851c5bd04e7ce8",
+  "words": 286,
+  "carded_by": "claude",
+  "needs_recard": false
+ }
+]
