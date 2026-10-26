@@ -129,7 +129,11 @@ export default function Widget({ conversationId, hs: hs0, page, roots, origins, 
       if (e.source !== parent || parent === window) return;
       if (x.parent) { if (e.origin === x.parent && e.data?.t === "focus" && !matchMedia("(pointer: coarse)").matches) input.current?.focus(); return; }
       const init = acceptInit(e, origins, parent);
-      if (init) { x.parent = init.origin; if (init.visitor_id) x.visitor = init.visitor_id; }
+      if (init) {
+        x.parent = init.origin;
+        if (init.visitor_id) x.visitor = init.visitor_id;
+        if (!matchMedia("(pointer: coarse)").matches) input.current?.focus({ preventScroll: true }); // keyboard users land in the box; phones keep the keyboard down
+      }
     };
     addEventListener("message", onMsg);
     // Ask each allowed origin; postMessage silently drops all but the one actually framing us. Never "*".
@@ -155,12 +159,14 @@ export default function Widget({ conversationId, hs: hs0, page, roots, origins, 
     return () => clearTimeout(t);
   }, [busy]);
 
-  // Keep the visitor's newest question at the top of the view, so a long answer reads from its start.
-  const meCount = items.filter(i => "me" in i).length;
+  // Keep the visitor's newest question at the top of the view (when it is sent, while it thinks, when the answer
+  // lands), so a long answer reads from its start. Scrolls the thread only, never the host page.
   useEffect(() => {
-    const b = thread.current, m = lastMe.current; // scrolls the thread only, never the host page
-    if (meCount && b && m) b.scrollTo({ top: m.offsetTop - 12, behavior: reducedMotion() ? "auto" : "smooth" });
-  }, [meCount]);
+    const b = thread.current, m = lastMe.current;
+    if (!b || !m) return;
+    const r = requestAnimationFrame(() => b.scrollTo({ top: m.offsetTop - 12, behavior: reducedMotion() ? "auto" : "smooth" }));
+    return () => cancelAnimationFrame(r);
+  }, [items.length, slow]);
 
   const submit = () => {
     const q = text.trim();
