@@ -625,7 +625,7 @@
       "needs_human": "Delete this file or replace it with the real English v4 deck; as it stands it misleads anyone looking for the English Tokyo deck."
     },
     {
-      "source": "sharepoint/v2026-06-30-Confidential-Accops Partner Bootcamp Event Deck 4Hour 2026- Final Version.pptx",
+      "source": "sharepoint/v2026-06-30-Confidential-Accops Partner Bootcamp Event Deck 4Hour 2026.pptx",
       "title": "Accops Partner Sales Bootcamp 2026 - 4-Hour Deck, Confidential Final Version (30 Jun 2026): AI-Exploit Threat, Company and 2030 Roadmap, IAM/ZTNA/VDI Deep Dives with Editions and Licensing, 15 Named Case Studies, Forcepoint SSE, New Launches, Use Cases by Industry",
       "asset_type": "Deck",
       "industry": "Cross-industry",
@@ -709,7 +709,7 @@
       "needs_human": "Re-carded 5 October 2026 after a 4 October re-save. Re-read in full against the new file and nothing substantive changed from the 3 October reading: still 225 slides with 218 carrying text, the same modules, the same 15 named case studies plus the anonymous 'customer of national interest', the same editions, licensing, GA dates and TCO figures, and the Gartner years on slide 16 still corrected. Nothing for a rep to relearn. Slide 46 still has the CEO's real usernames, a bank customer ID and a personal email - replace with dummy values. The 'Lauras Labs' spelling (slide 67, Laurus Labs) is still wrong. Base deck for the 2026 bootcamp family: the May 16 PUBLIC-SHARABLE, June 30 Public-Shareable, MEA (Confidential and Public Version) and Japan (English and Japanese) editions derive from it and now lag this master - decide whether they should be refreshed, in particular the Gartner correction."
     },
     {
-      "source": "sharepoint/v2026-06-30-Public-Shareable-Accops Partner Bootcamp Event Deck 4Hour 2026- Final Version.pptx",
+      "source": "sharepoint/v2026-06-30-Public-Shareable-Accops Partner Bootcamp Event Deck 4Hour 2026.pptx",
       "title": "Accops Partner Sales Bootcamp 2026 - 4-Hour Deck, 'Public-Shareable' Final Version (30 Jun 2026): Case Studies Anonymised and Logo Slides Removed, but Still Marked Internal and Still Carrying the 2030 ARR Target, GA Dates and CEO Identifiers",
       "asset_type": "Deck",
       "industry": "Cross-industry",
@@ -848,7 +848,7 @@
       "publish_year": "2026",
       "expired": false,
       "stale_risk": "16 May 2026 edition, reworked on 30 June; product and GA-date slides are older than the June editions. The Nayara/Unit 8200 slide's claims are unverified (already flagged in the gap report).",
-      "superseded_by": "sharepoint/v2026-06-30-Public-Shareable-Accops Partner Bootcamp Event Deck 4Hour 2026- Final Version.pptx - the later public cut of the same bootcamp deck (June 2026 rework), though it drops the partner-programme section",
+      "superseded_by": "sharepoint/v2026-06-30-Public-Shareable-Accops Partner Bootcamp Event Deck 4Hour 2026.pptx - the later public cut of the same bootcamp deck (June 2026 rework), though it drops the partner-programme section",
       "confidence": 0.78,
       "public_url": "",
       "visibility": "internal",

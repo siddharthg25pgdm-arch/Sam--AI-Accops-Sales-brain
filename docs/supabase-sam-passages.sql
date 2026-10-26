@@ -21,7 +21,7 @@
 
 create table if not exists sam_passages (
   id            text primary key,                     -- '<source>#<ordinal>'
-  source        text not null references sam_asset_cards(source) on delete cascade,
+  source        text not null references sam_asset_cards(source) on delete cascade on update cascade,
   item_id       text,                                 -- the card's registry binding at build time
   doc_version   text not null,                        -- sha256 of the extracted text, 16 hex chars
   ordinal       int  not null check (ordinal >= 0),
