@@ -103,7 +103,7 @@ for (const k of ["log", "warn", "error"]) { const o = console[k]; console[k] = (
 const { ask } = await jiti.import("./web/answer.ts");
 const { Answer } = await jiti.import("./blocks.ts");
 const { qHash } = await jiti.import("./web/normalise.ts");
-const { LEAD } = await jiti.import("./web/fill.ts");
+const { LEAD, accopsFirst } = await jiti.import("./web/fill.ts");
 const config = await jiti.import("../app/api/web/config/route.ts");
 const event = await jiti.import("../app/api/web/event/route.ts");
 
@@ -391,5 +391,11 @@ const everything = JSON.stringify([printed, bodies, N.logs]);
 ok(printed.some(p => /web model openai/.test(p)) && printed.some(p => /web log/.test(p)), "errors were logged");
 for (const v of Object.values(SECRETS)) ok(!everything.includes(v), "a key appeared in a log line, a response or a stored message");
 ok(!everything.includes("CHECKSECRET"), "no key fragment anywhere");
+
+// Highlights only on Accops (27 Oct live test bolded a Citrix strength)
+const live = "Accops offers **gateway built in**, while Citrix needs NetScaler. Accops supports **perpetual or subscription licensing**; Citrix has withdrawn perpetual licensing. Citrix remains more mature for **extreme-latency cases**.";
+const af = accopsFirst(live);
+ok(af.includes("**gateway built in**") && af.includes("**perpetual or subscription licensing**"), "Accops highlights kept");
+ok(!af.includes("**extreme-latency cases**") && af.includes("extreme-latency cases"), "a competitor-only clause loses its highlight, keeps its words");
 
 console.log(`web-answer.check: ${n} assertions passed`);

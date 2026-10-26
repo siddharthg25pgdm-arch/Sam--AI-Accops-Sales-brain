@@ -63,6 +63,12 @@ const docCard = (c: Candidate): Block | null => {
 };
 
 const sentences = (s: string) => s.split(/(?<=[.!?])\s+/).filter(Boolean);
+
+// Highlights go on Accops (Siddharth, 27 Oct 2026): a clause about a competitor that doesn't name Accops keeps its words but
+// loses its ** (the first live answer bolded a Citrix strength). ponytail: static rival list; read core.terms if it grows.
+const RIVAL = /\b(citrix|netscaler|vmware|horizon|omnissa|broadcom|azure virtual desktop|avd|windows 365|zscaler|okta)\b/i;
+export const accopsFirst = (s: string) =>
+  s.split(/(?<=[.!?;])\s+/).map(c => RIVAL.test(c) && !/accops/i.test(c) ? c.replace(/\*\*/g, "") : c).join(" ");
 const words = (s: string) => s.replace(/\*/g, "").split(/\s+/).filter(Boolean).length;
 
 /** The model's written answer -> blocks, or `problems` when it may not be shown (the caller then shows verified facts).
@@ -75,7 +81,7 @@ export function compose(w: Written, cands: Candidate[], pairs: Map<string, Qa>, 
   const cited = [...new Set(w.cites)].map(r => byRef.get(r)).filter((c): c is Candidate => !!c);
   let kept = "", n = 0;
   for (const s of sentences(w.answer.replace(/\s+/g, " ").trim())) { if (n + words(s) > 70) break; kept += `${kept ? " " : ""}${s}`; n += words(s); }
-  const body = emClean(kept).replace(/ {2,}/g, " ").trim();
+  const body = emClean(accopsFirst(kept)).replace(/ {2,}/g, " ").trim();
   const src = cited.map(c => source(c.kind === "qa" ? pairs.get(qaId(c.ref))?.sources?.[0] ?? c.url : c.url)).find(Boolean);
   const problems = [
     ...(!cited.length ? ["no cites"] : []), ...(!body ? ["empty or over 70 words"] : []), ...(body.length > 600 ? ["over 600 chars"] : []),
