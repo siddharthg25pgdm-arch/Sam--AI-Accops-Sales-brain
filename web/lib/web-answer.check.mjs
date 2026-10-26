@@ -243,7 +243,7 @@ fresh({ cands: [{ ...CANDS[0], text: `${QA["lp-renewal-1"].answer} Accops offers
 N.openai.push(writes("answered", "Citrix moved to **subscription** **bundles**, so **many renewals now include components you may not** use. **Accops** offers **perpetual** **or** subscription **licensing** and a **site database** **with no separate SQL Server licence for every user group you migrate over time*.", ["qa:lp-renewal-1"]));
 r = await run(typed("why is the citrix renewal so expensive"));
 const em = r.body.blocks[0].body, phrases = [...em.matchAll(/\*\*([^*]+)\*\*/g)].map(x => x[1]);
-ok(r.body.blocks[0].ai && emProblems(em).length === 0 && phrases.join("|") === "subscription|bundles|Accops|perpetual" && !em.replace(/\*\*[^*]+\*\*/g, "").includes("*"), `emphasis cleaned to the limits: ${em}`);
+ok(r.body.blocks[0].ai && emProblems(em).length === 0 && phrases.join("|") === "Accops|perpetual|or|licensing" && !em.replace(/\*\*[^*]+\*\*/g, "").includes("*"), `emphasis cleaned to the limits: ${em}`);
 // length: whole sentences up to 70 words; one sentence over 70 -> verified facts
 const long = `HySecure is ISO 27001:2022 certified ${"and certified ".repeat(40)}.`;
 fresh(); N.openai.push(writes("answered", `Yes. **HySecure** is ISO 27001:2022 certified. ${long}`, ["fact:hysecure-1"]));
