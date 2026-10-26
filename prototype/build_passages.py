@@ -27,13 +27,13 @@ ROOT = Path(os.environ.get("SAM_CORPUS") or HERE.parent / "corpus")
 TEXT = ROOT / "text"
 CARDS = HERE.parent / "corpus" / "cards"
 # Bump to rebuild every document (the comparison is on doc_version, audience and this).
-EXTRACTOR = "build_passages.py@1"
+EXTRACTOR = "build_passages.py@2"   # @2, 26 Oct 2026: chart and table values on their own line are kept
 INDEXED = (".pdf", ".pptx", ".docx")
 MIN, SOFT, TARGET, MAX = 40, 400, 1200, 2000
 
 MARK = re.compile(r"^--- (page|slide) (\d+) ---[ \t]*$", re.M)
 # Page furniture repeated on every page: page numbers, copyright and confidentiality footers, the URL.
-BOILER = re.compile(r"^(\d{1,3}|.*(©|copyright|all rights reserved).*|(https?://)?(www\.)?accops\.com/?|(accops )?confidential)$", re.I)
+BOILER = re.compile(r"^(.*(©|copyright|all rights reserved).*|(https?://)?(www\.)?accops\.com/?|(accops )?confidential)$", re.I)
 BULLET = re.compile(r"^[•▪●◦▶➢➤✓✔■□○]+\s*")
 EMAIL = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 # International (+...), dashed or dotted groups, an Indian "98765 43210", or 10-12 bare digits. Not plain
@@ -55,12 +55,19 @@ def scrub(s: str) -> str:
     return PHONE.sub(lambda m: "[phone]" if 10 <= sum(ch.isdigit() for ch in m.group()) <= 15 else m.group(), s)
 
 
-def flow(text: str) -> str:
+def page_number(line: str, at: int | None) -> bool:
+    """A bare 1-3 digit line is page furniture only when it is (about) this page's or slide's own number.
+    @1 dropped every bare number, and with it every chart and table value on a line of its own: the Turbo
+    benchmark's "258" (Mbps, OpenVPN) was in six documents' text and in none of their passages."""
+    return line.isdigit() and len(line) <= 3 and (at is None or abs(int(line) - at) <= 2)
+
+
+def flow(text: str, at: int | None = None) -> str:
     """Extracted lines -> one paragraph. A line that ends a sentence or wraps into a lowercase line joins
     with a space; otherwise it was a bullet or a heading, kept apart with " · "."""
     out = ""
     for line in (BULLET.sub("", l.strip()) for l in html.unescape(text).splitlines()):
-        if not line or BOILER.match(line):
+        if not line or BOILER.match(line) or page_number(line, at):
             continue
         if not out:
             out = line
@@ -123,7 +130,8 @@ def passages(body: str, audience: str) -> list[dict]:
     version = hashlib.sha256(body.encode("utf-8")).hexdigest()[:16]
     rows, seen = [], set()
     for loc, text in units(body):
-        for t in pack(scrub(flow(text))):
+        n = loc.get("page") or loc.get("slide")
+        for t in pack(scrub(flow(text, n if n else None))):
             if t.lower() in seen:  # the same footer or disclaimer on every page
                 continue
             seen.add(t.lower())
@@ -196,6 +204,8 @@ def self_check() -> None:
     assert "[email]" in tail and "[phone]" in tail and "password: [redacted]" in tail and "[ip]" in tail, tail
     assert "Hunter2" not in tail and "98765" not in tail and "1,200 concurrent users" in tail and "& scales" in tail, tail
     assert "100 200 500 1000 2000 users" in tail, "figures in a table are not phone numbers"
+    chart = passages("--- page 7 ---\nAccops Turbo throughput, higher is better.\n1011\n258\n7\nMbps\n", "internal")[0]["text"]
+    assert "258" in chart and "1011" in chart and " 7 " not in f" {chart} ", f"chart values stay, the page's own number goes: {chart}"
     assert not any(r["locator"] == {"page": 3} for r in rows), "a page under 40 characters gives no passage"
     assert [r["ordinal"] for r in rows] == list(range(len(rows))) and len({r["doc_version"] for r in rows}) == 1
     assert passages(pdf, "internal")[0]["doc_version"] == rows[0]["doc_version"], "version is the text's hash"
@@ -256,9 +266,10 @@ def main() -> None:
     if a.dry_run:
         print("  dry run: nothing written.")
         return
-    from load_cards import env, rest  # same credentials and project check as the card loader
+    from load_cards import env, rest, rest_all  # same credentials and project check as the card loader
     url, key = env()
-    have = {r["source"]: r for r in rest(url, key, "sam_passages?select=source,doc_version,extractor,audience&ordinal=eq.0&limit=20000") or []}
+    # Paged: a capped read would make every document past the 1,000th look new (re-uploaded nightly).
+    have = {r["source"]: r for r in rest_all(url, key, "sam_passages?select=source,doc_version,extractor,audience&ordinal=eq.0&order=source")}
     changed = [s for s, rows in want.items()
                if (have.get(s) or {}).get("doc_version") != rows[0]["doc_version"]
                or have[s].get("extractor") != EXTRACTOR or have[s].get("audience") != rows[0]["audience"]]

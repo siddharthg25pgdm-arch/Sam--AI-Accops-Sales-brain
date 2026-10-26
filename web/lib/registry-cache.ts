@@ -15,7 +15,7 @@
  *  answer "this exists, here is the link, here is where it lives", which is most of what a rep
  *  needs, but it cannot answer "what outcome did that bank get". Carding fills that in later. */
 import type { Asset } from "./cards";
-import { registry, type RegistryRow } from "./sharepoint";
+import { registry, goneRows, ingestRoots, DEFAULT_ROOT, FALLBACK_ROOTS, type IngestRoot, type RegistryRow } from "./sharepoint";
 import { cardsReady } from "./cards-cache";
 
 const TTL_MS = 5 * 60_000;
@@ -24,7 +24,7 @@ const JUNK_EXT = new Set(["tmp", "lnk", "csv"]);
 // One cache per process, not per route bundle. Next.js gives each route its own module instance,
 // so a plain module-level array would leave /api/ask and the catalogue with separate copies -
 // the same trap events.ts already documents.
-const g = globalThis as unknown as { __samReg?: Asset[]; __samRegAt?: number; __samRegBusy?: boolean };
+const g = globalThis as unknown as { __samReg?: Asset[]; __samRegAt?: number; __samRegBusy?: boolean; __samGone?: Map<string, "deleted" | "archived"> };
 
 /** Office web links arrive as ...Doc.aspx?sourcedoc={GUID}&action=edit. A rep who forwards that
  *  sends the customer to an EDITING surface. Downgrade to a viewer; leave every other URL alone. */
@@ -35,8 +35,12 @@ export function safeLink(url: string): string {
 
 /** Registry row -> Asset. Deliberately conservative: every field SAM has not actually read stays
  *  empty rather than being invented, so a registry-only asset never looks better sourced than it is. */
-export function rowToAsset(r: RegistryRow): Asset {
+export function rowToAsset(r: RegistryRow, roots: IngestRoot[] = FALLBACK_ROOTS): Asset {
   const year = (r.created_at ?? r.modified_at ?? "").slice(0, 4) || null;
+  const root = roots.find(x => x.key === (r.root ?? DEFAULT_ROOT));
+  // Sales Collateral folders read as they always have ("Competition/VDI"); any other root names itself
+  // first, so a rep looking for "Industries/Banking" knows which library folder to open.
+  const folder = root && root.key !== DEFAULT_ROOT ? [root.label, r.folder].filter(Boolean).join("/") : r.folder;
   return {
     inventory_id: null,
     title: r.filename.replace(/\.[^.]+$/, ""),
@@ -49,10 +53,10 @@ export function rowToAsset(r: RegistryRow): Asset {
     brief: "",
     // Read by a human as provenance, and by searchAssets() as part of the match blob, so the
     // folder name ("Competition/ZTNA and VPN") makes the asset findable before it is carded.
-    use_for: r.folder ? `Filed under ${r.folder}` : "",
-    section: r.folder ?? "",
+    use_for: folder ? `Filed under ${folder}` : "",
+    section: folder ?? "",
     file: {
-      path: r.folder ? `${r.folder}/${r.filename}` : r.filename,
+      path: folder ? `${folder}/${r.filename}` : r.filename,
       ext: r.ext ?? "", size_mb: 0, pages: null,
       modified: r.modified_at ?? undefined, year,
     },
@@ -64,7 +68,16 @@ export function rowToAsset(r: RegistryRow): Asset {
     sharepoint_url: safeLink(r.web_url),
     // Stable across rename; bound cards merge on it (allAssets).
     item_id: r.item_id,
+    root: r.root ?? DEFAULT_ROOT,
+    // A bulk-copied folder's dates are copy dates: eligibility must not read a year from them (cards.ts).
+    datesTrusted: root?.trust_file_dates ?? true,
   };
+}
+
+/** Why a card's bound file can no longer answer, or null: the file was deleted, or it now sits in an
+ *  archive folder (zCase Studies (Archive_DONOTUSE), _archieve ...). Read by eligibility() in cards.ts. */
+export function fileGone(itemId: string | undefined): "deleted" | "archived" | null {
+  return (itemId && g.__samGone?.get(itemId)) || null;
 }
 
 /** Cached registry assets. Returns [] until the first load completes, and kicks that load off. */
@@ -83,12 +96,14 @@ export async function refresh(): Promise<number> {
   if (g.__samRegBusy) return g.__samReg?.length ?? 0;
   g.__samRegBusy = true;
   try {
-    const rows = await registry("sales", 5000);
+    const [rows, roots, gone] = await Promise.all([registry("sales", 5000), ingestRoots(), goneRows().catch(() => null)]);
+    // Archived rows come with the registry read; deleted ones need their own (registry() skips them).
+    if (gone) g.__samGone = new Map(gone.map(r => [r.item_id, r.deleted ? "deleted" : "archived"]));
     // Only things a rep could actually use. Archive folders, temp files, shortcuts and CSV exports
     // are tracked in the registry for completeness but must never surface as an answer. Images and
     // videos DO stay: they are mostly logos in "Accops Brand Files" and product videos, which reps ask for.
     const usable = rows.filter(r => r.status !== "archived" && !r.deleted && !JUNK_EXT.has((r.ext ?? "").toLowerCase()));
-    g.__samReg = usable.map(rowToAsset);
+    g.__samReg = usable.map(r => rowToAsset(r, roots));
     g.__samRegAt = Date.now();
     return g.__samReg.length;
   } catch (e) {

@@ -15,7 +15,7 @@ import { latestRatings, FEEDBACK_LABEL, type Rating } from "./feedback";
 /** Distinct reps at which a request is "worth creating". */
 export const WORTH_CREATING = 3;
 // 96 h, not 48: a quiet weekend is normal, and a Monday alarm every week trains everyone to ignore it.
-const FLOW_STALE_H = 96, DELETIONS_STALE_H = 36;
+const FLOW_STALE_H = 96, DELETIONS_STALE_H = 36, STUCK_H = 72;
 
 export type DigestInput = {
   now: string;
@@ -188,7 +188,7 @@ export function buildDigest(i: DigestInput): Digest {
   // lists every file, so a recent clean one ("0 unknown": no file SAM doesn't know about) proves no
   // addition was missed - the library was simply quiet. The first digest (30 Sep) cried wolf on this.
   const snapH = hoursSince(i.sync?.last_run ?? null, i.now);
-  const snapshotClean = snapH !== null && snapH <= DELETIONS_STALE_H && /\b0 unknown\b/.test(i.sync?.last_result ?? "");
+  const snapshotClean = snapH !== null && snapH <= DELETIONS_STALE_H && /\b0 unknown\b/.test(i.sync?.last_result ?? "") && !/missed edits/.test(i.sync?.last_result ?? "");
   if (flowH === null || (flowH > FLOW_STALE_H && !snapshotClean)) health.push({
     title: flowH === null ? "The SharePoint change flow has never written" : `No SharePoint change has reached SAM for ${daysText(flowH)}`,
     detail: `${i.lastFlowWrite ? `Last write ${day(i.lastFlowWrite)}. ` : ""}If files were added or edited since, the Power Automate change flow is probably off, and SAM cannot link to anything new.`,
@@ -203,6 +203,17 @@ export function buildDigest(i: DigestInput): Digest {
     detail: `${u.provider_failures} of ${u.model_attempted || u.questions} questions hit a provider failure in the last 24 hours${w?.model_attempted ? ` (7 days before: ${w.provider_failures} of ${w.model_attempted})` : ""}. Usually Groq's daily token limit; answers fall back to the smaller model or to retrieval.`,
   });
   for (const j of i.jobs ?? []) health.push(j);
+  // Carding that "ran" but left files behind, night after night: a nightly warn is not in jobHealth, and the
+  // Library section only counts the queue. A file waiting over 3 days is a file SAM describes from an old
+  // card, or not at all. Pure renames are not waiting (the bound card still fits; carding_prep skips them).
+  const waiting = q.filter(x => !(x.reason === "renamed" && (x.modified_at ?? "") <= (x.card_updated_at ?? "")))
+    .filter(x => (hoursSince(x.modified_at ?? null, i.now) ?? 0) > STUCK_H);
+  if (waiting.length) health.push({
+    title: `${plural(waiting.length, "file")} waiting more than ${STUCK_H / 24} days to be carded`,
+    detail: `${waiting.slice(0, 3).map(x => `${x.filename} (${x.reason.replace(/_/g, " ")}, ${daysText(hoursSince(x.modified_at ?? null, i.now)!)})`).join("; ")}` +
+      `${waiting.length > 3 ? `; ${waiting.length - 3} more` : ""}. Until carded, answers describe these from an old card or by file name only. ` +
+      `The nightly job cards 15 a night on Siddharth's laptop: check it ran (System tab), or card a backlog by hand.`,
+  });
   if (!i.cardCount) health.push({ title: "The card cache is empty", detail: "SAM is answering from file names only. Check sam_asset_cards and the server log." });
   // The 60-day WhatsApp token dies silently: replies just stop. Three weeks' notice is enough time to
   // make a permanent system-user token (docs/TASK-whatsapp-meta-setup.md, section "Replace the token").

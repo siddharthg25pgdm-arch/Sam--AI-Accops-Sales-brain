@@ -111,11 +111,23 @@ const dirty = { scope: "sales", last_run: h(10), last_result: "snapshot write: 0
 eq(buildDigest({ ...base, lastFlowWrite: h(110), sync: dirty }).lead, "A quiet day. One thing needs a look, at the bottom.", "health only");
 ok(!buildDigest({ ...base, lastFlowWrite: h(120) }).health.some(x => /change has reached SAM/.test(x.title)), "a quiet week with a clean recent snapshot (0 unknown) is not an alarm");
 ok(buildDigest({ ...base, lastFlowWrite: h(120), sync: dirty }).health.some(x => /change has reached SAM/.test(x.title)), "silent flow + snapshot found unknown files = alarm");
+ok(buildDigest({ ...base, lastFlowWrite: h(120), sync: { ...dirty, last_result: "snapshot write: 0 tombstoned, 0 restored, 877 listed, 0 unknown, 3 missed edits caught" } }).health.some(x => /change has reached SAM/.test(x.title)), "silent flow + snapshot caught missed edits = alarm");
 ok(buildDigest({ ...base, lastFlowWrite: h(120), sync: { ...healthy.sync, last_run: h(50) } }).health.some(x => /change has reached SAM/.test(x.title)), "silent flow + stale snapshot = alarm");
 ok(sick.subject.endsWith("5 things to check"), sick.subject);
 const fine = buildDigest({ ...base, lastFlowWrite: h(47), usage: { ...zero, questions: 20, model_attempted: 20, provider_failures: 3 } });
 eq(fine.health.length, 0, "47 h and 15% provider failures are not alarms");
 eq(buildDigest({ ...base, lastFlowWrite: null }).health[0].title, "The SharePoint change flow has never written", "never wrote");
+// Files stuck in the carding queue: 12 nights of "renamed" warns never reached Needs a look (Oct 2026).
+const stuck = buildDigest({ ...base, queue: [
+  { item_id: "a", filename: "Bootcamp.pptx", reason: "renamed", modified_at: h(400), card_updated_at: h(500) },   // renamed AND edited after the card
+  { item_id: "b", filename: "Logo.pdf", reason: "renamed", modified_at: h(400), card_updated_at: h(300) },        // pure rename: the card still fits
+  { item_id: "c", filename: "Fresh.pdf", reason: "uncarded", modified_at: h(20) },                                 // tonight's work, not stuck
+  { item_id: "d", filename: "Old copy.pdf", reason: "uncarded", modified_at: h(400), family_role: "older_version" }, // skipped by design
+  { item_id: "e", filename: "Playbook.docx", reason: "uncarded", modified_at: h(100) }] });
+const s1 = stuck.health.find(x => /waiting more than 3 days/.test(x.title));
+ok(s1 && s1.title.startsWith("2 files") && /Bootcamp\.pptx \(renamed, 17 days\)/.test(s1.detail) && /Playbook\.docx \(uncarded, 4 days\)/.test(s1.detail)
+  && !/Logo|Fresh|Old copy/.test(s1.detail), `stuck queue: ${JSON.stringify(s1)}`);
+ok(!busy.health.some(x => /waiting more than/.test(x.title)), "a queue with no dates (or under 3 days) is not an alarm");
 
 // --- IST dates
 eq(day("2026-09-28T20:00:00Z"), "29 Sep", "IST shifts the day"); eq(day("2026-10-03"), "3 Oct", "bare dates are not shifted");

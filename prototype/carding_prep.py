@@ -21,12 +21,25 @@ skipped and logged; the newest copy of a family carded from another file is card
 
 Why OneDrive: Microsoft Graph is blocked by a Conditional Access policy, but the OneDrive client
 syncs the whole library to this laptop (Siddharth set it to "Always keep on this device").
+
+Several folders (ingestion roots, docs/supabase-sam-ingest-roots.sql): each registry row names its root, and
+each root names its folder under the OneDrive - Accops root on this laptop (sam_ingest_roots.onedrive_folder).
+A root whose folder is not on this laptop is skipped with that reason, not "still syncing".
+
+A renamed file that was also edited after its card is re-carded (reason changed_since_card, flag renamed):
+the queue says "renamed" first, and the skill used to leave renamed files for a human, so an edit hidden
+behind a rename was never re-read (the two Partner Bootcamp decks, 9-26 Oct 2026). `card_source` tells the
+skill which card to update in place: the card is bound to the file by item_id, so its source does not change.
+A pure rename is skipped: the bound card still describes the file.
 """
-import datetime, json, os, shutil, subprocess, sys, urllib.request
+import datetime, json, os, shutil, subprocess, sys, urllib.error, urllib.parse, urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
-ONEDRIVE = Path(os.environ["USERPROFILE"]) / "OneDrive - Accops Systems Private Limited" / "Company - Sales Collateral"
+ONEDRIVE_BASE = Path(os.environ.get("USERPROFILE", "~")) / "OneDrive - Accops Systems Private Limited"
+DEFAULT_ROOT = "sales-collateral"
+# Until sam_ingest_roots exists: today's one root (the same fallback as FALLBACK_ROOTS in web/lib/sharepoint.ts).
+FALLBACK_ROOTS = {DEFAULT_ROOT: {"key": DEFAULT_ROOT, "label": "Sales Collateral", "onedrive_folder": "Company - Sales Collateral"}}
 TEXTABLE = {".pdf", ".docx", ".pptx", ".xlsx"}
 
 
@@ -39,13 +52,47 @@ def env() -> dict:
     return out
 
 
-def queue() -> list[dict]:
+def get(path: str):
     e = env()
     url, key = e["SUPABASE_URL"].rstrip("/"), e["SUPABASE_SERVICE_KEY"]
-    req = urllib.request.Request(f"{url}/rest/v1/sam_carding_queue?select=item_id,folder,filename,reason,modified_at,family_role,canonical_filename"
-                                 f"&order=modified_at.desc.nullslast,item_id&limit=1000",
-                                 headers={"apikey": key, "Authorization": f"Bearer {key}"})
+    req = urllib.request.Request(f"{url}/rest/v1/{path}", headers={"apikey": key, "Authorization": f"Bearer {key}"})
     return json.load(urllib.request.urlopen(req, timeout=60))
+
+
+def queue() -> list[dict]:
+    return get("sam_carding_queue?select=item_id,folder,filename,reason,modified_at,card_updated_at,family_role,canonical_filename"
+               "&order=modified_at.desc.nullslast,item_id&limit=1000")
+
+
+def roots() -> dict[str, dict]:
+    try:
+        return {r["key"]: r for r in get("sam_ingest_roots?select=key,label,onedrive_folder,enabled")} or FALLBACK_ROOTS
+    except urllib.error.HTTPError:  # the table is not created yet
+        return FALLBACK_ROOTS
+
+
+def by_item(table: str, cols: str, ids: list[str]) -> dict[str, dict]:
+    """item_id -> row, 50 ids per request (URL length). {} when a column does not exist yet."""
+    out: dict[str, dict] = {}
+    try:
+        for i in range(0, len(ids), 50):
+            chunk = ",".join('"' + x.replace('"', "") + '"' for x in ids[i:i + 50])
+            for r in get(f"{table}?item_id=in.({urllib.parse.quote(chunk)})&select=item_id,{cols}"):
+                out.setdefault(r["item_id"], r)
+    except urllib.error.HTTPError:
+        return {}
+    return out
+
+
+def local_path(r: dict, rts: dict[str, dict]) -> tuple[Path | None, str | None]:
+    """Where a queue row's file is on this laptop, or (None, why not)."""
+    root = rts.get(r.get("root") or DEFAULT_ROOT)
+    if not root or not root.get("onedrive_folder"):
+        return None, f"root {r.get('root')} has no OneDrive folder configured (sam_ingest_roots.onedrive_folder)"
+    base = ONEDRIVE_BASE / root["onedrive_folder"]
+    if not base.exists():
+        return None, f"the {root['label']} folder is not on this laptop ({base.name}): add the OneDrive shortcut and 'Always keep on this device'"
+    return base.joinpath(*[p for p in (r.get("folder") or "").split("/") if p], r["filename"]), None
 
 
 def log_run(job: str, status: str, summary: str, details: dict | None = None, started_at: str | None = None) -> None:
@@ -63,6 +110,13 @@ def log_run(job: str, status: str, summary: str, details: dict | None = None, st
         print(f"(could not record the run in sam_ops_runs: {ex})")
 
 
+def renamed_and_edited(r: dict) -> dict:
+    """A rename that also changed the file after its card is an edit: re-card it, keeping the card's source."""
+    if r.get("reason") == "renamed" and r.get("card_updated_at") and (r.get("modified_at") or "") > r["card_updated_at"]:
+        return {**r, "reason": "changed_since_card", "renamed": True}
+    return r
+
+
 def plan(rows: list[dict]) -> tuple[list[dict], list[dict]]:
     """Queue rows -> (to consider, skipped), using the file's family (docs/supabase-sam-asset-families.sql).
 
@@ -70,9 +124,14 @@ def plan(rows: list[dict]) -> tuple[list[dict], list[dict]]:
     so a card would be wasted work. The NEWEST copy of a family carded from another file goes first:
     it becomes what answers show, and until it is carded SAM describes it from the old copy's card.
     Everything else keeps the queue's order (most recently modified first)."""
+    rows = [renamed_and_edited(r) for r in rows]
     skipped = [{**r, "why": f"older version of {r.get('canonical_filename') or 'a carded document'} - already carded, answers use the newer one"}
                for r in rows if r.get("family_role") == "older_version"]
     keep = [r for r in rows if r.get("family_role") != "older_version"]
+    # A pure rename: the card is bound by item_id and still describes the file. Nothing to read.
+    skipped += [{**r, "why": "renamed only - the card is still bound to the file and describes it; nothing to re-read"}
+                for r in keep if r.get("reason") == "renamed"]
+    keep = [r for r in keep if r.get("reason") != "renamed"]
     return sorted(keep, key=lambda r: r.get("family_role") != "new_version"), skipped
 
 
@@ -83,6 +142,25 @@ def self_check() -> None:
     todo, skipped = plan(rows)
     assert [r["filename"] for r in todo] == ["v3.pdf", "a.pdf", "b.pdf"], todo
     assert [r["filename"] for r in skipped] == ["old v1.pdf"] and "v2.pdf" in skipped[0]["why"], skipped
+    # Renamed: edited after the card -> re-card in place; renamed only -> skipped, not left for a human every night.
+    todo, skipped = plan([{"filename": "Deck 2026.pptx", "reason": "renamed", "modified_at": "2026-10-09T10:00:00Z", "card_updated_at": "2026-10-05T00:00:00Z"},
+                          {"filename": "Logo.pdf", "reason": "renamed", "modified_at": "2026-09-01T00:00:00Z", "card_updated_at": "2026-09-05T00:00:00Z"}])
+    assert [(r["filename"], r["reason"], r.get("renamed")) for r in todo] == [("Deck 2026.pptx", "changed_since_card", True)], todo
+    assert [r["filename"] for r in skipped] == ["Logo.pdf"] and "renamed only" in skipped[0]["why"], skipped
+    # Roots: the row's root picks the OneDrive folder; a root not synced to this laptop says so.
+    import tempfile
+    global ONEDRIVE_BASE
+    keep_base = ONEDRIVE_BASE
+    with tempfile.TemporaryDirectory() as t:
+        ONEDRIVE_BASE = Path(t)
+        (Path(t) / "Company - Sales Collateral").mkdir()
+        rts = {**FALLBACK_ROOTS, "se": {"key": "se", "label": "2025_Sales Enablement", "onedrive_folder": "Company - 2025_Sales Enablement"}}
+        p, why = local_path({"folder": "Competition/VDI", "filename": "a.pdf"}, rts)
+        assert p == Path(t) / "Company - Sales Collateral" / "Competition" / "VDI" / "a.pdf" and why is None, p
+        p, why = local_path({"root": "se", "folder": "Industries/Banking", "filename": "b.pdf"}, rts)
+        assert p is None and "not on this laptop" in why and "OneDrive shortcut" in why, why
+        assert local_path({"root": "gone", "folder": "", "filename": "c.pdf"}, rts)[0] is None
+    ONEDRIVE_BASE = keep_base
     print("carding_prep self-check: ok")
 
 
@@ -113,6 +191,13 @@ def main() -> None:
 def prep(dry: bool, started: str) -> None:
     limit = int(sys.argv[sys.argv.index("--limit") + 1]) if "--limit" in sys.argv else 15
     rows = queue()
+    rts = roots()
+    where = by_item("sam_sharepoint_files", "root", [r["item_id"] for r in rows])
+    bound = by_item("sam_asset_cards", "source", [r["item_id"] for r in rows if r["reason"] != "uncarded"])
+    for r in rows:
+        r["root"] = where.get(r["item_id"], {}).get("root") or DEFAULT_ROOT
+        if r["item_id"] in bound:  # the card to update in place (its source may carry an older filename)
+            r["card_source"] = bound[r["item_id"]]["source"]
     print(f"queue: {len(rows)} ({', '.join(f'{r} {sum(1 for x in rows if x['reason']==r)}' for r in sorted({x['reason'] for x in rows}))})" if rows else "queue: empty")
     ordered, skipped = plan(rows)
     todo = []
@@ -120,9 +205,11 @@ def prep(dry: bool, started: str) -> None:
     for r in ordered:
         if len(todo) >= limit:
             break
-        src = ONEDRIVE.joinpath(*[p for p in r["folder"].split("/") if p], r["filename"])
         if Path(r["filename"]).suffix.lower() not in TEXTABLE:
             skipped.append({**r, "why": "not a text document"}); continue
+        src, why = local_path(r, rts)
+        if src is None:
+            skipped.append({**r, "why": why}); continue
         if not src.exists():
             skipped.append({**r, "why": "not in the OneDrive folder yet (still syncing?)"}); continue
         dest = ROOT / "corpus" / "sharepoint" / r["filename"]

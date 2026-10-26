@@ -126,7 +126,14 @@ const REG = [
   row("Q13", "Events", "Zeta Tokyo Deck 2026 - English v4.pptx", "Deck"),
   row("Q14", "Events", "Zeta Tokyo Deck 2026 - Japanese v4.pptx", "Deck"),
   row("Q15", "Presentations", "Zeta Blank Template 2026.pptx", "Deck"),
+  // A bulk-copied root (sam_ingest_roots.trust_file_dates = false): every file "modified" in 2026.
+  { ...row("Q30", "Industries/Banking", "Zeta Bulk Playbook.docx", "Other"), root: "bulk" },
+  { ...row("Q31", "Industries/Banking", "Zeta Bulk Case Study.pdf", "Case Study"), root: "bulk" },
 ];
+// Rows that can no longer back a card (goneRows): Q20 sits in an archive folder, Q21 was deleted. Neither is live.
+const GONE = [{ item_id: "Q20", deleted: false }, { item_id: "Q21", deleted: true }];
+const ROOTS = [{ key: "sales-collateral", label: "Sales Collateral", library_path: "Shared Documents/Sales/Sales Collateral", onedrive_folder: "x", trust_file_dates: true, enabled: true },
+  { key: "bulk", label: "Other Sales Tools/Bulk", library_path: "Shared Documents/Sales/Other Sales Tools/Bulk", onedrive_folder: "y", trust_file_dates: false, enabled: true }];
 const CARDS = [
   card("Zeta Portfolio Deck 2021.pptx", "Q1", { title: "Zeta Portfolio Deck (2021)", asset_type: "Deck", publish_year: "2021", brief: "The 2021 zeta portfolio deck." }),
   card("ISO Certificate- Zeta Systems.pdf", "Q2", { title: "Zeta ISO 27001 Certificate (2021)", asset_type: "Certification", publish_year: "2021", brief: "ISO 27001 certificate for zeta." }),
@@ -134,6 +141,9 @@ const CARDS = [
   card("Zeta vs Omega Battlecard.pptx", "Q4", { title: "Zeta vs Omega Battlecard (2022)", asset_type: "Battlecard", publish_year: "2022", competitors: ["Omega"], brief: "Zeta against Omega, feature by feature." }),
   card("Zeta vs Sigma Battlecard.pptx", "Q5", { title: "Zeta vs Sigma Battlecard (2022)", asset_type: "Battlecard", publish_year: "2022", competitors: ["Sigma"], brief: "Zeta against Sigma, feature by feature." }),
   card("Zeta Blank Template 2026.pptx", "Q15", { title: "Zeta Blank Template", asset_type: "Deck", publish_year: "2026", confidence: 0.3, needs_human: "The file is empty: one blank slide.", brief: "An empty zeta deck." }),
+  card("Zeta Archived Case Study.pdf", "Q20", { title: "Zeta Archived Case Study (2025)", asset_type: "Case Study", publish_year: "2025", brief: "A 2025 zeta case study, filed in Archive_DONOTUSE." }),
+  card("Zeta Deleted Brochure.pdf", "Q21", { title: "Zeta Deleted Brochure (2026)", asset_type: "Brochure", publish_year: "2026", brief: "A zeta brochure whose file was deleted." }),
+  card("Zeta Bulk Case Study.pdf", "Q31", { title: "Zeta Bulk Case Study (2025)", asset_type: "Case Study", publish_year: "2025", brief: "A zeta case study read from the bulk folder." }),
 ];
 let pins = [];
 const OVERRIDES = [{ stem: "zetatokyodeck2026englishv4", family_key: "zetatokyodeck", exclude: true, reason: "empty file" }];
@@ -142,6 +152,8 @@ globalThis.fetch = async (url, init = {}) => {
   if (u.includes("groq.stub")) return Response.json({ choices: [{ message: { role: "assistant", content: "No Zeta battlecard for Omega exists.\nPICKS: none" } }], usage: { total_tokens: 10 } });
   if (u.includes("sam_asset_pins")) return Response.json(pins);
   if (u.includes("sam_asset_family_overrides")) return Response.json(OVERRIDES);
+  if (u.includes("sam_ingest_roots")) return Response.json(ROOTS);
+  if (u.includes("sam_sharepoint_files") && u.includes("deleted.is.true")) return Response.json(GONE);
   if (u.includes("sam_sharepoint_files")) return Response.json(REG);
   if (u.includes("sam_asset_cards")) return Response.json(CARDS);
   return Response.json([]);
@@ -170,8 +182,20 @@ ok(!searchAssets({ query: "zeta omega battlecard" }).results.some(h => /Omega/.t
 let r = await ask("zeta vs omega battlecard");
 ok(r.missing && !r.assets.some(a => /Battlecard \(2022\)/.test(a.title)), `an excluded battlecard is not a substitute either; the topic is an honest gap: ${r.text} | ${r.assets.map(a => a.title)}`);
 
-pins = [{ asset_key: "id:Q4", pinned_by: "admin", reason: "still accurate", created_at: "2026-09-30" }];
+// A card whose own file is gone, with no live copy: deleted never answers; archived answers only if pinned.
+ok(!inAnswers("Zeta Archived Case Study.pdf") && byFile("Zeta Archived Case Study.pdf").family.excluded === "the file is in an archive folder in SharePoint", "a card bound to an archived file is out, and says why");
+ok(!inAnswers("Zeta Deleted Brochure.pdf") && byFile("Zeta Deleted Brochure.pdf").family.gone === "deleted", "a card bound to a deleted file is out");
+ok(!searchAssets({ query: "zeta deleted brochure" }).results.some(h => /Deleted Brochure/.test(h.asset.title)), "search never returns a deleted file's card");
+// A bulk-copied root: copy dates are not a year. Uncarded = out until carded; a carded year counts as usual.
+ok(!inAnswers("Zeta Bulk Playbook.docx") && byFile("Zeta Bulk Playbook.docx").family.excluded === "year unknown: this folder's file dates are copy dates", "an uncarded file from a bulk-copied root does not answer on its copy date");
+ok(inAnswers("Zeta Bulk Case Study.pdf"), "a carded 2025 case study from the same root answers");
+ok(byFile("Zeta Bulk Playbook.docx").file.path === "Other Sales Tools/Bulk/Industries/Banking/Zeta Bulk Playbook.docx", "a non-default root's files say which library folder they are in");
+
+pins = [{ asset_key: "id:Q4", pinned_by: "admin", reason: "still accurate", created_at: "2026-09-30" },
+  { asset_key: "id:Q20", pinned_by: "admin", reason: "still the best one", created_at: "2026-10-26" }, { asset_key: "id:Q21", pinned_by: "admin", reason: "x", created_at: "2026-10-26" }];
 await load();
+ok(inAnswers("Zeta Archived Case Study.pdf"), "an admin pin brings an archived file's card back");
+ok(!inAnswers("Zeta Deleted Brochure.pdf"), "a pin never brings a deleted file back");
 ok(inAnswers("Zeta vs Omega Battlecard.pptx") && byFile("Zeta vs Omega Battlecard.pptx").family.pinned && !inAnswers("Zeta vs Sigma Battlecard.pptx"), "a pinned 2022 battlecard answers; its unpinned neighbour does not");
 ok(searchAssets({ query: "zeta omega battlecard" }).results[0]?.asset.title === "Zeta vs Omega Battlecard (2022)", "and search finds it");
 
