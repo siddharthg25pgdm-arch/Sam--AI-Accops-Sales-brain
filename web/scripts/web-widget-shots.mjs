@@ -192,6 +192,7 @@ try {
     pass(`${W}: 3-column comparison renders as stacked cards in the panel`, cards === "grid", cards);
     const overflow = await fr.evaluate(() => [...document.querySelectorAll(".sb-scroll")].some(e => e.scrollWidth > e.clientWidth + 1));
     pass(`${W}: no sideways scroll in any comparison`, !overflow);
+    pass(`${W}: collapsed row details stay hidden`, await fr.evaluate(() => [...document.querySelectorAll("tr.sb-detail[hidden]")].every(e => e.offsetHeight === 0)));
     await shot(page, `${W}-5-compare`);
     // expand a row's detail
     const rowBtn = await fr.$$(".sb-rowbtn");

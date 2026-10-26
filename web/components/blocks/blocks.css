@@ -122,6 +122,7 @@
   .sb-cols-3 tbody td::before { content: attr(data-col); display: block; margin-bottom: 1px; font-size: 11px; font-weight: 600; letter-spacing: .06em;
     text-transform: uppercase; color: var(--sb-ink-3); }
   .sb-cols-3 tbody td:nth-of-type(1)::before { color: var(--sb-navy); }
+  .sb-cols-3 tbody tr[hidden] { display: none; }   /* the grid rule above would otherwise show collapsed details */
   .sb-cols-3 tbody tr.sb-detail:not([hidden]) { display: block; padding: 0 14px 12px; border-bottom: 1px solid var(--sb-line); }
   .sb-cols-3 tbody tr.sb-detail:last-child { border-bottom: 0; }
   .sb-cols-3 tbody tr.sb-detail td::before, .sb-cols-3 td.sb-empty::before { content: none; }

@@ -391,6 +391,7 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   ok(!renderToStaticMarkup(React.createElement(W.AnswerView, { a: bare })).includes("99% faster"), "a Text without a source is not drawn");
   const css = read("components/blocks/blocks.css");
   ok(/@container \(max-width: 479px\)[\s\S]*content: attr\(data-col\)/.test(css), "narrow 3-column tables stack as cards (container query)");
+  ok(/@container \(max-width: 479px\)[\s\S]*tbody tr\[hidden\] \{ display: none; \}/.test(css), "card mode keeps collapsed row details hidden");
   const shell = renderToStaticMarkup(React.createElement(W.default, { conversationId: "c_x", hs: "h", page: "", origins: [], ask: null,
     roots: [{ id: "lp-01", label: "Why did my Citrix renewal go up?" }], talk: { label: "Talk to an expert", url: "https://www.accops.com/schedule-a-free-demo" } }));
   ok(/role="log"[^>]*aria-live="polite"/.test(shell), "thread is a polite live log");
