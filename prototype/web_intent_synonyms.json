@@ -1,0 +1,43 @@
+{
+  "_note": "Hand-kept input to build_intent_index.py (plan 3.2). All strings are compared AFTER normalise(). stop: words that carry no intent (English, question words, light Hinglish). synonyms: one word -> one word, applied before stemming. entity_add: extra spellings for core.terms labels (or new labels). entity_drop_labels / entity_drop_aliases: terms too generic to act as a product/competitor filter. group_entities: entities a page group implies even when the visitor does not type them.",
+  "stop": [
+    "a", "an", "the", "and", "or", "but", "if", "then", "than", "so", "to", "of", "in", "on", "at", "by", "for", "from", "with", "into", "onto", "about", "as", "up", "off", "out", "over",
+    "is", "are", "was", "were", "be", "been", "being", "am", "do", "does", "did", "doing", "done", "have", "has", "had", "having",
+    "can", "could", "will", "would", "shall", "should", "may", "might", "must", "need", "needs",
+    "i", "me", "my", "we", "us", "our", "ours", "you", "your", "yours", "it", "its", "they", "them", "their", "he", "she", "his", "her",
+    "this", "that", "these", "those", "there", "here", "what", "which", "who", "whom", "whose", "when", "where", "why", "how",
+    "any", "some", "all", "each", "every", "much", "more", "most", "very", "really", "just", "also", "too", "still", "already",
+    "please", "pls", "plz", "kindly", "tell", "know", "want", "like", "get", "got", "let", "lets", "s", "t", "d", "ll", "re", "ve", "m",
+    "yes", "no", "not", "dont", "doesnt", "isnt", "wont", "cant", "ok", "okay", "hi", "hello", "hey", "thanks", "thank",
+    "accops", "accop", "solution", "solutions", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+    "kya", "hai", "hain", "ho", "hoga", "hogi", "hoge", "ka", "ki", "ke", "ko", "se", "me", "mein", "pe", "par", "aur", "ya", "bhi", "toh", "to", "kaise", "kaisa", "kaun", "kab", "kyun", "kahan",
+    "karein", "karen", "kare", "karna", "karte", "karta", "karti", "kar", "sakte", "sakta", "skte", "chahiye", "lagega", "lagta", "hum", "humein", "hamara", "hamare", "apna", "apne", "aap", "aapka", "aapke", "chalega", "chalta", "saath", "sath", "wala", "wale", "kitna", "kitne", "kuch", "yeh", "ye", "woh", "wo", "na", "nahi"
+  ],
+  "synonyms": {
+    "licence": "license", "licences": "license", "licenses": "license", "licencing": "license", "licensing": "license", "licensed": "license",
+    "vs": "compare", "versus": "compare", "compared": "compare", "comparison": "compare", "comparing": "compare",
+    "pricing": "price", "priced": "price", "prices": "price", "costs": "cost", "costing": "cost", "kharcha": "cost", "paisa": "cost", "expensive": "cost",
+    "renew": "renewal", "renewals": "renewal", "renewing": "renewal",
+    "try": "trial", "trying": "trial", "trials": "trial", "test": "trial", "testing": "trial", "evaluate": "trial",
+    "organization": "organisation", "organizations": "organisation", "optimization": "optimisation", "optimized": "optimisation",
+    "certificate": "certified", "certification": "certified", "certifications": "certified",
+    "bina": "without", "behtar": "better", "badla": "replace", "switch": "replace", "switching": "replace", "switched": "replace", "substitute": "replace", "replacement": "replace",
+    "time": "timeline", "duration": "timeline", "weeks": "timeline", "months": "timeline", "days": "timeline",
+    "hypervisors": "hypervisor", "clouds": "cloud",
+    "retrain": "training", "retraining": "training", "retrained": "training", "train": "training", "trained": "training",
+    "headquartered": "headquarters", "hq": "headquarters",
+    "customers": "customer",
+    "abroad": "international", "overseas": "international", "globally": "global",
+    "parts": "components", "part": "components", "pieces": "components", "gpus": "gpu", "videos": "video", "uses": "use", "using": "use", "used": "use"
+  },
+  "entity_add": {
+    "Citrix": ["netscaler", "net scaler", "xenapp", "xendesktop", "cvad", "citrix adc", "citrix gateway", "storefront", "hdx", "citrix virtual apps", "citrix daas"],
+    "Oracle": ["oci", "oracle cloud"],
+    "Google": ["gcp", "google cloud"],
+    "Nutanix": ["ahv", "prism central"],
+    "Reliance Jio": ["reliance", "jio", "reliance jio"]
+  },
+  "entity_drop_labels": ["Microsoft", "Cross-industry", "SSE vendors"],
+  "entity_drop_aliases": ["frame", "rbi", "horizontal", "it", "industrial"],
+  "group_entities": {"citrix-lp": ["Citrix"]}
+}
