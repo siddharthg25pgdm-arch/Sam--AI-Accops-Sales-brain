@@ -51,7 +51,7 @@ $vars = [ordered]@{
   WEB_IP_SALT             = (RandomSecret)
   WEB_HS_SECRET           = (RandomSecret)
   WEB_EVAL_TOKEN          = $evalToken
-  WEB_EMBED_ORIGINS       = "https://accops-citrix-lp.vercel.app"
+  WEB_EMBED_ORIGINS       = "https://accops-citrix-lp.vercel.app,https://sam-accops.vercel.app"
   SUPABASE_URL            = $Supabase
   WEB_CHAT_ENABLED        = "1"
 }
