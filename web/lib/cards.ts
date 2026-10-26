@@ -1,5 +1,5 @@
 import raw from "@/data/asset_cards.json";
-import { registryAssets, safeLink } from "./registry-cache";
+import { registryAssets, safeLink, fileGone } from "./registry-cache";
 import { cardAssets, cardMeta, pinnedKeys, familyOverrides, excludedStems } from "./cards-cache";
 import { demotion } from "./feedback";
 import { families, editionScore, stemOf, type FamilyInfo } from "./family";
@@ -21,6 +21,11 @@ export type Asset = {
    *  filename, is what joins a card to its file, because a SharePoint rename changes the filename and
    *  keeps the item_id. */
   item_id?: string;
+  /** The ingestion root (sam_ingest_roots.key) of the registry row, when there is one. */
+  root?: string;
+  /** False when the registry row's SharePoint dates are copy dates (sam_ingest_roots.trust_file_dates):
+   *  then no year is read from them. Undefined on a card, which has no file date of its own. */
+  datesTrusted?: boolean;
   /** Set by allAssets(): the document family (every version and edition of this document) and
    *  whether answers may use it at all. */
   family?: AssetFamily;
@@ -32,6 +37,8 @@ export type AssetFamily = FamilyInfo & {
   /** Why not, when not eligible: "published 2021", "year unknown, last modified 2022". */
   excluded: string | null;
   pinned: boolean;
+  /** Set when a card's own file is gone from the library: deleted, or moved into an archive folder. */
+  gone?: "deleted" | "archived";
 };
 
 const data = raw as unknown as { counts: Record<string, number>; assets: Asset[] };
@@ -142,17 +149,28 @@ function publishYear(a: Asset): number | null {
 }
 /** Eligible for answers, and why not. A carded year is what the document says; without one, the year
  *  SharePoint last saw the file modified stands in, and an unknown year is not eligible. */
-export function eligibility(a: Asset, pins: Set<string> = pinnedKeys()): { eligible: boolean; excluded: string | null; pinned: boolean } {
+export function eligibility(a: Asset, pins: Set<string> = pinnedKeys()): { eligible: boolean; excluded: string | null; pinned: boolean; gone?: "deleted" | "archived" } {
   const pinned = pins.has(pinKey(a));
   // Out whatever the year or a pin: a human exclusion, or a card saying the file is empty.
   const human = excludedStems().get(stemOf((a.file?.path ?? "").split("/").pop() || a.title));
   if (human) return { eligible: false, excluded: human, pinned };
+  // A card whose own file is gone, and no live copy merged in (a live copy brings its verified link).
+  // Deleted beats a pin: SAM citing a file that no longer exists is the worst failure there is.
+  // Archived (zCase Studies (Archive_DONOTUSE) ...) is the library owners saying "do not use": out unless
+  // an admin pins it back. Mirrors `gone` in docs/supabase-sam-ingest-roots.sql.
+  const gone = a.carded && !verified(a) ? fileGone(a.item_id) : null;
+  if (gone === "deleted") return { eligible: false, excluded: "the file was deleted in SharePoint", pinned, gone };
   const m = a.carded ? metaOf(a) : undefined;
-  if (m && cardSaysEmpty(m.confidence, m.needs_human)) return { eligible: false, excluded: "the card says the file is empty", pinned };
+  if (m && cardSaysEmpty(m.confidence, m.needs_human)) return { eligible: false, excluded: "the card says the file is empty", pinned, ...(gone ? { gone } : {}) };
   const doc = publishYear(a);
-  const year = doc ?? (Number((a.file?.modified ?? "").slice(0, 4)) || null);
-  if (pinned || EXEMPT_TYPE.test(a.asset_type) || (year != null && year >= ELIGIBLE_FROM)) return { eligible: true, excluded: null, pinned };
-  return { eligible: false, pinned, excluded: doc ? `published ${doc}` : year ? `year unknown, last modified ${year}` : "year unknown" };
+  // The file's year stands in only where file dates mean something: a bulk-copied folder's are copy dates.
+  const trusted = a.datesTrusted !== false;
+  const year = doc ?? (trusted ? Number((a.file?.modified ?? "").slice(0, 4)) || null : null);
+  if (pinned) return { eligible: true, excluded: null, pinned, ...(gone ? { gone } : {}) };
+  if (gone === "archived") return { eligible: false, excluded: "the file is in an archive folder in SharePoint", pinned, gone };
+  if (EXEMPT_TYPE.test(a.asset_type) || (year != null && year >= ELIGIBLE_FROM)) return { eligible: true, excluded: null, pinned };
+  return { eligible: false, pinned, excluded: doc ? `published ${doc}` : year ? `year unknown, last modified ${year}`
+    : trusted ? "year unknown" : "year unknown: this folder's file dates are copy dates" };
 }
 
 function withFamilies(pool: Asset[], pins: Set<string>): Asset[] {
@@ -241,6 +259,9 @@ function merge(seen: Asset, a: Asset): Asset {
     // The card's binding when there is one, so trustNote() still finds the card's expiry after the
     // merge rewrote file.path to the registry's (possibly renamed) filename.
     item_id: (carded(winner) ? winner.item_id : carded(other) ? other.item_id : undefined) ?? winner.item_id ?? other.item_id,
+    root: winner.root ?? other.root,
+    // Trusted if any registry copy's dates can be trusted; a card alone has no file date to trust.
+    datesTrusted: winner.datesTrusted === true || other.datesTrusted === true ? true : (winner.datesTrusted ?? other.datesTrusted),
     section: filed,
     sharepoint_url: verified(winner) ? winner.sharepoint_url : (verified(other) ? other.sharepoint_url : winner.sharepoint_url),
     // A public URL is a fact wherever it came from, and it is what makes an asset sendable.

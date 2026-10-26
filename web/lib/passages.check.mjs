@@ -35,6 +35,8 @@ const CARDS = [
   card(ISO, "I3", { title: "Zeta ISO 27001 Certificate", type: "Certification", year: "2022", expired: true }),
   card(D24, "I4", { title: "Zeta HySecure Datasheet Old", type: "Datasheet", products: ["HySecure"], year: "2024", superseded_by: `${D26} - newer edition` }),
   card(GG, "I5", { title: "Zeta Analyst Market Guide", type: "Analyst Report", year: "2025", url: "https://www.example-analyst.com/doc/123" }),
+  // Its file was deleted in SharePoint (goneRows): the card and its passages stay in the database, but are never served.
+  card("sharepoint/Zeta Deleted Posture Guide.pdf", "I9", { title: "Zeta Deleted Posture Guide", type: "Whitepaper", year: "2026" }),
 ];
 const P = (source, ordinal, audience, text, locator = { page: ordinal + 1 }) => ({ id: `${source}#${ordinal}`, source, item_id: null, doc_version: "v1",
   ordinal, locator, text, audience, extracted_at: "2026-10-17T01:00:00Z" });
@@ -48,6 +50,7 @@ const ROWS = [
   P(ISO, 0, "internal", "Zeta ISO 27001 certificate covering posture management, valid until 20 September 2025."),
   P(D24, 0, "internal", "Zeta HySecure older edition: device posture on Windows only."),
   P(GG, 0, "public", "Zeta market guide: posture checks are table stakes for ZTNA vendors."),
+  P("sharepoint/Zeta Deleted Posture Guide.pdf", 0, "internal", "Zeta device posture guide whose file was deleted from SharePoint."),
 ];
 const APPROVALS = [{ asset_title: "Zeta HyWorks Brochure 2026", asset_path: null, status: "published", decided_by: "siddharth", decided_at: "2026-10-01T10:00:00Z",
   public_url: "https://www.accops.com/zeta-hyworks.pdf" }];
@@ -70,6 +73,7 @@ globalThis.fetch = async (url, init = {}) => {
     return json(ROWS.filter(r => r.source === src && r.ordinal >= lo && r.ordinal <= hi));
   }
   if (u.includes("sam_asset_cards")) return json(CARDS);
+  if (u.includes("sam_sharepoint_files") && u.includes("deleted.is.true")) return json([{ item_id: "I9", deleted: true }]);
   if (u.includes("sam_sharepoint_files")) return json(REG);
   return json([]);
 };
@@ -107,6 +111,7 @@ const top = r.passages[0];
 ok(top.passage_id === `${D26}#0` && top.audience === "internal" && top.links.internal === "https://propalmsnetwork.sharepoint.com/sites/Company/I1" && top.links.public === null,
   `ranked + linked: ${JSON.stringify(top)}`);
 ok(top.sharing.external_approved === false && top.sharing.basis === "none", "internal = not approved for sharing");
+ok(!srcs(r).includes("sharepoint/Zeta Deleted Posture Guide.pdf"), `a deleted file's passages are never served: ${srcs(r)}`);
 ok(top.freshness.expired === false && top.freshness.superseded === false && top.freshness.year === 2026 && top.freshness.indexed_at, `freshness: ${JSON.stringify(top.freshness)}`);
 ok(!srcs(r).includes(ISO) && !srcs(r).includes(D24), "expired and superseded excluded by default");
 ok(srcs(r).filter(s => s === D26).length <= 3, "at most 3 passages from one document");

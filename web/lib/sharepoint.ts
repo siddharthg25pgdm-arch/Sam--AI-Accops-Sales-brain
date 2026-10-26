@@ -116,8 +116,9 @@ export async function ingestRoots(): Promise<IngestRoot[]> {
       .filter(r => r?.key && r.library_path);
     gRoots.__samRoots = { at: Date.now(), v: v.length ? v : FALLBACK_ROOTS };
   } catch (e) {
-    console.error("sam_ingest_roots unreadable, using the built-in root", e);
-    return c?.v ?? FALLBACK_ROOTS;
+    console.error("sam_ingest_roots unreadable, using the last good list or the built-in root", e);
+    // Held for the TTL like a success, so a missing table is one log line per five minutes, not one per call.
+    gRoots.__samRoots = { at: Date.now(), v: c?.v ?? FALLBACK_ROOTS };
   }
   return gRoots.__samRoots.v;
 }
@@ -362,6 +363,13 @@ export type CardRow = {
 const CARD_COLS = "source,filename,title,asset_type,industry,client,products,competitors,personas," +
   "regulations,key_problem,key_outcomes,brief,use_for,publish_year,expired,expiry_date,stale_risk," +
   "superseded_by,visibility,internal_reason,public_url,confidence,needs_human,batch,item_id";
+
+/** Registry rows that can no longer back a card: deleted, or filed in an archive folder. Small (the archive
+ *  folders hold ~440 rows), read with the registry so a card bound to one stops answering (cards.ts). */
+export async function goneRows(): Promise<{ item_id: string; deleted: boolean }[]> {
+  if (!configured()) return [];
+  return restAll(`sam_sharepoint_files?or=(deleted.is.true,status.neq.active)&select=item_id,deleted&order=item_id`);
+}
 
 /** Every asset card. Explicit column list rather than select=*, so client_actual cannot arrive by
  *  accident when someone adds a column later. */
