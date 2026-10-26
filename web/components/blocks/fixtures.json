@@ -1,0 +1,822 @@
+{
+ "note": "Gallery + blocks.check fixtures, built from corpus/web/qa-citrix-lp.json the way the stage-1 loader maps it. 'data' says what is proposed, blocked or synthetic.",
+ "fixtures": [
+  {
+   "id": "lp-01",
+   "name": "Root question: compare table + CTA + chips",
+   "data": "bank (as the stage-1 loader maps it)",
+   "answer": {
+    "blocks": [
+     {
+      "type": "text",
+      "body": "For most mainstream Windows app and desktop delivery, yes. Accops covers the same ground with VDI, a ZTNA gateway, MFA and SSO in one platform, on infrastructure you already own. If you depend heavily on HDX-specific optimisations for extreme-latency links or specialist graphics, evaluate carefully.",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#faq",
+       "url": "https://accops-citrix-lp.vercel.app/#faq"
+      }
+     },
+     {
+      "type": "compare_table",
+      "title": "Is Accops a real alternative to Citrix?",
+      "columns": [
+       "You need",
+       "Accops"
+      ],
+      "rows": [
+       {
+        "label": "Virtual apps and desktops",
+        "cells": [
+         "HyWorks"
+        ]
+       },
+       {
+        "label": "Secure remote access gateway (ZTNA)",
+        "cells": [
+         "HySecure"
+        ]
+       },
+       {
+        "label": "MFA and SSO",
+        "cells": [
+         "HyID"
+        ]
+       },
+       {
+        "label": "Where it runs",
+        "cells": [
+         "On-prem, hybrid or cloud"
+        ]
+       }
+      ],
+      "footnote": "One platform, one contract.",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#section-1",
+       "url": "https://accops-citrix-lp.vercel.app/#section-1"
+      }
+     },
+     {
+      "type": "cta",
+      "label": "Talk to an expert",
+      "action": "talk_to_sales",
+      "url": "https://www.accops.com/schedule-a-free-demo",
+      "sub": "A solutions engineer, not a sales script."
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-02",
+      "label": "Which Citrix components does Accops replace?"
+     },
+     {
+      "id": "lp-03",
+      "label": "How does Accops compare with Citrix feature by feature?"
+     },
+     {
+      "id": "lp-04",
+      "label": "When is Citrix still the better choice?"
+     }
+    ]
+   }
+  },
+  {
+   "id": "lp-03",
+   "name": "Filterable comparison: groups, accents, row detail",
+   "data": "PROPOSED bank data: group / accent / detail / filters are not in the bank yet (detail texts are verbatim LP quotes)",
+   "answer": {
+    "blocks": [
+     {
+      "type": "text",
+      "body": "On the eight criteria that usually decide it, Accops builds in the gateway, monitoring, site database, printing and ZTNA/MFA/SSO, offers perpetual or subscription licensing, and gives direct OEM support. Citrix's HDX remains the more mature protocol for extreme-latency and specialist graphics cases.",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#comparison",
+       "url": "https://accops-citrix-lp.vercel.app/#comparison"
+      }
+     },
+     {
+      "type": "compare_table",
+      "title": "How does Accops compare with Citrix feature by feature?",
+      "columns": [
+       "Criterion",
+       "Accops",
+       "Citrix"
+      ],
+      "rows": [
+       {
+        "label": "Gateway & load balancing",
+        "cells": [
+         "Built into the platform",
+         "Typically requires NetScaler / ADC, licensed separately"
+        ],
+        "group": "Infrastructure",
+        "accent": 1,
+        "detail": "A Citrix estate needs NetScaler for load balancing, Director for monitoring, SQL Server for the site database and Universal Print Server for printing."
+       },
+       {
+        "label": "Monitoring & session analytics",
+        "cells": [
+         "Built in",
+         "Citrix Director; advanced analytics in higher tiers"
+        ],
+        "group": "Infrastructure",
+        "accent": 1
+       },
+       {
+        "label": "Site database",
+        "cells": [
+         "Bundled; no separate SQL Server licence",
+         "SQL Server required, commonly clustered for HA"
+        ],
+        "group": "Licensing",
+        "accent": 1
+       },
+       {
+        "label": "Printing",
+        "cells": [
+         "Driver-free universal printing included",
+         "Universal Print Server component"
+        ],
+        "group": "Infrastructure",
+        "accent": 1
+       },
+       {
+        "label": "ZTNA, MFA and SSO",
+        "cells": [
+         "Included (HySecure, HyID)",
+         "Separate SKUs or third-party identity products"
+        ],
+        "group": "Security",
+        "accent": 1,
+        "detail": "Included — HySecure ZTNA and HyID MFA/SSO, same vendor"
+       },
+       {
+        "label": "Protocol maturity & WAN optimisation",
+        "cells": [
+         "Production-proven for mainstream workloads",
+         "HDX more mature for extreme-latency and specialist graphics"
+        ],
+        "group": "Infrastructure",
+        "accent": 2,
+        "detail": "HDX remains the more mature protocol for extreme-latency and specialist graphics cases"
+       },
+       {
+        "label": "Licensing model",
+        "cells": [
+         "Perpetual or subscription; concurrent or named user",
+         "Subscription; perpetual withdrawn for new purchases"
+        ],
+        "group": "Licensing",
+        "accent": 1
+       },
+       {
+        "label": "Support model",
+        "cells": [
+         "Direct OEM support; named engineers",
+         "Tiered support, frequently via partner or distributor"
+        ],
+        "group": "Support",
+        "accent": 1
+       }
+      ],
+      "footnote": "Citrix statements are based on publicly available Citrix information. Citrix, NetScaler and HDX are trademarks of Cloud Software Group, Inc.",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#comparison",
+       "url": "https://accops-citrix-lp.vercel.app/#comparison"
+      },
+      "filters": [
+       "Licensing",
+       "Infrastructure",
+       "Security",
+       "Support"
+      ]
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-04",
+      "label": "When is Citrix still the better choice?"
+     },
+     {
+      "id": "lp-15",
+      "label": "Is the Accops display protocol as good as HDX?"
+     }
+    ]
+   },
+   "states": [
+    {
+     "label": "Filter: Licensing",
+     "block": 1,
+     "init": {
+      "filter": "Licensing"
+     }
+    },
+    {
+     "label": "Row expanded (protocol, a caveat row)",
+     "block": 1,
+     "init": {
+      "open": 5
+     }
+    }
+   ]
+  },
+  {
+   "id": "lp-23+lp-03",
+   "name": "Parity row + Differences only",
+   "data": "PROPOSED: 3-column licensing rows derived from lp-23 and lp-03; 'Subscription' is parity (identical cells)",
+   "answer": {
+    "blocks": [
+     {
+      "type": "compare_table",
+      "title": "Which licensing models are available?",
+      "columns": [
+       "Option",
+       "Accops",
+       "Citrix"
+      ],
+      "rows": [
+       {
+        "label": "Perpetual",
+        "cells": [
+         "Yes",
+         "Withdrawn for new purchases"
+        ],
+        "accent": 1
+       },
+       {
+        "label": "Subscription",
+        "cells": [
+         "Yes",
+         "Yes"
+        ]
+       },
+       {
+        "label": "Concurrent or named user",
+        "cells": [
+         "Either",
+         "Per the Citrix edition"
+        ]
+       }
+      ],
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#faq",
+       "url": "https://accops-citrix-lp.vercel.app/#faq"
+      }
+     }
+    ],
+    "chips": []
+   },
+   "states": [
+    {
+     "label": "Differences only on",
+     "block": 0,
+     "init": {
+      "diff": true
+     }
+    }
+   ]
+  },
+  {
+   "id": "lp-05",
+   "name": "Migration stepper (4 steps)",
+   "data": "bank steps; PROPOSED 'need' checklists (taken from the LP's #migration wording)",
+   "answer": {
+    "blocks": [
+     {
+      "type": "text",
+      "body": "Yes. Accops runs alongside your existing Citrix environment during the pilot and phased rollout. Users move in batches while both environments stay live, and nothing is decommissioned until you choose to.",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#faq",
+       "url": "https://accops-citrix-lp.vercel.app/#faq"
+      }
+     },
+     {
+      "type": "steps",
+      "title": "Can we migrate off Citrix without downtime?",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#migration",
+       "url": "https://accops-citrix-lp.vercel.app/#migration"
+      },
+      "steps": [
+       {
+        "title": "Assessment",
+        "body": "Review your Citrix environment, user profiles and application dependencies.",
+        "need": [
+         "Your Citrix environment details",
+         "User profiles",
+         "Application dependencies"
+        ]
+       },
+       {
+        "title": "Pilot / POC",
+        "body": "A limited user group runs on Accops alongside the existing setup.",
+        "need": [
+         "A limited user group"
+        ]
+       },
+       {
+        "title": "Phased migration",
+        "body": "Users move in planned batches; both environments coexist.",
+        "need": [
+         "Planned user batches"
+        ]
+       },
+       {
+        "title": "Go-live & support",
+        "body": "Full cutover with direct OEM support."
+       }
+      ]
+     },
+     {
+      "type": "cta",
+      "label": "Talk to an expert",
+      "action": "talk_to_sales",
+      "url": "https://www.accops.com/schedule-a-free-demo"
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-06",
+      "label": "How long does a Citrix to Accops migration take?"
+     },
+     {
+      "id": "lp-07",
+      "label": "Can we run a pilot or POC before committing?"
+     },
+     {
+      "id": "lp-09",
+      "label": "Do we have to replace our hypervisor, Active Directory or…"
+     }
+    ]
+   },
+   "states": [
+    {
+     "label": "Step 3 of 4",
+     "block": 1,
+     "init": 2
+    },
+    {
+     "label": "Last step",
+     "block": 1,
+     "init": 3
+    },
+    {
+     "label": "3 steps or fewer: plain rail (layout state, first 3 steps)",
+     "block": 1,
+     "props": {
+      "steps": [
+       {
+        "title": "Assessment",
+        "body": "Review your Citrix environment, user profiles and application dependencies.",
+        "need": [
+         "Your Citrix environment details",
+         "User profiles",
+         "Application dependencies"
+        ]
+       },
+       {
+        "title": "Pilot / POC",
+        "body": "A limited user group runs on Accops alongside the existing setup.",
+        "need": [
+         "A limited user group"
+        ]
+       },
+       {
+        "title": "Phased migration",
+        "body": "Users move in planned batches; both environments coexist.",
+        "need": [
+         "Planned user batches"
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "lp-28",
+   "name": "Stat (count-up) + text",
+   "data": "bank (loader keeps the first figure)",
+   "answer": {
+    "blocks": [
+     {
+      "type": "stat",
+      "value": "1000+",
+      "label": "Organisations",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#section-2",
+       "url": "https://accops-citrix-lp.vercel.app/#section-2"
+      }
+     },
+     {
+      "type": "text",
+      "body": "Accops says 1000+ organisations run its products, across 12 countries, supported by 200+ channel partners, including regulated banks and insurers in India and APAC.",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#section-2",
+       "url": "https://accops-citrix-lp.vercel.app/#section-2"
+      }
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-26",
+      "label": "Which banks and regulated organisations use Accops?"
+     }
+    ]
+   }
+  },
+  {
+   "id": "lp-22",
+   "name": "Stat with a long label + case-study source",
+   "data": "bank",
+   "answer": {
+    "blocks": [
+     {
+      "type": "stat",
+      "value": "50%",
+      "label": "lower TCO vs competitive solutions (3rd largest PSB of India)",
+      "source": {
+       "label": "accops.com/case-studies/third-largest-psb",
+       "url": "https://www.accops.com/case-studies/third-largest-psb"
+      }
+     },
+     {
+      "type": "text",
+      "body": "Published Accops case studies report, for example, 50% lower TCO than competitive solutions at India's third largest public sector bank, IT costs down 25% at HPCL, and OpEx optimised by 20% at Maveric Systems. Results depend on the estate.",
+      "source": {
+       "label": "accops.com/case-studies/third-largest-psb",
+       "url": "https://www.accops.com/case-studies/third-largest-psb"
+      }
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-25",
+      "label": "Has anyone replaced Citrix with Accops?"
+     }
+    ]
+   }
+  },
+  {
+   "id": "lp-02-stat",
+   "name": "Non-numeric stat (no count-up)",
+   "data": "stream A's sample pair (lp-02 evidence)",
+   "answer": {
+    "blocks": [
+     {
+      "type": "stat",
+      "value": "8 → 1",
+      "label": "Products to license and patch",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#section-4",
+       "url": "https://accops-citrix-lp.vercel.app/#section-4"
+      }
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-03",
+      "label": "How does Accops compare with Citrix feature by feature?"
+     }
+    ]
+   }
+  },
+  {
+   "id": "lp-13",
+   "name": "Doc card: page (no thumbnail)",
+   "data": "bank (loader keeps the first card)",
+   "answer": {
+    "blocks": [
+     {
+      "type": "text",
+      "body": "Yes. Accops DaaS delivers fully managed virtual desktops across Windows, Windows Server and Linux on a zero-CapEx subscription, and Accops Managed Desktops covers deployment, operations, upgrades, monitoring and support.",
+      "source": {
+       "label": "accops.com/cloud-services/accops-daas",
+       "url": "https://www.accops.com/cloud-services/accops-daas"
+      }
+     },
+     {
+      "type": "doc_card",
+      "title": "Accops Desktop as a Service",
+      "kind": "Page",
+      "summary": "Managed virtual desktops, pay as you consume.",
+      "url": "https://www.accops.com/cloud-services/accops-daas",
+      "action": "read"
+     }
+    ],
+    "chips": []
+   },
+   "states": [
+    {
+     "label": "PDF card, no thumbnail (bank's 2nd card)",
+     "block": 1,
+     "props": {
+      "type": "doc_card",
+      "title": "Accops DaaS brochure (PDF)",
+      "kind": "PDF",
+      "summary": "Multi-tenant or dedicated control plane.",
+      "url": "https://downloads.accops.com/Accops%20DaaS%20Brochure%20V4%202026.pdf",
+      "action": "download"
+     }
+    }
+   ]
+  },
+  {
+   "id": "lp-19",
+   "name": "Doc card: PDF with a first-page thumbnail",
+   "data": "bank, second card; thumb from prototype/build_web_thumbs.py",
+   "answer": {
+    "blocks": [
+     {
+      "type": "text",
+      "body": "Gateway and load balancing are built into the Accops platform. HySecure is a ZTNA gateway for web, SaaS, client-server and VDI apps, with per-application tunnels, contextual checks on device, identity, time and location, and web application protection against OWASP Top 10/20 risks.",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#comparison",
+       "url": "https://accops-citrix-lp.vercel.app/#comparison"
+      }
+     },
+     {
+      "type": "doc_card",
+      "title": "HySecure Gateway datasheet (PDF)",
+      "kind": "PDF",
+      "summary": "Protocols, security and deployment topologies.",
+      "url": "https://downloads.accops.com/Accops%20Hysecure%20Datasheet%20V5%202026.pdf",
+      "action": "download",
+      "thumb": "/web-thumbs/accops-hysecure-datasheet-v5-2026.webp"
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-20",
+      "label": "Are MFA and SSO included, or do we need another identity…"
+     }
+    ]
+   }
+  },
+  {
+   "id": "picker",
+   "name": "Picker: what are you replacing?",
+   "data": "PROPOSED options, each mapped to an existing bank pair",
+   "answer": {
+    "blocks": [
+     {
+      "type": "picker",
+      "prompt": "What are you replacing?",
+      "options": [
+       {
+        "label": "Citrix Virtual Apps and Desktops",
+        "qa_id": "lp-03"
+       },
+       {
+        "label": "Citrix DaaS",
+        "qa_id": "lp-13"
+       },
+       {
+        "label": "NetScaler / Citrix Gateway",
+        "qa_id": "lp-19"
+       },
+       {
+        "label": "Citrix + a separate MFA vendor",
+        "qa_id": "lp-20"
+       }
+      ]
+     }
+    ],
+    "chips": []
+   },
+   "states": [
+    {
+     "label": "Chosen",
+     "block": 0,
+     "init": "lp-19"
+    }
+   ]
+  },
+  {
+   "id": "calculator",
+   "name": "Calculator (BLOCKED: illustrative figures)",
+   "data": "BLOCKED: the LP's $220 / $132 per seat per year are illustrative placeholders; no pair may use this until Siddharth approves sourced figures",
+   "answer": {
+    "blocks": [
+     {
+      "type": "calculator",
+      "title": "Illustrative licence cost by seat count",
+      "input": {
+       "label": "Seats",
+       "min": 100,
+       "max": 5000,
+       "step": 50,
+       "default": 1000,
+       "unit": "seats"
+      },
+      "columns": [
+       "Accops",
+       "Citrix"
+      ],
+      "rows": [
+       {
+        "label": "Per year",
+        "per_unit": [
+         132,
+         220
+        ],
+        "currency": "USD"
+       },
+       {
+        "label": "3-year term",
+        "per_unit": [
+         396,
+         660
+        ],
+        "currency": "USD"
+       }
+      ],
+      "disclaimer": "Illustrative placeholder rates from the comparison page ($132 and $220 per seat per year). Not a quote; your pricing depends on edition and term.",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app",
+       "url": "https://accops-citrix-lp.vercel.app/"
+      }
+     }
+    ],
+    "chips": []
+   },
+   "states": [
+    {
+     "label": "Slider at 4,000 seats",
+     "block": 0,
+     "init": 4000
+    }
+   ]
+  },
+  {
+   "id": "fallback",
+   "name": "Fallback: fixed lead + CTA",
+   "data": "fixed lead line (plan 3.4) + the settings CTA + root questions",
+   "answer": {
+    "lead": "I don't have that on our public pages yet. The team can answer it directly.",
+    "blocks": [
+     {
+      "type": "cta",
+      "label": "Talk to an expert",
+      "action": "talk_to_sales",
+      "url": "https://www.accops.com/schedule-a-free-demo"
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-01",
+      "label": "Is Accops a real alternative to Citrix?"
+     },
+     {
+      "id": "lp-05",
+      "label": "Can we migrate off Citrix without downtime?"
+     }
+    ]
+   }
+  },
+  {
+   "id": "partial",
+   "name": "Partial: fixed lead + closest answer",
+   "data": "fixed lead line + bank",
+   "answer": {
+    "lead": "Not exactly that, but this is the closest we've published:",
+    "blocks": [
+     {
+      "type": "text",
+      "body": "No. Accops is hypervisor-agnostic (VMware, Nutanix, Hyper-V) and integrates with Azure, AWS, GCP and OCI. Your existing Active Directory and file servers stay in place.",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#faq",
+       "url": "https://accops-citrix-lp.vercel.app/#faq"
+      }
+     },
+     {
+      "type": "compare_table",
+      "title": "Do we have to replace our hypervisor, Active Directory or file servers?",
+      "columns": [
+       "Your estate",
+       "With Accops"
+      ],
+      "rows": [
+       {
+        "label": "Hypervisor (VMware, Nutanix, Hyper-V)",
+        "cells": [
+         "Keep it"
+        ]
+       },
+       {
+        "label": "Public cloud (Azure, AWS, GCP, OCI)",
+        "cells": [
+         "Integrates"
+        ]
+       },
+       {
+        "label": "Active Directory",
+        "cells": [
+         "Stays in place"
+        ]
+       },
+       {
+        "label": "File servers",
+        "cells": [
+         "Stay in place"
+        ]
+       }
+      ],
+      "source": {
+       "label": "accops-citrix-lp.vercel.app/#faq",
+       "url": "https://accops-citrix-lp.vercel.app/#faq"
+      }
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-10",
+      "label": "Does Accops run on Nutanix AHV?"
+     },
+     {
+      "id": "lp-12",
+      "label": "Which hypervisors and clouds does Accops support?"
+     }
+    ]
+   }
+  },
+  {
+   "id": "limits",
+   "name": "Limits: every field at its maximum length",
+   "data": "SYNTHETIC layout test, never shown to visitors",
+   "answer": {
+    "lead": "A lead line at the 120 character limit, to see how it wraps inside a 400 pixel panel without clipping or overflow...",
+    "blocks": [
+     {
+      "type": "compare_table",
+      "title": "A comparison title that runs right up to the eighty character limit of a block",
+      "columns": [
+       "Thirty character column header",
+       "Accops",
+       "Citrix"
+      ],
+      "rows": [
+       {
+        "label": "A row label at exactly forty characters!",
+        "cells": [
+         "A value cell at the eighty character limit wraps over several lines in a panel, ",
+         "Short"
+        ],
+        "accent": 2,
+        "detail": "Detail text can run to 240 characters. Detail text can run to 240 characters. Detail text can run to 240 characters. Detail text can run to 240 characters. Detail text can run to 240 characters. Detail text can run to 240 characters. Detail"
+       },
+       {
+        "label": "Short",
+        "cells": [
+         "Built in",
+         "Separate SKU"
+        ]
+       }
+      ],
+      "footnote": "A footnote at the 160 character limit: Citrix statements are based on publicly available Citrix information, as stated on the page, current as of 2026...",
+      "source": {
+       "label": "a-very-long-source-label-of-sixty-characters.accops.com/x/yz",
+       "url": "https://www.accops.com/"
+      }
+     },
+     {
+      "type": "stat",
+      "value": "100,000,000+",
+      "label": "A twelve character value at the contract limit steps the type size down",
+      "source": {
+       "label": "accops-citrix-lp.vercel.app",
+       "url": "https://accops-citrix-lp.vercel.app/"
+      }
+     },
+     {
+      "type": "doc_card",
+      "title": "A document title at the hundred and twenty character limit, which is far longer than any real Accops document title is",
+      "kind": "Datasheet",
+      "meta": "PDF · 2.4 MB · Updated October 2026",
+      "summary": "A summary at the two hundred and twenty character limit clamps to three lines. It should end in an ellipsis rather than pushing the card taller, so a long summary never breaks the rhythm of the thread at all..",
+      "url": "https://www.accops.com/",
+      "action": "download"
+     },
+     {
+      "type": "cta",
+      "label": "Talk to an expert",
+      "action": "talk_to_sales",
+      "url": "https://www.accops.com/schedule-a-free-demo"
+     }
+    ],
+    "chips": [
+     {
+      "id": "lp-01",
+      "label": "A sixty character chip label wraps inside the panel nicely."
+     },
+     {
+      "id": "lp-02",
+      "label": "Which Citrix components does Accops replace?"
+     },
+     {
+      "id": "lp-03",
+      "label": "How does Accops compare with Citrix feature by feature?"
+     }
+    ]
+   }
+  }
+ ]
+}
