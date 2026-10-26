@@ -1,0 +1,693 @@
+{
+ "version": 1,
+ "note": "build_intent_index.py output: Python normalise/tokens/match for each q; intent.ts must agree exactly.",
+ "rows": [
+  {
+   "q": "can accops replace citrix for us",
+   "group": "citrix-lp",
+   "normalised": "can accops replace citrix for us",
+   "tokens": [
+    "replac",
+    "citrix"
+   ],
+   "entities": [
+    "Citrix"
+   ],
+   "expect": "lp-01",
+   "score": 1.0
+  },
+  {
+   "q": "citrx alternative",
+   "group": "citrix-lp",
+   "normalised": "citrx alternative",
+   "tokens": [
+    "citrix",
+    "altern"
+   ],
+   "entities": [
+    "Citrix"
+   ],
+   "expect": "lp-01",
+   "score": 1.0
+  },
+  {
+   "q": "will we still need netscaler if we move to accops",
+   "group": "citrix-lp",
+   "normalised": "will we still need netscaler if we move to accops",
+   "tokens": [
+    "netsca",
+    "move"
+   ],
+   "entities": [
+    "Citrix"
+   ],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "feature comparison between accops and citrix",
+   "group": "citrix-lp",
+   "normalised": "feature comparison between accops and citrix",
+   "tokens": [
+    "featur",
+    "compar",
+    "betwe",
+    "citrix"
+   ],
+   "entities": [
+    "Citrix"
+   ],
+   "expect": "lp-03",
+   "score": 0.7412873741547075
+  },
+  {
+   "q": "featur parity with citirx",
+   "group": "citrix-lp",
+   "normalised": "featur parity with citirx",
+   "tokens": [
+    "featur",
+    "parity",
+    "citrix"
+   ],
+   "entities": [
+    "Citrix"
+   ],
+   "expect": "lp-03",
+   "score": 1.0
+  },
+  {
+   "q": "in which cases is citrix the better choice",
+   "group": "citrix-lp",
+   "normalised": "in which cases is citrix the better choice",
+   "tokens": [
+    "case",
+    "citrix",
+    "better",
+    "choic"
+   ],
+   "entities": [
+    "Citrix"
+   ],
+   "expect": "lp-04",
+   "score": 0.865031670221396
+  },
+  {
+   "q": "can we run citrix and accops side by side while migrating",
+   "group": "citrix-lp",
+   "normalised": "can we run citrix and accops side by side while migrating",
+   "tokens": [
+    "run",
+    "citrix",
+    "side",
+    "whil",
+    "migrat"
+   ],
+   "entities": [
+    "Citrix"
+   ],
+   "expect": "lp-05",
+   "score": 0.5402404670458492
+  },
+  {
+   "q": "how long will it take to migrate from citrix",
+   "group": "citrix-lp",
+   "normalised": "how long will it take to migrate from citrix",
+   "tokens": [
+    "long",
+    "take",
+    "migrat",
+    "citrix"
+   ],
+   "entities": [
+    "Citrix"
+   ],
+   "expect": "lp-06",
+   "score": 1.0
+  },
+  {
+   "q": "migration mein kitna time lagega",
+   "group": "citrix-lp",
+   "normalised": "migration mein kitna time lagega",
+   "tokens": [
+    "migrat",
+    "timeli"
+   ],
+   "entities": [],
+   "expect": "lp-06",
+   "score": 1.0
+  },
+  {
+   "q": "poc possible hai kya",
+   "group": "citrix-lp",
+   "normalised": "poc possible hai kya",
+   "tokens": [
+    "poc",
+    "possib"
+   ],
+   "entities": [],
+   "expect": "lp-07",
+   "score": 0.6225248246893619
+  },
+  {
+   "q": "do end users need to be retrained",
+   "group": "citrix-lp",
+   "normalised": "do end users need to be retrained",
+   "tokens": [
+    "end",
+    "user",
+    "train"
+   ],
+   "entities": [],
+   "expect": "lp-08",
+   "score": 0.6901773427154467
+  },
+  {
+   "q": "do we need to change our active directory",
+   "group": "citrix-lp",
+   "normalised": "do we need to change our active directory",
+   "tokens": [
+    "chang",
+    "activ",
+    "direct"
+   ],
+   "entities": [],
+   "expect": "lp-09",
+   "score": 0.6727079314933033
+  },
+  {
+   "q": "does accops support nutanix",
+   "group": "citrix-lp",
+   "normalised": "does accops support nutanix",
+   "tokens": [
+    "suppor",
+    "nutani"
+   ],
+   "entities": [
+    "Nutanix"
+   ],
+   "expect": "lp-10",
+   "score": 1.0
+  },
+  {
+   "q": "nutanx support",
+   "group": "citrix-lp",
+   "normalised": "nutanx support",
+   "tokens": [
+    "nutani",
+    "suppor"
+   ],
+   "entities": [
+    "Nutanix"
+   ],
+   "expect": "lp-10",
+   "score": 1.0
+  },
+  {
+   "q": "proxmox support",
+   "group": "citrix-lp",
+   "normalised": "proxmox support",
+   "tokens": [
+    "proxmo",
+    "suppor"
+   ],
+   "entities": [
+    "Proxmox"
+   ],
+   "expect": "lp-11",
+   "score": 1.0
+  },
+  {
+   "q": "what cloud platforms does accops support",
+   "group": "citrix-lp",
+   "normalised": "what cloud platforms does accops support",
+   "tokens": [
+    "cloud",
+    "platfo",
+    "suppor"
+   ],
+   "entities": [],
+   "expect": "lp-12",
+   "score": 1.0
+  },
+  {
+   "q": "can accops host and manage our desktops",
+   "group": "citrix-lp",
+   "normalised": "can accops host and manage our desktops",
+   "tokens": [
+    "host",
+    "manag",
+    "deskto"
+   ],
+   "entities": [],
+   "expect": "lp-13",
+   "score": 1.0
+  },
+  {
+   "q": "does accops integrate with azure virtual desktop",
+   "group": "citrix-lp",
+   "normalised": "does accops integrate with azure virtual desktop",
+   "tokens": [
+    "integr",
+    "azur",
+    "virtua",
+    "deskto"
+   ],
+   "entities": [
+    "Azure Virtual Desktop"
+   ],
+   "expect": "lp-14",
+   "score": 0.7317715995574061
+  },
+  {
+   "q": "avd ke saath kaam karta hai",
+   "group": "citrix-lp",
+   "normalised": "avd ke saath kaam karta hai",
+   "tokens": [
+    "avd",
+    "kaam"
+   ],
+   "entities": [
+    "Azure Virtual Desktop"
+   ],
+   "expect": "lp-14",
+   "score": 0.6033368669500948
+  },
+  {
+   "q": "tell me about the photon protocol",
+   "group": "citrix-lp",
+   "normalised": "tell me about the photon protocol",
+   "tokens": [
+    "photon",
+    "protoc"
+   ],
+   "entities": [
+    "Photon"
+   ],
+   "expect": "lp-15",
+   "score": 1.0
+  },
+  {
+   "q": "can we run cad and gpu workloads",
+   "group": "citrix-lp",
+   "normalised": "can we run cad and gpu workloads",
+   "tokens": [
+    "run",
+    "cad",
+    "gpu",
+    "worklo"
+   ],
+   "entities": [],
+   "expect": "lp-16",
+   "score": 0.6846006004232077
+  },
+  {
+   "q": "what security certifications does accops have",
+   "group": "citrix-lp",
+   "normalised": "what security certifications does accops have",
+   "tokens": [
+    "securi",
+    "certif"
+   ],
+   "entities": [],
+   "expect": "lp-17",
+   "score": 1.0
+  },
+  {
+   "q": "does accops help with rbi compliance",
+   "group": "citrix-lp",
+   "normalised": "does accops help with rbi compliance",
+   "tokens": [
+    "help",
+    "rbi",
+    "compli"
+   ],
+   "entities": [],
+   "expect": "lp-18",
+   "score": 1.0
+  },
+  {
+   "q": "regulatory compliance for banks",
+   "group": "citrix-lp",
+   "normalised": "regulatory compliance for banks",
+   "tokens": [
+    "regula",
+    "compli",
+    "bank"
+   ],
+   "entities": [
+    "BFSI"
+   ],
+   "expect": "lp-18",
+   "score": 0.834074646155786
+  },
+  {
+   "q": "can hysecure replace our citrix adc",
+   "group": "citrix-lp",
+   "normalised": "can hysecure replace our citrix adc",
+   "tokens": [
+    "hysecu",
+    "replac",
+    "citrix",
+    "adc"
+   ],
+   "entities": [
+    "HySecure",
+    "Citrix"
+   ],
+   "expect": "lp-19",
+   "score": 0.7359775780894664
+  },
+  {
+   "q": "does accops include sso",
+   "group": "citrix-lp",
+   "normalised": "does accops include sso",
+   "tokens": [
+    "includ",
+    "sso"
+   ],
+   "entities": [],
+   "expect": "lp-20",
+   "score": 1.0
+  },
+  {
+   "q": "what is the per user price",
+   "group": "citrix-lp",
+   "normalised": "what is the per user price",
+   "tokens": [
+    "per",
+    "user",
+    "pric"
+   ],
+   "entities": [],
+   "expect": "lp-21",
+   "score": 1.0
+  },
+  {
+   "q": "what roi have customers seen",
+   "group": "citrix-lp",
+   "normalised": "what roi have customers seen",
+   "tokens": [
+    "roi",
+    "custom",
+    "seen"
+   ],
+   "entities": [],
+   "expect": "lp-22",
+   "score": 0.7113433485739169
+  },
+  {
+   "q": "do you offer perpetual licenses",
+   "group": "citrix-lp",
+   "normalised": "do you offer perpetual licenses",
+   "tokens": [
+    "offer",
+    "perpet",
+    "licens"
+   ],
+   "entities": [],
+   "expect": "lp-23",
+   "score": 0.6849953800800787
+  },
+  {
+   "q": "named user vs concurrent",
+   "group": "citrix-lp",
+   "normalised": "named user vs concurrent",
+   "tokens": [
+    "named",
+    "user",
+    "compar",
+    "concur"
+   ],
+   "entities": [],
+   "expect": "lp-23",
+   "score": 0.8756828637147787
+  },
+  {
+   "q": "how do i know you won't hike the renewal",
+   "group": "citrix-lp",
+   "normalised": "how do i know you won t hike the renewal",
+   "tokens": [
+    "won",
+    "hike",
+    "renewa"
+   ],
+   "entities": [],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "do you have a reference customer that moved off citrix",
+   "group": "citrix-lp",
+   "normalised": "do you have a reference customer that moved off citrix",
+   "tokens": [
+    "refer",
+    "custom",
+    "move",
+    "citrix"
+   ],
+   "entities": [
+    "Citrix"
+   ],
+   "expect": "lp-25",
+   "score": 0.828439469206365
+  },
+  {
+   "q": "insurance companies using accops",
+   "group": "citrix-lp",
+   "normalised": "insurance companies using accops",
+   "tokens": [
+    "insura",
+    "compan",
+    "use"
+   ],
+   "entities": [
+    "BFSI"
+   ],
+   "expect": "lp-26",
+   "score": 0.8083022388059702
+  },
+  {
+   "q": "gartner recognition",
+   "group": "citrix-lp",
+   "normalised": "gartner recognition",
+   "tokens": [
+    "gartn",
+    "recogn"
+   ],
+   "entities": [],
+   "expect": "lp-27",
+   "score": 1.0
+  },
+  {
+   "q": "how many customers does accops have",
+   "group": "citrix-lp",
+   "normalised": "how many customers does accops have",
+   "tokens": [
+    "many",
+    "custom"
+   ],
+   "entities": [],
+   "expect": "lp-28",
+   "score": 0.7527645687645688
+  },
+  {
+   "q": "who provides support after deployment",
+   "group": "citrix-lp",
+   "normalised": "who provides support after deployment",
+   "tokens": [
+    "provid",
+    "suppor",
+    "after",
+    "deploy"
+   ],
+   "entities": [],
+   "expect": "lp-29",
+   "score": 0.6654713646005185
+  },
+  {
+   "q": "support model after go live",
+   "group": "citrix-lp",
+   "normalised": "support model after go live",
+   "tokens": [
+    "suppor",
+    "model",
+    "after",
+    "go",
+    "live"
+   ],
+   "entities": [],
+   "expect": "lp-29",
+   "score": 1.0
+  },
+  {
+   "q": "any presence in japan",
+   "group": "citrix-lp",
+   "normalised": "any presence in japan",
+   "tokens": [
+    "presen",
+    "japan"
+   ],
+   "entities": [],
+   "expect": "lp-30",
+   "score": 0.6115188018883282
+  },
+  {
+   "q": "  Why did my CITRIX renewal go UP?! ",
+   "group": "citrix-lp",
+   "normalised": "why did my citrix renewal go up",
+   "tokens": [
+    "citrix",
+    "renewa",
+    "go"
+   ],
+   "entities": [
+    "Citrix"
+   ],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "ＨｙＳｅｃｕｒｅ　vs\tCitrix\n\nNetScaler",
+   "group": "citrix-lp",
+   "normalised": "hysecure vs citrix netscaler",
+   "tokens": [
+    "hysecu",
+    "compar",
+    "citrix",
+    "netsca"
+   ],
+   "entities": [
+    "HySecure",
+    "Citrix"
+   ],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "hy​secure‍﻿ pri\u0007ce",
+   "group": "citrix-lp",
+   "normalised": "hysecure price",
+   "tokens": [
+    "hysecu",
+    "pric"
+   ],
+   "entities": [
+    "HySecure"
+   ],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "“Zero trust” isn’t ‘magic’",
+   "group": "citrix-lp",
+   "normalised": "zero trust isn t magic",
+   "tokens": [
+    "zero",
+    "trust",
+    "isn",
+    "magic"
+   ],
+   "entities": [],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "Does Accops run on Nutanix AHV ?",
+   "group": "citrix-lp",
+   "normalised": "does accops run on nutanix ahv",
+   "tokens": [
+    "run",
+    "nutani",
+    "ahv"
+   ],
+   "entities": [
+    "Nutanix"
+   ],
+   "expect": "lp-10",
+   "score": 1.0
+  },
+  {
+   "q": "ﬁle servers – keep them? ²",
+   "group": "citrix-lp",
+   "normalised": "file servers keep them 2",
+   "tokens": [
+    "file",
+    "server",
+    "keep"
+   ],
+   "entities": [],
+   "expect": "lp-09",
+   "score": 0.8139530167999919
+  },
+  {
+   "q": "सिट्रिक्स से माइग्रेशन",
+   "group": "citrix-lp",
+   "normalised": "सिट्रिक्स से माइग्रेशन",
+   "tokens": [
+    "सिट्रिक्स",
+    "से",
+    "माइग्रेशन"
+   ],
+   "entities": [],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "café naïve NUTANIX",
+   "group": "citrix-lp",
+   "normalised": "café naïve nutanix",
+   "tokens": [
+    "café",
+    "naïve",
+    "nutani"
+   ],
+   "entities": [
+    "Nutanix"
+   ],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "pilot\u001cpoc",
+   "group": "citrix-lp",
+   "normalised": "pilotpoc",
+   "tokens": [
+    "pilotp"
+   ],
+   "entities": [],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "Is Accops ISO 27001 certified?",
+   "group": "home",
+   "normalised": "is accops iso 27001 certified",
+   "tokens": [
+    "iso",
+    "27001",
+    "certif"
+   ],
+   "entities": [],
+   "expect": "lp-17",
+   "score": 1.0
+  },
+  {
+   "q": "",
+   "group": "citrix-lp",
+   "normalised": "",
+   "tokens": [],
+   "entities": [],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "?!...",
+   "group": "citrix-lp",
+   "normalised": "",
+   "tokens": [],
+   "entities": [],
+   "expect": null,
+   "score": null
+  }
+ ]
+}
