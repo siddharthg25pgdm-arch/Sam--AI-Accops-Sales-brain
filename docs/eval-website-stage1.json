@@ -1,5 +1,5 @@
 {
-  "about": "Visitor eval for the website chatbot, stage 1 (plan 8.1). 30 Citrix-LP questions: 10 cost/renewal, 6 migration/risk, 6 compatibility, 4 security/compliance, 4 general; 17 are not in the bank (paraphrases or new; in_bank false); 3 are traps. Run: node web/scripts/web-eval.mjs <base> (live, x-sam-eval) or --dry (in-process, network stubbed). `accept`: what counts as a correct answer, judged on the FIRST block that identifies a record: a qa id, `url:<prefix>` for a page fact or page card, `@fallback` / `@guard` for an honest non-answer. A later block in `accept` scores 'partly'. `forbid`: regexes (case-insensitive) that must not appear anywhere in the answer; a hit counts as an invented claim. Written without looking at what the pipeline returns.",
+  "about": "Visitor eval for the website chatbot, stage 1 (plan 8.1). 30 Citrix-LP questions: 10 cost/renewal, 6 migration/risk, 6 compatibility, 4 security/compliance, 4 general; 16 are not in the bank (paraphrases or new; in_bank false; g03 became a bank question on 27 Oct); 3 are traps. Run: node web/scripts/web-eval.mjs <base> (live, x-sam-eval) or --dry (in-process, network stubbed). `accept`: what counts as a correct answer, judged on the FIRST block that identifies a record: a qa id, `url:<prefix>` for a page fact or page card, `@fallback` / `@guard` for an honest non-answer. A later block in `accept` scores 'partly'. `forbid`: regexes (case-insensitive) that must not appear anywhere in the answer; a hit counts as an invented claim. Written without looking at what the pipeline returns.",
   "page": "https://accops-citrix-lp.vercel.app/",
   "cases": [
     { "id": "c01", "cat": "cost", "in_bank": true,  "q": "How much does Accops cost compared with Citrix?", "accept": ["lp-21"] },
@@ -24,7 +24,8 @@
 
     { "id": "p01", "cat": "compatibility", "in_bank": true,  "q": "Does Accops run on Nutanix AHV?", "accept": ["lp-10", "lp-12"] },
     { "id": "p02", "cat": "compatibility", "in_bank": false, "q": "Can we keep our VMware vSphere hosts?", "accept": ["lp-09", "lp-12"] },
-    { "id": "p03", "cat": "compatibility", "in_bank": false, "q": "Is Microsoft Hyper-V supported?", "accept": ["lp-12", "lp-09"] },
+    { "id": "p03", "cat": "compatibility", "in_bank": false, "q": "Is Microsoft Hyper-V supported?", "accept": ["lp-62", "lp-12"],
+      "note": "Relabelled 28 Oct: lp-62 (Does Accops support Hyper-V and OpenShift?, approved 27 Oct, after this set was written) is the bank's own Hyper-V pair and opens 'Yes'. lp-09 dropped: it opens 'No.' (to 'do we have to replace'), which misleads on this yes/no." },
     { "id": "p04", "cat": "compatibility", "in_bank": true,  "q": "Does Accops work with Azure Virtual Desktop?", "accept": ["lp-14"] },
     { "id": "p05", "cat": "compatibility", "in_bank": false, "q": "Will our existing thin clients work with Accops?", "accept": ["@fallback", "url:https://www.accops.com/"],
       "note": "No bank pair covers thin clients: the honest answer is the fallback, or a public accops.com fact about endpoints." },
@@ -38,7 +39,8 @@
 
     { "id": "g01", "cat": "general", "in_bank": true,  "q": "Is Accops a real alternative to Citrix?", "accept": ["lp-01"] },
     { "id": "g02", "cat": "general", "in_bank": false, "q": "Who owns Accops?", "accept": ["lp-31"] },
-    { "id": "g03", "cat": "general", "in_bank": false, "q": "Do you have customers in the Middle East?", "accept": ["lp-30", "lp-26"] },
+    { "id": "g03", "cat": "general", "in_bank": true, "q": "Do you have customers in the Middle East?", "accept": ["lp-74", "lp-30"],
+      "note": "Relabelled 28 Oct: lp-74 (approved 27 Oct, after this set was written) is this exact question; lp-30 also covers the Middle East. lp-26 dropped: it lists Indian banks and insurers only." },
     { "id": "g04", "cat": "general", "in_bank": false, "trap": "gartner", "q": "Are you a Gartner leader?", "accept": ["@fallback", "@guard", "lp-28", "lp-25"],
       "forbid": ["gartner", "magic\\s+quadrant"], "note": "Gartner wording awaits legal; it is a blocked pattern." }
   ]
