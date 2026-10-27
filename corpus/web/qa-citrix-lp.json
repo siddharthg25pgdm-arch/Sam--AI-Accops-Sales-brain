@@ -2148,7 +2148,11 @@
    "how big is accops as a company",
    "number of customers",
    "how many countries",
-   "how many partners"
+   "how many partners",
+   "how many customers does accops have",
+   "accops customer base",
+   "how many clients does accops have",
+   "how many companies use accops"
   ],
   "short_answer": "**1000+ organisations** run Accops across **12 countries**, supported by **200+ channel partners**. They include regulated banks and insurers in India and APAC, and deployments span BFSI, government, healthcare, manufacturing and IT/ITeS.",
   "visual": {
@@ -2204,7 +2208,7 @@
   ],
   "status": "draft",
   "origin": "claude_draft",
-  "notes": "CONTRADICTION: /about-us says 900+ customers; a 2025 article on the site says ~1,000 organisations with ~700 active customers; why-accops implies 11 countries (India, Japan, UAE, Saudi Arabia and 7 others). Fix the site, then approve."
+  "notes": "Siddharth confirmed 1000+ customers on 27 Oct 2026 (the home page and the LP say 1000+). Still on the site: /about-us says 900+ customers, a 2025 article says ~1,000 organisations with ~700 active customers, and why-accops implies 11 countries (content gap logged in docs/CONTENT-GAPS-2026-09-25.md). The 4 aliases added 27 Oct are also in prototype/web_intent_learned.json: the loader never touches an approved pair, so that is how they reach the live index."
  },
  {
   "id": "lp-29",
@@ -5775,5 +5779,54 @@
   "status": "draft",
   "origin": "claude_draft",
   "notes": ""
+ },
+ {
+  "id": "lp-79",
+  "parent_id": "lp-31",
+  "nudge_weight": 65,
+  "question": "Who leads Accops?",
+  "aliases": [
+   "who is the ceo of accops",
+   "accops ceo",
+   "founder of accops",
+   "who runs accops",
+   "accops leadership team",
+   "managing director of accops"
+  ],
+  "short_answer": "Accops is led by **Vijender Yadav**, its **Co-founder, MD & CEO**. Founded in October 2012, Accops is headquartered in Pune, India.",
+  "visual": null,
+  "cta": "none",
+  "cta_url": null,
+  "pages": [
+   "citrix-lp",
+   "general",
+   "home"
+  ],
+  "regions": [],
+  "sources": [
+   "https://www.accops.com/about-us",
+   "https://www.accops.com/about-us/vijender-yadav"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.accops.com/about-us",
+    "quote": "Vijender Yadav | Co-founder, MD & CEO"
+   },
+   {
+    "url": "https://www.accops.com/about-us",
+    "quote": "Founded in October 2012, Accops is headquartered in Pune, India"
+   },
+   {
+    "url": "https://www.accops.com/about-us/vijender-yadav",
+    "quote": "Vijender Yadav is the Co-founder, Managing Director, and CEO of Accops"
+   }
+  ],
+  "needs_approval": true,
+  "approval_reasons": [
+   "leadership claim"
+  ],
+  "status": "draft",
+  "origin": "claude_draft",
+  "notes": "Siddharth confirmed 27 Oct 2026: 'CEO name is Vijender'. Wording is the /about-us team card's. Never name Harish Menon: 2022-23 news posts on accops.com still call him CEO (content gap logged in docs/CONTENT-GAPS-2026-09-25.md)."
  }
 ]

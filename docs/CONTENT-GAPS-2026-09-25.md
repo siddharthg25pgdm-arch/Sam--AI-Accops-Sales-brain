@@ -407,3 +407,21 @@ really a 104-slide product catalogue. "Calculatore in sales tools.txt" is empty.
 - The Gartner Japan summit deck is the only sustainability / ESG material.
 - The VDI-Benefits-2 draft has a five-lens VDI business-case framework worth finishing.
 - A 24]7.ai hybrid-cloud BPO proposal could become a case study.
+
+---
+
+## Update, 27 October: accops.com says two different things (found by the website chatbot)
+
+The website chatbot answers only from accops.com and the Citrix LP, so a contradiction on the site becomes a wrong
+answer. Siddharth confirmed both facts below on 27 Oct 2026, and the bot now states them. The site still needs fixing.
+
+- **Who the CEO is.** The About Us page names **Vijender Yadav, Co-founder, MD & CEO** (confirmed). Four news posts still
+  call **Harish Menon** the CEO: "Accops appoints Harish Menon as the Chief Executive Officer" (7 Jul 2022), the two
+  GITEX 2022 interviews ("Partnering with MENA customers to build future-ready secure workspace", "Securing the Digital
+  Workspace") and "Accops recognized in the 2023 Gartner Market Guide for Desktop as a Service" (29 Mar 2023). Add a
+  note to those posts or unpublish them.
+- **How many customers.** The home page and the Citrix LP say **1000+** (confirmed). The About Us stats strip still says
+  **900+ customers**, and a 2025 article on the site says about 1,000 organisations with about 700 active customers.
+  Change About Us to 1000+.
+- **Countries** (not yet confirmed): the home page, About Us and the LP say 12 countries; Why Accops lists India, Japan,
+  UAE, Saudi Arabia "and 7 other countries", which is 11.

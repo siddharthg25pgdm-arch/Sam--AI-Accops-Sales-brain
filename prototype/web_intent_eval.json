@@ -249,7 +249,7 @@
     ["how much does hysecure cost", null, "other"],
     ["does hyid run on proxmox", null, "other"],
     ["can we migrate from vmware horizon", null, "other"],
-    ["who is the ceo of accops", null, "other"],
+    ["who is the ceo of accops", "lp-79", "para"],
     ["does accops have a mobile app", null, "other"],
     ["what is accops annual revenue", null, "other"],
     ["are there any job openings", null, "other"],
