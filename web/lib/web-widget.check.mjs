@@ -5,7 +5,10 @@
  *     kill switch; every teaser rule of plan 7.1; the iframe only on first interaction; the bridge ignores a foreign
  *     origin or window and answers only to the iframe's origin; dataLayer / beacons carry no text; #anchor CTA;
  *     the mobile scroll lock; the lift above a bottom bar; server strings only ever set as textContent; page-aware
- *     (27 Oct): the section most in view picks the teaser, goes to /embed as sec and to the widget on a reopen.
+ *     (27 Oct): the section most in view picks the teaser, goes to /embed as sec and to the widget on a reopen;
+ *     welcome-back memory (27 Oct): the device id (v4 UUID, 90 days, localStorage only when the config says persist,
+ *     else this session; stale / junk ids replaced), sent to config only when stored, always to /embed and the events,
+ *     one page_viewed beacon per load, nothing stored or sent under the kill switch.
  *  3. The widget bridge (app/embed/bridge.ts): init only from an allowed parent; events strip anything but name/id/source/ref.
  *  4. frame-ancestors on /embed only (next.config.ts), from the same origin list the widget trusts.
  *  5. /embed (page.tsx): notFound while inert; when on, a handshake that verifyHs accepts, cleaned page + q + sec, the starters.
@@ -42,9 +45,10 @@ ok(!/innerHTML\s*=(?![^;]*CSS[^;]*HTML)/.test(src), "innerHTML only ever takes t
 
 // ---------- 2. the loader in a fake DOM ----------
 const BASE = "https://sam-accops.vercel.app", LP = "https://accops-citrix-lp.vercel.app";
-class Store { constructor(o = {}) { this.m = { ...o }; } getItem(k) { return k in this.m ? this.m[k] : null; } setItem(k, v) { this.m[k] = String(v); } }
+class Store { constructor(o = {}) { this.m = { ...o }; } getItem(k) { return k in this.m ? this.m[k] : null; } setItem(k, v) { this.m[k] = String(v); } removeItem(k) { delete this.m[k]; } }
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/, NOV = /&vid=[0-9a-f-]{36}$/; // NOV: the src without its device id
 
-function boot({ width = 1280, consent = false, teaser = "15", avoid = null, pg = null, origin = LP, config = { enabled: true, teaser: { after_s: 15, qa_id: "lp-01", label: "Why did my Citrix renewal go up?" }, chips: [{ id: "lp-03", label: "Compare licensing" }, { id: "lp-05", label: "How does migration work?" }] },
+function boot({ width = 1280, persist = false, teaser = "15", avoid = null, pg = null, origin = LP, config = { enabled: true, teaser: { after_s: 15, qa_id: "lp-01", label: "Why did my Citrix renewal go up?" }, chips: [{ id: "lp-03", label: "Compare licensing" }, { id: "lp-05", label: "How does migration work?" }] },
   ss = new Store(), ls = new Store(), start = Date.UTC(2026, 9, 27), talk = false, avoidRect = null, sections = [] } = {}) {
   const t = { now: start, timers: new Map(), id: 0, posts: [], beacons: [], opened: [], fetches: [], ios: [], docL: {}, winL: {} };
   const on = (bag, k, f) => (bag[k] ||= []).push(f);
@@ -84,10 +88,11 @@ function boot({ width = 1280, consent = false, teaser = "15", avoid = null, pg =
     querySelector: s => (s === avoid ? avoidEl : null), addEventListener: (k, f) => on(t.docL, k, f) };
   const timer = every => (fn, ms = 0) => { const id = ++t.id; t.timers.set(id, { at: t.now + ms, fn, every: every ? ms : 0 }); return id; };
   const win = {
-    document: doc, location: { origin, pathname: "/", href: `${origin}/` }, innerWidth: width, innerHeight: 800, SAM_CONSENT: consent,
+    document: doc, location: { origin, pathname: "/", href: `${origin}/` }, innerWidth: width, innerHeight: 800,
     sessionStorage: ss, localStorage: ls, crypto: globalThis.crypto, URL, Blob, Promise,
     navigator: { sendBeacon: (u, b) => { t.beacons.push([u, b]); return true; } },
-    fetch: async u => { t.fetches.push(u); const c = typeof config === "function" ? config(u) : config; return c ? { ok: true, json: async () => c } : { ok: false, json: async () => ({}) }; },
+    fetch: async u => { t.fetches.push(u); const c0 = typeof config === "function" ? config(u) : config, c = c0 && persist ? { ...c0, persist: true } : c0;
+      return c ? { ok: true, json: async () => c } : { ok: false, json: async () => ({}) }; },
     setTimeout: timer(false), setInterval: timer(true), clearTimeout: id => t.timers.delete(id), clearInterval: id => t.timers.delete(id),
     requestIdleCallback: f => win.setTimeout(f, 1), requestAnimationFrame: f => { f(); return 1; }, matchMedia: () => ({ matches: false }),
     IntersectionObserver: class { constructor(cb) { Object.assign(this, { cb, els: [] }); t.ios.push(this); } observe(el) { this.els.push(el); } },
@@ -162,7 +167,7 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   eq(again.sh(".t").className, "", "once a session");
   // a chip opens the chat on that question
   b.sh(".tc").children[1].fire("click");
-  eq(b.sh(".f").children[0].src, `${BASE}/embed?page=${encodeURIComponent(`${LP}/`)}&q=lp-05`, "chip opens /embed with q");
+  eq(b.sh(".f").children[0].src.replace(NOV, ""), `${BASE}/embed?page=${encodeURIComponent(`${LP}/`)}&q=lp-05`, "chip opens /embed with q");
   eq(b.dl().slice(-2).map(e => [e.sam_event, e.sam_qa_id]), [["popup_clicked", "lp-05"], ["chat_opened", "lp-05"]], "popup_clicked + chat_opened");
 }
 // only visible time counts; pointer move also engages; config after_s when no data-teaser; data-teaser=0 = never
@@ -211,13 +216,13 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   await b.advance(15_000);
   eq(b.sh(".t").className, "t m", "pill under 640 px");
 }
-// dismissal: session only without consent, 30 days with consent; Esc dismisses
+// dismissal: session only when the visitor id is session-only (persist:false), 30 days where it persists; Esc dismisses
 {
   const ls = new Store();
   const b = boot({ ls });
   await b.advance(10); b.fireWin("scroll"); await b.advance(15_000);
   b.sh(".tx").fire("click");
-  eq([b.sh(".t").hidden, b.ss.getItem("acc_chat_td"), ls.getItem("acc_chat_td")], [true, "1", null], "no consent: dismissed for the session only");
+  eq([b.sh(".t").hidden, b.ss.getItem("acc_chat_td"), ls.getItem("acc_chat_td")], [true, "1", null], "persist:false: dismissed for the session only");
   eq(b.dl().at(-1).sam_event, "popup_dismissed", "popup_dismissed tracked");
   const next = boot({ ls }); // a new session
   await next.advance(10); next.fireWin("scroll"); await next.advance(15_000);
@@ -226,18 +231,18 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   eq(next.sh(".t").hidden, true, "Esc dismisses");
 
   const cls = new Store(), t0 = Date.UTC(2026, 9, 27);
-  const c = boot({ consent: true, ls: cls, start: t0 });
+  const c = boot({ persist: true, ls: cls, start: t0 });
   await c.advance(10); c.fireWin("scroll"); await c.advance(15_000);
   c.sh(".tx").fire("click");
-  ok(Number(cls.getItem("acc_chat_td")) > 0, "consent: dismissal stored for 30 days");
-  const d = boot({ consent: true, ls: cls, start: t0 + 29 * 864e5 });
+  ok(Number(cls.getItem("acc_chat_td")) > 0, "persist: dismissal stored for 30 days");
+  const d = boot({ persist: true, ls: cls, start: t0 + 29 * 864e5 });
   await d.advance(10); d.fireWin("scroll"); await d.advance(15_000);
   eq(d.sh(".t").className, "", "still dismissed on day 29");
-  const e = boot({ consent: true, ls: cls, start: t0 + 31 * 864e5 });
+  const e = boot({ persist: true, ls: cls, start: t0 + 31 * 864e5 });
   await e.advance(10); e.fireWin("scroll"); await e.advance(15_000);
   eq(e.sh(".t").className, "t", "back after 30 days");
-  ok(cls.getItem("acc_chat_v")?.startsWith("v_") && !new Store().getItem("acc_chat_v"), "visitor id kept across visits only with consent");
-  eq(ls.getItem("acc_chat_v"), null, "no consent: visitor id not persisted");
+  ok(UUID.test(cls.getItem("acc_chat_v")?.split(".")[0]), "persist: visitor id kept on the device");
+  eq(ls.getItem("acc_chat_v"), null, "persist:false: visitor id not kept on the device");
 }
 // the iframe, the bridge, events, close, CTA
 {
@@ -247,7 +252,7 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   b.html.style.overflow = "auto";
   btn.fire("click");
   const fr = wrap.children[0];
-  eq([fr.tag, fr.src, fr.title, fr.attrs.referrerpolicy, fr.attrs.allow], ["iframe", `${BASE}/embed?page=${encodeURIComponent(`${LP}/`)}`, "Ask Accops", "strict-origin", ""], "iframe created on the first click");
+  eq([fr.tag, fr.src.replace(NOV, ""), fr.title, fr.attrs.referrerpolicy, fr.attrs.allow], ["iframe", `${BASE}/embed?page=${encodeURIComponent(`${LP}/`)}`, "Ask Accops", "strict-origin", ""], "iframe created on the first click");
   eq([wrap.className, btn.attrs["aria-expanded"], b.html.style.overflow], ["f on", "true", "hidden"], "open; page scroll locked on mobile");
   btn.fire("click"); btn.fire("click");
   eq(wrap.children.length, 1, "one iframe, reused");
@@ -261,7 +266,8 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   eq(init.length, 1, "init answered");
   eq(init[0][1], BASE, "init goes to the iframe's origin only");
   ok(b.t.posts.every(([, o]) => o === BASE), "every post targets the iframe origin, never *");
-  ok(/^v_[0-9a-f]{16}$/.test(init[0][0].visitor_id) && init[0][0].consent === false, "init carries visitor id + consent");
+  ok(UUID.test(init[0][0].visitor_id) && Object.keys(init[0][0]).join() === "t,visitor_id", "init carries the visitor id (a v4 UUID), nothing else");
+  eq(fr.src.slice(-41), `&vid=${init[0][0].visitor_id}`, "/embed gets the same device id");
   const before = b.dl().length;
   msg({ t: "event", name: "answer_shown", qa_id: "lp-01", source: "bank", text: "my email is a@b.com", ref: "x" });
   msg({ t: "event", name: "question_clicked", qa_id: "call me on 98765 43210", source: "typed text here" });
@@ -304,7 +310,7 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   await b.advance(10);
   eq(b.t.fetches, [`${BASE}/api/web/config?page=${encodeURIComponent(`${LP}/`)}`], "data-page: config asked for that page's roots");
   b.sh(".l").fire("click");
-  eq(b.sh(".f").children[0].src, `${BASE}/embed?page=${encodeURIComponent(`${BASE}/`)}&pg=${encodeURIComponent(`${LP}/`)}`, "data-page passed to /embed as pg, page stays the host's");
+  eq(b.sh(".f").children[0].src.replace(NOV, ""), `${BASE}/embed?page=${encodeURIComponent(`${BASE}/`)}&pg=${encodeURIComponent(`${LP}/`)}`, "data-page passed to /embed as pg, page stays the host's");
   const j = JSON.parse(await b.t.beacons.at(-1)[1].text());
   eq(j.page, `${BASE}/`, "beacons report the real host page, not data-page");
 }
@@ -330,7 +336,7 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   eq(b.dl().at(-1), { event: "sam_chat", sam_event: "popup_shown", page_path: "/", sam_qa_id: "lp-05" }, "popup_shown names the section's question");
   b.sh(".tq").fire("click");
   const fr = b.sh(".f").children[0];
-  eq(fr.src, `${BASE}/embed?page=${encodeURIComponent(`${LP}/`)}&q=lp-05&sec=migration`, "/embed gets the section (starter chips match)");
+  eq(fr.src.replace(NOV, ""), `${BASE}/embed?page=${encodeURIComponent(`${LP}/`)}&q=lp-05&sec=migration`, "/embed gets the section (starter chips match)");
   b.fireWin("message", { data: { t: "close" }, origin: BASE, source: fr.contentWindow });
   see(b, { 1: { top: -1200, bottom: -300 }, 2: { top: -300, bottom: 600 }, 3: { top: 600, bottom: 1400 } });
   b.sh(".l").fire("click");
@@ -343,7 +349,7 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   const c = boot({ config: cfg, sections: [at("", -900, -100), at("comparison", -100, 50), at("", 50, 800)] });
   await c.advance(10); see(c, {});
   c.sh(".l").fire("click");
-  ok(c.sh(".f").children[0].src.endsWith("&sec=section-3"), "id-less <main> section: section-N (the page cards' naming)");
+  ok(c.sh(".f").children[0].src.replace(NOV, "").endsWith("&sec=section-3"), "id-less <main> section: section-N (the page cards' naming)");
   for (const junk of ["Pricing_Table", "a b", "-x", "x".repeat(42), "évaluation"]) {
     const d = boot({ config: cfg, sections: [at(junk, 0, 800, false)] });
     await d.advance(10); see(d, {});
@@ -356,13 +362,60 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   const e = boot({ origin: BASE, pg: `${LP}/#comparison`, config: cfg, sections: [at("migration", 0, 800)] });
   await e.advance(10); see(e, {});
   e.sh(".l").fire("click");
-  ok(e.sh(".f").children[0].src.endsWith(`&pg=${encodeURIComponent(`${LP}/#comparison`)}&sec=comparison`), "data-page #anchor -> sec");
+  ok(e.sh(".f").children[0].src.replace(NOV, "").endsWith(`&pg=${encodeURIComponent(`${LP}/#comparison`)}&sec=comparison`), "data-page #anchor -> sec");
 }
 // the launcher rises above the page's sticky bar while it shows
 {
   const b = boot({ width: 375, avoid: "[data-sticky]", avoidRect: { top: 730, height: 70 } });
   await b.advance(10);
   eq(b.host().style["--lift"], "70px", "lift = the bar's visible height");
+}
+
+// welcome-back memory (27 Oct): per device, never IP. A v4 UUID stored as "uuid.issued_ms" once the config answers:
+// localStorage for 90 days when it says persist:true; this session only when false (EU/EEA/UK/CH; a stored copy is
+// removed). Sent to config only when it was already stored (a possibly returning device: that response is personal),
+// always to /embed, the beacons and init. One page_viewed beacon per load. Nothing at all under the kill switch.
+{
+  const t0 = Date.UTC(2026, 9, 27), DAY = 864e5, cfgUrl = `${BASE}/api/web/config?page=${encodeURIComponent(`${LP}/`)}`;
+  const beacons = b => Promise.all(b.t.beacons.map(async ([, blob]) => JSON.parse(await blob.text())));
+  const ls = new Store(), ss = new Store();
+  const a = boot({ persist: true, ls, ss, start: t0 });
+  await a.advance(10);
+  const [id, at] = ls.getItem("acc_chat_v").split(".");
+  ok(UUID.test(id) && +at === t0, "new device: a v4 UUID stored with its issue time");
+  eq([ss.getItem("acc_chat_v"), a.t.fetches], [null, [cfgUrl]], "persist: localStorage only; a new id never goes to config (its response stays CDN-cacheable)");
+  eq(await beacons(a), [{ visitor_id: id, page: `${LP}/`, name: "page_viewed" }], "one page_viewed beacon per load: id + page, no text");
+  a.sh(".l").fire("click");
+  ok(a.sh(".f").children[0].src.endsWith(`&vid=${id}`), "/embed gets the id");
+  const b = boot({ persist: true, ls, start: t0 + 89 * DAY });
+  await b.advance(10);
+  eq([b.t.fetches, ls.getItem("acc_chat_v")], [[`${cfgUrl}&vid=${id}`], `${id}.${t0}`], "returning on day 89: same id, sent to config, issue time kept");
+  const c = boot({ persist: true, ls, start: t0 + 91 * DAY });
+  await c.advance(10);
+  const [id2, at2] = ls.getItem("acc_chat_v").split(".");
+  ok(UUID.test(id2) && id2 !== id && +at2 === t0 + 91 * DAY && c.t.fetches[0] === cfgUrl, "day 91: a fresh id, not sent to config");
+  // EU / EEA / UK / CH: the server says persist:false (from its country header, never the client's)
+  const els = new Store({ acc_chat_v: `${id}.${t0}` }), ess = new Store();
+  const d = boot({ ls: els, ss: ess, start: t0 + DAY });
+  await d.advance(10);
+  eq([els.getItem("acc_chat_v"), ess.getItem("acc_chat_v")], [null, `${id}.${t0}`], "persist:false: moved to this session, removed from the device");
+  eq(d.t.fetches, [`${cfgUrl}&vid=${id}`], "persist:false: it was stored, so this visit can still be greeted back");
+  const e = boot({ ss: ess, start: t0 + DAY + 60_000 }); // the next page, same session
+  await e.advance(10);
+  eq(e.t.fetches, [`${cfgUrl}&vid=${id}`], "persist:false: the next page of the same visit keeps the id");
+  const f = boot({});
+  await f.advance(10);
+  ok(f.ls.getItem("acc_chat_v") === null && UUID.test(f.ss.getItem("acc_chat_v").split(".")[0]), "persist:false, new device: this session only");
+  for (const junk of ["v_0123456789abcdef", "x.y", `${id}.abc`, `${id.toUpperCase()}.${t0}`, id, "<script>.1"]) {
+    const g = boot({ persist: true, ls: new Store({ acc_chat_v: junk }), start: t0 + DAY });
+    await g.advance(10);
+    ok(g.t.fetches[0] === cfgUrl && UUID.test(g.ls.getItem("acc_chat_v").split(".")[0]) && g.ls.getItem("acc_chat_v") !== junk, `stored ${JSON.stringify(junk)}: replaced, never sent`);
+  }
+  for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
+    const k = boot({ config, persist: true });
+    await k.advance(5000);
+    eq([k.ls.m, k.ss.m, k.t.beacons.length], [{}, {}, 0], `kill switch (${JSON.stringify(config)}): nothing stored, no page_viewed`);
+  }
 }
 
 // ---------- 3-6: the iframe side (TypeScript via jiti) ----------
@@ -380,8 +433,8 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
     [...A, "https://accops-citrix-lp-git-x.vercel.app"], "WEB_EMBED_ORIGINS adds exact https origins only");
   eq(Br.acceptInit({ origin: "https://evil.example", source: parentWin, data: { t: "init" } }, A, parentWin), null, "init: foreign origin ignored");
   eq(Br.acceptInit({ origin: LP, source: {}, data: { t: "init" } }, A, parentWin), null, "init: a window other than the parent ignored");
-  eq(Br.acceptInit({ origin: LP, source: parentWin, data: { t: "init", visitor_id: "v_0123456789abcdef", consent: true } }, A, parentWin),
-    { origin: LP, visitor_id: "v_0123456789abcdef", consent: true }, "init from the framing LP accepted");
+  eq(Br.acceptInit({ origin: LP, source: parentWin, data: { t: "init", visitor_id: "0f8e2d1c-3b4a-4c5d-9e6f-7a8b9c0d1e2f", consent: true } }, A, parentWin),
+    { origin: LP, visitor_id: "0f8e2d1c-3b4a-4c5d-9e6f-7a8b9c0d1e2f" }, "init from the framing LP accepted (the id only)");
   eq(Br.acceptInit({ origin: LP, source: parentWin, data: { t: "init", visitor_id: "drop table" } }, A, parentWin)?.visitor_id, null, "bad visitor id dropped");
   eq(Br.eventMessage("answer_shown", { qa_id: "lp-01", source: "model", text: "secret", ref: "a b<script>" }),
     { t: "event", name: "answer_shown", qa_id: "lp-01", source: "model", ref: "a_bscript" }, "event: only name/id/source/ref, ref reduced");
@@ -414,7 +467,7 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   eq([Br.opensBooking("", "talk_to_sales"), Br.opensBooking(BK, "talk_to_sales"), Br.opensBooking(BK, undefined), Br.opensBooking(BK, ""), Br.opensBooking(BK, "open_url")],
     [false, true, true, true, false], "the calendar opens only with a booking_url, and only for talk-to-sales (never an open_url CTA)");
   eq(Br.eventMessage("booking_opened", { text: "my email is a@b.com", ref: "a b" }), { t: "event", name: "booking_opened", ref: "a_b" }, "booking_opened is allowlisted, no text");
-  ok(read("app/api/web/event/route.ts").includes('"booking_opened"] as const'), "the event route accepts booking_opened");
+  ok(read("app/api/web/event/route.ts").includes('"booking_opened", "page_viewed"] as const'), "the event route accepts booking_opened and page_viewed");
   ok(/EV = \/\^\([^)]*\|booking_opened\)\$\//.test(read("scripts/embed.src.js")), "the loader forwards booking_opened to the dataLayer");
   // the Website tab's setting takes the same rule
   const Wd = await jiti.import("@/lib/web-dashboard.ts");
@@ -559,6 +612,17 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   ok(shell.includes("Please don&#x27;t share personal details") || shell.includes("Please don’t share personal details"), "privacy line above the input");
   ok(shell.includes('maxLength="500"'), "input capped at 500");
   ok(shell.includes("Why did my Citrix renewal go up?") && shell.includes("↳"), "roots as ↳ rows");
+  // welcome-back (27 Oct): the greeting with its emphasis, its offers before the page's, the privacy line's memory
+  // sentence (90 days, or this visit), and no "forget me" link (Siddharth: don't build one)
+  const back = renderToStaticMarkup(React.createElement(W.default, { conversationId: "c_x", hs: "h", page: "", origins: [], ask: null, persist: true,
+    starters: [{ id: "lp-01", label: "Why did my Citrix renewal go up?" }, { id: "lp-03", label: "Compare licensing" }],
+    welcome: { line: "Welcome back! Last time you looked at **What is HySecure?** Want to pick up there?", chips: [{ id: "lp-36", label: "How does HySecure work?" }, { id: "lp-01", label: "Why did my Citrix renewal go up?" }] },
+    talk: { label: "Talk to an expert", url: "https://www.accops.com/schedule-a-free-demo" } }));
+  ok(back.includes('Welcome back! Last time you looked at <strong class="sb-em">What is HySecure?</strong> Want to pick up there?') && !back.includes("**"), "welcome: the greeting, its emphasis drawn");
+  ok(back.includes("Pick up where you left off") && back.indexOf("How does HySecure work?") < back.indexOf("Why did my Citrix") && back.split("Why did my Citrix renewal go up?").length === 2,
+    "welcome: its offers first, then the page's, no repeats");
+  ok(back.includes("remembered on this device for 90 days.") && shell.includes("remembered on this device for this visit.") && /accops\.com\/privacy-policy/.test(back) && !/forget/i.test(back + shell),
+    "privacy line: 90 days where the id persists, this visit elsewhere; the Privacy link stays; no forget-me link");
   // stage 3: the booking calendar inside the panel
   const BK = "https://bookings.cloud.microsoft/book/AccopsUnifiedPlatformforSecureRemoteAccess2@propalmsnetwork.onmicrosoft.com/s/UEDDAf42hEiNVqsGcRVJ-w2?ismsaljsauthenabled";
   const withBk = renderToStaticMarkup(React.createElement(W.default, { conversationId: "c_x", hs: "h", page: "", origins: [], ask: null, starters: [],

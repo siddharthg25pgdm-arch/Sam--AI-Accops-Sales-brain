@@ -50,10 +50,15 @@ export const logEvent = (e: Record<string, unknown>) => rpc<null>("sam_web_log_e
 /** Every approved pair, light columns: page-aware suggestions rank them in TS (suggest.ts). */
 export type QaLite = { id: string; question: string; sources: string[] | null; pages: string[] | null; nudge_weight: number | null };
 export const pairs = () => rest<QaLite[]>("sam_web_qa_public?select=id,question,sources,pages,nudge_weight");
-export type PageCard = { url: string; page_type: string | null; products: string[] | null; industries: string[] | null; questions_answered: string[] | null };
+export type PageCard = { url: string; title: string; page_type: string | null; products: string[] | null; industries: string[] | null; questions_answered: string[] | null };
 /** The public cards for these exact URLs. The caller builds them from new URL() (no raw quotes) + an allowlisted section. */
-export const pageCards = (urls: string[]) => rest<PageCard[]>(`sam_web_pages_public?select=url,page_type,products,industries,questions_answered&url=in.${
+export const pageCards = (urls: string[]) => rest<PageCard[]>(`sam_web_pages_public?select=url,title,page_type,products,industries,questions_answered&url=in.${
   encodeURIComponent(`(${urls.map(u => `"${u}"`).join(",")})`)}`);
+
+/** Welcome-back memory (07 SQL): up to 3 approved pairs this device asked or clicked and the last public page it read
+ *  (other than not_page), within 90 days; null for an unknown id or nothing to recall. */
+export type Recall = { last_qa: QaRef[]; last_page: { url: string; title: string } | null; last_seen: string } | null;
+export const recall = (visitor_id: string, not_page: string) => rpc<Recall>("sam_web_recall", { visitor_id, not_page });
 
 /** Approved pairs only (the view filters status/review); ids are validated by the caller (no quotes or commas). */
 export async function qas(ids: string[]): Promise<Map<string, Qa>> {

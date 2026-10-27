@@ -85,7 +85,7 @@ export function boundary(web) {
 }
 
 const READER_PATHS = new Set(["/", "/sam_web_qa_public", "/sam_web_pages_public", "/sam_web_assets_public",
-  ...["settings", "page_group", "roots", "children", "search", "admit", "take_model_slot", "cache_get", "cache_put", "log_message", "log_event"]
+  ...["settings", "page_group", "roots", "children", "search", "admit", "take_model_slot", "cache_get", "cache_put", "log_message", "log_event", "recall"]
     .map(f => `/rpc/sam_web_${f}`)]);
 const INTERNAL = ["sam_asset_cards", "sam_passages", "sam_v1_assets", "sam_events", "sam_sharepoint_files", "sam_ops_runs", "sam_content_requests",
   "sam_web_qa", "sam_web_pages", "sam_web_settings", "sam_web_conversations", "sam_web_messages", "sam_web_answer_cache", "sam_web_rate", "sam_web_usage_daily",

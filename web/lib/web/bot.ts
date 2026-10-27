@@ -48,6 +48,15 @@ export function cadence(recent: number[]): string | null {
   return sd < 100 ? "cadence_regular" : null;
 }
 
+/** Welcome-back memory is recalled only for a request that looks like a person's browser (bots and suspects get the
+ *  normal greeting): a browser user agent, plus the browser's own fetch metadata. /embed must load as an iframe; the
+ *  loader's config call must come from an allowed host page (a browser always sends Origin on that cross-site fetch).
+ *  ponytail: no BotID here (its headers ride only on the widget's asks), so this is the cheap local half of classify. */
+export function pageHuman(h: { get(k: string): string | null }, allowed: string[]) {
+  const ua = h.get("user-agent") ?? "";
+  return !!ua && !BOT_UA.test(ua) && (h.get("sec-fetch-dest") === "iframe" || allowed.includes(h.get("origin") ?? ""));
+}
+
 export const classify: Classify = async (req, ctx) => {
   if (ctx.eval) return { label: "human", signals: ["eval"] }; // E's eval: valid x-sam-eval token (checked in answer.ts)
   const bot: string[] = [], suspect: string[] = [];

@@ -5,16 +5,18 @@ import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import "@/components/blocks/blocks.css"; // the one import of the block styles (contract notes: the host owns it)
 import "./embed.css";
-import { mintHs } from "@/lib/web/bot";
+import { mintHs, pageHuman } from "@/lib/web/bot";
 import { settings, webReady } from "@/lib/web/db";
 import { cleanPage } from "@/lib/web/fill";
+import { persist, VID, welcome } from "@/lib/web/recall";
 import { suggest } from "@/lib/web/suggest";
 import { bookingUrl, cleanSection, embedOrigins, ID, selfFramed } from "./bridge";
 import Widget from "./Widget";
 
 // The iframe the loader opens on first interaction (plan 7.2). Server-rendered: the starter questions for the page and
-// the section being read (`sec`, suggest.ts) and a fresh handshake per request (hs = conv.issued.HMAC, minted by bot.ts
-// so mint and verify share one secret).
+// the section being read (`sec`, suggest.ts), a fresh handshake per request (hs = conv.issued.HMAC, minted by bot.ts
+// so mint and verify share one secret), and for a returning device (`vid`, the loader's id) the welcome-back greeting
+// (recall.ts; a human-looking request only, else the normal greeting).
 const barlow = Barlow({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--sb-font", display: "swap" });
 
 export const dynamic = "force-dynamic";
@@ -35,18 +37,22 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   // is honoured. Any other host's `pg` is ignored.
   // ponytail: no session check here (lib/auth is outside the web-guard boundary); a non-browser forging the headers
   // gains only what it already has (any `page` in the ask body) plus hiding its own chats from the dashboard.
-  const test = selfFramed(await headers(), embedOrigins());
+  const h = await headers();
+  const test = selfFramed(h, embedOrigins());
   const page = (test && cleanPage(one(sp.pg))) || cleanPage(one(sp.page));
   const q = String(one(sp.q) ?? "");
   const conversationId = `${test ? "t" : "c"}_${randomUUID()}`;
-  const rows = await suggest(page, cleanSection(one(sp.sec))).catch(() => []);
+  const vid = String(one(sp.vid) ?? ""), visitor = VID.test(vid) ? vid : "";
+  const [rows, back] = await Promise.all([suggest(page, cleanSection(one(sp.sec))).catch(() => []),
+    visitor && pageHuman(h, embedOrigins()) ? welcome(visitor, page).catch(() => null) : null]);
 
   return (
     <div className={barlow.variable}>
       <Widget conversationId={conversationId} hs={mintHs(conversationId)} page={page} origins={embedOrigins()}
         starters={rows.filter(r => ID.test(r.id))}
         talk={{ label: cut(s.cta_label || "Talk to an expert", 28), url: (s.cta_url || "https://www.accops.com/schedule-a-free-demo").slice(0, 300) }}
-        booking={bookingUrl(s.booking_url)} ask={ID.test(q) ? q : null} />
+        booking={bookingUrl(s.booking_url)} ask={ID.test(q) ? q : null} visitor={visitor} persist={persist(h.get("x-vercel-ip-country"))}
+        welcome={back && { line: back.line, chips: back.chips.filter(r => ID.test(r.id)) }} />
     </div>
   );
 }

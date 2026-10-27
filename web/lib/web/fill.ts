@@ -15,7 +15,7 @@ export const LEAD = {
   facts: "Here's what we've published on that:", // verified facts: the model's answer failed the fact check, or no model answer
 } as const;
 
-const cut = (s: string, n: number) => (s.length <= n ? s : `${s.slice(0, n - 1).trimEnd()}…`);
+export const cut = (s: string, n: number) => (s.length <= n ? s : `${s.slice(0, n - 1).trimEnd()}…`);
 
 /** "accops.com/hysecure" + the URL, or nothing for a value that is not an http(s) URL. */
 export function source(url: string | null | undefined) {

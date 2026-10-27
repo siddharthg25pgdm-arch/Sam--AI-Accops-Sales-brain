@@ -15,6 +15,7 @@ import { Picker } from "@/components/blocks/Picker";
 import { Stat } from "@/components/blocks/Stat";
 import { Steps } from "@/components/blocks/Steps";
 import { Text } from "@/components/blocks/Text";
+import { emSplit } from "@/lib/emphasis";
 import { acceptInit, eventMessage, ID, opensBooking, SEC, type WidgetEvent } from "./bridge";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,6 +28,9 @@ export type Props = {
   talk: { label: string; url: string }; ask?: string | null;
   /** The Bookings calendar (bridge.ts bookingUrl): talk-to-sales opens it inside the panel. "" = a new tab, as before. */
   booking?: string;
+  /** Welcome-back memory (27 Oct): the loader's device id (a UUID), whether it lasts 90 days on this device (false = this
+   *  visit only: EU/EEA/UK/CH), and for a returning device the server's greeting (approved labels / public titles only). */
+  visitor?: string; persist?: boolean; welcome?: { line: string; chips: Chip[] } | null;
 };
 type Item = { id: number; me: string } | { id: number; a: AnswerT; source: string; qa?: string };
 type Saved = { c: string; hs: string; at: number; page: string; items: Item[]; recent: number[] };
@@ -69,10 +73,11 @@ export function BookingView({ url, title, on, onBack, onClose, backRef }: { url:
   );
 }
 
-const rid = () => `v_${Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, "0")).join("")}`;
+const rid = () => crypto.randomUUID(); // only when the loader gave none (the /embed URL's vid, or the init message)
 const load = (): Saved | null => { try { return JSON.parse(sessionStorage.getItem(KEY) ?? "null"); } catch { return null; } };
 
-export default function Widget({ conversationId, hs: hs0, page, starters: starters0, origins, talk, ask: askFirst, booking = "" }: Props) {
+export default function Widget({ conversationId, hs: hs0, page, starters: starters0, origins, talk, ask: askFirst, booking = "",
+  visitor = "", persist = false, welcome = null }: Props) {
   const [items, setItems] = useState<Item[]>([]);
   const [starters, setStarters] = useState(starters0);
   const [near, setNear] = useState<Chip[]>([]); // the section's questions when the chat is reopened elsewhere mid-conversation
@@ -83,7 +88,7 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
   const [booked, setBooked] = useState(false); // the calendar was opened once (its iframe then stays)
   const backBtn = useRef<HTMLButtonElement>(null);
   const s = useRef({ c: conversationId, hs: hs0, at: Date.now(), recent: [] as number[], renderAt: 0, n: 0,
-    parent: null as string | null, visitor: "", prev: "", asked: [] as string[] });
+    parent: null as string | null, visitor, prev: "", asked: [] as string[] });
   const thread = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const lastMe = useRef<HTMLDivElement>(null);
@@ -252,6 +257,8 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
   };
   const close = () => { if (s.current.parent) parent.postMessage({ t: "close" }, s.current.parent); };
   const lastMeId = [...items].reverse().find(i => "me" in i)?.id;
+  // a returning device: the greeting's own offers first, then the page's (or the section's) questions
+  const offer = welcome ? [...welcome.chips, ...starters].filter((c, i, a) => a.findIndex(x => x.id === c.id) === i) : starters;
   const inBooking = view === "booking"; // the chat stays laid out underneath (its scroll is kept) but inert
 
   return (
@@ -273,13 +280,14 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
         <div className="w-body" ref={thread} role="log" aria-live="polite" aria-label="Conversation" inert={inBooking}>
           {items.length === 0 && (
             <div className="w-hello sb-in">
-              <p className="w-hello-t">What would you like to know?</p>
+              <p className="w-hello-t">{welcome // "Welcome back! Last time you looked at **…**": its **emphasis** as in a Text block
+                ? emSplit(welcome.line).map((t, i) => (i % 2 ? <strong key={i} className="sb-em">{t}</strong> : t)) : "What would you like to know?"}</p>
               <p className="w-hello-s">Every answer links to its source on accops.com.</p>
-              {starters.length > 0 && (
+              {offer.length > 0 && (
                 <>
-                  <p className="w-eyebrow" id="w-roots">Asked on this page</p>
+                  <p className="w-eyebrow" id="w-roots">{welcome ? "Pick up where you left off" : "Asked on this page"}</p>
                   <ul className="w-roots" aria-labelledby="w-roots">
-                    {starters.slice(0, 4).map(r => ( // the thread is empty here, so nothing was asked yet
+                    {offer.slice(0, 4).map(r => ( // the thread is empty here, so nothing was asked yet
                       <li key={r.id}>
                         <button type="button" onClick={() => askQa(r.id, r.label, "root")} disabled={!!busy}>
                           <span className="w-glyph" aria-hidden="true">↳</span><span>{r.label}</span>
@@ -311,7 +319,8 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
               {near.map(c => <li key={c.id}><button type="button" className="sb-chip" onClick={() => askQa(c.id, c.label, "chip")}>{c.label}</button></li>)}
             </ul>
           )}
-          <p className="w-privacy">Please don&rsquo;t share personal details. Conversations are stored to improve answers.{" "}
+          <p className="w-privacy">Please don&rsquo;t share personal details. Conversations are stored to improve answers, and the topics
+            you view are remembered on this device {persist ? "for 90 days" : "for this visit"}.{" "}
             <a href="https://www.accops.com/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy</a></p>
           <form className="w-input" onSubmit={e => { e.preventDefault(); submit(); }}>
             <label htmlFor="w-q" className="sb-sr">Your question</label>

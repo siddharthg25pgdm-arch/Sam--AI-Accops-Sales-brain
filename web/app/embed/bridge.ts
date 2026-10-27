@@ -28,9 +28,9 @@ export const testEvent = (origin: string | null, ownHost: string, conversation_i
 
 /** The loader's `init`: only from an allowed origin AND from the window that framed us. */
 export function acceptInit(e: { origin: string; source: unknown; data: unknown }, allowed: string[], parent: unknown) {
-  const d = e.data as { t?: unknown; visitor_id?: unknown; consent?: unknown } | null;
+  const d = e.data as { t?: unknown; visitor_id?: unknown } | null;
   if (!allowed.includes(e.origin) || e.source !== parent || !d || d.t !== "init") return null;
-  return { origin: e.origin, visitor_id: typeof d.visitor_id === "string" && ID.test(d.visitor_id) ? d.visitor_id : null, consent: d.consent === true };
+  return { origin: e.origin, visitor_id: typeof d.visitor_id === "string" && ID.test(d.visitor_id) ? d.visitor_id : null };
 }
 
 /** The Microsoft Bookings host the chat may open inside its panel (settings booking_url). next.config.ts frames exactly

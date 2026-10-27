@@ -15,6 +15,12 @@
  * "section-N" for the N-th id-less <main> section, the page cards' own naming; SEC-allowlisted, never text). It goes
  * to /api/web/config (the teaser + its chips) and to /embed (the starter questions); a reopen on another section tells
  * the open widget. Measured only at those moments, so nothing runs per scroll (a debounce by construction).
+ * Welcome-back memory (Siddharth, 27 Oct 2026): per DEVICE, never per IP. A random UUID kept first-party in THIS page's
+ * own storage (key acc_chat_v = "uuid.issued_ms", regenerated after 90 days): localStorage when the config says
+ * persist:true, this session only when it says false (EU/EEA/UK/CH, decided by the server from the visitor's country;
+ * a stored copy is then removed). It goes to /embed and the events always, and to the config call only when it was
+ * already stored (a device that may be returning: that response is personal and never CDN-cached). One page_viewed
+ * event per load (id + page URL, no text) lets the bot remember which pages the device read.
  * The launcher and teaser live in a closed shadow root (no CSS leaks either way); the /embed iframe is created on the
  * first click only. The bridge takes messages only from that iframe's window AND origin, answers only to that origin
  * (never "*"), and forwards to dataLayer / Clarity / PostHog nothing but allowlisted event names, ids and sources:
@@ -29,20 +35,18 @@
   var SRC = /^(bank|intent|cache|model|fallback|guard|limited|repeat|root|chip|picker|teaser)$/, SEC = /^[a-z0-9][a-z0-9-]{0,40}$/;
   var ok = function (re, v) { return typeof v === "string" && re.test(v) ? v : null; };
   var attr = function (n) { return me.getAttribute("data-" + n); };
-  var consent = function () { return W.SAM_CONSENT === true; };
+  var keep = false; // the config's persist
   var still = function () { return !!(W.matchMedia && W.matchMedia("(prefers-reduced-motion: reduce)").matches); };
   function get(k, local) { try { return (local ? W.localStorage : W.sessionStorage).getItem(K + k); } catch (e) { return null; } }
-  function put(k, v, local) { try { (local ? W.localStorage : W.sessionStorage).setItem(K + k, v); } catch (e) { } }
+  function put(k, v, local) { try { var s = local ? W.localStorage : W.sessionStorage; if (v) s.setItem(K + k, v); else s.removeItem(K + k); } catch (e) { } }
 
-  // Visitor id: this session only; kept across visits only with consent (window.SAM_CONSENT === true).
-  var vid = ok(ID, get("v")) || (consent() && ok(ID, get("v", 1)));
-  if (!vid) {
-    var a = new Uint8Array(8);
-    W.crypto.getRandomValues(a);
-    vid = "v_" + Array.prototype.map.call(a, function (b) { return (b + 256).toString(16).slice(1); }).join("");
-  }
-  put("v", vid);
-  if (consent()) put("v", vid, 1);
+  // Visitor id: a stored one under 90 days old (localStorage first), else a fresh v4 UUID (getRandomValues: older
+  // browsers lack randomUUID). Stored only once the config answers (remember), where it says.
+  function mem(local) { var s = (get("v", local) || "").split("."); return /^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/.test(s[0]) && Date.now() - s[1] < 90 * DAY ? s : 0; }
+  var old = mem(1) || mem(), born = old ? old[1] : Date.now(), vid = old ? old[0] : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, function (c) {
+    return (c ^ W.crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16);
+  });
+  function remember(p) { keep = p; put("v", vid + "." + born, p); if (!p) put("v", "", 1); }
 
   function track(name, qa, src) {
     var e = { event: "sam_chat", sam_event: name, page_path: location.pathname };
@@ -129,7 +133,7 @@
       if (frame) { if (s && s !== sec) frame.contentWindow.postMessage({ t: "sec", sec: s }, base); }
       else {
         frame = D.createElement("iframe");
-        frame.src = base + "/embed?page=" + encodeURIComponent(page) + (qa ? "&q=" + encodeURIComponent(qa) : "") + (pg ? "&pg=" + encodeURIComponent(pg) : "") + (s ? "&sec=" + s : "");
+        frame.src = base + "/embed?page=" + encodeURIComponent(page) + (qa ? "&q=" + encodeURIComponent(qa) : "") + (pg ? "&pg=" + encodeURIComponent(pg) : "") + (s ? "&sec=" + s : "") + "&vid=" + vid;
         frame.title = "Ask Accops";
         frame.setAttribute("allow", "");
         frame.setAttribute("referrerpolicy", "strict-origin");
@@ -161,7 +165,7 @@
       if (!frame || e.source !== frame.contentWindow || e.origin !== base) return;
       var m = e.data;
       if (!m || typeof m !== "object") return;
-      if (m.t === "ready") frame.contentWindow.postMessage({ t: "init", visitor_id: vid, consent: consent() }, base);
+      if (m.t === "ready") frame.contentWindow.postMessage({ t: "init", visitor_id: vid }, base);
       else if (m.t === "event" && ok(EV, m.name)) track(m.name, ok(ID, m.qa_id), ok(SRC, m.source));
       else if (m.t === "close") close();
       else if (m.t === "cta" && typeof m.url === "string") {
@@ -192,8 +196,9 @@
 
     // Teaser: after N s of visible time, counted only once the visitor scrolls or moves the pointer; once a session;
     // never while a form field has focus or #talk is in view (and it hides if either happens); a dismissal lasts the
-    // session, or 30 days with consent. It never takes focus; Esc dismisses it. Desktop: a card above the launcher with
-    // the page's top question + 2 chips; under 640 px: a one-line pill beside the launcher, never an overlay.
+    // session, or 30 days where the visitor id persists. It never takes focus; Esc dismisses it. Desktop: a card above
+    // the launcher with the page's top question (a returning device: the welcome-back line) + 2 chips; under 640 px: a
+    // one-line pill beside the launcher, never an overlay.
     var T = good(c), after = attr("teaser"), due = 0;
     after = after === null ? T && T.after_s : +after;
     // The teaser + 2 chips, from a config (the page's at load, the reading section's when due); text only via textContent.
@@ -211,7 +216,7 @@
     }
     function dismissed() { return !!get("td") || Date.now() - (+get("td", 1) || 0) < 30 * DAY; }
     function hideT() { if (timer) { clearInterval(timer); timer = null; } if (shown) { shown = false; tz.hidden = true; } }
-    function dismiss() { both("popup_dismissed", T.qa_id); put("td", consent() ? String(Date.now()) : "1", consent()); hideT(); }
+    function dismiss() { both("popup_dismissed", T.qa_id); put("td", keep ? String(Date.now()) : "1", keep); hideT(); }
     function pick(id) { both("popup_clicked", id); open(id); }
     if (T && after > 0 && !get("ts") && !dismissed()) {
       var engaged = false, seen = 0, talkIn = false, talk = D.getElementById("talk");
@@ -244,13 +249,13 @@
     }
   }
 
-  function conf(s) { // public data only, any page
-    return W.fetch(base + "/api/web/config?page=" + encodeURIComponent(pg || page) + (s ? "&section=" + s : ""), { credentials: "omit" })
+  function conf(s) { // public data only, any page; the id only when it was stored (a possibly returning device)
+    return W.fetch(base + "/api/web/config?page=" + encodeURIComponent(pg || page) + (s ? "&section=" + s : "") + (old ? "&vid=" + vid : ""), { credentials: "omit" })
       .then(function (r) { return r.ok ? r.json() : null; });
   }
   function noop() { }
   function good(x) { var t = x && x.enabled === true && x.teaser; return t && ok(ID, t.qa_id) && typeof t.label === "string" ? t : null; }
-  function start() { conf().then(function (c) { if (c && c.enabled === true) mount(c); }).catch(noop); }
+  function start() { conf().then(function (c) { if (c && c.enabled === true) { remember(c.persist === true); beacon("page_viewed"); mount(c); } }).catch(noop); }
   function idle() { if (W.requestIdleCallback) W.requestIdleCallback(start, { timeout: 3000 }); else setTimeout(start, 1); }
   if (D.readyState === "complete") idle(); else W.addEventListener("load", idle);
 })(window, document);

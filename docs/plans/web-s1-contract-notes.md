@@ -170,3 +170,67 @@ Tier 2 first orders by the card label matched: an industry page's industries com
 **Checks:**
 - `web-suggest.check` runs on real data (the bank, page cards and committed index; PostgREST stubbed): the allowlist, LP `#comparison` / `#migration` / `#faq` / `#section-2` / `#talk`, the HySecure, healthcare, BFSI, government and About Us pages, the roots fallback, the teaser following the section (config route) and the memo.
 - `web-widget.check` covers the observer, the measurement, `section-N`, junk ids, the reopen message and `data-page#anchor`.
+
+## 27 Oct: welcome-back memory (Siddharth: "Welcome back! Since you were exploring ZTNA before…", as Sophos's Qualified bot)
+
+**Siddharth's decisions:**
+- Memory is per **device**, never per IP: a shared office or mobile IP would show one person's topics to a colleague.
+- No "Forget me" link (he said don't build one). The privacy line under the input now reads "…Conversations are stored to improve answers, and the topics you view are remembered on this device for 90 days." (EU/EEA/UK/CH: "for this visit"), with the Privacy link kept.
+- Lookback 90 days. Only APPROVED question labels or public page-card titles are ever echoed: never the visitor's typed text, never a model answer.
+
+**The device id** (`scripts/embed.src.js`):
+- A v4 UUID made with `getRandomValues` (older browsers lack `randomUUID`), kept first-party in the HOST page's storage as `acc_chat_v = "uuid.issued_ms"`. It is regenerated after 90 days, and a malformed or old-format value (`v_…`) is replaced.
+- Nothing is stored until `/api/web/config` answers `enabled: true`. The config's `persist` says where: `true` puts it in localStorage, `false` puts it in sessionStorage and removes any localStorage copy.
+- `persist` is decided server-side only (`lib/web/recall.ts persist`) from Vercel's `x-vercel-ip-country`: false for EU 27, IS, LI, NO, GB and CH, and for a missing or odd header (fail safe). Reason: the LP has no consent banner.
+- `window.SAM_CONSENT` is retired: the country rule replaces it, so the widget's privacy line always matches what the loader did. The teaser dismissal now lasts 30 days wherever the id persists, otherwise the session.
+- The id goes to `/embed` (`&vid=`) always, to the beacons and the `init` message (`init` no longer carries `consent`), and to the config call **only when it was already stored** (a device that may be returning). So a first visit's config response stays public and CDN-cached.
+- One `page_viewed` beacon per page load (id + page URL, no text), so the bot knows which pages the device read. The event route drops a crawler UA's `page_viewed`.
+- The loader is 5,015 B gzip (budget 5,120).
+
+**The recall** (`docs/supabase-sam-web-07-recall.sql`, NOT APPLIED; apply order 05, 06, 07):
+- `sam_web_recall(visitor_id text, not_page text default null)` is a SECURITY DEFINER function with a fixed search_path, granted to `sam_web_reader` ONLY (revoked from public, anon, authenticated and service_role). It returns jsonb `{last_qa: [{id, question}] (<= 3), last_page: {url, title} | null, last_seen}` or null.
+- `last_qa`: distinct `sam_web_messages.qa_id` (clicks, plus typed questions the bank matched) from the device's non-bot conversations in the last 90 days, newest first, joined through `sam_web_qa_public`, so a retired, blocked or expired pair never comes back. `question` is the approved label. It never reads `sam_web_messages.question`.
+- `last_page`: the newest page with any event of the device in 90 days, other than `not_page` (trailing slash ignored), and only if it has a card in `sam_web_pages_public`.
+- It returns null for a malformed id, an unknown id, and a known id with nothing recallable alike, so a caller cannot tell whether an id was ever seen.
+- The 07 SQL also extends `sam_web_events_name_check` with `page_viewed` (05's list plus one; running 05 AFTER 07 would drop it) and adds indexes on `sam_web_conversations (visitor_id)` and `sam_web_events (visitor_id, created_at desc)`.
+- `web-guard.mjs` now allows `/rpc/sam_web_recall` for the reader.
+- Until 07 is applied: the RPC 404s, `welcome()` fails, and the routes fall back to the normal greeting. `page_viewed` inserts fail on the check and are only warned about. Nothing visible breaks.
+
+**The greeting** (`lib/web/recall.ts welcome(vid, page)`, memo 60 s per (device, page), cleared past 500 keys):
+- **Asked before:** "Welcome back! Last time you looked at **<label>** Want to pick up there?"
+  - The label comes from the LIVE `sam_web_qa_public` list (`db.pairs()`, re-checked in TS after the SQL's join), cut to 60 characters.
+  - The teaser asks that pair.
+  - The chips are its children, then the earlier recalled pairs, then the intent matcher's related approved pairs (3 at most).
+- **Read pages only:** "Welcome back! Since you were reading about **<title>**, want to pick up there?"
+  - The title is the page card's own public title, re-read with `pageCards` (never the recall's copy), the part before " | ", without an "Accops - " prefix.
+  - The teaser asks that page's top suggestion, and the chips are that page's suggestions.
+- The line goes through `emClean`, so the contract's emphasis limits hold: a label over 6 words keeps no emphasis.
+- **Who gets it:** a human-looking request only (`bot.ts pageHuman`): a browser UA, plus `sec-fetch-dest: iframe` (/embed) or an Origin in the embed list (config). Bots, curl, direct fetches and other sites get the normal greeting. BotID is not used here (its headers ride only on the asks).
+
+**Where it shows:**
+- **Config** (`/api/web/config`):
+  - Without `vid`: `public, s-maxage=300` + `Vary: X-Vercel-IP-Country` (`persist` differs by country).
+  - With `vid`: `private, no-store`, whatever the outcome, so it is never CDN-cached across visitors. For a returning device the teaser is the welcome line as plain text (the loader sets textContent and the card is already bold), and its chips are the welcome's chips, then the page's (7, never the teaser's own pair).
+- **/embed:** it passes `visitor`, `persist` and `welcome {line, chips}` to the widget. With an empty thread the widget shows:
+  - the line, its `**emphasis**` drawn as `<strong class="sb-em">` (as in a Text block)
+  - the eyebrow "Pick up where you left off"
+  - the welcome chips, then the page's or section's starters (4, no repeats)
+- The widget's ask and event calls use the same id (the URL's `vid`). Its own fallback id is now `crypto.randomUUID()`.
+
+**Checks:**
+- `web-recall.check` (new, real bank + cards, PostgREST stubbed incl. `sam_web_recall`) covers:
+  - the id rule and the country rule
+  - a typed question and a retired pair (lp-27) never echoed
+  - the 7-word label with no emphasis
+  - the page-title case, a non-public page, and asked-beats-read
+  - unknown / malformed ids (no DB call), the memo, and `pageHuman`
+  - config caching for both paths and the welcome teaser and chips
+  - /embed props (bot, UK, junk id)
+  - `page_viewed` in the event route (crawler dropped, no extra field)
+  - the 07 SQL's shape and grants, and its event list equal to the route's
+- `web-widget.check` adds:
+  - in the loader: UUID + issue time, day 89 same id sent to config, day 91 fresh id, persist:false moving it to the session (and the next page of that visit), junk values replaced, and the kill switch storing and sending nothing
+  - in the widget: the greeting's emphasis, chip order, the privacy line (90 days / this visit, Privacy link, no forget link)
+- Run all of them with a botid stub on NODE_PATH: web/node_modules has no botid, so make a dir with `botid/package.json` (exports `./server`, `./client/core`) and stub `checkBotId` / `initBotId`, then run `NODE_PATH=<dir> node scripts/checks.mjs`.
+
+**Not built (say if wanted):** page views in the Website tab's funnel; recall across the LP and accops.com. Each origin has its own storage, so they are separate devices to the bot. That is first-party by design.

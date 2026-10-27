@@ -1,11 +1,14 @@
 import { z } from "zod";
 import { redact } from "@/lib/redact";
 import { cleanPage } from "@/lib/web/fill";
+import { BOT_UA } from "@/lib/web/bot";
 import { logEvent, webReady } from "@/lib/web/db";
 import { embedOrigins, testEvent } from "@/app/embed/bridge";
 
 const NAMES = ["chat_opened", "chat_closed", "popup_shown", "popup_clicked", "popup_dismissed", "question_clicked",
-  "answer_shown", "doc_opened", "talk_to_sales_clicked", "filter_used", "step_viewed", "booking_opened"] as const; // 05 SQL adds booking_opened to the table's check
+  "answer_shown", "doc_opened", "talk_to_sales_clicked", "filter_used", "step_viewed", "booking_opened", "page_viewed"] as const;
+// 05 SQL adds booking_opened to the table's check, 07 adds page_viewed (the loader's one per page load: what welcome-back
+// memory reads as "pages this device read"; until 07 is applied the insert fails and is only warned about).
 const Id = z.string().regex(/^[A-Za-z0-9_.:-]{1,80}$/);
 // Strict: an unknown name or any extra field (free text) is rejected. No field can hold a sentence (no spaces).
 const Event = z.strictObject({ conversation_id: Id.optional(), visitor_id: Id, page: z.string().max(500).regex(/^\S*$/),
@@ -23,6 +26,8 @@ export async function POST(req: Request) {
   try { body = raw.length <= 2000 ? JSON.parse(raw) : null; } catch { /* rejected below */ }
   const e = Event.safeParse(body);
   if (!e.success) return new Response(null, { status: 400 });
+  // crawlers that run the loader would fill the page history with ids that never come back
+  if (e.data.name === "page_viewed" && BOT_UA.test(req.headers.get("user-agent") ?? "")) return new Response(null, { status: 204 });
   try { await logEvent({ ...e.data, page: cleanPage(e.data.page), country: req.headers.get("x-vercel-ip-country"),
     is_test: testEvent(origin(req), new URL(req.url).host, e.data.conversation_id) }); }
   catch (err) { console.warn(`web event: ${redact(err)}`); }
