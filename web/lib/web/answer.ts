@@ -108,7 +108,9 @@ export async function ask(req: Request): Promise<Out> {
     const answer = out.success ? out.data : { lead: LEAD.none, blocks: [], chips: [] };
     const log = { ...m, source: src, label, signals, conversation_id: ctx.conversation_id, visitor_id: ctx.visitor_id, page,
       page_group, country: ctx.country, is_test: ev || isTestConv(ctx.hs, ctx.conversation_id), latency_ms: Date.now() - t0 };
-    return { status, body: { message_id, source: src, ...answer },
+    // the pair a bank / intent answer came from, so the widget never suggests it again in this conversation
+    const qa = (src === "bank" || src === "intent") && typeof m.qa_id === "string" ? { qa_id: m.qa_id } : {};
+    return { status, body: { message_id, source: src, ...qa, ...answer },
       log: () => db.logMessage(log).then(() => undefined, e => console.warn(`web log: ${redact(e)}`)) };
   };
 

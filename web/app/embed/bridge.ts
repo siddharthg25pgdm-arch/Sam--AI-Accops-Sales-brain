@@ -34,6 +34,9 @@ export function acceptInit(e: { origin: string; source: unknown; data: unknown }
 }
 
 export const ID = /^[A-Za-z0-9_.:-]{1,80}$/;
+/** The section the visitor is reading, as the loader reports it (an element id, or the cards' "section-N"): never free text. */
+export const SEC = /^[a-z0-9][a-z0-9-]{0,40}$/;
+export const cleanSection = (s: unknown) => (typeof s === "string" && SEC.test(s) ? s : "");
 /** Events the widget reports (the loader reports popup_*, chat_opened, chat_closed and talk_to_sales_clicked itself). */
 export const WIDGET_EVENTS = ["question_clicked", "answer_shown", "doc_opened", "filter_used", "step_viewed", "talk_to_sales_clicked"] as const;
 export type WidgetEvent = (typeof WIDGET_EVENTS)[number];

@@ -6,13 +6,15 @@ import { randomUUID } from "node:crypto";
 import "@/components/blocks/blocks.css"; // the one import of the block styles (contract notes: the host owns it)
 import "./embed.css";
 import { mintHs } from "@/lib/web/bot";
-import { roots, settings, webReady } from "@/lib/web/db";
+import { settings, webReady } from "@/lib/web/db";
 import { cleanPage } from "@/lib/web/fill";
-import { embedOrigins, ID, selfFramed } from "./bridge";
+import { suggest } from "@/lib/web/suggest";
+import { cleanSection, embedOrigins, ID, selfFramed } from "./bridge";
 import Widget from "./Widget";
 
-// The iframe the loader opens on first interaction (plan 7.2). Server-rendered: the page's root questions and a
-// fresh handshake per request (hs = conv.issued.HMAC, minted by bot.ts so mint and verify share one secret).
+// The iframe the loader opens on first interaction (plan 7.2). Server-rendered: the starter questions for the page and
+// the section being read (`sec`, suggest.ts) and a fresh handshake per request (hs = conv.issued.HMAC, minted by bot.ts
+// so mint and verify share one secret).
 const barlow = Barlow({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--sb-font", display: "swap" });
 
 export const dynamic = "force-dynamic";
@@ -37,12 +39,12 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   const page = (test && cleanPage(one(sp.pg))) || cleanPage(one(sp.page));
   const q = String(one(sp.q) ?? "");
   const conversationId = `${test ? "t" : "c"}_${randomUUID()}`;
-  const rows = await roots(page).catch(() => []);
+  const rows = await suggest(page, cleanSection(one(sp.sec))).catch(() => []);
 
   return (
     <div className={barlow.variable}>
       <Widget conversationId={conversationId} hs={mintHs(conversationId)} page={page} origins={embedOrigins()}
-        roots={rows.filter(r => r.id && ID.test(r.id)).slice(0, 6).map(r => ({ id: r.id, label: cut(r.question, 60) }))}
+        starters={rows.filter(r => ID.test(r.id))}
         talk={{ label: cut(s.cta_label || "Talk to an expert", 28), url: (s.cta_url || "https://www.accops.com/schedule-a-free-demo").slice(0, 300) }}
         ask={ID.test(q) ? q : null} />
     </div>

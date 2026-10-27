@@ -139,3 +139,34 @@ So the model call dominated the 8 s.
 - **Aliases and the matcher:** if a pair's question names a product, vendor or industry (core.terms), the matcher only offers it to questions naming one of those, so an alias without the name ("ztna gateway" on "What is the HySecure ZTNA gateway?") can never match it. An alias that reduces to one word ("what does hysecure do" -> `hysecu`) matches every question that mentions that word. Write aliases with two or more content words, and the product name where the question has one.
 - **Calibration:** `build_intent_index.py` measures the tune precision on the labelled eval rows only. With 78 pairs, the bank's own ~470 phrases (always right) let the old rule spend its 1% on real questions, and min_score slid from 0.54 to 0.39.
 - **Eval relabels (27 Oct):** 8 rows in `web_intent_eval.json` now point at the new, more specific pairs (SQL Server -> lp-50, NetScaler -> lp-19, VPN -> lp-40, government -> lp-72, hospitals -> lp-73, zero trust -> lp-54, Japan -> lp-75, ISO on general -> lp-17).
+
+## 27 Oct: page-aware suggestions (Siddharth: "the bot should be able to detect which page the user is on and suggest questions basis that")
+
+**Where the visitor is** (`scripts/embed.src.js`). One IntersectionObserver keeps the `main section, section[id], h2[id], h3[id]` elements in view. Only when the teaser is due and whenever the chat opens does the loader measure them: the one with the most pixels on screen names the section, by its id, or `section-N` for the N-th id-less `<main>` section (the page cards' own naming, `web_pages.py extract_lp`). Nothing runs per scroll, so it needs no debounce. A name must pass `SEC = /^[a-z0-9][a-z0-9-]{0,40}$/` (`app/embed/bridge.ts`, the same regex in the loader), or no section is sent. On SAM's test page, `data-page`'s `#anchor` stands in (`/admin/website/test?section=migration`), because that page has none of the LP's sections. The loader is 4,901 B gzip (budget 5,120).
+
+**Where it goes:**
+- Teaser due: `GET /api/web/config?page=…&section=…`. Its teaser and 2 chips replace the page's (from the load-time call). With no section, or a failed call, the page's teaser shows.
+- First open: `/embed?…&sec=…`, so the starter questions are the section's (the first 4).
+- Reopen on another section: `postMessage({t:"sec", sec}, base)` to the widget. The widget accepts it only from the parent origin it already trusts and re-reads config. With an empty thread the starters change. Mid-conversation, up to 3 chips appear above the input until the next question.
+
+**Ranking** (`lib/web/suggest.ts`, TS only, no new SQL). It reads `sam_web_qa_public` (the light columns), the page card(s) from `sam_web_pages_public` (`<page>/#<section>` first, then the page, with and without a trailing slash) and `sam_web_roots`, all in parallel. APPROVED pairs of the page's group (else `general`) are ranked in four tiers:
+0. A source is `page#section`.
+1. A source is on the page (any anchor).
+2. The pair names one of the card's products / industries.
+3. The group's roots (filler).
+
+Within a tier, pairs are ordered by:
+1. The card's `questions_answered` order: each question maps to a confident `intentMatch`, else the best-ranked pair citing the section.
+2. Then `sources[0]` matched.
+3. Then `nudge_weight`, then id.
+
+Tier 2 first orders by the card label matched: an industry page's industries come before its products, any other page's products first. Card labels and pairs meet as core.terms entities (`intent.ts analyse`), from the pair's question and its `product:` / `industry:` tags. So "Pharma / Healthcare" meets "hospitals" and `industry:healthcare`. Up to 8 come back. `[0]` is the teaser, and the config's `chips` are the other 7, so the browser (which holds the conversation) can drop already-asked ids and still show 4. The memo is per instance, 60 s per (page, section), cleared past 500 keys. The config response stays CDN-cached 300 s, and the CDN key is the full URL, `section` included.
+
+**Never repeat a question:**
+- `/api/web/ask` now returns `qa_id` for `bank` / `intent` answers.
+- The widget keeps the conversation's asked ids (restored with the thread).
+- It drops them from the follow-up chips of new answers and from the reopen chips. The starters show only while the thread is empty.
+
+**Checks:**
+- `web-suggest.check` runs on real data (the bank, page cards and committed index; PostgREST stubbed): the allowlist, LP `#comparison` / `#migration` / `#faq` / `#section-2` / `#talk`, the HySecure, healthcare, BFSI, government and About Us pages, the roots fallback, the teaser following the section (config route) and the memo.
+- `web-widget.check` covers the observer, the measurement, `section-N`, junk ids, the reopen message and `data-page#anchor`.

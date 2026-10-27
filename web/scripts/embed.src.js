@@ -6,9 +6,15 @@
  * Tag:  <script src="https://sam-accops.vercel.app/embed.js" async data-teaser="15" data-avoid="[data-sticky]"></script>
  *   data-teaser  seconds of visible, engaged time before the teaser (0 = never); default: the config's after_s
  *   data-avoid   a bottom-fixed bar of the host page (CSS selector) that the launcher rises above while it shows
- *   data-page    test only: answer as if on this page URL (SAM's "Test the bot" page uses the LP's). /embed honours it only
- *                when SAM frames itself; on any other host it is ignored. Events always report the real page.
+ *   data-page    test only: answer as if on this page URL (SAM's "Test the bot" page uses the LP's); its #anchor stands in
+ *                for the section being read. /embed honours it only when SAM frames itself; on any other host it is
+ *                ignored. Events always report the real page.
  * After load + idle it GETs /api/web/config: the kill switch (anything but enabled:true draws nothing).
+ * Page-aware (Siddharth, 27 Oct 2026): an IntersectionObserver keeps the sections and id'd headings in view; when the
+ * teaser is due and whenever the chat opens, the one with the most pixels on screen names the section (its id, or
+ * "section-N" for the N-th id-less <main> section, the page cards' own naming; SEC-allowlisted, never text). It goes
+ * to /api/web/config (the teaser + its chips) and to /embed (the starter questions); a reopen on another section tells
+ * the open widget. Measured only at those moments, so nothing runs per scroll (a debounce by construction).
  * The launcher and teaser live in a closed shadow root (no CSS leaks either way); the /embed iframe is created on the
  * first click only. The bridge takes messages only from that iframe's window AND origin, answers only to that origin
  * (never "*"), and forwards to dataLayer / Clarity / PostHog nothing but allowlisted event names, ids and sources:
@@ -20,7 +26,7 @@
   W.AccopsChat = 1;
   var base = new URL(me.src).origin, page = location.origin + location.pathname, K = "acc_chat_", DAY = 864e5, pg = me.getAttribute("data-page");
   var ID = /^[\w.:-]{1,80}$/, EV = /^(question_clicked|answer_shown|doc_opened|filter_used|step_viewed)$/;
-  var SRC = /^(bank|intent|cache|model|fallback|guard|limited|repeat|root|chip|picker|teaser)$/;
+  var SRC = /^(bank|intent|cache|model|fallback|guard|limited|repeat|root|chip|picker|teaser)$/, SEC = /^[a-z0-9][a-z0-9-]{0,40}$/;
   var ok = function (re, v) { return typeof v === "string" && re.test(v) ? v : null; };
   var attr = function (n) { return me.getAttribute("data-" + n); };
   var consent = function () { return W.SAM_CONSENT === true; };
@@ -102,18 +108,34 @@
     D.body.appendChild(host);
     var q = function (s) { return root.querySelector(s); };
     var btn = q(".l"), tz = q(".t"), tq = q(".tq"), tc = q(".tc"), wrap = q(".f");
-    var frame = null, opened = false, shown = false, lock = null, timer = null;
+    var frame = null, opened = false, shown = false, lock = null, timer = null, sec = null, live = [];
+    var secs = [].slice.call(D.querySelectorAll("main section"));
+    if (W.IntersectionObserver) {
+      var io = new W.IntersectionObserver(function (x) {
+        x.forEach(function (e) { var i = live.indexOf(e.target); if (e.isIntersecting) { if (i < 0) live.push(e.target); } else if (i >= 0) live.splice(i, 1); });
+      });
+      [].forEach.call(D.querySelectorAll("main section,section[id],h2[id],h3[id]"), function (el) { io.observe(el); });
+    }
+    function where() {
+      if (pg) return ok(SEC, pg.split("#")[1]);
+      var best = null, max = 0;
+      live.forEach(function (el) { var r = el.getBoundingClientRect(), h = Math.min(r.bottom, W.innerHeight) - Math.max(r.top, 0); if (h > max) { max = h; best = el; } });
+      return best && ok(SEC, best.id || "section-" + (secs.indexOf(best) + 1));
+    }
 
     function open(qa) {
       hideT();
-      if (!frame) {
+      var s = where();
+      if (frame) { if (s && s !== sec) frame.contentWindow.postMessage({ t: "sec", sec: s }, base); }
+      else {
         frame = D.createElement("iframe");
-        frame.src = base + "/embed?page=" + encodeURIComponent(page) + (qa ? "&q=" + encodeURIComponent(qa) : "") + (pg ? "&pg=" + encodeURIComponent(pg) : "");
+        frame.src = base + "/embed?page=" + encodeURIComponent(page) + (qa ? "&q=" + encodeURIComponent(qa) : "") + (pg ? "&pg=" + encodeURIComponent(pg) : "") + (s ? "&sec=" + s : "");
         frame.title = "Ask Accops";
         frame.setAttribute("allow", "");
         frame.setAttribute("referrerpolicy", "strict-origin");
         wrap.appendChild(frame);
       }
+      sec = s || sec;
       opened = true;
       wrap.className = "f on";
       wrap.removeAttribute("aria-hidden");
@@ -172,14 +194,26 @@
     // never while a form field has focus or #talk is in view (and it hides if either happens); a dismissal lasts the
     // session, or 30 days with consent. It never takes focus; Esc dismisses it. Desktop: a card above the launcher with
     // the page's top question + 2 chips; under 640 px: a one-line pill beside the launcher, never an overlay.
-    var T = c.teaser, after = attr("teaser");
+    var T = good(c), after = attr("teaser"), due = 0;
     after = after === null ? T && T.after_s : +after;
-    var chips = (c.chips || []).filter(function (x) { return x && ok(ID, x.id) && typeof x.label === "string"; }).slice(0, 2);
+    // The teaser + 2 chips, from a config (the page's at load, the reading section's when due); text only via textContent.
+    function fill(x) {
+      T = good(x);
+      q(".tq span").textContent = T.label;
+      tc.textContent = "";
+      (x.chips || []).filter(function (y) { return y && ok(ID, y.id) && typeof y.label === "string"; }).slice(0, 2).forEach(function (y) {
+        var b = D.createElement("button");
+        b.type = "button";
+        b.textContent = y.label;
+        b.addEventListener("click", function () { pick(y.id); });
+        tc.appendChild(b);
+      });
+    }
     function dismissed() { return !!get("td") || Date.now() - (+get("td", 1) || 0) < 30 * DAY; }
     function hideT() { if (timer) { clearInterval(timer); timer = null; } if (shown) { shown = false; tz.hidden = true; } }
     function dismiss() { both("popup_dismissed", T.qa_id); put("td", consent() ? String(Date.now()) : "1", consent()); hideT(); }
     function pick(id) { both("popup_clicked", id); open(id); }
-    if (T && ok(ID, T.qa_id) && typeof T.label === "string" && after > 0 && !get("ts") && !dismissed()) {
+    if (T && after > 0 && !get("ts") && !dismissed()) {
       var engaged = false, seen = 0, talkIn = false, talk = D.getElementById("talk");
       var engage = function () { engaged = true; };
       W.addEventListener("scroll", engage, { passive: true, once: true });
@@ -187,21 +221,17 @@
       if (talk && W.IntersectionObserver) new W.IntersectionObserver(function (x) { talkIn = x[0].isIntersecting; if (talkIn) hideT(); }).observe(talk);
       var busy = function () { var f = D.activeElement; return talkIn || !!(f && f.matches && f.matches("input,textarea,select,[contenteditable]")); };
       D.addEventListener("focusin", function () { if (shown && busy()) hideT(); });
-      q(".tq span").textContent = T.label;
+      fill(c);
       tq.addEventListener("click", function () { pick(T.qa_id); });
-      chips.forEach(function (x) {
-        var b = D.createElement("button");
-        b.type = "button";
-        b.textContent = x.label;
-        b.addEventListener("click", function () { pick(x.id); });
-        tc.appendChild(b);
-      });
       q(".tx").addEventListener("click", dismiss);
       timer = setInterval(function () {
         if (opened) return hideT();
         if (!engaged || D.visibilityState !== "visible") return;
         seen += 250;
         if (seen >= after * 1000 && !busy()) {
+          // due: the section being read picks the question (one config call; the page's teaser if none or it fails)
+          if (!due) { var s = where(); due = s ? 1 : 2; if (s) conf(s).then(function (x) { if (good(x)) fill(x); }).catch(noop).then(function () { due = 2; }); }
+          if (due < 2) return;
           clearInterval(timer);
           timer = null;
           put("ts", "1");
@@ -214,12 +244,13 @@
     }
   }
 
-  function start() {
-    W.fetch(base + "/api/web/config?page=" + encodeURIComponent(pg || page), { credentials: "omit" }) // public roots, any page
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (c) { if (c && c.enabled === true) mount(c); })
-      .catch(function () { });
+  function conf(s) { // public data only, any page
+    return W.fetch(base + "/api/web/config?page=" + encodeURIComponent(pg || page) + (s ? "&section=" + s : ""), { credentials: "omit" })
+      .then(function (r) { return r.ok ? r.json() : null; });
   }
+  function noop() { }
+  function good(x) { var t = x && x.enabled === true && x.teaser; return t && ok(ID, t.qa_id) && typeof t.label === "string" ? t : null; }
+  function start() { conf().then(function (c) { if (c && c.enabled === true) mount(c); }).catch(noop); }
   function idle() { if (W.requestIdleCallback) W.requestIdleCallback(start, { timeout: 3000 }); else setTimeout(start, 1); }
   if (D.readyState === "complete") idle(); else W.addEventListener("load", idle);
 })(window, document);

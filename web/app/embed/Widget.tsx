@@ -15,7 +15,7 @@ import { Picker } from "@/components/blocks/Picker";
 import { Stat } from "@/components/blocks/Stat";
 import { Steps } from "@/components/blocks/Steps";
 import { Text } from "@/components/blocks/Text";
-import { acceptInit, eventMessage, ID, type WidgetEvent } from "./bridge";
+import { acceptInit, eventMessage, ID, SEC, type WidgetEvent } from "./bridge";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const BLOCK: Record<Block["type"], ComponentType<any>> = { text: Text, doc_card: DocCard, compare_table: CompareTable, steps: Steps, stat: Stat, picker: Picker, calculator: Calculator, cta: Cta };
@@ -23,7 +23,7 @@ const MAX = 500, KEY = "acc_chat_v1", HS_REUSE_MS = 100 * 60_000; // hs lives 2 
 const FAIL = "That didn't go through. Try again in a moment, or talk to the team.";
 
 export type Props = {
-  conversationId: string; hs: string; page: string; roots: Chip[]; origins: string[];
+  conversationId: string; hs: string; page: string; starters: Chip[]; origins: string[];
   talk: { label: string; url: string }; ask?: string | null;
 };
 type Item = { id: number; me: string } | { id: number; a: AnswerT; source: string; qa?: string };
@@ -42,13 +42,15 @@ export function AnswerView({ a }: { a: AnswerT }) {
 const rid = () => `v_${Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, "0")).join("")}`;
 const load = (): Saved | null => { try { return JSON.parse(sessionStorage.getItem(KEY) ?? "null"); } catch { return null; } };
 
-export default function Widget({ conversationId, hs: hs0, page, roots, origins, talk, ask: askFirst }: Props) {
+export default function Widget({ conversationId, hs: hs0, page, starters: starters0, origins, talk, ask: askFirst }: Props) {
   const [items, setItems] = useState<Item[]>([]);
+  const [starters, setStarters] = useState(starters0);
+  const [near, setNear] = useState<Chip[]>([]); // the section's questions when the chat is reopened elsewhere mid-conversation
   const [busy, setBusy] = useState<false | "click" | "typed">(false);
   const [slow, setSlow] = useState(false);
   const [text, setText] = useState("");
   const s = useRef({ c: conversationId, hs: hs0, at: Date.now(), recent: [] as number[], renderAt: 0, n: 0,
-    parent: null as string | null, visitor: "", prev: "" });
+    parent: null as string | null, visitor: "", prev: "", asked: [] as string[] });
   const thread = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const lastMe = useRef<HTMLDivElement>(null);
@@ -75,6 +77,7 @@ export default function Widget({ conversationId, hs: hs0, page, roots, origins, 
     if (busy) return;
     x.recent = [...x.recent, now].slice(-6); // includes this send: the CTA comes after the 2nd answer (contract notes)
     if (echo) push({ me: echo });
+    setNear([]);
     setBusy(turn.kind);
     const body = { conversation_id: x.c, visitor_id: x.visitor || (x.visitor = rid()), page, hs: x.hs, parent: !!x.parent,
       ms_since_render: Math.max(0, now - x.renderAt), recent_ms: x.recent, ...(turn.kind === "typed" && x.prev ? { prev: x.prev.slice(0, 200) } : {}), turn };
@@ -83,7 +86,12 @@ export default function Widget({ conversationId, hs: hs0, page, roots, origins, 
     try {
       const r = await fetch("/api/web/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(20_000) });
       const j = await r.json(); // a 429 still carries renderable fallback blocks
-      if (Array.isArray(j?.blocks)) { a = { lead: j.lead, blocks: j.blocks, chips: Array.isArray(j.chips) ? j.chips : [] }; source = String(j.source); }
+      if (Array.isArray(j?.blocks)) {
+        qa ??= typeof j.qa_id === "string" && ID.test(j.qa_id) ? j.qa_id : undefined; // a typed question the bank answered
+        if (qa) x.asked.push(qa);
+        a = { lead: j.lead, blocks: j.blocks, chips: Array.isArray(j.chips) ? (j.chips as Chip[]).filter(c => !x.asked.includes(c.id)) : [] };
+        source = String(j.source);
+      }
     } catch { /* below */ }
     if (!a) a = { lead: FAIL, blocks: [{ type: "cta", label: talk.label, action: "talk_to_sales", url: talk.url }], chips: [] };
     else track("answer_shown", { qa_id: qa, source });
@@ -122,12 +130,30 @@ export default function Widget({ conversationId, hs: hs0, page, roots, origins, 
     const x = s.current, old = load();
     x.renderAt = Date.now();
     if (old && old.page === page && Date.now() - old.at < HS_REUSE_MS && old.items?.length) {
-      Object.assign(x, { c: old.c, hs: old.hs, at: old.at, recent: old.recent ?? [], n: old.items.length + 1 });
+      Object.assign(x, { c: old.c, hs: old.hs, at: old.at, recent: old.recent ?? [], n: old.items.length + 1,
+        asked: old.items.flatMap(i => ("qa" in i && i.qa ? [i.qa] : [])) });
       setItems(old.items);
     }
+    /** The loader says the visitor reopened the chat on another section: that section's questions, never one already asked
+     *  (the starters while the thread is empty, else a chip row above the input until the next question). */
+    const reSection = async (sec: string) => {
+      try {
+        const c = await (await fetch(`/api/web/config?page=${encodeURIComponent(page)}&section=${sec}`)).json();
+        const l = [c?.teaser && { id: c.teaser.qa_id, label: c.teaser.label }, ...(Array.isArray(c?.chips) ? c.chips : [])]
+          .filter((r): r is Chip => !!r && typeof r.id === "string" && ID.test(r.id) && typeof r.label === "string");
+        if (!l.length) return;
+        setStarters(l);
+        if (x.n) setNear(l.filter(c => !x.asked.includes(c.id)).slice(0, 3));
+      } catch { /* keep what is shown */ }
+    };
     const onMsg = (e: MessageEvent) => {
       if (e.source !== parent || parent === window) return;
-      if (x.parent) { if (e.origin === x.parent && e.data?.t === "focus" && !matchMedia("(pointer: coarse)").matches) input.current?.focus(); return; }
+      if (x.parent) {
+        if (e.origin !== x.parent) return;
+        if (e.data?.t === "focus" && !matchMedia("(pointer: coarse)").matches) input.current?.focus();
+        else if (e.data?.t === "sec" && typeof e.data.sec === "string" && SEC.test(e.data.sec)) void reSection(e.data.sec);
+        return;
+      }
       const init = acceptInit(e, origins, parent);
       if (init) {
         x.parent = init.origin;
@@ -143,7 +169,7 @@ export default function Widget({ conversationId, hs: hs0, page, roots, origins, 
     // The teaser's or a ?q= question: asked once the handshake had its chance (and never inside the 300 ms click rule).
     let t: ReturnType<typeof setTimeout> | undefined;
     if (askFirst && ID.test(askFirst) && !(old?.items?.length && old.page === page)) {
-      const label = roots.find(r => r.id === askFirst)?.label ?? null;
+      const label = starters0.find(r => r.id === askFirst)?.label ?? null;
       const t0 = Date.now();
       const go = () => (x.parent || Date.now() - t0 > 1500 ? askQa(askFirst, label ?? "", "teaser") : (t = setTimeout(go, 100)));
       t = setTimeout(go, 400);
@@ -201,11 +227,11 @@ export default function Widget({ conversationId, hs: hs0, page, roots, origins, 
             <div className="w-hello sb-in">
               <p className="w-hello-t">What would you like to know?</p>
               <p className="w-hello-s">Every answer links to its source on accops.com.</p>
-              {roots.length > 0 && (
+              {starters.length > 0 && (
                 <>
                   <p className="w-eyebrow" id="w-roots">Asked on this page</p>
                   <ul className="w-roots" aria-labelledby="w-roots">
-                    {roots.map(r => (
+                    {starters.slice(0, 4).map(r => ( // the thread is empty here, so nothing was asked yet
                       <li key={r.id}>
                         <button type="button" onClick={() => askQa(r.id, r.label, "root")} disabled={!!busy}>
                           <span className="w-glyph" aria-hidden="true">↳</span><span>{r.label}</span>
@@ -232,6 +258,11 @@ export default function Widget({ conversationId, hs: hs0, page, roots, origins, 
         </div>
 
         <footer className="w-foot">
+          {items.length > 0 && near.length > 0 && !busy && (
+            <ul className="sb-chips w-near" aria-label="Asked about this part of the page">
+              {near.map(c => <li key={c.id}><button type="button" className="sb-chip" onClick={() => askQa(c.id, c.label, "chip")}>{c.label}</button></li>)}
+            </ul>
+          )}
           <p className="w-privacy">Please don&rsquo;t share personal details. Conversations are stored to improve answers.{" "}
             <a href="https://www.accops.com/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy</a></p>
           <form className="w-input" onSubmit={e => { e.preventDefault(); submit(); }}>

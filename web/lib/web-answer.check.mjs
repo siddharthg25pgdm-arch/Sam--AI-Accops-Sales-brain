@@ -137,13 +137,15 @@ ok(r.body.source === "bank" && N.model.length === 0 && N.slots.length === 0, "cl
 ok(r.body.blocks.map(b => b.type).join() === "text,compare_table" && r.body.blocks[0].body === QA["lp-renewal-1"].answer, "bank = verbatim answer + its visual");
 ok(r.body.blocks[0].source.label === "accops-citrix-lp.vercel.app" && r.body.chips.map(c => c.id).join() === "lp-steps-1,lp-x", "source pill + children chips");
 ok(N.logs[0].source === "bank" && N.logs[0].label === "human" && N.logs[0].country === "IN" && N.logs[0].qa_id === "lp-renewal-1", "logged");
+ok(r.body.qa_id === "lp-renewal-1", "a bank answer names its pair");
 fresh({ S: { intent: { qa_id: "lp-steps-1", score: 5, margin: 0.4 } } });
 r = await run(typed("how does the migration work"));
 ok(r.body.source === "intent" && N.model.length === 0 && N.slots.length === 0 && !N.rpc.includes("rpc/sam_web_search"), "intent hit -> no model, no search");
 ok(r.body.blocks.at(-1).type === "cta" && r.body.blocks.at(-1).label === "Plan my migration", "a pair's own CTA");
+ok(r.body.qa_id === "lp-steps-1", "an intent answer names its pair (the widget never suggests it again in this conversation)");
 fresh({ S: { intent: { qa_id: "retired-1", score: 5, margin: 0.4 } } }); N.openai.push(writes("answered", GOOD, ["fact:hysecure-1"]));
 r = await run(typed("is hysecure certified"));
-ok(r.body.source === "model", "an intent hit on a retired pair falls through");
+ok(r.body.source === "model" && !("qa_id" in r.body), "an intent hit on a retired pair falls through (a model answer names no pair)");
 fresh(); r = await run(click("lp-calc-1"));
 ok(r.body.blocks.every(b => b.type !== "calculator"), "a calculator without figures_approved is never shown");
 fresh(); r = await run(click("does-not-exist"));

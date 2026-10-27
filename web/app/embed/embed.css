@@ -57,6 +57,7 @@
 /* footer: the privacy line right above the input (Klaviyo), then a pill input with a round send */
 .w-foot { flex: none; padding: 8px 12px 12px; padding-bottom: max(12px, env(safe-area-inset-bottom)); background: #fff;
   box-shadow: 0 -1px 0 var(--w-line); }
+.w-near { padding: 2px 2px 10px; } /* the reading section's questions, after a reopen mid-conversation */
 .w-privacy { padding: 0 6px 8px; font-size: 12px; line-height: 1.4; color: var(--w-ink-3); text-align: center; }
 .w-privacy a { text-decoration: underline; text-underline-offset: 2px; }
 .w-input { position: relative; display: flex; align-items: flex-end; gap: 8px; padding: 5px 5px 5px 16px; border: 1px solid #d5d2d2;

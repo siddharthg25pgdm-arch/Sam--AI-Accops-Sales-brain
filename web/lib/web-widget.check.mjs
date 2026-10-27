@@ -4,10 +4,11 @@
  *  2. The loader in a fake DOM (fake clock, storage, fetch, postMessage), the real built file:
  *     kill switch; every teaser rule of plan 7.1; the iframe only on first interaction; the bridge ignores a foreign
  *     origin or window and answers only to the iframe's origin; dataLayer / beacons carry no text; #anchor CTA;
- *     the mobile scroll lock; the lift above a bottom bar; server strings only ever set as textContent.
+ *     the mobile scroll lock; the lift above a bottom bar; server strings only ever set as textContent; page-aware
+ *     (27 Oct): the section most in view picks the teaser, goes to /embed as sec and to the widget on a reopen.
  *  3. The widget bridge (app/embed/bridge.ts): init only from an allowed parent; events strip anything but name/id/source/ref.
  *  4. frame-ancestors on /embed only (next.config.ts), from the same origin list the widget trusts.
- *  5. /embed (page.tsx): notFound while inert; when on, a handshake that verifyHs accepts, cleaned page + q, the roots.
+ *  5. /embed (page.tsx): notFound while inert; when on, a handshake that verifyHs accepts, cleaned page + q + sec, the starters.
  *  6. Every fixture as the widget draws it: each Text / Stat / table / steps shows its source pill ("Based on" for the
  *     model's written answer); a Text without a source is not drawn; **emphasis** is drawn as <strong class="sb-em">
  *     (never raw asterisks), navy on its highlight band at AA contrast; 3-column tables carry data-col (blocks.css). */
@@ -42,7 +43,7 @@ const BASE = "https://sam-accops.vercel.app", LP = "https://accops-citrix-lp.ver
 class Store { constructor(o = {}) { this.m = { ...o }; } getItem(k) { return k in this.m ? this.m[k] : null; } setItem(k, v) { this.m[k] = String(v); } }
 
 function boot({ width = 1280, consent = false, teaser = "15", avoid = null, pg = null, origin = LP, config = { enabled: true, teaser: { after_s: 15, qa_id: "lp-01", label: "Why did my Citrix renewal go up?" }, chips: [{ id: "lp-03", label: "Compare licensing" }, { id: "lp-05", label: "How does migration work?" }] },
-  ss = new Store(), ls = new Store(), start = Date.UTC(2026, 9, 27), talk = false, avoidRect = null } = {}) {
+  ss = new Store(), ls = new Store(), start = Date.UTC(2026, 9, 27), talk = false, avoidRect = null, sections = [] } = {}) {
   const t = { now: start, timers: new Map(), id: 0, posts: [], beacons: [], opened: [], fetches: [], ios: [], docL: {}, winL: {} };
   const on = (bag, k, f) => (bag[k] ||= []).push(f);
   class El {
@@ -60,6 +61,8 @@ function boot({ width = 1280, consent = false, teaser = "15", avoid = null, pg =
     matches(s) { return s.split(",").includes(this.tag); }
     getBoundingClientRect() { return this.rect || { top: 0, height: 0 }; }
     scrollIntoView(o) { this.scrolled = o; }
+    set textContent(v) { this.text = v; if (v === "") this.children = []; } // as the DOM: "" removes the children
+    get textContent() { return this.text; }
     set innerHTML(v) { this.html = v; }
     get innerHTML() { return this.html; }
   }
@@ -71,18 +74,21 @@ function boot({ width = 1280, consent = false, teaser = "15", avoid = null, pg =
   const talkEl = new El("section"), avoidEl = new El("div");
   avoidEl.rect = avoidRect;
   const body = new El("body"), html = new El("html");
+  // sections: [{ id, rect: {top, bottom}, main }]: <main> sections (id or not) and id'd sections / headings elsewhere
+  const secEls = sections.map(x => Object.assign(new El(x.main === false ? "h2" : "section"), x));
   const doc = { currentScript: script, readyState: "complete", visibilityState: "visible", body, documentElement: html, activeElement: body,
     createElement: tag => new El(tag), getElementById: id => (id === "talk" && talk ? talkEl : null),
+    querySelectorAll: s => (s === "main section" ? secEls.filter(e => e.main !== false) : s === "main section,section[id],h2[id],h3[id]" ? secEls : []),
     querySelector: s => (s === avoid ? avoidEl : null), addEventListener: (k, f) => on(t.docL, k, f) };
   const timer = every => (fn, ms = 0) => { const id = ++t.id; t.timers.set(id, { at: t.now + ms, fn, every: every ? ms : 0 }); return id; };
   const win = {
     document: doc, location: { origin, pathname: "/", href: `${origin}/` }, innerWidth: width, innerHeight: 800, SAM_CONSENT: consent,
     sessionStorage: ss, localStorage: ls, crypto: globalThis.crypto, URL, Blob, Promise,
     navigator: { sendBeacon: (u, b) => { t.beacons.push([u, b]); return true; } },
-    fetch: async u => { t.fetches.push(u); return config ? { ok: true, json: async () => config } : { ok: false, json: async () => ({}) }; },
+    fetch: async u => { t.fetches.push(u); const c = typeof config === "function" ? config(u) : config; return c ? { ok: true, json: async () => c } : { ok: false, json: async () => ({}) }; },
     setTimeout: timer(false), setInterval: timer(true), clearTimeout: id => t.timers.delete(id), clearInterval: id => t.timers.delete(id),
     requestIdleCallback: f => win.setTimeout(f, 1), requestAnimationFrame: f => { f(); return 1; }, matchMedia: () => ({ matches: false }),
-    IntersectionObserver: class { constructor(cb) { t.ios.push(cb); } observe() {} },
+    IntersectionObserver: class { constructor(cb) { Object.assign(this, { cb, els: [] }); t.ios.push(this); } observe(el) { this.els.push(el); } },
     open: (...a) => t.opened.push(a), addEventListener: (k, f) => on(t.winL, k, f),
     Date: class extends Date { static now() { return t.now; } },
   };
@@ -191,7 +197,7 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   const c = boot({ talk: true });
   await c.advance(10);
   c.fireWin("scroll");
-  c.t.ios[0]([{ isIntersecting: true }]);
+  c.t.ios.find(o => o.els.includes(c.talkEl)).cb([{ isIntersecting: true, target: c.talkEl }]);
   await c.advance(60_000);
   eq(c.sh(".t").className, "", "not while #talk is in view");
 }
@@ -295,6 +301,56 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   const j = JSON.parse(await b.t.beacons.at(-1)[1].text());
   eq(j.page, `${BASE}/`, "beacons report the real host page, not data-page");
 }
+// page-aware (27 Oct): the section with the most pixels in view (its id, or "section-N" for the N-th id-less <main>
+// section, SEC-allowlisted) picks the teaser when it is due, goes to /embed as sec, and to the open widget on a reopen
+{
+  const at = (id, top, bottom, main = true) => ({ id, rect: { top, bottom, height: bottom - top }, main });
+  const cfg = u => (u.includes("&section=migration")
+    ? { enabled: true, teaser: { after_s: 15, qa_id: "lp-05", label: "Can we migrate off Citrix without downtime?" }, chips: [{ id: "lp-07", label: "Pilot first?" }, { id: "lp-06", label: "How long?" }, { id: "lp-29", label: "Support?" }] }
+    : { enabled: true, teaser: { after_s: 15, qa_id: "lp-01", label: "How is Accops different from Citrix?" }, chips: [{ id: "lp-02", label: "Components" }] });
+  const see = (b, rects) => { const o = b.t.ios[0]; Object.entries(rects).forEach(([i, r]) => { o.els[i].rect = r; }); o.cb(o.els.map(target => ({ target, isIntersecting: target.rect.bottom > 0 && target.rect.top < 800 }))); };
+  const b = boot({ config: cfg, sections: [at("", -900, -100), at("migration", -200, 700), at("faq", 700, 1600), at("talk", 1600, 2400)] });
+  await b.advance(10);
+  eq(b.t.ios[0].els.map(e => e.id), ["", "migration", "faq", "talk"], "one observer over the <main> sections and id'd sections / headings");
+  see(b, {});
+  b.fireWin("scroll");
+  await b.advance(15_000);
+  eq(b.t.fetches.length, 2, "nothing measured or fetched before the teaser is due (no per-scroll work)");
+  eq(b.t.fetches[1], `${BASE}/api/web/config?page=${encodeURIComponent(`${LP}/`)}&section=migration`, "teaser due: config for the section most in view (700 px of migration vs 100 px of faq)");
+  await b.advance(250);
+  eq([b.sh(".t").className, b.sh(".tq span").textContent, b.sh(".tc").children.map(c => c.textContent)],
+    ["t", "Can we migrate off Citrix without downtime?", ["Pilot first?", "How long?"]], "the teaser and its 2 chips follow the section");
+  eq(b.dl().at(-1), { event: "sam_chat", sam_event: "popup_shown", page_path: "/", sam_qa_id: "lp-05" }, "popup_shown names the section's question");
+  b.sh(".tq").fire("click");
+  const fr = b.sh(".f").children[0];
+  eq(fr.src, `${BASE}/embed?page=${encodeURIComponent(`${LP}/`)}&q=lp-05&sec=migration`, "/embed gets the section (starter chips match)");
+  b.fireWin("message", { data: { t: "close" }, origin: BASE, source: fr.contentWindow });
+  see(b, { 1: { top: -1200, bottom: -300 }, 2: { top: -300, bottom: 600 }, 3: { top: 600, bottom: 1400 } });
+  b.sh(".l").fire("click");
+  eq(JSON.parse(JSON.stringify(b.t.posts.filter(([m]) => m.t === "sec"))), [[{ t: "sec", sec: "faq" }, BASE]], "reopened after scrolling: the widget is told the new section, at its origin only");
+  b.sh(".l").fire("click"); b.sh(".l").fire("click");
+  eq(b.t.posts.filter(([m]) => m.t === "sec").length, 1, "reopened on the same section: nothing new sent");
+  eq(b.sh(".f").children.length, 1, "still one iframe");
+
+  // the N-th id-less <main> section is "section-N"; ids outside the allowlist are never sent (no free text leaves the page)
+  const c = boot({ config: cfg, sections: [at("", -900, -100), at("comparison", -100, 50), at("", 50, 800)] });
+  await c.advance(10); see(c, {});
+  c.sh(".l").fire("click");
+  ok(c.sh(".f").children[0].src.endsWith("&sec=section-3"), "id-less <main> section: section-N (the page cards' naming)");
+  for (const junk of ["Pricing_Table", "a b", "-x", "x".repeat(42), "évaluation"]) {
+    const d = boot({ config: cfg, sections: [at(junk, 0, 800, false)] });
+    await d.advance(10); see(d, {});
+    d.fireWin("scroll"); await d.advance(15_250);
+    d.sh(".l").fire("click");
+    ok(!d.t.fetches.some(u => u.includes("section=")) && !d.sh(".f").children[0].src.includes("sec="), `id ${JSON.stringify(junk)} dropped`);
+    eq(d.sh(".tq span").textContent, "How is Accops different from Citrix?", "no section: the page's teaser");
+  }
+  // SAM's test page: data-page's #anchor stands in for the section (the host page's own sections are never read)
+  const e = boot({ origin: BASE, pg: `${LP}/#comparison`, config: cfg, sections: [at("migration", 0, 800)] });
+  await e.advance(10); see(e, {});
+  e.sh(".l").fire("click");
+  ok(e.sh(".f").children[0].src.endsWith(`&pg=${encodeURIComponent(`${LP}/#comparison`)}&sec=comparison`), "data-page #anchor -> sec");
+}
 // the launcher rises above the page's sticky bar while it shows
 {
   const b = boot({ width: 375, avoid: "[data-sticky]", avoidRect: { top: 730, height: 70 } });
@@ -368,8 +424,10 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   await assert.rejects(() => Page({ searchParams: Promise.resolve({}) }), is404, "inert (no env): 404"); n++;
   Object.assign(process.env, ENV);
   let enabled = true;
+  const seen = [];
   globalThis.fetch = async u => {
     const s = String(u);
+    seen.push(decodeURIComponent(s));
     const body = s.includes("rpc/sam_web_settings") ? { enabled, model_enabled: true, cta_url: "https://www.accops.com/schedule-a-free-demo", cta_label: "Talk to an expert" }
       : s.includes("rpc/sam_web_roots") ? [{ id: "lp-01", question: "Why did my Citrix renewal go up?" }, { id: "bad id", question: "x" }, { id: "lp-03", question: "q".repeat(80) }]
       : null;
@@ -383,8 +441,14 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   ok("age" in verifyHs(p.hs, p.conversationId, Date.now() + 1500), "hs verifies with bot.ts (same secret and format)");
   ok(/^c_[0-9a-f-]{36}$/.test(p.conversationId), "a fresh conversation id per request");
   eq([p.page, p.ask, p.origins], ["https://accops-citrix-lp.vercel.app/", "lp-01", Br.embedOrigins()], "page, q and origins passed");
-  eq(p.roots.map(r => r.id), ["lp-01", "lp-03"], "roots: valid ids only");
-  ok(p.roots[1].label.length <= 60, "root labels cut to 60");
+  eq(p.starters.map(r => r.id), ["lp-01", "lp-03"], "starters: valid ids only (no pairs or cards readable here: the roots)");
+  ok(p.starters[1].label.length <= 60, "starter labels cut to 60");
+  seen.length = 0;
+  await Page({ searchParams: Promise.resolve({ page: "https://accops-citrix-lp.vercel.app/", sec: "migration" }) });
+  ok(seen.some(u => u.includes("sam_web_pages_public") && u.includes('"https://accops-citrix-lp.vercel.app/#migration"')), "sec: the section's page card is asked for");
+  seen.length = 0;
+  await Page({ searchParams: Promise.resolve({ page: "https://accops-citrix-lp.vercel.app/", sec: "Bad Id\"),x" }) });
+  ok(!seen.some(u => u.includes("#")), "a junk sec is dropped before any query");
   eq(p.talk, { label: "Talk to an expert", url: "https://www.accops.com/schedule-a-free-demo" }, "talk-to-sales from settings");
   const p2 = (await Page({ searchParams: Promise.resolve({ page: "javascript:alert(1)", q: "x y" }) })).props.children.props;
   eq([p2.page, p2.ask], ["", null], "a bad page or q is dropped, never reflected");
@@ -452,7 +516,7 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   ok(/@container \(max-width: 479px\)[\s\S]*content: attr\(data-col\)/.test(css), "narrow 3-column tables stack as cards (container query)");
   ok(/@container \(max-width: 479px\)[\s\S]*tbody tr\[hidden\] \{ display: none; \}/.test(css), "card mode keeps collapsed row details hidden");
   const shell = renderToStaticMarkup(React.createElement(W.default, { conversationId: "c_x", hs: "h", page: "", origins: [], ask: null,
-    roots: [{ id: "lp-01", label: "Why did my Citrix renewal go up?" }], talk: { label: "Talk to an expert", url: "https://www.accops.com/schedule-a-free-demo" } }));
+    starters: [{ id: "lp-01", label: "Why did my Citrix renewal go up?" }], talk: { label: "Talk to an expert", url: "https://www.accops.com/schedule-a-free-demo" } }));
   ok(/role="log"[^>]*aria-live="polite"/.test(shell), "thread is a polite live log");
   ok(shell.includes("Please don&#x27;t share personal details") || shell.includes("Please don’t share personal details"), "privacy line above the input");
   ok(shell.includes('maxLength="500"'), "input capped at 500");

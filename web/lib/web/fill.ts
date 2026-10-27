@@ -51,9 +51,9 @@ export function qaBlocks(qa: Qa, only?: string): Block[] {
 export const cta = (s: Settings, qa?: Qa | null): Block => ({ type: "cta", label: cut(qa?.cta || s.cta_label || "Talk to an expert", 28),
   action: "talk_to_sales", url: (qa?.cta_url || s.cta_url || "https://www.accops.com/schedule-a-free-demo").slice(0, 300) });
 
-export const chips = (rows: QaRef[], skip: string[] = []): Chip[] =>
+export const chips = (rows: QaRef[], skip: string[] = [], n = 3): Chip[] =>
   rows.filter((r, i) => r.id && r.id.length <= 80 && !skip.includes(r.id) && rows.findIndex(x => x.id === r.id) === i)
-    .slice(0, 3).map(r => ({ id: r.id, label: cut(r.question, 60) }));
+    .slice(0, n).map(r => ({ id: r.id, label: cut(r.question, 60) }));
 
 /** A public asset (PDF or document) as a card: only when the visitor asked for a document (Siddharth, 27 Oct). */
 const docCard = (c: Candidate): Block | null => {
