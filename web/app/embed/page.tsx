@@ -52,7 +52,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
         starters={rows.filter(r => ID.test(r.id))}
         talk={{ label: cut(s.cta_label || "Talk to an expert", 28), url: (s.cta_url || "https://www.accops.com/schedule-a-free-demo").slice(0, 300) }}
         booking={bookingUrl(s.booking_url)} ask={ID.test(q) ? q : null} visitor={visitor} persist={persist(h.get("x-vercel-ip-country"))}
-        welcome={back && { line: back.line, chips: back.chips.filter(r => ID.test(r.id)) }} />
+        welcome={back && { line: back.line, chips: back.chips.filter(r => ID.test(r.id)), book: !!back.book }} />
     </div>
   );
 }

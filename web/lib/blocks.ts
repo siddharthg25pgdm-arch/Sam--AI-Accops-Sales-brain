@@ -27,6 +27,8 @@ export const Calculator = z.object({ type: z.literal("calculator"), title: z.str
   disclaimer: z.string().min(20).max(200), source: Source });
 export const Cta = z.object({ type: z.literal("cta"), label: z.string().max(28), action: z.enum(["talk_to_sales", "open_url"]), url: z.string().max(300), sub: z.string().max(80).optional() });
 export const Block = z.discriminatedUnion("type", [Text, DocCard, CompareTable, Steps, Stat, Picker, Calculator, Cta]);
-export const Chip = z.object({ id: z.string().max(80), label: z.string().max(60) });            // id = an approved qa id
-export const Answer = z.object({ lead: z.string().max(120).optional(), blocks: z.array(Block).max(5), chips: z.array(Chip).max(3) });
+// id = an approved qa id; url (https only) makes it a link chip instead: the triage support route (fill.ts SUPPORT)
+export const Chip = z.object({ id: z.string().max(80), label: z.string().max(60), url: z.string().max(300).regex(/^https:\/\/[^\s"<>]+$/).optional() });
+// chips: 3 follow-ups, or the triage set (3 routes + support, 27 Oct)
+export const Answer = z.object({ lead: z.string().max(120).optional(), blocks: z.array(Block).max(5), chips: z.array(Chip).max(4) });
 export type Block = z.infer<typeof Block>; export type Chip = z.infer<typeof Chip>; export type Answer = z.infer<typeof Answer>;

@@ -15,7 +15,9 @@ export function Answer({ lead, blocks, chips }: { lead?: string | null; blocks: 
         <ul className="sb-chips sb-in" style={{ ["--i" as string]: k++ }} aria-label="Related questions">
           {chips.map(c => (
             <li key={c.id}>
-              <button type="button" className="sb-chip" onClick={() => act("ask", { qa_id: c.id, source: "chip" }, c.label)}>{c.label}</button>
+              {c.url ? ( // a route off the chat (the support portal): a plain new-tab link, never an ask
+                <a className="sb-chip" href={c.url} target="_blank" rel="noopener noreferrer">{c.label}<span className="sb-sr"> (opens in a new tab)</span></a>
+              ) : <button type="button" className="sb-chip" onClick={() => act("ask", { qa_id: c.id, source: "chip" }, c.label)}>{c.label}</button>}
             </li>
           ))}
         </ul>

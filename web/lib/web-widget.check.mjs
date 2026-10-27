@@ -254,6 +254,8 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   const fr = wrap.children[0];
   eq([fr.tag, fr.src.replace(NOV, ""), fr.title, fr.attrs.referrerpolicy, fr.attrs.allow], ["iframe", `${BASE}/embed?page=${encodeURIComponent(`${LP}/`)}`, "Ask Accops", "strict-origin", ""], "iframe created on the first click");
   eq([wrap.className, btn.attrs["aria-expanded"], b.html.style.overflow], ["f on", "true", "hidden"], "open; page scroll locked on mobile");
+  await b.advance(300);
+  eq(b.t.posts.filter(([m]) => m.t === "focus").length, 0, "first open: no focus message before the frame says ready (it would hit about:blank: a console error on every first open)");
   btn.fire("click"); btn.fire("click");
   eq(wrap.children.length, 1, "one iframe, reused");
   const msg = (data, origin = BASE, source = fr.contentWindow) => b.fireWin("message", { data, origin, source });
@@ -268,6 +270,9 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   ok(b.t.posts.every(([, o]) => o === BASE), "every post targets the iframe origin, never *");
   ok(UUID.test(init[0][0].visitor_id) && Object.keys(init[0][0]).join() === "t,visitor_id", "init carries the visitor id (a v4 UUID), nothing else");
   eq(fr.src.slice(-41), `&vid=${init[0][0].visitor_id}`, "/embed gets the same device id");
+  btn.fire("click"); btn.fire("click"); await b.advance(300);
+  const focus = b.t.posts.filter(([m]) => m.t === "focus");
+  ok(focus.length > 0 && focus.every(([m, o]) => JSON.stringify(m) === '{"t":"focus"}' && o === BASE), "after ready, a reopen sends {t:\"focus\"} to the iframe's origin (the first open focused itself on init)");
   const before = b.dl().length;
   msg({ t: "event", name: "answer_shown", qa_id: "lp-01", source: "bank", text: "my email is a@b.com", ref: "x" });
   msg({ t: "event", name: "question_clicked", qa_id: "call me on 98765 43210", source: "typed text here" });
@@ -627,7 +632,30 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   const BK = "https://bookings.cloud.microsoft/book/AccopsUnifiedPlatformforSecureRemoteAccess2@propalmsnetwork.onmicrosoft.com/s/UEDDAf42hEiNVqsGcRVJ-w2?ismsaljsauthenabled";
   const withBk = renderToStaticMarkup(React.createElement(W.default, { conversationId: "c_x", hs: "h", page: "", origins: [], ask: null, starters: [],
     talk: { label: "Talk to an expert", url: "https://www.accops.com/schedule-a-free-demo" }, booking: BK }));
-  ok(!withBk.includes("<iframe") && withBk.includes('href="https://www.accops.com/schedule-a-free-demo"'), "with a booking_url: nothing loads from Microsoft until asked; the link still works without script");
+  ok(!withBk.includes("<iframe") && withBk.includes(`class="w-human" href="${esc(BK)}"`) && !withBk.includes("schedule-a-free-demo"),
+    "with a booking_url: nothing loads from Microsoft until asked; Prefer a person? points at the calendar (a click the script misses still lands there, never on cta_url)");
+  ok(shell.includes('class="w-human" href="https://www.accops.com/schedule-a-free-demo"'), "no booking_url: Prefer a person? opens cta_url in a new tab, as before");
+  // welcome-back after a talk-to-sales topic (27 Oct): the calendar is the first offer, then 3 of the rest
+  const bookBack = bk => renderToStaticMarkup(React.createElement(W.default, { conversationId: "c_x", hs: "h", page: "", origins: [], ask: null, booking: bk,
+    starters: [{ id: "lp-01", label: "Why did my Citrix renewal go up?" }, { id: "lp-03", label: "Compare licensing" }, { id: "lp-05", label: "Can we migrate?" }],
+    welcome: { line: "Welcome back! Last time you asked “How do I talk to an Accops engineer?” Want to pick up there?", chips: [{ id: "lp-29", label: "Who supports us after go-live?" }], book: true },
+    talk: { label: "Talk to an expert", url: "https://www.accops.com/schedule-a-free-demo" } }));
+  const bb = bookBack(BK), rows = bb.split('<ul class="w-roots"')[1].split("</ul>")[0];
+  ok(rows.split("<li>")[1] === `<a href="${esc(BK)}" target="_blank" rel="noopener noreferrer"><span class="w-glyph" aria-hidden="true">↳</span><span>Book a time with an engineer</span></a></li>`,
+    `welcome after talk-to-sales: "Book a time with an engineer" first, pointing at the calendar: ${rows.split("<li>")[1]}`);
+  eq((rows.match(/<li>/g) || []).length, 4, "the calendar + 3 offers (4 rows, as without it)");
+  ok(bb.includes("Last time you asked “How do I talk to an Accops engineer?” Want to pick up there?"), "the quoted welcome line");
+  ok(bookBack("").includes('<li><a href="https://www.accops.com/schedule-a-free-demo"'), "no booking_url: the same first offer opens cta_url in a new tab");
+  const wsrc0 = read("app/embed/Widget.tsx");
+  ok(wsrc0.includes("onTalk = (e: MouseEvent) => { if (cta(talk.url)) e.preventDefault(); }") && wsrc0.split("onClick={onTalk}").length === 3,
+    "the calendar offer and Prefer a person? both go through cta() (opensBooking)");
+  ok(wsrc0.includes('action: "talk_to_sales", url: booking || talk.url }], chips: [] }'), "the error message's CTA points at the calendar too");
+  // the triage's support route: a link chip, never an ask
+  const tri = renderToStaticMarkup(React.createElement(W.AnswerView, { a: { lead: "Happy to help.", blocks: [], chips: [{ id: "lp-05", label: "Moving off Citrix" },
+    { id: "support", label: "I'm an existing Accops customer (support)", url: "https://support.accops.com/" }] } }));
+  ok(tri.includes('<button type="button" class="sb-chip">Moving off Citrix</button>') &&
+    tri.includes('<a class="sb-chip" href="https://support.accops.com/" target="_blank" rel="noopener noreferrer">I&#x27;m an existing Accops customer (support)<span class="sb-sr"> (opens in a new tab)</span></a>'),
+    "triage: route chips ask, the support chip is a new-tab link to the portal");
   const bv = on => renderToStaticMarkup(React.createElement(W.BookingView, { url: BK, title: "Talk to an expert", on, onBack: () => {}, onClose: () => {} }));
   const opened = bv(true), shut = bv(false);
   ok(opened.includes('class="w-book on"') && shut.includes('class="w-book"') && !shut.includes('class="w-book on"'), "shown only when open (kept mounted when not, so a half-filled booking survives Back)");

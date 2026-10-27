@@ -13,11 +13,12 @@ const stub = path.join(mkdtempSync(path.join(tmpdir(), "web-answer-")), "stub.mj
 writeFileSync(stub, `const S = () => globalThis.__S;
 export const classify = async () => S().label;
 export const admit = async (ctx, kind, h) => { S().admits.push([kind, h]); return S().admit; };
-export const preGuard = t => S().guard(t);
+export const preGuard = (t, talk) => S().guard(t, talk);
 export const cacheGet = async h => S().cached;
 export const cachePut = async (h, g, a, src) => { S().puts.push({ h, g, a, src }); };
 export const intentMatch = t => S().intent;
 export const related = (t, g) => S().related ?? [];
+export const vague = (t, g) => S().vague === true;
 export const isTestConv = (hs, c) => c.startsWith("t_") && hs === "hs-test"; // the real MAC check: web-widget.check`);
 const alias = { "@": web };
 for (const m of ["bot", "limits", "guard", "cache", "intent"]) alias[`@/lib/web/${m}`] = stub;
@@ -51,6 +52,10 @@ const CANDS = [
   { ref: "page:https://accops-citrix-lp.vercel.app/#comparison", kind: "page", types: ["doc_card"], title: "Accops vs Citrix on eight decision criteria",
     text: "A feature table comparing Accops and Citrix on gateway and load balancing.", url: "https://accops-citrix-lp.vercel.app/#comparison" },
 ];
+// public page cards: a named LP section, a generated one (its title is a carder's description) and an accops.com page
+const CARDS = [{ url: "https://accops-citrix-lp.vercel.app/#compare", title: "Accops vs Citrix on eight decision criteria" },
+  { url: "https://accops-citrix-lp.vercel.app/#section-2", title: "Trust strip: customers, countries, partners, ISO 27001" },
+  { url: "https://www.accops.com/hysecure", title: "Accops - HySecure Zero Trust Access Gateway | Accops" }];
 const ROOTS = [{ id: "lp-renewal-1", question: QA["lp-renewal-1"].question }, { id: "lp-steps-1", question: QA["lp-steps-1"].question }, { id: "lp-x", question: "Does it run on Nutanix?" }];
 
 // ---- stubbed network
@@ -80,6 +85,10 @@ globalThis.fetch = async (url, init = {}) => {
         if (N.logFails) return new Response(`denied for Bearer ${SECRETS.SAM_WEB_READER_JWT}`, { status: 401 });
         N.logs.push(args.m); return new Response(null, { status: 204 });
       case "rpc/sam_web_log_event": N.events.push(args.e); return new Response(null, { status: 204 });
+      case "sam_web_pages_public": { // the pills' titles (fill.ts titled)
+        const urls = decodeURIComponent(u.searchParams.get("url")).replace(/^in\.\(|\)$/g, "").split(",").map(s => s.replace(/"/g, ""));
+        return Response.json(CARDS.filter(c => urls.includes(c.url)));
+      }
       case "sam_web_qa_public": {
         const ids = decodeURIComponent(u.searchParams.get("id")).replace(/^in\.\(|\)$/g, "").split(",").map(s => s.replace(/"/g, ""));
         return Response.json(ids.map(i => QA[i]).filter(Boolean));
@@ -135,7 +144,8 @@ fresh();
 let r = await run(click("lp-renewal-1"));
 ok(r.body.source === "bank" && N.model.length === 0 && N.slots.length === 0, "click -> bank, no model, no slot");
 ok(r.body.blocks.map(b => b.type).join() === "text,compare_table" && r.body.blocks[0].body === QA["lp-renewal-1"].answer, "bank = verbatim answer + its visual");
-ok(r.body.blocks[0].source.label === "accops-citrix-lp.vercel.app" && r.body.chips.map(c => c.id).join() === "lp-steps-1,lp-x", "source pill + children chips");
+ok(r.body.blocks[0].source.label === "Accops vs Citrix on eight decision criteria" && r.body.chips.map(c => c.id).join() === "lp-steps-1,lp-x", `source pill (the page card's title) + children chips: ${r.body.blocks[0].source.label}`);
+ok(r.body.blocks[1].source.label === "Accops vs Citrix on eight decision criteria", "every pill in the answer is titled (the table's too)");
 ok(N.logs[0].source === "bank" && N.logs[0].label === "human" && N.logs[0].country === "IN" && N.logs[0].qa_id === "lp-renewal-1", "logged");
 ok(r.body.qa_id === "lp-renewal-1", "a bank answer names its pair");
 fresh({ S: { intent: { qa_id: "lp-steps-1", score: 5, margin: 0.4 } } });
@@ -211,7 +221,8 @@ for (const [why, text] of [["an invented number", "Yes. **HySecure** is ISO 2700
   ok(r.body.source === "model" && r.body.lead === LEAD.facts && /^fact_check: /.test(N.logs[0].error), `${why} -> verified facts (${N.logs[0].error})`);
   const tx = r.body.blocks.filter(b => b.type === "text");
   ok(tx[0].body === CANDS[1].text && tx.every(b => !b.ai && b.source && !b.body.includes("**")), `${why}: the cited quote first, verbatim, no AI text`);
-  ok(tx.map(b => b.body).join("|") === [CANDS[1].text, QA["lp-renewal-1"].answer, QA["lp-steps-1"].answer].join("|"), `${why}: cites first, then search rank, at most 3`);
+  ok(tx.map(b => b.body).join("|") === CANDS[1].text, `${why}: only records that answer the question; the renewal and migration pairs (search rank 2 and 3) share no word with it, so no filler`);
+  ok(tx[0].source.label === "HySecure Zero Trust Access Gateway", `${why}: the pill is the page card's title (before " | ", no "Accops - "): ${tx[0].source.label}`);
   ok(!JSON.stringify(r.body).includes(text) && r.body.blocks.at(-1).type === "cta" && !r.body.blocks.some(b => b.type === "doc_card"), `${why}: never shown, CTA, no links list`);
   ok(N.puts.length === 1 && N.puts[0].src === "model" && r.body.chips.length > 0, `${why}: cached as the outcome, chips`);
 }
@@ -295,7 +306,7 @@ ok(g.max_tokens === 400 && g.reasoning_effort === "low" && g.temperature === 0 &
 fresh(); N.openai.push(fails[429]); N.groq.push((b, init) => new Response(`no: ${init.headers.Authorization}`, { status: 500 }));
 r = await run(typed("is hysecure certified"));
 ok(r.body.source === "fallback" && N.logs[0].error === "model" && N.puts.length === 0, "both fail -> not cached");
-ok(r.body.lead === LEAD.facts && r.body.blocks.filter(b => b.type === "text").length === 3 && r.body.blocks.every(b => b.type !== "text" || (!b.ai && b.source)) && r.body.blocks.at(-1).type === "cta", "both fail -> verified facts by search rank + CTA");
+ok(r.body.lead === LEAD.facts && r.body.blocks.filter(b => b.type === "text").length === 1 && r.body.blocks.every(b => b.type !== "text" || (!b.ai && b.source)) && r.body.blocks.at(-1).type === "cta", "both fail -> verified facts (the one relevant record) + CTA");
 fresh(); N.openai.push(fails[429]); N.slot.groq = false;
 r = await run(typed("is hysecure certified"));
 ok(r.body.source === "fallback" && N.model.length === 1 && r.body.lead === LEAD.facts, "Groq cap reached -> no Groq call, verified facts");
@@ -307,7 +318,8 @@ ok(r.body.source === "fallback" && r.body.lead === LEAD.none && r.body.blocks.ma
 fresh(); N.openai.push(groqOk);
 r = await run(typed("Is HySecure certified?"));
 ok(N.puts.length === 1 && N.puts[0].h === qHash("Is HySecure certified?", "citrix-lp") && N.puts[0].g === "citrix-lp" && N.puts[0].src === "model"
-  && JSON.stringify(N.puts[0].a.blocks) === JSON.stringify(r.body.blocks), "model answer cache-put under q_hash");
+  && JSON.stringify(N.puts[0].a.blocks.map(b => b.source ? { ...b, source: { url: b.source.url } } : b)) === JSON.stringify(r.body.blocks.map(b => b.source ? { ...b, source: { url: b.source.url } } : b)),
+  "model answer cache-put under q_hash (pills are titled on the way out, so a cached answer gets today's titles)");
 fresh(); N.openai.push(writes("none", "", []));
 r = await run(typed("what is the weather"));
 ok(r.body.source === "fallback" && N.puts.length === 1 && N.puts[0].src === "fallback" && r.body.chips.length === 3, "verdict none -> fallback, cached as such, page roots as chips");
@@ -393,6 +405,89 @@ const everything = JSON.stringify([printed, bodies, N.logs]);
 ok(printed.some(p => /web model openai/.test(p)) && printed.some(p => /web log/.test(p)), "errors were logged");
 for (const v of Object.values(SECRETS)) ok(!everything.includes(v), "a key appeared in a log line, a response or a stored message");
 ok(!everything.includes("CHECKSECRET"), "no key fragment anywhere");
+
+// ---- 27 Oct benchmark fixes
+// (1) "Talk to an engineer" left the page: every talk-to-sales CTA, whoever made it, points at the Bookings calendar when
+// booking_url is set (the widget opens it in the panel; a click its script misses still lands on the calendar)
+const BK = "https://bookings.cloud.microsoft/book/AccopsUnifiedPlatformforSecureRemoteAccess2@propalmsnetwork.onmicrosoft.com/s/UEDDAf42hEiNVqsGcRVJ-w2?ismsaljsauthenabled";
+const DEMO = "https://www.accops.com/schedule-a-free-demo";
+const talks = body => body.blocks.filter(b => b.type === "cta" && b.action === "talk_to_sales");
+const OLD_CTA = { type: "cta", label: "Talk to an expert", action: "talk_to_sales", url: DEMO };
+for (const [why, o, body, model] of [
+  ["an intent pair's own CTA", { S: { intent: { qa_id: "lp-steps-1", score: 5, margin: 0.4 } } }, typed("how does the migration work")],
+  ["the CTA after the 2nd answer", {}, click("lp-renewal-1", { recent_ms: [1000, 9000] })],
+  ["the fallback's CTA", {}, click("does-not-exist")],
+  ["the rate limit's CTA", { S: { admit: "rate" } }, typed("hello")],
+  ["the repeat's CTA", { S: { admit: "repeat" } }, typed("hello")],
+  ["a cached answer's old CTA", { S: { cached: { lead: LEAD.partial, blocks: [{ type: "text", body: "cached", source: { label: "x", url: "https://www.accops.com/hysecure" } }, OLD_CTA], chips: [] } } }, typed("anything at all")],
+  ["the pre-guard's CTA", { S: { guard: (t, talk) => ({ reason: "pricing", answer: { lead: "Accops doesn't publish prices here.", blocks: [talk], chips: [] } }) } }, typed("give me a quote")],
+  ["verified facts' CTA", {}, typed("is hysecure certified"), writes("answered", "Yes. **HySecure** is 10X faster.", ["fact:hysecure-1"])],
+]) {
+  fresh(o); N.settings.booking_url = BK; if (model) N.openai.push(model);
+  r = await run(body);
+  ok(talks(r.body).length === 1 && talks(r.body)[0].url === BK, `${why} -> the calendar: ${JSON.stringify(talks(r.body))}`);
+  fresh(o); if (model) N.openai.push(model);
+  r = await run(body);
+  ok(talks(r.body).length === 1 && talks(r.body)[0].url === DEMO, `${why}, no booking_url -> cta_url, a new tab as before`);
+}
+fresh({ S: { admit: "repeat" } }); N.settings.booking_url = "https://evil.example/book/x";
+r = await run(typed("hello"));
+ok(talks(r.body)[0].url === DEMO, "a booking_url off bookings.cloud.microsoft is ignored (bridge.ts bookingUrl, as /embed)");
+const CAREERS = { type: "cta", label: "See open roles", action: "open_url", url: "https://www.accops.com/career" };
+fresh({ S: { guard: () => ({ reason: "careers", answer: { lead: "Open roles are on the careers page.", blocks: [CAREERS], chips: [] } }) } }); N.settings.booking_url = BK;
+r = await run(typed("are you hiring"));
+ok(JSON.stringify(r.body.blocks) === JSON.stringify([CAREERS]), "an open_url CTA (careers, a document) never becomes the calendar");
+// guard.ts's CTA comes from settings (answer.ts passes cta(s)), not a constant
+fresh({ S: { guard: (t, talk) => ({ reason: "pricing", answer: { lead: "x", blocks: [talk], chips: [] } }) } });
+Object.assign(N.settings, { cta_label: "Book a call", cta_url: "https://www.accops.com/contact-us" });
+r = await run(typed("give me a quote"));
+ok(talks(r.body)[0].label === "Book a call" && talks(r.body)[0].url === "https://www.accops.com/contact-us", "the pre-guard's CTA is the settings' label and URL");
+
+// (2) verified facts never pad: the benchmark's Entra ID question showed the SSO answer plus the OEM-support and the
+// CEO/Pune quotes. Only records sharing a topic word or name with the question; none -> the honest fallback.
+const SSO = { ref: "fact:sso", kind: "fact", types: ["text"], title: "Accops HyID", text: "HyID single sign-on federates Microsoft 365, Salesforce, Google Workspace and other SaaS using SAML and OAuth.", url: "https://www.accops.com/hyid" };
+const OEM = { ref: "fact:oem", kind: "fact", types: ["text"], title: "Accops vs Citrix on eight decision criteria", text: "Accops support: direct OEM support with named engineers.", url: "https://accops-citrix-lp.vercel.app/#comparison" };
+const CEO = { ref: "fact:ceo", kind: "fact", types: ["text"], title: "About Us", text: "Founded in October 2012, Accops is headquartered in Pune, India.", url: "https://www.accops.com/about-us" };
+const ENTRA = "Does Accops support SAML SSO with Microsoft Entra ID?", texts = body => body.blocks.filter(b => b.type === "text").map(b => b.body);
+fresh({ cands: [SSO, OEM, CEO] }); N.slot.openai = false;
+r = await run(typed(ENTRA));
+ok(r.body.lead === LEAD.facts && JSON.stringify(texts(r.body)) === JSON.stringify([SSO.text]), `no model: the SSO record only, no filler: ${texts(r.body)}`);
+fresh({ cands: [OEM, CEO, SSO] }); N.openai.push(writes("answered", "Yes. **HyID** works with Entra ID and is 10X faster.", ["fact:oem", "fact:ceo", "fact:sso"]));
+r = await run(typed(ENTRA));
+ok(r.body.lead === LEAD.facts && JSON.stringify(texts(r.body)) === JSON.stringify([SSO.text]), `a failed fact check that cited the filler first: still the SSO record only: ${texts(r.body)}`);
+fresh({ cands: [OEM, CEO] }); N.slot.openai = false;
+r = await run(typed(ENTRA));
+ok(r.body.source === "fallback" && r.body.lead === LEAD.none && r.body.blocks.map(b => b.type).join() === "cta", "nothing relevant: the honest line + the CTA, never filler");
+fresh({ cands: [{ ...SSO, ref: "fact:aad", text: "HyID works with Azure AD as the identity source." }, CEO] }); N.slot.openai = false;
+r = await run(typed(ENTRA));
+ok(JSON.stringify(texts(r.body)) === JSON.stringify(["HyID works with Azure AD as the identity source."]), "a core.terms alias links (Entra ID meets Azure AD)");
+fresh({ cands: [OEM, CEO] }); N.slot.openai = false;
+r = await run(typed("Do you offer support?"));
+ok(r.body.lead === LEAD.none, "a question with no topic word gets no quotes (\"support\" alone is not a topic)");
+
+// (3) pills name the page: a named LP section's card title, a generated "#section-N" (its card title is a carder's
+// description) and an uncarded LP URL -> "Citrix comparison page"; never a raw vercel.app host
+const { pill, source: src0 } = await jiti.import("./web/fill.ts");
+ok(pill("https://accops-citrix-lp.vercel.app/#section-2", CARDS) === "Citrix comparison page", "a generated section: the friendly page name, not \"Trust strip: …\"");
+ok(pill("https://accops-citrix-lp.vercel.app/#talk", CARDS) === "Citrix comparison page" && src0("https://accops-citrix-lp.vercel.app/").label === "Citrix comparison page", "no card: the friendly page name");
+ok(pill("https://www.accops.com/hysecure/", CARDS) === "HySecure Zero Trust Access Gateway" && pill("https://www.accops.com/hysecure#faq", CARDS) === "HySecure Zero Trust Access Gateway", "the page's card without its slash or #anchor");
+ok(src0("https://www.accops.com/cloud-services/accops-daas").label === "accops.com/cloud-services/accops-daas", "an uncarded accops.com page: its path, as before");
+ok(bodies.every(b => !JSON.stringify(b).includes("\"label\":\"accops-citrix-lp.vercel.app")), "no answer in this check showed the vercel.app host as a pill");
+
+// (7) a vague problem gets triage: the routes (approved pairs only) + support; before the cache, no model, no search
+QA["lp-05"] = { id: "lp-05", question: "Can we migrate off Citrix without downtime?", answer: "Yes.", visual: null, visual_data: null, cta: null, cta_url: null, sources: ["https://accops-citrix-lp.vercel.app/#migration"] };
+QA["lp-36"] = { id: "lp-36", question: "How does HyID handle MFA and SSO?", answer: "HyID.", visual: null, visual_data: null, cta: null, cta_url: null, sources: ["https://www.accops.com/hyid"] };
+fresh({ S: { vague: true, cached: { lead: "a stale generic answer", blocks: [], chips: [] } } });
+r = await run(typed("we have remote access problems"));
+ok(r.body.source === "fallback" && r.body.lead === LEAD.triage && r.body.blocks.length === 0, `triage: the line, no blocks: ${JSON.stringify(r.body)}`);
+ok(r.body.chips.map(c => c.id).join() === "lp-05,lp-36,support" && r.body.chips.map(c => c.label).join("|") === "Moving off Citrix|Securing logins (MFA/SSO)|I'm an existing Accops customer (support)",
+  `routes: approved pairs only (lp-40 isn't here), then support: ${r.body.chips.map(c => c.id)}`);
+ok(r.body.chips.at(-1).url === "https://support.accops.com/" && r.body.chips.slice(0, -1).every(c => !c.url), "support is the one link chip (the portal accops.com/contact-us publishes)");
+ok(N.model.length === 0 && !N.rpc.includes("rpc/sam_web_search") && N.logs[0].guard_reason === "triage" && N.logs[0].source === "fallback" && N.puts.length === 0, "no model, no search, logged as triage, not cached");
+fresh({ S: { vague: true } }); N.openai.push(writes("answered", GOOD, ["fact:hysecure-1"]));
+r = await run(typed("we have remote access problems", { prev: "is hysecure certified" }));
+ok(r.body.lead !== LEAD.triage && r.body.source === "model", "after an earlier question: no triage, the model has that question as context");
+delete QA["lp-05"]; delete QA["lp-36"];
 
 // Highlights only on Accops (27 Oct live test bolded a Citrix strength)
 const live = "Accops offers **gateway built in**, while Citrix needs NetScaler. Accops supports **perpetual or subscription licensing**; Citrix has withdrawn perpetual licensing. Citrix remains more mature for **extreme-latency cases**.";

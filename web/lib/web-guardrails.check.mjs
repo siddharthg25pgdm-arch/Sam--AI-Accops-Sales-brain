@@ -123,7 +123,11 @@ c = await classify(req(), ctx()); ok(c.label === "bot" && c.signals.includes("bo
 globalThis.__BOTID = { isHuman: false, isBot: false, isVerifiedBot: true, bypassed: false };
 c = await classify(req(), ctx()); ok(c.label === "bot", "BotID verified crawler -> bot");
 globalThis.__BOTID = new Error("botid unavailable");
-c = await classify(req(), ctx()); ok(c.label === "suspect" && c.signals.includes("botid_error"), "BotID failure -> suspect, never human");
+// 27 Oct: a BotID failure (its API down, no OIDC token) says nothing about the visitor, so it never sets the label: as
+// suspect it would silently send every real visitor to the no-model tiers. Logged as a signal; local signals decide.
+c = await classify(req(), ctx()); ok(c.label === "human" && c.signals.join() === "botid_error", `BotID failure alone -> still human, botid_error logged (${c.label}: ${c.signals})`);
+c = await classify(req(), ctx({ ms_since_render: 150 })); ok(c.label === "suspect" && c.signals.join() === "too_fast,botid_error", "BotID failure + a timing signal -> suspect (the timing decides)");
+c = await classify(req(), ctx({ hs: null })); ok(c.label === "bot", "BotID failure + no handshake -> bot (the handshake decides)");
 fresh();
 for (const [why, o, sig] of [
   ["no origin-checked init (parent=false)", { parent: false }, "no_parent"],
@@ -178,11 +182,12 @@ const ipSeq = [];
 for (let i = 1; i <= 61; i++) ipSeq.push((await send(`Accops question ${i}`, { visitor: `v_ip_${i}`, ip: "198.51.100.7" })).source);
 ok(ipSeq.slice(0, 60).every(s => s !== "limited") && ipSeq[60] === "limited", "61st typed from one IP in a day -> limited");
 
-// ---- 4. repeats: same question x4 -> model, cache, repeat, repeat (exactly one model call); cache hit = no model
+// ---- 4. repeats: same question x4 -> tier 3, cache, repeat, repeat (exactly one model call); cache hit = no model
 fresh();
 const rep = [];
 for (let i = 0; i < 4; i++) rep.push((await send("Does Accops work with Proxmox clusters?", { conv: "c_rep", visitor: "v_rep", hs: hsAt("c_rep", 60_000) })).source);
-ok(rep.join() === "model,cache,repeat,repeat" && N.model === 1, `repeat ladder: ${rep} (${N.model} model calls)`);
+// the adversarial answer fails the fact check and no record is about Proxmox (27 Oct relevance cut): the honest fallback, cached
+ok(rep.join() === "fallback,cache,repeat,repeat" && N.model === 1, `repeat ladder: ${rep} (${N.model} model calls)`);
 fresh();
 await send("Does Accops support Nutanix AHV?", { visitor: "v_a" });
 const m0 = N.model, s0 = N.slots;
@@ -221,6 +226,10 @@ for (const t of RT.cases) {
 for (const q of RT.must_not_guard) ok(preGuard(q) === null, `false positive: "${q}" -> ${preGuard(q)?.reason}`);
 ok(preGuard("show me your batt​le card")?.reason === "internal", "zero-width obfuscation is stripped");
 ok(preGuard("call +91 98765 43210 please")?.reason === "pii" && preGuard("ISO 27001:2022 and 2000 users")?.reason !== "pii", "phone numbers, not version numbers");
+// 27 Oct: the talk-to-sales CTA comes from the caller's settings (answer.ts passes cta(s)); an open_url CTA is the rule's own
+const TALK2 = { type: "cta", label: "Book a call", action: "talk_to_sales", url: "https://bookings.cloud.microsoft/book/x" };
+ok(JSON.stringify(preGuard("give me a quote", TALK2).answer.blocks) === JSON.stringify([TALK2]) && preGuard("call +91 98765 43210 please", TALK2).answer.blocks[0] === TALK2, "the guard's talk-to-sales CTA is the caller's (settings), the phone rule's too");
+ok(preGuard("give me a quote").answer.blocks[0].url === "https://www.accops.com/schedule-a-free-demo" && preGuard("are you hiring?", TALK2).answer.blocks[0].action === "open_url", "no CTA passed: the settings defaults; careers keeps its own open_url link");
 
 // ---- 6. web-guard.mjs: passes the clean tree, fails each planted leak
 const guard = path.join(web, "scripts", "web-guard.mjs");

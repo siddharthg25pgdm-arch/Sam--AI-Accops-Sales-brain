@@ -112,7 +112,7 @@
     D.body.appendChild(host);
     var q = function (s) { return root.querySelector(s); };
     var btn = q(".l"), tz = q(".t"), tq = q(".tq"), tc = q(".tc"), wrap = q(".f");
-    var frame = null, opened = false, shown = false, lock = null, timer = null, sec = null, live = [];
+    var frame = null, up = false, opened = false, shown = false, lock = null, timer = null, sec = null, live = [];
     var secs = [].slice.call(D.querySelectorAll("main section"));
     if (W.IntersectionObserver) {
       var io = new W.IntersectionObserver(function (x) {
@@ -146,7 +146,9 @@
       btn.setAttribute("aria-expanded", "true");
       if (W.innerWidth < 640) { lock = D.documentElement.style.overflow; D.documentElement.style.overflow = "hidden"; }
       both("chat_opened", qa);
-      setTimeout(function () { if (opened) { frame.focus(); frame.contentWindow.postMessage({ t: "focus" }, base); } }, 230);
+      // Into the input: a frame that has said ready gets {t:"focus"}; a new one focuses itself on init (posting before it
+      // loads hits about:blank, a console error on every first open: benchmark, 27 Oct).
+      setTimeout(function () { if (opened) { frame.focus(); if (up) frame.contentWindow.postMessage({ t: "focus" }, base); } }, 230);
     }
     function close() {
       if (!opened) return;
@@ -165,7 +167,7 @@
       if (!frame || e.source !== frame.contentWindow || e.origin !== base) return;
       var m = e.data;
       if (!m || typeof m !== "object") return;
-      if (m.t === "ready") frame.contentWindow.postMessage({ t: "init", visitor_id: vid }, base);
+      if (m.t === "ready") { up = true; frame.contentWindow.postMessage({ t: "init", visitor_id: vid }, base); }
       else if (m.t === "event" && ok(EV, m.name)) track(m.name, ok(ID, m.qa_id), ok(SRC, m.source));
       else if (m.t === "close") close();
       else if (m.t === "cta" && typeof m.url === "string") {

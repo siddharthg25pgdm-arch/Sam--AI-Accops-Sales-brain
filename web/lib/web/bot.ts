@@ -3,6 +3,7 @@
  *  conversation's highest label. Cheap local signals first; Vercel BotID (Basic, free) last. */
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { checkBotId } from "botid/server";
+import { redact } from "@/lib/redact";
 import type { Classify, Label } from "./contracts";
 
 export const BOT_UA = /bot|crawl|spider|slurp|headless|python-requests|curl|wget|httpclient|go-http|java\//i;
@@ -74,16 +75,20 @@ export const classify: Classify = async (req, ctx) => {
   const c = cadence(ctx.recent_ms);
   if (c) suspect.push(c);
 
-  // BotID last (one network-free header check on Vercel; always `isBot: false` in local dev).
-  // ponytail: if BotID misbehaves inside the cross-site iframe (plan risk 11), it degrades to suspect, never human.
+  // BotID last: Vercel's verdict on the challenge token the /embed page attached (always `isBot: false` in local dev).
+  // A BotID verdict of bot makes the turn a bot. A BotID FAILURE (checkBotId throws: Vercel's bot-protection API down
+  // or answering junk, no OIDC token) says nothing about this visitor, so it never sets the label (27 Oct: as suspect it
+  // would have silently sent every real visitor to the no-model tiers while it lasted). It is logged as the signal
+  // botid_error and warned; the local signals above decide, and the model ceiling and visitor limits still cap spend.
+  const noted: string[] = [];
   try {
     const v = await checkBotId();
     if (v.isBot || v.isVerifiedBot) bot.push(v.isVerifiedBot ? "botid_verified_bot" : "botid");
-  } catch { suspect.push("botid_error"); }
+  } catch (e) { noted.push("botid_error"); console.warn(`web botid: ${redact(e)}`); }
 
   // TODO(web-s1 contract notes, "labels are not sticky across turns"): this labels one turn only. A bot or suspect
   // conversation's next clean-looking turn is human again (the log keeps the highest label, but nothing reads it back
   // here). Needs a Stream A read RPC for the conversation's highest label; escalate to it before returning.
   const label: Label = bot.length ? "bot" : suspect.length ? "suspect" : "human";
-  return { label, signals: [...bot, ...suspect] };
+  return { label, signals: [...bot, ...suspect, ...noted] };
 };

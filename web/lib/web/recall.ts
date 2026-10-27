@@ -7,7 +7,7 @@
 import type { Chip } from "@/lib/blocks";
 import { emClean } from "@/lib/emphasis";
 import * as db from "./db";
-import { chips, cut } from "./fill";
+import { chips, topic } from "./fill";
 import { related } from "./intent";
 import { suggest } from "./suggest";
 
@@ -20,11 +20,14 @@ const SESSION_ONLY = new Set("AT BE BG HR CY CZ DK EE FI FR DE GR IE IT LV LT LU
 export const persist = (country: string | null) => !!country && /^[A-Z]{2}$/.test(country) && !SESSION_ONLY.has(country);
 
 /** line: the greeting (**emphasis** within the contract's limits); qa_id: what the teaser asks when clicked;
- *  chips: what the chat offers under the greeting (the page's own suggestions follow, see `offers`). */
-export type Welcome = { line: string; qa_id: string; chips: Chip[] };
+ *  chips: what the chat offers under the greeting (the page's own suggestions follow, see `offers`); book: the last
+ *  topic was talking to the team (lp-32, or any pair whose visual is a CTA), so the chat offers the calendar first. */
+export type Welcome = { line: string; qa_id: string; chips: Chip[]; book?: boolean };
 
-/** A page card's title as a topic: the part before " | " (site suffixes), without an "Accops - " prefix. */
-const topic = (t: string) => cut(t.split(" | ")[0].replace(/^Accops\s+[-–]\s+/, "").trim(), 60);
+/** "Last time you asked “How do I talk to an Accops engineer?” Want to pick up there?": the approved label quoted as the
+ *  visitor's own question (benchmark, 27 Oct: "you looked at How do I…?" read badly), a full stop after the closing
+ *  quote only when the label has no end mark of its own. */
+export const askedLine = (label: string) => `Welcome back! Last time you asked “${label}”${/[.?!…]$/.test(label) ? "" : "."} Want to pick up there?`;
 
 async function build(vid: string, page: string): Promise<Welcome | null> {
   const r = await db.recall(vid, page);
@@ -35,8 +38,7 @@ async function build(vid: string, page: string): Promise<Welcome | null> {
     const [top, ...earlier] = asked, label = chips([top])[0].label;
     const kids = await db.children(top.id).catch(() => []);
     const rel = related(top.question, top.pages?.find(p => !p.includes(":")) ?? "general").flatMap(id => live.get(id) ?? []);
-    return { line: emClean(`Welcome back! Last time you looked at **${label}**${/[.?!…]$/.test(label) ? "" : "."} Want to pick up there?`),
-      qa_id: top.id, chips: chips([...kids, ...earlier, ...rel], [top.id], 3) };
+    return { line: askedLine(label), qa_id: top.id, chips: chips([...kids, ...earlier, ...rel], [top.id], 3), book: top.visual === "cta" };
   }
   const url = r.last_page?.url && URL.canParse(r.last_page.url) ? new URL(r.last_page.url).href : null; // no raw quotes reach PostgREST
   const card = url ? (await db.pageCards([url]))[0] : null; // its public card, re-read: the title is the only page text echoed

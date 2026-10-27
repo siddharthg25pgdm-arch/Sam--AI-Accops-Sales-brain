@@ -1,21 +1,22 @@
 /** POST /api/web/ask, in the order of plan 3.3: validate -> classify -> admit -> pre-guard -> tier 0 bank /
- *  tier 1 intent -> tier 2 cache -> [human, model on, candidates, a slot] tier 3 model (text-first since 27 Oct:
+ *  tier 1 intent -> (a vague problem: triage chips) -> tier 2 cache -> [human, model on, candidates, a slot] tier 3 model (text-first since 27 Oct:
  *  a written answer, fact-checked, else verified facts) -> cache put -> log. Cheapest first; bots and suspects never
  *  reach the model. Every answer ends with follow-up chips when approved pairs exist. Logging is returned as a
  *  callback the route runs after the response (it never blocks the answer). */
 import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
+import { bookingUrl } from "@/app/embed/bridge";
 import { Answer, type Chip } from "@/lib/blocks";
 import { redact } from "@/lib/redact";
 import { classify, isTestConv } from "@/lib/web/bot";
 import { admit } from "@/lib/web/limits";
 import { preGuard } from "@/lib/web/guard";
 import { cacheGet, cachePut } from "@/lib/web/cache";
-import { intentMatch, related } from "@/lib/web/intent";
+import { intentMatch, related, vague } from "@/lib/web/intent";
 import type { Ctx, Label, Source } from "./contracts";
 import * as db from "./db";
 import { docIntent } from "./facts";
-import { LEAD, chips, cleanPage, compose, cta, facts, qaBlocks, qaId } from "./fill";
+import { LEAD, SUPPORT, TRIAGE, chips, cleanPage, compose, cta, facts, qaBlocks, qaId, titled } from "./fill";
 import { MAX_CANDS, writeAnswer } from "./model";
 import { qHash } from "./normalise";
 
@@ -105,7 +106,12 @@ export async function ask(req: Request): Promise<Out> {
   const finish = async (source: Source, a: unknown, status = 200): Promise<Out> => {
     let out = Answer.safeParse(a), src = source;
     if (!out.success) { m.error = "fill"; src = "fallback"; out = Answer.safeParse(await fallback()); }
-    const answer = out.success ? out.data : { lead: LEAD.none, blocks: [], chips: [] };
+    const answer: Answer = out.success ? out.data : { lead: LEAD.none, blocks: [], chips: [] };
+    // Every talk-to-sales CTA, whoever made it (a pair's own visual, cta(), the pre-guard, a cached answer), points at the
+    // Bookings calendar when settings carry one: the widget opens it in the panel, and a click its script misses still
+    // lands on the calendar, never accops.com in a new tab (benchmark, 27 Oct). Then every pill names its page.
+    const book = bookingUrl(s.booking_url);
+    answer.blocks = await titled(answer.blocks.map(x => (book && x.type === "cta" && x.action === "talk_to_sales" ? { ...x, url: book } : x)));
     const log = { ...m, source: src, label, signals, conversation_id: ctx.conversation_id, visitor_id: ctx.visitor_id, page,
       page_group, country: ctx.country, is_test: ev || isTestConv(ctx.hs, ctx.conversation_id), latency_ms: Date.now() - t0 };
     // the pair a bank / intent answer came from, so the widget never suggests it again in this conversation
@@ -124,11 +130,18 @@ export async function ask(req: Request): Promise<Out> {
       const a = await bank(turn.qa_id);
       return a ? finish("bank", a) : finish("fallback", await fallback());
     }
-    const g = preGuard(turn.text);
+    const g = preGuard(turn.text, cta(s));
     if (g) { m.guard_reason = g.reason; return finish("guard", g.answer); } // the rule name only, never the text
 
     const hit = intentMatch(turn.text, page_group); // tier 1
     if (hit) { const a = await bank(hit.qa_id); if (a) { m.qa_id = hit.qa_id; return finish("intent", a); } }
+    // "we have remote access problems" as an opener: route it (live pairs only) + the support portal. After an earlier
+    // question the model gets that question as context instead.
+    if (!b.prev && vague(turn.text, page_group)) {
+      const ok = await db.qas(TRIAGE.map(c => c.id)).catch(() => new Map<string, db.Qa>());
+      m.guard_reason = "triage"; // logged as a fallback (unanswered, so it shows in the missed questions), named by its rule
+      return finish("fallback", { lead: LEAD.triage, blocks: [], chips: [...TRIAGE.filter(c => ok.has(c.id)), SUPPORT] });
+    }
 
     const cached = await cacheGet(q_hash!); // tier 2
     if (cached) return finish("cache", cached);
@@ -146,7 +159,7 @@ export async function ask(req: Request): Promise<Out> {
       db.qas([...new Set([...cands.filter(c => c.kind === "qa").map(c => qaId(c.ref)), ...rel])]).catch(() => new Map<string, db.Qa>())]);
     if (!w) { // no slot, or both providers failed: verified facts; not cached (the next ask may reach the model)
       m.error = "model";
-      const blocks = facts([], cands, pairs, doc);
+      const blocks = facts(turn.text, page_group, [], cands, pairs, doc);
       const next = await more([], rel, [], pairs);
       return finish("fallback", blocks.length ? { lead: LEAD.facts, blocks: [...blocks, cta(s)], chips: next } : await fallback(next));
     }
@@ -162,7 +175,7 @@ export async function ask(req: Request): Promise<Out> {
       let blocks = c.blocks, lead: string | undefined = w.verdict === "partial" ? LEAD.partial : undefined;
       if (c.problems.length) { // the written answer may not be shown: verified facts instead; the log says what failed
         m.error = `fact_check: ${c.problems.join("; ")}`.slice(0, 200);
-        blocks = facts(w.cites, cands, pairs, doc);
+        blocks = facts(turn.text, page_group, w.cites, cands, pairs, doc);
         lead = LEAD.facts;
       }
       if (!blocks.length) { a = await fallback(next); source = "fallback"; }

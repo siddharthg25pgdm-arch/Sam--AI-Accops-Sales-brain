@@ -22,6 +22,10 @@ const idf = new Map<string, number>();
 for (const k of kws) for (const [t, w] of k) idf.set(t, w);
 const unk = ix.unk * Math.max(...idf.values());
 const groupEnts = new Map(Object.entries(ix.group_entities));
+/** A term's weight as the matcher scores it; a word the bank never uses counts as rare (verified facts' relevance, fill.ts). */
+export const weight = (t: string) => idf.get(t) ?? unk;
+/** The names a page group is about (group_entities: Citrix on the Citrix LP): context there, not a topic (fill.ts facts). */
+export const groupNames = (group: string) => groupEnts.get(group) ?? [];
 
 export function stem(t: string): string {
   if (!ASCII_WORD.test(t)) return t;
@@ -118,4 +122,14 @@ export const intentMatch: IntentMatch = (text, page_group) => {
   const margin = (top - second) / top;
   const it = ix.intents[r[0].n];
   return top >= it.min_score && margin >= ix.margin ? { qa_id: it.qa_id, score: top, margin } : null;
+};
+
+// ponytail: a fixed cue list; across the 295 eval and red-team questions only one probe trips it (the pre-guard stops it first).
+const PROBLEM = /\b(problems?|issues?|trouble|struggl\w*|challenges?|pain points?|not working|broken|help)\b/;
+/** A vague problem ("we have remote access problems", benchmark 27 Oct): a problem or help word, no product, vendor or
+ *  industry named (core.terms), at most 5 content words, and no confident match. answer.ts routes it with triage chips
+ *  (fill.ts TRIAGE) instead of a generic answer. */
+export const vague = (text: string, page_group: string) => {
+  const a = analyse(text);
+  return PROBLEM.test(a.normalised) && !a.entities.length && a.terms.length <= 5 && !intentMatch(text, page_group);
 };

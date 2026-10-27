@@ -241,6 +241,7 @@
   font-size: 14px; font-weight: 500; line-height: 1.35; color: var(--sb-ink); transition: border-color 160ms, background 160ms; }
 .sb-chip::after { content: ""; position: absolute; inset: -4px 0; }
 .sb-chip:hover { border-color: var(--sb-navy); background: var(--sb-card); }
+a.sb-chip { display: inline-flex; align-items: center; }  /* the triage support route: a link styled as a chip */
 
 /* thinking: 3 dots, then skeleton */
 .sb-thinking { min-height: 24px; }

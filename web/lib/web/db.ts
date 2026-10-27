@@ -48,8 +48,8 @@ export const logMessage = (m: Record<string, unknown>) => rpc<null>("sam_web_log
 export const logEvent = (e: Record<string, unknown>) => rpc<null>("sam_web_log_event", { e });
 
 /** Every approved pair, light columns: page-aware suggestions rank them in TS (suggest.ts). */
-export type QaLite = { id: string; question: string; sources: string[] | null; pages: string[] | null; nudge_weight: number | null };
-export const pairs = () => rest<QaLite[]>("sam_web_qa_public?select=id,question,sources,pages,nudge_weight");
+export type QaLite = { id: string; question: string; sources: string[] | null; pages: string[] | null; nudge_weight: number | null; visual?: string | null };
+export const pairs = () => rest<QaLite[]>("sam_web_qa_public?select=id,question,sources,pages,nudge_weight,visual");
 export type PageCard = { url: string; title: string; page_type: string | null; products: string[] | null; industries: string[] | null; questions_answered: string[] | null };
 /** The public cards for these exact URLs. The caller builds them from new URL() (no raw quotes) + an allowlisted section. */
 export const pageCards = (urls: string[]) => rest<PageCard[]>(`sam_web_pages_public?select=url,title,page_type,products,industries,questions_answered&url=in.${

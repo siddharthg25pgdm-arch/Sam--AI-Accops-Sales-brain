@@ -3,7 +3,7 @@
 // answer.blocks.map -> C's block components (Siddharth, 26 Oct: no OpenUI <Renderer> on the client; library.tsx +
 // toOpenUI stay untouched so it can be switched back). Only types come from lib/blocks: the server already validated
 // every answer with Answer.parse, so no zod ships to the browser.
-import { useCallback, useEffect, useRef, useState, type ComponentType, type KeyboardEvent, type Ref } from "react";
+import { useCallback, useEffect, useRef, useState, type ComponentType, type KeyboardEvent, type MouseEvent, type Ref } from "react";
 import type { Answer as AnswerT, Block, Chip } from "@/lib/blocks";
 import { Answer, Thinking } from "@/components/blocks/Answer";
 import { Calculator } from "@/components/blocks/Calculator";
@@ -30,7 +30,7 @@ export type Props = {
   booking?: string;
   /** Welcome-back memory (27 Oct): the loader's device id (a UUID), whether it lasts 90 days on this device (false = this
    *  visit only: EU/EEA/UK/CH), and for a returning device the server's greeting (approved labels / public titles only). */
-  visitor?: string; persist?: boolean; welcome?: { line: string; chips: Chip[] } | null;
+  visitor?: string; persist?: boolean; welcome?: { line: string; chips: Chip[]; book?: boolean } | null;
 };
 type Item = { id: number; me: string } | { id: number; a: AnswerT; source: string; qa?: string };
 type Saved = { c: string; hs: string; at: number; page: string; items: Item[]; recent: number[] };
@@ -131,11 +131,11 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
         source = String(j.source);
       }
     } catch { /* below */ }
-    if (!a) a = { lead: FAIL, blocks: [{ type: "cta", label: talk.label, action: "talk_to_sales", url: talk.url }], chips: [] };
+    if (!a) a = { lead: FAIL, blocks: [{ type: "cta", label: talk.label, action: "talk_to_sales", url: booking || talk.url }], chips: [] };
     else track("answer_shown", { qa_id: qa, source });
     push({ a, source, qa });
     setBusy(false);
-  }, [busy, page, talk, track]);
+  }, [busy, page, talk, booking, track]);
 
   /** A tier-0 click: echo the label as the visitor's own bubble (Klook / WhatsApp pattern). */
   const askQa = useCallback((qa_id: string, label: string, source: string) => {
@@ -260,6 +260,10 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
   // a returning device: the greeting's own offers first, then the page's (or the section's) questions
   const offer = welcome ? [...welcome.chips, ...starters].filter((c, i, a) => a.findIndex(x => x.id === c.id) === i) : starters;
   const inBooking = view === "booking"; // the chat stays laid out underneath (its scroll is kept) but inert
+  // Talk-to-sales links: with a calendar, cta() opens it in the panel and the href is only for a click the script misses
+  // (middle-click, before hydration), which then still lands on the calendar, never on cta_url (benchmark, 27 Oct).
+  const talkHref = booking || talk.url, onTalk = (e: MouseEvent) => { if (cta(talk.url)) e.preventDefault(); };
+  const book = !!welcome?.book; // the last topic was talking to the team: the calendar is the first offer
 
   return (
     <ActCtx.Provider value={act}>
@@ -280,14 +284,19 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
         <div className="w-body" ref={thread} role="log" aria-live="polite" aria-label="Conversation" inert={inBooking}>
           {items.length === 0 && (
             <div className="w-hello sb-in">
-              <p className="w-hello-t">{welcome // "Welcome back! Last time you looked at **…**": its **emphasis** as in a Text block
+              <p className="w-hello-t">{welcome // "Welcome back! Last time you asked “…”": any **emphasis** as in a Text block
                 ? emSplit(welcome.line).map((t, i) => (i % 2 ? <strong key={i} className="sb-em">{t}</strong> : t)) : "What would you like to know?"}</p>
               <p className="w-hello-s">Every answer links to its source on accops.com.</p>
-              {offer.length > 0 && (
+              {(offer.length > 0 || book) && (
                 <>
                   <p className="w-eyebrow" id="w-roots">{welcome ? "Pick up where you left off" : "Asked on this page"}</p>
                   <ul className="w-roots" aria-labelledby="w-roots">
-                    {offer.slice(0, 4).map(r => ( // the thread is empty here, so nothing was asked yet
+                    {book && (
+                      <li><a href={talkHref} target="_blank" rel="noopener noreferrer" onClick={onTalk}>
+                        <span className="w-glyph" aria-hidden="true">↳</span><span>Book a time with an engineer</span>
+                      </a></li>
+                    )}
+                    {offer.slice(0, book ? 3 : 4).map(r => ( // the thread is empty here, so nothing was asked yet
                       <li key={r.id}>
                         <button type="button" onClick={() => askQa(r.id, r.label, "root")} disabled={!!busy}>
                           <span className="w-glyph" aria-hidden="true">↳</span><span>{r.label}</span>
@@ -297,8 +306,7 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
                   </ul>
                 </>
               )}
-              <a className="w-human" href={talk.url} target="_blank" rel="noopener noreferrer"
-                onClick={e => { if (cta(talk.url)) e.preventDefault(); }}>
+              <a className="w-human" href={talkHref} target="_blank" rel="noopener noreferrer" onClick={onTalk}>
                 <span>Prefer a person?</span> {talk.label}<Icon d={ICON.arrow} />
               </a>
             </div>

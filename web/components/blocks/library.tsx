@@ -45,7 +45,7 @@ const Root = defineComponent({
   props: z.object({
     lead: z.string().max(120).optional(),
     blocks: z.array(z.union(Object.values(parts).map(p => p.ref) as unknown as [z.ZodType, z.ZodType, ...z.ZodType[]])).max(5),
-    chips: z.array(B.Chip).max(3),
+    chips: z.array(B.Chip).max(4),
   }),
   component: function Root({ props, renderNode }) {
     const trigger = useTriggerAction();

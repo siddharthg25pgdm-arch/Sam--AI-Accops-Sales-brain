@@ -41,7 +41,7 @@ globalThis.fetch = async (url, init = {}) => {
   }
   if (fn === "rpc/sam_web_settings") return Response.json({ enabled: true, model_enabled: true, cta_url: "https://www.accops.com/schedule-a-free-demo", cta_label: "Talk to an expert" });
   if (fn === "rpc/sam_web_log_event") { events.push(args.e); return new Response(null, { status: 204 }); }
-  if (fn === "sam_web_qa_public") return Response.json(bank.map(({ id, question, sources, pages, nudge_weight }) => ({ id, question, sources, pages, nudge_weight })));
+  if (fn === "sam_web_qa_public") return Response.json(bank.map(({ id, question, sources, pages, nudge_weight, visual }) => ({ id, question, sources, pages, nudge_weight, visual: visual?.type ?? null })));
   if (fn === "sam_web_pages_public") {
     const want = u.searchParams.get("url").replace(/^in\.\(|\)$/g, "").split(",").map(s => s.replace(/^"|"$/g, ""));
     return Response.json(cards.filter(c => want.includes(c.url)).map(({ url, title, page_type, products, industries, questions_answered }) => ({ url, title, page_type, products, industries, questions_answered })));
@@ -70,7 +70,8 @@ for (const c of ["DE", "FR", "IE", "NL", "PL", "SE", "GR", "GB", "CH", "NO", "IS
 MEM.set(id(2), { last_qa: [{ id: "lp-27", question: "a retired pair" }, { id: "lp-35", question: "my email is priya@bank.example, call me" }, { id: "lp-01", question: "x" }],
   last_page: null, last_seen: "2026-10-20T10:00:00Z" });
 const w2 = await R.welcome(id(2), LP);
-eq(w2.line, "Welcome back! Last time you looked at **What is the HySecure ZTNA gateway?** Want to pick up there?", "the last approved pair's label (lp-27 is not approved: skipped)");
+eq(w2.line, "Welcome back! Last time you asked “What is the HySecure ZTNA gateway?” Want to pick up there?", "the last approved pair's label, quoted as the visitor's question (lp-27 is not approved: skipped)");
+ok(!w2.book, "not a talk-to-sales topic: no calendar offer");
 ok(!w2.line.includes("priya") && !w2.line.includes("retired") && emProblems(w2.line).length === 0, "no typed text, no retired pair; emphasis within the contract's limits");
 eq(w2.qa_id, "lp-35", "the teaser picks up there: the pair itself");
 eq(w2.chips.map(c => c.id), ["lp-40", "lp-41", "lp-42"], `chips: its children (${w2.chips.map(c => c.label).join(" | ")})`);
@@ -83,7 +84,14 @@ ok(w3.qa_id === "lp-42" && w3.chips[0].id === "lp-05" && w3.chips.length === 3 &
 // a label over 6 words keeps no emphasis (the contract's limit), the words stay
 MEM.set(id(4), { last_qa: [{ id: "lp-05" }], last_page: null, last_seen: "x" });
 const w4 = await R.welcome(id(4), LP);
-eq(w4.line, "Welcome back! Last time you looked at Can we migrate off Citrix without downtime? Want to pick up there?", "7 words: no emphasis");
+eq(w4.line, "Welcome back! Last time you asked “Can we migrate off Citrix without downtime?” Want to pick up there?", "a long label reads as a quoted question (benchmark, 27 Oct)");
+eq(R.askedLine("Pricing"), "Welcome back! Last time you asked “Pricing”. Want to pick up there?", "a label with no end mark gets a full stop after the quote");
+// the last topic was talking to the team (lp-32, or any pair whose visual is a CTA): the chat offers the calendar first
+MEM.set(id(11), { last_qa: [{ id: "lp-32" }], last_page: null, last_seen: "x" });
+const w11 = await R.welcome(id(11), LP);
+ok(w11.book === true && w11.line === "Welcome back! Last time you asked “How do I talk to an Accops engineer?” Want to pick up there?", `lp-32: the calendar offer, the quoted line: ${w11.line}`);
+MEM.set(id(12), { last_qa: [{ id: "lp-21" }], last_page: null, last_seen: "x" });
+ok((await R.welcome(id(12), LP)).book === true, "any pair whose visual is a CTA (lp-21, the renewal review) offers the calendar");
 // only retired pairs and no page: the normal greeting
 MEM.set(id(5), { last_qa: [{ id: "lp-27", question: "x" }, { id: "lp-999", question: "y" }], last_page: null, last_seen: "x" });
 eq(await R.welcome(id(5), LP), null, "only retired / unknown pairs: normal greeting");
@@ -130,7 +138,7 @@ eq((await (await conf("", { ...human, "x-vercel-ip-country": "DE" })).json()).pe
 eq((await (await conf("", { "user-agent": CHROME })).json()).persist, false, "no country header: this visit only (fail safe)");
 const back = await conf(`&vid=${id(2)}`, human), jb = await back.json();
 eq(back.headers.get("cache-control"), "private, no-store", "with an id: private, no-store (never CDN-cached across visitors)");
-eq(jb.teaser, { after_s: 15, qa_id: "lp-35", label: "Welcome back! Last time you looked at What is the HySecure ZTNA gateway? Want to pick up there?" }, "the teaser is the welcome-back line (plain: the loader sets textContent)");
+eq(jb.teaser, { after_s: 15, qa_id: "lp-35", label: "Welcome back! Last time you asked “What is the HySecure ZTNA gateway?” Want to pick up there?" }, "the teaser is the welcome-back line (plain: the loader sets textContent)");
 ok(jb.chips.slice(0, 3).map(c => c.id).join() === "lp-40,lp-41,lp-42" && jb.chips.length === 7 && !jb.chips.some(c => c.id === "lp-35") && new Set(jb.chips.map(c => c.id)).size === 7,
   "chips: the welcome's first, then the page's, no repeats, never the teaser's own pair");
 const normal = jp.teaser;
@@ -147,8 +155,9 @@ eq(normal.qa_id, "lp-01", "the normal teaser is the page's top question");
   const props = async (vid, h) => { globalThis.__H = h; return (await Page({ searchParams: Promise.resolve({ page: LP, vid }) })).props.children.props; };
   const frame = { "user-agent": CHROME, "sec-fetch-dest": "iframe", "sec-fetch-site": "cross-site", referer: LP, "x-vercel-ip-country": "IN" };
   const p = await props(id(2), frame);
-  eq([p.visitor, p.persist, p.welcome?.line, p.welcome?.chips.map(c => c.id)],
-    [id(2), true, "Welcome back! Last time you looked at **What is the HySecure ZTNA gateway?** Want to pick up there?", ["lp-40", "lp-41", "lp-42"]], "/embed: id, persist and the greeting with its chips");
+  eq([p.visitor, p.persist, p.welcome?.line, p.welcome?.chips.map(c => c.id), p.welcome?.book],
+    [id(2), true, "Welcome back! Last time you asked “What is the HySecure ZTNA gateway?” Want to pick up there?", ["lp-40", "lp-41", "lp-42"], false], "/embed: id, persist and the greeting with its chips");
+  eq((await props(id(11), frame)).welcome?.book, true, "/embed: a talk-to-sales topic tells the widget to offer the calendar first");
   eq((await props(id(2), { ...frame, "x-vercel-ip-country": "GB" })).persist, false, "/embed: UK, this visit only (the privacy line says so)");
   eq((await props(id(2), { ...frame, "user-agent": "python-requests/2.32" })).welcome, null, "/embed: a bot gets the normal greeting");
   const pj2 = await props("not-a-uuid", frame);

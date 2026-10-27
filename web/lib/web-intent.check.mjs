@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 const web = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jiti = createJiti(import.meta.url, { alias: { "@": web } });
-const { intentMatch, analyse } = await jiti.import("./web/intent.ts");
+const { intentMatch, analyse, vague, weight, groupNames } = await jiti.import("./web/intent.ts");
 const ix = JSON.parse(readFileSync(path.join(web, "data/web-intent-index.json"), "utf8"));
 const golden = JSON.parse(readFileSync(path.join(web, "data/web-intent-golden.json"), "utf8")).rows;
 let n = 0; const eq = (a, b, m) => { assert.deepStrictEqual(a, b, m); n++; };
@@ -47,6 +47,22 @@ if (ix.source !== "approved") console.log("NOTE: index built from the DRAFT corp
 
 // 4. Speed: < 2 ms per match (plan acceptance).
 const qs = golden.map(r => r.q);
+// 3. Vague problems (27 Oct benchmark: "we have remote access problems" got a generic answer): a problem or help word,
+// nothing named, at most 5 content words, no confident match -> triage chips (answer.ts). Never a real question.
+for (const q of ["we have remote access problems", "remote access issues", "we need help with logins", "can you help me", "we are struggling with work from home", "help"])
+  eq(vague(q, "citrix-lp"), true, `vague: ${q}`);
+for (const q of ["our citrix is giving problems", "I have an issue with HySecure login", "Our VPN keeps dropping", "hello", "Can we keep our existing thin clients?",
+  "is it secure", "how does the migration work", "we have problems with printing, USB redirection, session latency and licensing for remote users"])
+  eq(vague(q, "citrix-lp"), false, `not vague (names a product, no problem word, a confident match, or detailed): ${q}`);
+const evalQs = [...JSON.parse(readFileSync(path.join(web, "../prototype/web_intent_eval.json"), "utf8")).items.map(r => r[0]),
+  ...JSON.parse(readFileSync(path.join(web, "../docs/eval-website-stage1.json"), "utf8")).cases.map(r => r.q)];
+const { preGuard } = await jiti.import("./web/guard.ts"); // runs first in answer.ts (it stops the one probe with "problem" in it)
+eq(evalQs.filter(q => !preGuard(q) && vague(q, "citrix-lp")), [], `no eval question (${evalQs.length}) that passes the pre-guard is ever triaged`);
+// verified facts' relevance (fill.ts): the bank's words weigh as the matcher weighs them, a word unknown to it as rare
+assert.ok(weight("suppor") < weight("sso") && weight("sso") < weight("saml"), "support < SSO < SAML (unknown to the bank: rare)"); n++;
+eq(groupNames("citrix-lp"), ["Citrix"], "the Citrix LP is about Citrix (context there, not a topic)");
+eq(groupNames("general"), [], "no group subject elsewhere");
+
 const t0 = performance.now(); let k = 0;
 for (let i = 0; i < 20; i++) for (const q of qs) { intentMatch(q, "citrix-lp"); k++; }
 const per = (performance.now() - t0) / k;

@@ -6,8 +6,10 @@
 import type { Answer, Block } from "@/lib/blocks";
 import type { PreGuard } from "./contracts";
 
-// ponytail: fixed CTA (settings cta_url/label are async; PreGuard is sync). Same values as the settings defaults.
-const TALK: Block = { type: "cta", label: "Talk to an expert", action: "talk_to_sales", url: "https://www.accops.com/schedule-a-free-demo" };
+// The talk-to-sales placeholder: preGuard swaps in the caller's CTA (answer.ts passes cta(settings), and its finish()
+// points every talk-to-sales CTA at the Bookings calendar when booking_url is set). These values (the settings
+// defaults) show only when no CTA is passed, as in the red-team check.
+const TALK: Block ={ type: "cta", label: "Talk to an expert", action: "talk_to_sales", url: "https://www.accops.com/schedule-a-free-demo" };
 const say = (lead: string, cta: Block = TALK): Answer => ({ lead, blocks: [cta], chips: [] });
 
 const PUBLIC_ONLY = say("I can only share what's published on accops.com. The team can help with anything else.");
@@ -49,8 +51,8 @@ const RULES: [reason: string, re: RegExp[], answer: Answer][] = [
 /** A phone number: 10+ digits in one run of digits, spaces, dots, dashes and brackets. */
 const phone = (t: string) => (t.match(/\+?\d[\d\s().-]{8,}\d/g) ?? []).some(m => m.replace(/\D/g, "").length >= 10);
 
-export const preGuard: PreGuard = text => {
+export const preGuard: PreGuard = (text, talk = TALK) => {
   const t = text.normalize("NFKC").toLowerCase().replace(/\p{Cf}/gu, ""); // zero-width tricks ("batt​le card") vanish
-  for (const [reason, res, answer] of RULES) if (res.some(re => re.test(t))) return { reason, answer };
-  return phone(t) ? { reason: "pii", answer: RULES.find(r => r[0] === "pii")![2] } : null;
+  const hit = RULES.find(([, res]) => res.some(re => re.test(t))) ?? (phone(t) ? RULES.find(r => r[0] === "pii") : undefined);
+  return hit ? { reason: hit[0], answer: { ...hit[2], blocks: hit[2].blocks.map(b => (b === TALK ? talk : b)) } } : null;
 };

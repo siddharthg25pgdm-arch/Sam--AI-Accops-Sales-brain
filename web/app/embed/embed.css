@@ -43,9 +43,9 @@
 .w-hello-s { margin-top: 4px; font-size: 14px; color: var(--w-ink-2); }
 .w-eyebrow { margin: 22px 0 4px; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--w-ink-3); }
 .w-roots li + li { border-top: 1px solid var(--w-line); }
-.w-roots button { display: flex; align-items: flex-start; gap: 10px; min-height: 48px; padding: 12px 8px; margin: 0 -8px; width: calc(100% + 16px);
+.w-roots button, .w-roots a { display: flex; align-items: flex-start; gap: 10px; min-height: 48px; padding: 12px 8px; margin: 0 -8px; width: calc(100% + 16px);
   border-radius: 10px; text-align: left; font-weight: 500; line-height: 1.4; transition: background 160ms; }
-.w-roots button:hover { background: var(--w-card); }
+.w-roots button:hover, .w-roots a:hover { background: var(--w-card); }
 .w-roots button:disabled { cursor: default; opacity: .55; }
 .w-glyph { flex: none; width: 16px; color: var(--w-ink-3); font-weight: 400; }
 .w-human { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; min-height: 44px; margin-top: 14px;

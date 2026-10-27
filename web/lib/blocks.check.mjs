@@ -55,7 +55,10 @@ assert.ok(B.Block.safeParse(calc).success);
 fails(B.Block, { ...calc, disclaimer: undefined }, "calculator without a disclaimer");
 fails(B.Block, { ...calc, disclaimer: "Not a quote." }, "calculator with a disclaimer under 20 chars");
 fails(B.Answer, { ...a1, blocks: Array(6).fill(a1.blocks[0]) }, "6 blocks");
-fails(B.Answer, { ...a1, chips: [...a1.chips, a1.chips[0]] }, "4 chips");
+fails(B.Answer, { ...a1, chips: [0, 1, 2, 3, 4].map(i => ({ id: `lp-0${i}`, label: "q" })) }, "5 chips (4 is the triage set: 3 routes + support)");
+assert.ok(B.Answer.safeParse({ ...a1, chips: [...[0, 1, 2].map(i => ({ id: `lp-0${i}`, label: "q" })), { id: "support", label: "Support", url: "https://support.accops.com/" }] }).success, "4 chips, one an https link");
+for (const url of ["http://support.accops.com/", "javascript:alert(1)", "https://x.example/\"><script>", "//support.accops.com"])
+  fails(B.Chip, { id: "support", label: "Support", url }, `a link chip to ${url}`);
 fails(B.Answer, { ...a1, lead: "x".repeat(121) }, "lead 121 chars");
 fails(B.Block, { type: "text", body: "x", ai: false }, "ai is true or absent");
 // 7. emphasis: every fixture text within the limits; the model fixture really uses it
@@ -119,4 +122,4 @@ assert.ok(lc && pkg.dependencies["@openuidev/lang-core"] === lc && lock.packages
   assert.throws(() => Page(), e => String(e?.digest).includes("404"), "gallery is notFound() in production");
   if (was === undefined) delete process.env.VERCEL_ENV; else process.env.VERCEL_ENV = was;
 }
-console.log(`blocks: ${fixtures.length} fixtures + ${states} states parse; 18 must-fail cases fail; emphasis within limits (Python twin: ${twin}); lang-core direct; gallery 404 in production; OpenUI: ${openui}`);
+console.log(`blocks: ${fixtures.length} fixtures + ${states} states parse; 22 must-fail cases fail; emphasis within limits (Python twin: ${twin}); lang-core direct; gallery 404 in production; OpenUI: ${openui}`);
