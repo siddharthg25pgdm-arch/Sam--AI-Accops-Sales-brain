@@ -10,6 +10,7 @@ alternative landing page (accops-citrix-lp.vercel.app). No internal SAM material
 | `pages-citrix-lp.json` | One card per `<section>` of the Citrix LP (13) |
 | `fetch-log.json` | Pages that failed, came back thin, or lost a fact because its quote left the page |
 | `qa-citrix-lp.json` | Draft Q&A bank for the Citrix LP (stage 1 placement). Review sheet: [docs/web-qa-review.md](../../docs/web-qa-review.md) |
+| `simplify-2026-10-28.json` | The 28 Oct "not too technical" proposals for approved pairs (text + exact new visual); `prototype/import_simplify_review.py` applies the accepted ones to the database and `qa-citrix-lp.json`. Not read by the loader |
 
 Page bodies are cached in `corpus/web-raw/` (gitignored); only cards are committed.
 

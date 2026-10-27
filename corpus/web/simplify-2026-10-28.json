@@ -1,0 +1,1855 @@
+{
+ "made": "2026-10-28",
+ "rule": "Siddharth, 28 Oct 2026: \"don't answer anything too technical that which might not match later with what we can provide or the customer gets confused.\" Visitor answers state the capability and the business outcome in plain words, then hand specifics to an engineer.",
+ "note": "Proposals only. prototype/import_simplify_review.py applies the ones Siddharth accepts (database + qa-citrix-lp.json). proposed_visual is the bank-shape visual (null = text only), present only when the visual changes.",
+ "all_clear": [
+  "lp-02",
+  "lp-05",
+  "lp-06",
+  "lp-07",
+  "lp-08",
+  "lp-13",
+  "lp-17",
+  "lp-18",
+  "lp-21",
+  "lp-22",
+  "lp-23",
+  "lp-24",
+  "lp-25",
+  "lp-26",
+  "lp-28",
+  "lp-29",
+  "lp-30",
+  "lp-31",
+  "lp-32",
+  "lp-33",
+  "lp-39",
+  "lp-40",
+  "lp-41",
+  "lp-43",
+  "lp-44",
+  "lp-46",
+  "lp-48",
+  "lp-49",
+  "lp-51",
+  "lp-52",
+  "lp-54",
+  "lp-56",
+  "lp-57",
+  "lp-58",
+  "lp-60",
+  "lp-63",
+  "lp-64",
+  "lp-65",
+  "lp-66",
+  "lp-67",
+  "lp-68",
+  "lp-69",
+  "lp-71",
+  "lp-72",
+  "lp-73",
+  "lp-74",
+  "lp-75",
+  "lp-77",
+  "lp-78",
+  "lp-79"
+ ],
+ "pairs": [
+  {
+   "id": "lp-01",
+   "question": "How is Accops different from Citrix?",
+   "current_answer": "Accops **covers the same ground** as Citrix for mainstream Windows app and desktop delivery, as **one platform from one vendor**: VDI, ZTNA gateway, MFA and SSO, running on **infrastructure you already own**. If you rely heavily on HDX-specific optimisations for extreme-latency links or specialist graphics, evaluate carefully.",
+   "why": "Ends on an edge-case caveat in Citrix protocol jargon (\"HDX-specific optimisations for extreme-latency links or specialist graphics\"). The table lists three hypervisors, which may not match a buyer's setup.",
+   "proposed_answer": "Accops **covers the same ground** as Citrix for mainstream Windows app and desktop delivery, as **one platform from one vendor**: VDI, ZTNA gateway, MFA and SSO, running on **infrastructure you already own**. An engineer can confirm the fit for your workloads on a short call.",
+   "visual_change": "Hypervisors row reads \"Major hypervisors\" (not \"VMware, Nutanix, Hyper-V\")",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Accops in one platform",
+     "columns": [
+      "You need",
+      "Accops"
+     ],
+     "rows": [
+      {
+       "label": "Virtual apps and desktops",
+       "cells": [
+        "HyWorks"
+       ]
+      },
+      {
+       "label": "Secure remote access (ZTNA)",
+       "cells": [
+        "HySecure"
+       ]
+      },
+      {
+       "label": "MFA and SSO",
+       "cells": [
+        "HyID"
+       ]
+      },
+      {
+       "label": "Where it runs",
+       "cells": [
+        "On-prem, hybrid or cloud"
+       ]
+      },
+      {
+       "label": "Hypervisors",
+       "cells": [
+        "VMware, Nutanix, Hyper-V"
+       ]
+      }
+     ],
+     "footnote": "One platform, one contract."
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Accops in one platform",
+     "columns": [
+      "You need",
+      "Accops"
+     ],
+     "rows": [
+      {
+       "label": "Virtual apps and desktops",
+       "cells": [
+        "HyWorks"
+       ]
+      },
+      {
+       "label": "Secure remote access (ZTNA)",
+       "cells": [
+        "HySecure"
+       ]
+      },
+      {
+       "label": "MFA and SSO",
+       "cells": [
+        "HyID"
+       ]
+      },
+      {
+       "label": "Where it runs",
+       "cells": [
+        "On-prem, hybrid or cloud"
+       ]
+      },
+      {
+       "label": "Hypervisors",
+       "cells": [
+        "Major hypervisors"
+       ]
+      }
+     ],
+     "footnote": "One platform, one contract."
+    }
+   }
+  },
+  {
+   "id": "lp-03",
+   "question": "How does Accops compare with Citrix feature by feature?",
+   "current_answer": "On the eight criteria that usually decide it, Accops **builds in gateway, monitoring and printing**, bundles the site database, includes ZTNA, MFA and SSO, and offers **perpetual or subscription licences** with **direct OEM support**. Citrix HDX remains the more mature protocol for extreme-latency and specialist graphics cases.",
+   "why": "Ends on a protocol caveat (\"Citrix HDX remains the more mature protocol for extreme-latency and specialist graphics cases\"); the table's Protocol row says it in engineer terms.",
+   "proposed_answer": "On the eight criteria that usually decide it, Accops **builds in gateway, monitoring and printing**, bundles the site database, includes ZTNA, MFA and SSO, and offers **perpetual or subscription licences** with **direct OEM support**. An engineer can map this to your estate on a short call.",
+   "visual_change": "Protocol row in plain words: \"User experience\": Accops \"Proven for everyday workloads\", Citrix \"Stronger for very demanding graphics\"; its tap-to-expand reads \"Try your most demanding users in the pilot, alongside Citrix.\"",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Accops vs Citrix on eight criteria",
+     "columns": [
+      "",
+      "Accops",
+      "Citrix"
+     ],
+     "rows": [
+      {
+       "label": "Gateway & load balancing",
+       "cells": [
+        "Built into the platform",
+        "Typically requires NetScaler / ADC, licensed separately"
+       ],
+       "group": "Infrastructure",
+       "accent": 1
+      },
+      {
+       "label": "Monitoring & session analytics",
+       "cells": [
+        "Built in",
+        "Director, a separate component"
+       ],
+       "group": "Infrastructure",
+       "accent": 1
+      },
+      {
+       "label": "Site database",
+       "cells": [
+        "Bundled; no separate SQL Server licence",
+        "SQL Server for the site database"
+       ],
+       "group": "Infrastructure",
+       "accent": 1
+      },
+      {
+       "label": "Printing",
+       "cells": [
+        "Driver-free universal printing included",
+        "Universal Print Server"
+       ],
+       "group": "Infrastructure",
+       "accent": 1
+      },
+      {
+       "label": "ZTNA, MFA and SSO",
+       "cells": [
+        "Included: HySecure and HyID, same vendor",
+        "Not in the Citrix estate listed"
+       ],
+       "group": "Security",
+       "accent": 1
+      },
+      {
+       "label": "Protocol",
+       "cells": [
+        "Production-proven for mainstream workloads",
+        "HDX more mature for extreme-latency and specialist graphics"
+       ],
+       "group": "Experience",
+       "detail": "Test your own latency and graphics cases in a pilot alongside Citrix before you commit.",
+       "accent": 2
+      },
+      {
+       "label": "Licensing model",
+       "cells": [
+        "Perpetual or subscription; concurrent or named user",
+        "Subscription; perpetual withdrawn for new purchases"
+       ],
+       "group": "Commercial",
+       "accent": 1
+      },
+      {
+       "label": "Support model",
+       "cells": [
+        "Direct OEM support; named engineers",
+        "—"
+       ],
+       "group": "Commercial"
+      }
+     ],
+     "filters": [
+      "Infrastructure",
+      "Security",
+      "Experience",
+      "Commercial"
+     ],
+     "footnote": "Citrix statements are based on publicly available Citrix information."
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Accops vs Citrix on eight criteria",
+     "columns": [
+      "",
+      "Accops",
+      "Citrix"
+     ],
+     "rows": [
+      {
+       "label": "Gateway & load balancing",
+       "cells": [
+        "Built into the platform",
+        "Typically requires NetScaler / ADC, licensed separately"
+       ],
+       "group": "Infrastructure",
+       "accent": 1
+      },
+      {
+       "label": "Monitoring & session analytics",
+       "cells": [
+        "Built in",
+        "Director, a separate component"
+       ],
+       "group": "Infrastructure",
+       "accent": 1
+      },
+      {
+       "label": "Site database",
+       "cells": [
+        "Bundled; no separate SQL Server licence",
+        "SQL Server for the site database"
+       ],
+       "group": "Infrastructure",
+       "accent": 1
+      },
+      {
+       "label": "Printing",
+       "cells": [
+        "Driver-free universal printing included",
+        "Universal Print Server"
+       ],
+       "group": "Infrastructure",
+       "accent": 1
+      },
+      {
+       "label": "ZTNA, MFA and SSO",
+       "cells": [
+        "Included: HySecure and HyID, same vendor",
+        "Not in the Citrix estate listed"
+       ],
+       "group": "Security",
+       "accent": 1
+      },
+      {
+       "label": "User experience",
+       "cells": [
+        "Proven for everyday workloads",
+        "Stronger for very demanding graphics"
+       ],
+       "group": "Experience",
+       "detail": "Try your most demanding users in the pilot, alongside Citrix.",
+       "accent": 2
+      },
+      {
+       "label": "Licensing model",
+       "cells": [
+        "Perpetual or subscription; concurrent or named user",
+        "Subscription; perpetual withdrawn for new purchases"
+       ],
+       "group": "Commercial",
+       "accent": 1
+      },
+      {
+       "label": "Support model",
+       "cells": [
+        "Direct OEM support; named engineers",
+        "—"
+       ],
+       "group": "Commercial"
+      }
+     ],
+     "filters": [
+      "Infrastructure",
+      "Security",
+      "Experience",
+      "Commercial"
+     ],
+     "footnote": "Citrix statements are based on publicly available Citrix information."
+    }
+   }
+  },
+  {
+   "id": "lp-04",
+   "question": "When is Citrix still the better choice?",
+   "current_answer": "Citrix can be the better choice for a very large multi-region estate with deep HDX-specific dependencies, an established Citrix CoE, or tooling built directly on Citrix APIs. Accops is the stronger fit when you want **VDI, secure access and identity** from **one vendor**, on **infrastructure you already own**.",
+   "why": "Engineer jargon: \"deep HDX-specific dependencies\", \"an established Citrix CoE\", \"tooling built directly on Citrix APIs\".",
+   "proposed_answer": "Citrix can be the better choice for a very large multi-region estate, or for a team with deep Citrix skills and automation built around it. Accops is the stronger fit when you want **VDI, secure access and identity** from **one vendor**, on **infrastructure you already own**.",
+   "visual_change": "Two row labels in plain words: \"Heavy use of Citrix-specific features\" and \"Deep Citrix skills and automation\"",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Stay or switch",
+     "columns": [
+      "Your situation",
+      "Better fit"
+     ],
+     "rows": [
+      {
+       "label": "Very large multi-region estate",
+       "cells": [
+        "Citrix"
+       ],
+       "accent": 2
+      },
+      {
+       "label": "Deep HDX-specific dependencies",
+       "cells": [
+        "Citrix"
+       ],
+       "accent": 2
+      },
+      {
+       "label": "Citrix CoE or tooling on Citrix APIs",
+       "cells": [
+        "Citrix"
+       ],
+       "detail": "Teams with heavy investment in Citrix-specific automation and staff certification often find the switching cost outweighs the licensing saving.",
+       "accent": 2
+      },
+      {
+       "label": "VDI, access and identity, one vendor",
+       "cells": [
+        "Accops"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Infrastructure you already own",
+       "cells": [
+        "Accops"
+       ],
+       "accent": 1
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Stay or switch",
+     "columns": [
+      "Your situation",
+      "Better fit"
+     ],
+     "rows": [
+      {
+       "label": "Very large multi-region estate",
+       "cells": [
+        "Citrix"
+       ],
+       "accent": 2
+      },
+      {
+       "label": "Heavy use of Citrix-specific features",
+       "cells": [
+        "Citrix"
+       ],
+       "accent": 2
+      },
+      {
+       "label": "Deep Citrix skills and automation",
+       "cells": [
+        "Citrix"
+       ],
+       "detail": "Teams with heavy investment in Citrix-specific automation and staff certification often find the switching cost outweighs the licensing saving.",
+       "accent": 2
+      },
+      {
+       "label": "VDI, access and identity, one vendor",
+       "cells": [
+        "Accops"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Infrastructure you already own",
+       "cells": [
+        "Accops"
+       ],
+       "accent": 1
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-09",
+   "question": "Do we have to replace our hypervisor or Active Directory?",
+   "current_answer": "No. Accops is **hypervisor-agnostic** (VMware, Nutanix and Hyper-V) and integrates with Azure, AWS, GCP and OCI, so you keep the hypervisor you run today. Your existing **Active Directory and file servers** stay in place.",
+   "why": "Compatibility list of seven hypervisors and clouds (VMware, Nutanix, Hyper-V, Azure, AWS, GCP, OCI) in the answer and the table; a buyer on anything else reads \"not supported\".",
+   "proposed_answer": "No. Accops is **hypervisor-agnostic** and integrates with the major public clouds, so in most estates you **keep the hypervisor you run today**. Your existing **Active Directory and file servers** stay in place. An engineer can confirm the fit for your environment on a short call.",
+   "visual_change": "Row labels drop the vendor lists: \"Your hypervisor\" (Keep it) and \"Your public cloud\" (Integrates)",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "What you keep",
+     "columns": [
+      "Your estate",
+      "With Accops"
+     ],
+     "rows": [
+      {
+       "label": "Hypervisor (VMware, Nutanix, Hyper-V)",
+       "cells": [
+        "Keep it"
+       ]
+      },
+      {
+       "label": "Public cloud (Azure, AWS, GCP, OCI)",
+       "cells": [
+        "Integrates"
+       ]
+      },
+      {
+       "label": "Active Directory",
+       "cells": [
+        "Stays in place"
+       ]
+      },
+      {
+       "label": "File servers",
+       "cells": [
+        "Stay in place"
+       ]
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "What you keep",
+     "columns": [
+      "Your estate",
+      "With Accops"
+     ],
+     "rows": [
+      {
+       "label": "Your hypervisor",
+       "cells": [
+        "Keep it"
+       ]
+      },
+      {
+       "label": "Your public cloud",
+       "cells": [
+        "Integrates"
+       ]
+      },
+      {
+       "label": "Active Directory",
+       "cells": [
+        "Stays in place"
+       ]
+      },
+      {
+       "label": "File servers",
+       "cells": [
+        "Stay in place"
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-10",
+   "question": "Does Accops run on Nutanix AHV?",
+   "current_answer": "Yes. HyWorks lists **Nutanix** among its supported hypervisors, and recent releases add **a new Nutanix connector** for Prism Central v7.3 and later. HyDesk thin clients also support Nutanix.",
+   "why": "Version number and connector detail: \"a new Nutanix connector for Prism Central v7.3 and later\".",
+   "proposed_answer": "Yes. HyWorks **supports Nutanix** as a hypervisor, and **HyDesk thin clients** work with Nutanix too. The exact fit depends on your Nutanix setup, so an engineer confirms it on a short call.",
+   "visual_change": "none"
+  },
+  {
+   "id": "lp-11",
+   "question": "Does Accops support Proxmox?",
+   "current_answer": "Yes. HyWorks lists **Proxmox (non-HCI)** as a supported hypervisor, and **HyDesk thin clients** support Proxmox. Confirm your exact Proxmox setup with an engineer, since the edition table qualifies it as non-HCI.",
+   "why": "Edition caveat in jargon: \"Proxmox (non-HCI)\", \"the edition table qualifies it as non-HCI\".",
+   "proposed_answer": "Yes. HyWorks **supports Proxmox** as a hypervisor, and **HyDesk thin clients** work with Proxmox too. The exact fit depends on your Proxmox setup, so an engineer confirms it on a short call.",
+   "visual_change": "none"
+  },
+  {
+   "id": "lp-12",
+   "question": "Which hypervisors and clouds does Accops support?",
+   "current_answer": "HyWorks **runs on major hypervisors and clouds**: its edition table lists VMware, Nutanix, Proxmox (non-HCI), Hyper-V and Azure, with OpenShift, Azure Stack HCI and OpenStack, and AWS, OCI and GCP as add-ons. You can **deploy on-premises, cloud or hybrid**.",
+   "why": "A full compatibility list with edition and add-on detail (Proxmox non-HCI, OpenShift, Azure Stack HCI, OpenStack; AWS, OCI and GCP as add-ons), in the answer and a 7-row platform table.",
+   "proposed_answer": "HyWorks **runs on the major hypervisors** and public clouds, including VMware, Nutanix and Hyper-V, so you can **deploy on-premises, cloud or hybrid**. Some platforms depend on the edition, so an engineer confirms the fit for your estate on a short call.",
+   "visual_change": "Drop the platform table (text only: the answer names the main hypervisors and an engineer confirms the rest)",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "HyWorks platform support",
+     "columns": [
+      "Platform",
+      "HyWorks"
+     ],
+     "rows": [
+      {
+       "label": "VMware",
+       "cells": [
+        "Supported"
+       ],
+       "group": "Hypervisor"
+      },
+      {
+       "label": "Nutanix",
+       "cells": [
+        "Supported"
+       ],
+       "group": "Hypervisor"
+      },
+      {
+       "label": "Proxmox (non-HCI)",
+       "cells": [
+        "Supported"
+       ],
+       "group": "Hypervisor"
+      },
+      {
+       "label": "Hyper-V",
+       "cells": [
+        "Supported"
+       ],
+       "group": "Hypervisor"
+      },
+      {
+       "label": "OpenShift, Azure Stack HCI, OpenStack",
+       "cells": [
+        "In the edition table"
+       ],
+       "group": "Hypervisor"
+      },
+      {
+       "label": "Azure",
+       "cells": [
+        "Supported"
+       ],
+       "group": "Cloud"
+      },
+      {
+       "label": "AWS, OCI, GCP",
+       "cells": [
+        "Add-on"
+       ],
+       "group": "Cloud",
+       "detail": "Per the HyWorks edition table; confirm the edition for your estate.",
+       "accent": 2
+      }
+     ],
+     "filters": [
+      "Hypervisor",
+      "Cloud"
+     ]
+    }
+   },
+   "proposed_visual": null
+  },
+  {
+   "id": "lp-14",
+   "question": "Does Accops work with Azure Virtual Desktop?",
+   "current_answer": "Yes. Accops **extends Azure Virtual Desktop** with **power management that shuts idle VMs**, the latest Microsoft Teams audio and video optimisations, and access from Linux thin clients and zero clients. HyWorks also supports FSLogix and App Attach on Azure.",
+   "why": "Feature jargon (FSLogix, App Attach) and endpoint detail (\"Linux thin clients and zero clients\").",
+   "proposed_answer": "Yes. Accops **extends Azure Virtual Desktop**: it **shuts idle VMs to cut cost**, brings the latest Microsoft Teams audio and video optimisations, and lets users connect from thin and zero clients.",
+   "visual_change": "Drop the \"Profiles and apps\" row (FSLogix and App Attach); Endpoints reads \"Thin clients and zero clients\"",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "What Accops adds to AVD",
+     "columns": [
+      "Need",
+      "Accops for AVD"
+     ],
+     "rows": [
+      {
+       "label": "Cut idle VM cost",
+       "cells": [
+        "Shuts idle and pooled VMs on workday, weekend and holiday plans"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Teams calls",
+       "cells": [
+        "The latest Teams audio and video optimisations"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Endpoints",
+       "cells": [
+        "Linux thin clients and zero clients"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Profiles and apps",
+       "cells": [
+        "FSLogix and App Attach supported"
+       ]
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "What Accops adds to AVD",
+     "columns": [
+      "Need",
+      "Accops for AVD"
+     ],
+     "rows": [
+      {
+       "label": "Cut idle VM cost",
+       "cells": [
+        "Shuts idle and pooled VMs on workday, weekend and holiday plans"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Teams calls",
+       "cells": [
+        "The latest Teams audio and video optimisations"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Endpoints",
+       "cells": [
+        "Thin clients and zero clients"
+       ],
+       "accent": 1
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-15",
+   "question": "Is the Accops display protocol as good as HDX?",
+   "current_answer": "For mainstream workloads the **Accops protocol is production-proven**; Citrix HDX remains more mature for extreme-latency links and specialist graphics. Accops has announced **Photon, its own display protocol**, which **adapts to network conditions** in real time, redirects audio and video, and uses GPU acceleration.",
+   "why": "Protocol internals: HDX, extreme-latency links, audio/video redirection, GPU acceleration; the table adds \"UDP-based transport; encrypted pixel-only streams\".",
+   "proposed_answer": "For everyday workloads the **Accops protocol is production-proven**. Accops has announced **Photon, its own display protocol**, which **adapts to network conditions** in real time. For your most demanding graphics users, an engineer can set up a side-by-side test in the pilot.",
+   "visual_change": "Rows in plain words: \"Very demanding graphics\": \"Test them in the pilot, alongside Citrix\"; Photon: \"Adapts to your network in real time\"; drop the \"Graphics workstations\" row (UDP, pixel streams)",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Accops display protocols",
+     "columns": [
+      "Case",
+      "Accops"
+     ],
+     "rows": [
+      {
+       "label": "Mainstream workloads",
+       "cells": [
+        "Production-proven"
+       ],
+       "accent": 0
+      },
+      {
+       "label": "Extreme latency, specialist graphics",
+       "cells": [
+        "Evaluate carefully: HDX is more mature here"
+       ],
+       "detail": "Run your hardest latency and graphics cases in the pilot, alongside Citrix.",
+       "accent": 2
+      },
+      {
+       "label": "Photon (announced)",
+       "cells": [
+        "Adapts to the network in real time; AV redirection; GPU"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Graphics workstations",
+       "cells": [
+        "UDP-based transport; encrypted pixel-only streams"
+       ],
+       "accent": 1
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Accops display protocols",
+     "columns": [
+      "Case",
+      "Accops"
+     ],
+     "rows": [
+      {
+       "label": "Mainstream workloads",
+       "cells": [
+        "Production-proven"
+       ],
+       "accent": 0
+      },
+      {
+       "label": "Very demanding graphics",
+       "cells": [
+        "Test them in the pilot, alongside Citrix"
+       ],
+       "accent": 2
+      },
+      {
+       "label": "Photon (announced)",
+       "cells": [
+        "Adapts to your network in real time"
+       ],
+       "accent": 1
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-16",
+   "question": "Will Teams calls, video and graphics work well?",
+   "current_answer": "Accops offers **Microsoft Teams audio and video optimisations** on Azure Virtual Desktop and **Teams optimisation in Accops DaaS**. Graphics workstations stream over a **UDP-based transport** built for low-bandwidth networks, and only encrypted pixels leave the data centre. For on-prem HyWorks multimedia, test your workloads in a pilot.",
+   "why": "Transport internals (\"UDP-based transport\", \"encrypted pixels\") and a deployment caveat about on-prem HyWorks multimedia.",
+   "proposed_answer": "Accops offers **Microsoft Teams audio and video optimisations** on Azure Virtual Desktop and **Teams optimisation in Accops DaaS**. Graphics streaming is **built for low-bandwidth networks**, and only encrypted screen images leave the data centre. An engineer can help you test your own workloads in a pilot.",
+   "visual_change": "Graphics workstations reads \"Built for low bandwidth; only encrypted screen images leave\"; Teams on on-prem HyWorks reads \"Test it in the pilot with an engineer\"",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Calls, video and graphics",
+     "columns": [
+      "Workload",
+      "What Accops offers"
+     ],
+     "rows": [
+      {
+       "label": "Teams on Azure Virtual Desktop",
+       "cells": [
+        "The latest Teams audio and video optimisations"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Teams on Accops DaaS",
+       "cells": [
+        "Teams optimisation built in"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Graphics workstations",
+       "cells": [
+        "UDP-based transport; encrypted pixel-only streams"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Teams on on-prem HyWorks",
+       "cells": [
+        "Not published: test it in the pilot"
+       ],
+       "accent": 2
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Calls, video and graphics",
+     "columns": [
+      "Workload",
+      "What Accops offers"
+     ],
+     "rows": [
+      {
+       "label": "Teams on Azure Virtual Desktop",
+       "cells": [
+        "The latest Teams audio and video optimisations"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Teams on Accops DaaS",
+       "cells": [
+        "Teams optimisation built in"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Graphics workstations",
+       "cells": [
+        "Built for low bandwidth; only encrypted screen images leave"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Teams on on-prem HyWorks",
+       "cells": [
+        "Test it in the pilot with an engineer"
+       ],
+       "accent": 2
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-19",
+   "question": "Can Accops replace NetScaler or Citrix Gateway?",
+   "current_answer": "Yes. Accops **builds in gateway and load balancing**, so you don't need a separate ADC licence. Its HySecure gateway gives **zero trust access** to web, SaaS, client-server and VDI apps, with **web application protection** against OWASP Top 10/20 risks.",
+   "why": "Security-standard detail (\"OWASP Top 10/20 risks\", \"SANS 25 errors\") and \"GSLB\" jargon in the table.",
+   "proposed_answer": "Yes. Accops **builds in gateway and load balancing**, so you don't need a separate ADC licence. Its HySecure gateway gives **zero trust access** to web, SaaS, client-server and VDI apps, and **protects web apps** against common attacks.",
+   "visual_change": "Web application protection reads \"Protection against common web attacks\"; the GSLB row becomes \"Advanced load-balancing needs\": \"An engineer confirms the fit\"",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Gateway needs",
+     "columns": [
+      "What you need",
+      "Accops"
+     ],
+     "rows": [
+      {
+       "label": "Gateway & load balancing",
+       "cells": [
+        "Built into the platform"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Access to web, SaaS, client-server, VDI",
+       "cells": [
+        "HySecure ZTNA gateway"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Web application protection",
+       "cells": [
+        "OWASP Top 10/20 risks, SANS 25 errors"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Agentless access",
+       "cells": [
+        "Agent-based and agentless browser access"
+       ]
+      },
+      {
+       "label": "Advanced ADC features (e.g. GSLB)",
+       "cells": [
+        "Not published: check with an engineer"
+       ],
+       "accent": 2
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Gateway needs",
+     "columns": [
+      "What you need",
+      "Accops"
+     ],
+     "rows": [
+      {
+       "label": "Gateway & load balancing",
+       "cells": [
+        "Built into the platform"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Access to web, SaaS, client-server, VDI",
+       "cells": [
+        "HySecure ZTNA gateway"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Web application protection",
+       "cells": [
+        "Protection against common web attacks"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Agentless access",
+       "cells": [
+        "Agent-based and agentless browser access"
+       ]
+      },
+      {
+       "label": "Advanced load-balancing needs",
+       "cells": [
+        "An engineer confirms the fit"
+       ],
+       "accent": 2
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-20",
+   "question": "Are MFA and SSO included, or do we need another vendor?",
+   "current_answer": "Yes, included. **HyID, from the same vendor**, adds **MFA and SSO** to modern, legacy, cloud and on-premises apps, including ones without native MFA. It supports OTP, biometrics, hardware tokens, FIDO keys and QR codes, and connects to Active Directory, LDAP, Azure AD or another IdP.",
+   "why": "A long list of sign-in factors and directory protocols (OTP, QR codes, LDAP, \"another IdP\").",
+   "proposed_answer": "Yes, included. **HyID, from the same vendor**, adds **MFA and SSO** to modern, legacy, cloud and on-premises apps, including ones without native MFA. Users sign in with one-time codes, biometrics or security keys, and HyID **works with your existing directory**, including Active Directory and Azure AD.",
+   "visual_change": "none"
+  },
+  {
+   "id": "lp-34",
+   "question": "What is HyWorks VDI?",
+   "current_answer": "HyWorks is Accops' **VDI and app delivery** product. It runs **Windows and Linux desktops and apps** on VMware, Nutanix, Hyper-V, Azure, AWS, Google Cloud and more. It connects natively with the **Accops ZTNA gateway, MFA and SSO** and with thin clients, so you manage everything in one place.",
+   "why": "Compatibility list of six platforms in the answer and the table; the table also names FSLogix and AppAttach.",
+   "proposed_answer": "HyWorks is Accops' **VDI and app delivery** product. It runs **Windows and Linux desktops** and apps on the major hypervisors and public clouds, and connects natively with the **Accops ZTNA gateway, MFA and SSO** and with thin clients, so you manage everything in one place.",
+   "visual_change": "Platforms reads \"Major hypervisors and public clouds\"; drop the User profiles (FSLogix) and App streaming (AppAttach) rows",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "What HyWorks covers",
+     "columns": [
+      "Capability",
+      "HyWorks"
+     ],
+     "rows": [
+      {
+       "label": "Platforms",
+       "cells": [
+        "VMware, Nutanix, Hyper-V, Azure, AWS, Google Cloud and more"
+       ]
+      },
+      {
+       "label": "Desktops and apps",
+       "cells": [
+        "Windows and Linux, side by side"
+       ]
+      },
+      {
+       "label": "User profiles",
+       "cells": [
+        "FSLogix profile management"
+       ]
+      },
+      {
+       "label": "App streaming",
+       "cells": [
+        "AppAttach"
+       ]
+      },
+      {
+       "label": "Disaster recovery",
+       "cells": [
+        "Multi-site management"
+       ]
+      },
+      {
+       "label": "Works with",
+       "cells": [
+        "Accops ZTNA gateway, MFA, SSO and thin clients"
+       ]
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "What HyWorks covers",
+     "columns": [
+      "Capability",
+      "HyWorks"
+     ],
+     "rows": [
+      {
+       "label": "Platforms",
+       "cells": [
+        "Major hypervisors and public clouds"
+       ]
+      },
+      {
+       "label": "Desktops and apps",
+       "cells": [
+        "Windows and Linux, side by side"
+       ]
+      },
+      {
+       "label": "Disaster recovery",
+       "cells": [
+        "Multi-site management"
+       ]
+      },
+      {
+       "label": "Works with",
+       "cells": [
+        "Accops ZTNA gateway, MFA, SSO and thin clients"
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-35",
+   "question": "What is the HySecure ZTNA gateway?",
+   "current_answer": "HySecure is Accops' **ZTNA private-application gateway**. It gives users **compliant access to any corporate app**: web, SaaS, client-server and virtual desktops. Internal apps **stay hidden by default**, and access is allowed, restricted, stepped up or denied based on the device's compliance.",
+   "why": "The answer is plain; the table names security standards (\"OWASP Top 10/20 risks and SANS 25 errors\"). Answer unchanged.",
+   "proposed_answer": "HySecure is Accops' **ZTNA private-application gateway**. It gives users **compliant access to any corporate app**: web, SaaS, client-server and virtual desktops. Internal apps **stay hidden by default**, and access is allowed, restricted, stepped up or denied based on the device's compliance.",
+   "visual_change": "Web app protection reads \"Protection against common web attacks\"",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "What HySecure protects",
+     "columns": [
+      "What you need",
+      "HySecure"
+     ],
+     "rows": [
+      {
+       "label": "App types",
+       "cells": [
+        "Web, SaaS, client-server and virtual desktops (VDI/DaaS)"
+       ]
+      },
+      {
+       "label": "Exposure",
+       "cells": [
+        "Internal apps hidden by default"
+       ]
+      },
+      {
+       "label": "Device checks",
+       "cells": [
+        "Allow, restrict, step up or deny on endpoint compliance"
+       ]
+      },
+      {
+       "label": "Web app protection",
+       "cells": [
+        "Defence against OWASP Top 10/20 risks and SANS 25 errors"
+       ]
+      },
+      {
+       "label": "Client options",
+       "cells": [
+        "Agent-based and agentless browser access"
+       ]
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "What HySecure protects",
+     "columns": [
+      "What you need",
+      "HySecure"
+     ],
+     "rows": [
+      {
+       "label": "App types",
+       "cells": [
+        "Web, SaaS, client-server and virtual desktops (VDI/DaaS)"
+       ]
+      },
+      {
+       "label": "Exposure",
+       "cells": [
+        "Internal apps hidden by default"
+       ]
+      },
+      {
+       "label": "Device checks",
+       "cells": [
+        "Allow, restrict, step up or deny on endpoint compliance"
+       ]
+      },
+      {
+       "label": "Web app protection",
+       "cells": [
+        "Protection against common web attacks"
+       ]
+      },
+      {
+       "label": "Client options",
+       "cells": [
+        "Agent-based and agentless browser access"
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-36",
+   "question": "How does HyID handle MFA and SSO?",
+   "current_answer": "HyID is Accops' **MFA and single sign-on** product. It adds MFA to modern, legacy, cloud and on-premises apps, **including apps without native MFA**, and protects VPNs and VDI with **one set of credentials**. It connects to Active Directory, LDAP, Azure AD or any third-party IdP.",
+   "why": "Directory protocol jargon (LDAP, \"any third-party IdP\"); the table lists LDAP, device hardware ID and PKI certificates.",
+   "proposed_answer": "HyID is Accops' **MFA and single sign-on** product. It adds MFA to modern, legacy, cloud and on-premises apps, **including apps without native MFA**, and protects VPNs and VDI with **one set of credentials**. It works with your existing directory, including Active Directory and Azure AD.",
+   "visual_change": "Other factors reads \"QR codes and certificates\"; Directories reads \"Active Directory, Azure AD and other directories\"",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "What HyID supports",
+     "columns": [
+      "Area",
+      "HyID"
+     ],
+     "rows": [
+      {
+       "label": "One-time passwords",
+       "cells": [
+        "OTP by SMS, email or mobile app"
+       ],
+       "group": "Sign-in"
+      },
+      {
+       "label": "Biometrics",
+       "cells": [
+        "Biometric authentication"
+       ],
+       "group": "Sign-in"
+      },
+      {
+       "label": "Keys and tokens",
+       "cells": [
+        "Hardware tokens and FIDO keys"
+       ],
+       "group": "Sign-in"
+      },
+      {
+       "label": "Other factors",
+       "cells": [
+        "QR codes, device hardware ID, PKI certificates"
+       ],
+       "group": "Sign-in"
+      },
+      {
+       "label": "Directories",
+       "cells": [
+        "Local DB, Active Directory, LDAP, Azure AD, any IdP"
+       ],
+       "group": "Directory"
+      },
+      {
+       "label": "Windows logon",
+       "cells": [
+        "MFA at Windows desktop logon"
+       ],
+       "group": "Sign-in"
+      }
+     ],
+     "filters": [
+      "Sign-in",
+      "Directory"
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "What HyID supports",
+     "columns": [
+      "Area",
+      "HyID"
+     ],
+     "rows": [
+      {
+       "label": "One-time passwords",
+       "cells": [
+        "OTP by SMS, email or mobile app"
+       ],
+       "group": "Sign-in"
+      },
+      {
+       "label": "Biometrics",
+       "cells": [
+        "Biometric authentication"
+       ],
+       "group": "Sign-in"
+      },
+      {
+       "label": "Keys and tokens",
+       "cells": [
+        "Hardware tokens and FIDO keys"
+       ],
+       "group": "Sign-in"
+      },
+      {
+       "label": "Other factors",
+       "cells": [
+        "QR codes and certificates"
+       ],
+       "group": "Sign-in"
+      },
+      {
+       "label": "Directories",
+       "cells": [
+        "Active Directory, Azure AD and other directories"
+       ],
+       "group": "Directory"
+      },
+      {
+       "label": "Windows logon",
+       "cells": [
+        "MFA at Windows desktop logon"
+       ],
+       "group": "Sign-in"
+      }
+     ],
+     "filters": [
+      "Sign-in",
+      "Directory"
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-37",
+   "question": "Do you offer thin clients?",
+   "current_answer": "Yes. **Accops HyDesk thin and zero clients** replace PCs as **centrally managed VDI endpoints**. They draw as little as 5W-15W, against 50W-100W for a traditional PC, and a single IT admin can manage up to 300 HyDesk devices.",
+   "why": "Hardware specs: \"5W-15W, against 50W-100W for a traditional PC\" (models vary, so the figures may not match what is supplied).",
+   "proposed_answer": "Yes. Accops **HyDesk thin and zero clients** replace PCs as **centrally managed VDI endpoints**. They use **far less power** than a traditional PC, and a single IT admin can manage up to 300 HyDesk devices.",
+   "visual_change": "The figure's line under it reads \"They use far less power than traditional PCs.\" (no wattages)",
+   "current_visual": {
+    "type": "stat",
+    "data": {
+     "stats": [
+      {
+       "value": "300",
+       "label": "HyDesk devices a single IT admin can manage",
+       "source": "https://www.accops.com/products/hydesk",
+       "context": "Power draw as low as 5W–15W, against 50W–100W for traditional PCs."
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "stat",
+    "data": {
+     "stats": [
+      {
+       "value": "300",
+       "label": "HyDesk devices a single IT admin can manage",
+       "source": "https://www.accops.com/products/hydesk",
+       "context": "They use far less power than traditional PCs."
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-38",
+   "question": "Do you support FSLogix and App Attach?",
+   "current_answer": "Yes. HyWorks supports **profile management via FSLogix** and application streaming via AppAttach. It also offers user environment management through ADMX profiles, capacity planning, a task scheduler and **multi-site management for DR**.",
+   "why": "Admin-level detail: \"user environment management through ADMX profiles\", \"a task scheduler\".",
+   "proposed_answer": "Yes. HyWorks supports **FSLogix profile management** and **AppAttach application streaming**, plus capacity planning and **multi-site management for disaster recovery**. An engineer can confirm how it fits your setup on a short call.",
+   "visual_change": "none"
+  },
+  {
+   "id": "lp-42",
+   "question": "Can users connect from just a browser?",
+   "current_answer": "Yes. **HyLite gives clientless HTML5 access**: users need only a browser, with **no client install or RDP**. Delivered through HySecure, it opens desktops and apps from HyWorks, Microsoft Remote Desktop Services or Linux terminal services, with driver-free printing. HyLite needs its own licence.",
+   "why": "Protocol and platform detail: \"clientless HTML5 access\", \"no client install or RDP\", \"Linux terminal services\".",
+   "proposed_answer": "Yes. With **HyLite**, users open their desktops and apps **from a web browser**, with **nothing to install**. It works with HyWorks and Microsoft Remote Desktop Services, printing needs no extra drivers, and HyLite is licensed separately.",
+   "visual_change": "none"
+  },
+  {
+   "id": "lp-45",
+   "question": "Can Accops secure Microsoft 365 and other SaaS apps?",
+   "current_answer": "Yes. **HyID single sign-on** federates Microsoft 365, Salesforce, Google Workspace and other SaaS using SAML and OAuth. For BYOD and unmanaged devices, HySecure pairs with the **Vajra secure enterprise browser**, whose policies can **block copy-paste, downloads and screenshots**.",
+   "why": "Protocol names: \"federates ... using SAML and OAuth\" in the answer, \"SAML and OAuth federation\" in the table.",
+   "proposed_answer": "Yes. **HyID single sign-on** lets users sign in once to Microsoft 365, Salesforce, Google Workspace and other SaaS apps. For personal and unmanaged devices, HySecure pairs with the **Vajra secure enterprise browser**, whose policies can **block copy-paste, downloads and screenshots**.",
+   "visual_change": "Single sign-on to SaaS reads \"HyID single sign-on: one login for SaaS apps\"",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Securing SaaS",
+     "columns": [
+      "Need",
+      "Accops"
+     ],
+     "rows": [
+      {
+       "label": "Single sign-on to SaaS",
+       "cells": [
+        "HyID SSO with SAML and OAuth federation"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "SaaS from unmanaged devices",
+       "cells": [
+        "HySecure with the Vajra secure enterprise browser"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Stop data leaving the browser",
+       "cells": [
+        "Block copy-paste, printing, screenshots, downloads"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "MFA options",
+       "cells": [
+        "Biometrics, FIDO keys, QR login, Windows Hello, OTP"
+       ]
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Securing SaaS",
+     "columns": [
+      "Need",
+      "Accops"
+     ],
+     "rows": [
+      {
+       "label": "Single sign-on to SaaS",
+       "cells": [
+        "HyID single sign-on: one login for SaaS apps"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "SaaS from unmanaged devices",
+       "cells": [
+        "HySecure with the Vajra secure enterprise browser"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Stop data leaving the browser",
+       "cells": [
+        "Block copy-paste, printing, screenshots, downloads"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "MFA options",
+       "cells": [
+        "Biometrics, FIDO keys, QR login, Windows Hello, OTP"
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-47",
+   "question": "Does Accops work over slow or low-bandwidth links?",
+   "current_answer": "Yes. Accops streams graphics over a **UDP-based transport built for low bandwidth**, and Wockhardt compressed its VDI traffic for **speedy access at low bandwidth**. A major e-commerce firm saw support calls fall because Accops performed well over low-bandwidth networks.",
+   "why": "Transport detail: \"a UDP-based transport\".",
+   "proposed_answer": "Yes. Accops streams graphics in a way **built for low bandwidth**, and Wockhardt compressed its VDI traffic for **speedy access at low bandwidth**. A major e-commerce firm saw support calls fall because Accops performed well over low-bandwidth networks.",
+   "visual_change": "none"
+  },
+  {
+   "id": "lp-50",
+   "question": "Do we still need SQL Server licences?",
+   "current_answer": "No. The Accops **site database is bundled**, so there is **no separate SQL Server licence** to buy. Recent HyWorks releases also removed the SQL CE dependency from the HyWorks Controller, reducing its installation footprint.",
+   "why": "Release-note detail: \"removed the SQL CE dependency from the HyWorks Controller, reducing its installation footprint\".",
+   "proposed_answer": "No. The Accops site database is bundled, so there is **no separate SQL Server licence** to buy.",
+   "visual_change": "none"
+  },
+  {
+   "id": "lp-53",
+   "question": "Is Accops secure and certified?",
+   "current_answer": "Yes. Accops is **ISO 27001:2022 certified**, and the platform is built on zero trust. Internal apps stay hidden, each **device is checked before access**, HyID adds MFA to logins, and session controls can **block copy-paste, downloads and USB**. Pick a topic below for detail.",
+   "why": "The answer is plain; the table names security standards (\"OWASP Top 10/20 risks, SANS 25 errors\"). Answer unchanged.",
+   "proposed_answer": "Yes. Accops is **ISO 27001:2022 certified**, and the platform is built on zero trust. Internal apps stay hidden, each **device is checked before access**, HyID adds MFA to logins, and session controls can **block copy-paste, downloads and USB**. Pick a topic below for detail.",
+   "visual_change": "Web app protection reads \"Protection against common web attacks\"",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Security layers",
+     "columns": [
+      "Layer",
+      "What Accops does"
+     ],
+     "rows": [
+      {
+       "label": "Zero trust access",
+       "cells": [
+        "Apps hidden by default; access per app"
+       ],
+       "group": "Access",
+       "accent": 1
+      },
+      {
+       "label": "Device posture",
+       "cells": [
+        "Checks antivirus, firewall, OS patch, browser health"
+       ],
+       "group": "Access",
+       "accent": 1
+      },
+      {
+       "label": "MFA and SSO",
+       "cells": [
+        "HyID: OTP, biometrics, FIDO keys, QR codes"
+       ],
+       "group": "Access",
+       "accent": 1
+      },
+      {
+       "label": "Data controls",
+       "cells": [
+        "Restricts copy/paste, USB, screen capture"
+       ],
+       "group": "Data",
+       "accent": 1
+      },
+      {
+       "label": "Endpoints",
+       "cells": [
+        "Thin clients store no local data"
+       ],
+       "group": "Data",
+       "accent": 1
+      },
+      {
+       "label": "Web app protection",
+       "cells": [
+        "OWASP Top 10/20 risks, SANS 25 errors"
+       ],
+       "group": "Data",
+       "accent": 1
+      },
+      {
+       "label": "Certification",
+       "cells": [
+        "ISO 27001:2022"
+       ],
+       "group": "Assurance",
+       "accent": 1
+      }
+     ],
+     "filters": [
+      "Access",
+      "Data",
+      "Assurance"
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Security layers",
+     "columns": [
+      "Layer",
+      "What Accops does"
+     ],
+     "rows": [
+      {
+       "label": "Zero trust access",
+       "cells": [
+        "Apps hidden by default; access per app"
+       ],
+       "group": "Access",
+       "accent": 1
+      },
+      {
+       "label": "Device posture",
+       "cells": [
+        "Checks antivirus, firewall, OS patch, browser health"
+       ],
+       "group": "Access",
+       "accent": 1
+      },
+      {
+       "label": "MFA and SSO",
+       "cells": [
+        "HyID: OTP, biometrics, FIDO keys, QR codes"
+       ],
+       "group": "Access",
+       "accent": 1
+      },
+      {
+       "label": "Data controls",
+       "cells": [
+        "Restricts copy/paste, USB, screen capture"
+       ],
+       "group": "Data",
+       "accent": 1
+      },
+      {
+       "label": "Endpoints",
+       "cells": [
+        "Thin clients store no local data"
+       ],
+       "group": "Data",
+       "accent": 1
+      },
+      {
+       "label": "Web app protection",
+       "cells": [
+        "Protection against common web attacks"
+       ],
+       "group": "Data",
+       "accent": 1
+      },
+      {
+       "label": "Certification",
+       "cells": [
+        "ISO 27001:2022"
+       ],
+       "group": "Assurance",
+       "accent": 1
+      }
+     ],
+     "filters": [
+      "Access",
+      "Data",
+      "Assurance"
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-55",
+   "question": "Do we need to open inbound firewall ports?",
+   "current_answer": "No, not with reverse-connect. Accops ZTNA can run on-premises with **outbound-initiated tunnels** via Edge and App Connectors, so external access works **without opening inbound ports**. It can also run cloud-hosted, with users connecting to it over the internet.",
+   "why": "Network internals: \"reverse-connect\", \"outbound-initiated tunnels via Edge and App Connectors\".",
+   "proposed_answer": "No. Accops ZTNA can run on-premises **without opening inbound firewall ports**, because the connection starts from inside your network. It can also run **cloud-hosted**, with users connecting over the internet. An engineer can confirm the right option for your network.",
+   "visual_change": "On-premises row in plain words: \"On-premises\": \"No inbound firewall ports to open\"",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "ZTNA deployment options",
+     "columns": [
+      "Option",
+      "How users connect"
+     ],
+     "rows": [
+      {
+       "label": "On-premises, reverse-connect",
+       "cells": [
+        "Outbound tunnels via Edge and App Connectors; no inbound ports"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Cloud-hosted",
+       "cells": [
+        "Users connect directly to it over the internet"
+       ]
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "ZTNA deployment options",
+     "columns": [
+      "Option",
+      "How users connect"
+     ],
+     "rows": [
+      {
+       "label": "On-premises",
+       "cells": [
+        "No inbound firewall ports to open"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Cloud-hosted",
+       "cells": [
+        "Users connect directly to it over the internet"
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-59",
+   "question": "Can you isolate risky websites from our network?",
+   "current_answer": "Yes. **Accops Remote Browser Isolation** runs web sessions in **disposable browser containers** in your data centre or private cloud, and streams **only encrypted pixels and keystrokes** to the device. One of the world's largest IT services providers uses it for agentless HRMS and intranet access from customer-provided devices.",
+   "why": "Mildly technical: \"disposable browser containers\", \"streams only encrypted pixels and keystrokes\".",
+   "proposed_answer": "Yes. **Accops Remote Browser Isolation** runs web sessions in **disposable browsers** in your data centre or private cloud, so **website code never reaches the device**. One of the world's largest IT services providers uses it for agentless HRMS and intranet access from customer-provided devices.",
+   "visual_change": "none"
+  },
+  {
+   "id": "lp-61",
+   "question": "Where does Accops run: on-prem or cloud?",
+   "current_answer": "Accops runs **on-premises, cloud, isolated or hybrid**. It is **hypervisor- and cloud-agnostic**: VMware, Nutanix, Proxmox, Hyper-V and Azure are supported, with AWS, OCI and GCP as add-ons. Or Accops can run it for you as **managed DaaS**.",
+   "why": "Compatibility list with add-on detail: \"VMware, Nutanix, Proxmox, Hyper-V and Azure are supported, with AWS, OCI and GCP as add-ons\".",
+   "proposed_answer": "Accops runs **on-premises, cloud, isolated or hybrid**. It is **hypervisor- and cloud-agnostic**, working with the major hypervisors and public clouds, or Accops can run it for you as **managed DaaS**. An engineer can confirm the fit for your environment on a short call.",
+   "visual_change": "none"
+  },
+  {
+   "id": "lp-62",
+   "question": "Does Accops support Hyper-V and OpenShift?",
+   "current_answer": "Yes. Recent HyWorks releases add **native OpenShift and HPE Morpheus connectors**, and standalone **Hyper-V connectors work without SCVMM**. HyWorks also offers a token-based REST API for third-party automation, and HyDesk thin clients support both platforms.",
+   "why": "Release-note detail: \"native OpenShift and HPE Morpheus connectors\", \"Hyper-V connectors work without SCVMM\", \"token-based REST API\".",
+   "proposed_answer": "Yes. HyWorks **supports Hyper-V and OpenShift**, and **HyDesk thin clients** work with both. The exact fit depends on your environment, so an engineer confirms it on a short call.",
+   "visual_change": "none"
+  },
+  {
+   "id": "lp-70",
+   "question": "Does Accops work for IT services and BPOs?",
+   "current_answer": "Yes. IT and ITeS teams get **zero trust access and MFA**, with BYOD sessions held in **a secure sandbox** that restricts printing, screenshots and file saving. For BPOs, Accops carries **voice over a Layer-3 tunnel** and business apps over a Layer-7 tunnel; a global BPO kept agent productivity at pre-Covid levels.",
+   "why": "Network-layer jargon: \"voice over a Layer-3 tunnel and business apps over a Layer-7 tunnel\"; the table says \"Layer-3 tunnel for VoIP\".",
+   "proposed_answer": "Yes. IT and ITeS teams get **zero trust access and MFA**, with personal-device sessions held in **a secure sandbox** that restricts printing, screenshots and file saving. For BPOs, Accops **secures agents' calls and business apps** on separate connections; a global BPO kept agent productivity at pre-Covid levels.",
+   "visual_change": "Agents' voice calls reads \"Secure connection for calls\"; Business apps and CRM reads \"Separate secure connection for apps\"",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "IT, ITeS and BPO needs",
+     "columns": [
+      "Need",
+      "Accops"
+     ],
+     "rows": [
+      {
+       "label": "Agents' voice calls",
+       "cells": [
+        "Layer-3 tunnel for VoIP"
+       ],
+       "group": "BPO",
+       "accent": 1
+      },
+      {
+       "label": "Business apps and CRM",
+       "cells": [
+        "Layer-7 tunnel"
+       ],
+       "group": "BPO",
+       "accent": 1
+      },
+      {
+       "label": "Personal devices",
+       "cells": [
+        "Sandbox: no printing, screenshots or file saving"
+       ],
+       "group": "IT and ITeS",
+       "accent": 1
+      },
+      {
+       "label": "Strong sign-in",
+       "cells": [
+        "SMS, email, app, PC tokens or biometrics"
+       ],
+       "group": "IT and ITeS"
+      },
+      {
+       "label": "Device binding",
+       "cells": [
+        "Login time, location and device fingerprint"
+       ],
+       "group": "BPO"
+      }
+     ],
+     "filters": [
+      "IT and ITeS",
+      "BPO"
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "IT, ITeS and BPO needs",
+     "columns": [
+      "Need",
+      "Accops"
+     ],
+     "rows": [
+      {
+       "label": "Agents' voice calls",
+       "cells": [
+        "Secure connection for calls"
+       ],
+       "group": "BPO",
+       "accent": 1
+      },
+      {
+       "label": "Business apps and CRM",
+       "cells": [
+        "Separate secure connection for apps"
+       ],
+       "group": "BPO",
+       "accent": 1
+      },
+      {
+       "label": "Personal devices",
+       "cells": [
+        "Sandbox: no printing, screenshots or file saving"
+       ],
+       "group": "IT and ITeS",
+       "accent": 1
+      },
+      {
+       "label": "Strong sign-in",
+       "cells": [
+        "SMS, email, app, PC tokens or biometrics"
+       ],
+       "group": "IT and ITeS"
+      },
+      {
+       "label": "Device binding",
+       "cells": [
+        "Login time, location and device fingerprint"
+       ],
+       "group": "BPO"
+      }
+     ],
+     "filters": [
+      "IT and ITeS",
+      "BPO"
+     ]
+    }
+   }
+  },
+  {
+   "id": "lp-76",
+   "question": "How long is each Accops release supported?",
+   "current_answer": "Accops publishes its end-of-life policy: **Long Term Support Releases** reach end of support at **T+60 months**, and end of sale at T+36 months. Major feature releases reach end of support at T+12 months. Current versions such as HySecure 7.3 show end of life as to be announced.",
+   "why": "Version number (\"HySecure 7.3\") and \"T+60 months\" notation.",
+   "proposed_answer": "Accops publishes its end-of-life policy: **long-term support releases** are supported for **60 months from release** and sold for 36. Major feature releases are supported for 12 months. An engineer can confirm the dates for the release you would deploy.",
+   "visual_change": "Cells read \"36 months from release\", \"60 months from release\" and \"12 months from release\" (no \"T+\")",
+   "current_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Accops release lifecycle",
+     "columns": [
+      "Release type",
+      "End of sale",
+      "End of support"
+     ],
+     "rows": [
+      {
+       "label": "Long Term Support Release",
+       "cells": [
+        "T+36 months",
+        "T+60 months"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Major feature release",
+       "cells": [
+        "T+12 months",
+        "T+12 months"
+       ]
+      }
+     ]
+    }
+   },
+   "proposed_visual": {
+    "type": "compare_table",
+    "data": {
+     "title": "Accops release lifecycle",
+     "columns": [
+      "Release type",
+      "End of sale",
+      "End of support"
+     ],
+     "rows": [
+      {
+       "label": "Long Term Support Release",
+       "cells": [
+        "36 months from release",
+        "60 months from release"
+       ],
+       "accent": 1
+      },
+      {
+       "label": "Major feature release",
+       "cells": [
+        "12 months from release",
+        "12 months from release"
+       ]
+      }
+     ]
+    }
+   }
+  }
+ ]
+}
