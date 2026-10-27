@@ -8,7 +8,7 @@ import { normalise } from "./normalise";
 
 type Intent = { qa_id: string; groups: string[]; must: string[]; allow: string[]; keywords: Record<string, number>; phrases: string[]; min_score: number };
 type Index = { stop: string[]; synonyms: Record<string, string>; entities: Record<string, string[]>; group_entities: Record<string, string[]>;
-  vocab: string[]; w_kw: number; unk: number; intents: Intent[]; margin: number };
+  vocab: string[]; w_kw: number; unk: number; intents: Intent[]; margin: number; negatives: string[][] };
 
 const ix = raw as unknown as Index;
 const ASCII_WORD = /^[a-z]+$/;
@@ -115,9 +115,13 @@ export function rank(text: string, group: string): { score: number; n: number }[
  *  2 (Siddharth, 27 Oct). The index may hold drafts, so the caller keeps only ids live in sam_web_qa_public. */
 export const related = (text: string, page_group: string, n = 5) => rank(text, page_group).slice(0, n).map(r => ix.intents[r.n].qa_id);
 
+/** A reviewed negative (prototype/web_intent_learned.json, qa_id null, 2+ content words): a question holding all its
+ *  content words never matches; it goes to the model ("will our existing thin clients work" is not lp-37's "do you offer"). */
+const vetoed = (terms: string[]) => ix.negatives.some(v => v.every(t => terms.includes(t)));
+
 export const intentMatch: IntentMatch = (text, page_group) => {
   const r = rank(text, page_group);
-  if (!r.length) return null;
+  if (!r.length || vetoed(analyse(text).terms)) return null;
   const top = r[0].score, second = r.length > 1 ? r[1].score : 0;
   const margin = (top - second) / top;
   const it = ix.intents[r[0].n];

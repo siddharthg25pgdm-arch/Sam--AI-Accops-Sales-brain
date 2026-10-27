@@ -1,5 +1,5 @@
 {
-  "_note": "Hand-kept input to build_intent_index.py (plan 3.2). All strings are compared AFTER normalise(). stop: words that carry no intent (English, question words, light Hinglish). synonyms: one word -> one word, applied before stemming. entity_add: extra spellings for core.terms labels (or new labels). entity_drop_labels / entity_drop_aliases: terms too generic to act as a product/competitor filter. group_entities: entities a page group implies even when the visitor does not type them.",
+  "_note": "Hand-kept input to build_intent_index.py (plan 3.2). All strings are compared AFTER normalise(). stop: words that carry no intent (English, question words, light Hinglish). synonyms: one word -> one word, applied before stemming. entity_add: extra spellings for core.terms labels (or new labels). entity_drop_labels / entity_drop_aliases: terms too generic to act as a product/competitor filter. group_entities: entities a page group implies even when the visitor does not type them. 28 Oct: leadership -> leads, so 'leader' alone ('a Gartner leader', 'market leader') no longer meets lp-79 (Who leads Accops?) through the stem of 'leadership'; analyst firms are entities, so a question naming one only matches a pair that cites it.",
   "stop": [
     "a", "an", "the", "and", "or", "but", "if", "then", "than", "so", "to", "of", "in", "on", "at", "by", "for", "from", "with", "into", "onto", "about", "as", "up", "off", "out", "over",
     "is", "are", "was", "were", "be", "been", "being", "am", "do", "does", "did", "doing", "done", "have", "has", "had", "having",
@@ -28,14 +28,18 @@
     "headquartered": "headquarters", "hq": "headquarters",
     "customers": "customer",
     "abroad": "international", "overseas": "international", "globally": "global",
-    "parts": "components", "part": "components", "pieces": "components", "gpus": "gpu", "videos": "video", "uses": "use", "using": "use", "used": "use"
+    "parts": "components", "part": "components", "pieces": "components", "gpus": "gpu", "videos": "video", "uses": "use", "using": "use", "used": "use",
+    "leadership": "leads"
   },
   "entity_add": {
     "Citrix": ["netscaler", "net scaler", "xenapp", "xendesktop", "cvad", "citrix adc", "citrix gateway", "storefront", "hdx", "citrix virtual apps", "citrix daas"],
     "Oracle": ["oci", "oracle cloud"],
     "Google": ["gcp", "google cloud"],
     "Nutanix": ["ahv", "prism central"],
-    "Reliance Jio": ["reliance", "jio", "reliance jio"]
+    "Reliance Jio": ["reliance", "jio", "reliance jio"],
+    "Gartner": ["gartner", "magic quadrant", "gartner mq"],
+    "Forrester": ["forrester", "forrester wave"],
+    "Analyst rankings": ["analyst ranking", "analyst report", "analyst rating", "industry analyst"]
   },
   "entity_drop_labels": ["Microsoft", "Cross-industry", "SSE vendors"],
   "entity_drop_aliases": ["frame", "rbi", "horizontal", "it", "industrial"],

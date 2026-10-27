@@ -34,7 +34,7 @@ const TOKENS = [
 // Contract (docs/plans/web-s1-contract-notes.md): redact.ts names the service key only to scrub it from text (and
 // sam_events in a comment). It has no imports and no I/O.
 const ALLOW = { "lib/redact.ts": ["the service key", "an internal sam_* relation"] };
-const INDEX_KEYS = ["version", "built_at", "knowledge_version", "source", "stop", "synonyms", "entities", "group_entities", "vocab", "w_kw", "unk", "intents", "margin"];
+const INDEX_KEYS = ["version", "built_at", "knowledge_version", "source", "stop", "synonyms", "entities", "group_entities", "vocab", "w_kw", "unk", "intents", "margin", "negatives"];
 const INTENT_KEYS = ["qa_id", "groups", "must", "allow", "keywords", "phrases", "min_score"];
 
 const rel = (web, f) => path.relative(web, f).split(path.sep).join("/");

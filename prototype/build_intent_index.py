@@ -6,7 +6,8 @@ place goes to the model; what went to the model comes back so next time Python h
   2. Review it. A question that an approved pair answers -> add a row to prototype/web_intent_learned.json:
        {"question": "<the visitor's words>", "qa_id": "lp-05"}
      A question the bank must NOT answer (bait, off-topic) -> {"question": "...", "qa_id": null}; it becomes a
-     negative the thresholds are tuned against. A question with no pair -> draft a new pair for approval.
+     negative the thresholds are tuned against, and (2+ content words) a veto: any question holding all its
+     content words goes to the model, never to a pair. A question with no pair -> draft a new pair for approval.
      (Better still, add the alias to the pair itself in the bank; the learned file is the fast lane.)
   3. python prototype/build_intent_index.py            # rebuilds, tunes, refuses if precision < 0.95
      python prototype/build_intent_index.py --self-check
@@ -105,6 +106,11 @@ class Matcher:
             self.idf.update(it["keywords"])
         self.unk = ix["unk"] * max(self.idf.values()) if self.idf else 1.0
         self.phrase_terms = [[self.analyse(p, False)["terms"] for p in it["phrases"]] for it in ix["intents"]]
+        self.neg = ix["negatives"]
+
+    def vetoed(self, terms: list[str]) -> bool:
+        """A reviewed negative (learned file, qa_id null): a question holding all its content words never matches."""
+        return any(all(t in terms for t in v) for v in self.neg)
 
     def fix(self, t: str) -> str:
         if t in self.syn:
@@ -180,8 +186,8 @@ class Matcher:
         return a, out
 
     def match(self, text: str, group: str, min_score: float | None = None, margin: float | None = None):
-        _, r = self.rank(text, group)
-        if not r:
+        a, r = self.rank(text, group)
+        if not r or self.vetoed(a["terms"]):
             return None
         top, n = r[0]
         second = r[1][0] if len(r) > 1 else 0.0
@@ -262,8 +268,10 @@ def build(pairs: list[dict], page_qs: list[str], learned: list[dict], kv: str, s
     vocab = sorted({w for ps in phrases_by.values() for p in ps for w in p.split(" ") if w}
                    | {w for v in ents.values() for a in v for w in a.split(" ")} - set(stop))
     ix = {"version": 1, "built_at": "", "knowledge_version": kv, "source": source, "stop": stop, "synonyms": syn,
-          "entities": ents, "group_entities": cfg["group_entities"], "vocab": vocab, "w_kw": W_KW, "unk": UNK, "intents": [], "margin": 0.0}
+          "entities": ents, "group_entities": cfg["group_entities"], "vocab": vocab, "w_kw": W_KW, "unk": UNK, "intents": [], "margin": 0.0, "negatives": []}
     m = Matcher(ix)  # empty intents: used here only for analyse()
+    # fuzzy, as the visitor's words are analysed; one content word would veto too much, so it only tunes the thresholds
+    ix["negatives"] = [v for r in learned if r.get("qa_id") is None and len(v := m.analyse(r["question"])["terms"]) >= 2]
     docs = {pid: set(t for p in ps for t in m.analyse(p, False)["terms"]) for pid, ps in phrases_by.items()}
     bg = [set(m.analyse(q, False)["terms"]) for q in page_qs]
     n_docs = len(docs) + len(bg)
@@ -320,9 +328,9 @@ def calibrate(m: Matcher, tune: list[dict]) -> tuple[float, float]:
     "send me the citrix battlecard" matched). Bank phrases still count towards recall."""
     ranked = []  # rank once per row; each threshold pair is then just a comparison
     for r in tune:
-        _, rk = m.rank(r["q"], r["group"])
+        a, rk = m.rank(r["q"], r["group"])
         bank = r.get("kind") == "bank"
-        if rk:
+        if rk and not m.vetoed(a["terms"]):
             top, n = rk[0]
             second = rk[1][0] if len(rk) > 1 else 0.0
             ranked.append((r["expect"], m.ix["intents"][n]["qa_id"], top, (top - second) / top, bank))
@@ -377,6 +385,7 @@ GOLDEN_EXTRA = [
     ["Does Accops run on Nutanix AHV ?", "citrix-lp"], ["ﬁle servers – keep them? ²", "citrix-lp"],
     ["सिट्रिक्स से माइग्रेशन", "citrix-lp"], ["café naïve NUTANIX", "citrix-lp"], ["\u0085pilot\u001cpoc", "citrix-lp"],
     ["Is Accops ISO 27001 certified?", "home"], ["", "citrix-lp"], ["?!...", "citrix-lp"],
+    ["Will our existing thin clients work with Accops?", "citrix-lp"], ["Are you a Gartner leader?", "citrix-lp"],
 ]
 
 
@@ -429,6 +438,12 @@ def self_check() -> None:
     n += 2
     for q in ["does hysecure support teams calls", "is hylabs a citrix alternative", "does hyid run on proxmox"]:
         eq(m.match(q, "citrix-lp"), None, f"different product never matches: {q}")
+    learned = json.loads(LEARNED.read_text(encoding="utf-8")) if LEARNED.exists() else []
+    for r in learned:
+        if r.get("qa_id") is None and len(m.analyse(r["question"])["terms"]) >= 2:
+            eq(m.match(r["question"], r.get("group", "citrix-lp")), None, f"a learned negative never matches: {r['question']}")
+    for q in ["are you a gartner leader", "are you in the forrester wave", "are you a market leader"]:
+        eq(m.match(q, "citrix-lp"), None, f"an analyst ranking or 'leader' alone never meets a pair that does not cite it: {q}")
     if ix["source"] != "approved":
         print("NOTE: index built from the DRAFT corpus; rebuild from the approved bank before merge.")
     print(f"build_intent_index self-check: {n} assertions passed")

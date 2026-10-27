@@ -44,6 +44,9 @@ const RULES: [reason: string, re: RegExp[], answer: Answer][] = [
   ["roadmap", [/\b(product|your|accops|hysecure|hyworks|hyid|hylabs)\s+roadmap\b/, /\brelease\s+dates?\b/, /\b(next|upcoming|future)\s+(version|release|features?)\b/,
     /\bwhen\b.{0,40}\b(ship|ships|shipping|come\s+out|be\s+released)\b/],
     say("Release dates aren't shared here. The team can brief you on the roadmap.")],
+  // Gartner wording awaits legal: sam_web_blocked_patterns keeps it out of every public record, so no approved answer can
+  // hold it and this rule hides none. "mq" alone is left out (IBM MQ). (28 Oct live eval g04: "Are you a Gartner leader?")
+  ["analyst", [/\bgartner\b/, /\bmagic\s+quadrants?\b/], say("I can't cover analyst rankings here yet. The team can answer that directly.")],
   ["careers", [/\b(careers?|jobs?|vacanc(y|ies)|internships?|job\s+openings?|are\s+you\s+hiring)\b/],
     say("Open roles at Accops are listed on the careers page.", { type: "cta", label: "See open roles", action: "open_url", url: "https://www.accops.com/career" })],
 ];

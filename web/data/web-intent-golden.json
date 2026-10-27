@@ -433,7 +433,7 @@
    ],
    "entities": [],
    "expect": "lp-24",
-   "score": 0.517031277662735
+   "score": 0.5069196088217199
   },
   {
    "q": "do you have a reference customer that moved off citrix",
@@ -471,12 +471,14 @@
    "group": "citrix-lp",
    "normalised": "gartner recognition",
    "tokens": [
-    "partn",
+    "gartn",
     "recogn"
    ],
-   "entities": [],
-   "expect": "lp-46",
-   "score": 0.7669451477658298
+   "entities": [
+    "Gartner"
+   ],
+   "expect": null,
+   "score": null
   },
   {
    "q": "how many customers does accops have",
@@ -505,33 +507,6 @@
    "score": 0.8574917260054157
   },
   {
-   "q": "support model after go live",
-   "group": "citrix-lp",
-   "normalised": "support model after go live",
-   "tokens": [
-    "suppor",
-    "model",
-    "after",
-    "go",
-    "live"
-   ],
-   "entities": [],
-   "expect": "lp-29",
-   "score": 1.0
-  },
-  {
-   "q": "any presence in japan",
-   "group": "citrix-lp",
-   "normalised": "any presence in japan",
-   "tokens": [
-    "presen",
-    "japan"
-   ],
-   "entities": [],
-   "expect": "lp-75",
-   "score": 0.6033368669500948
-  },
-  {
    "q": "  Why did my CITRIX renewal go UP?! ",
    "group": "citrix-lp",
    "normalised": "why did my citrix renewal go up",
@@ -544,7 +519,7 @@
     "Citrix"
    ],
    "expect": "lp-24",
-   "score": 0.758116869569293
+   "score": 0.7505059342548612
   },
   {
    "q": "ＨｙＳｅｃｕｒｅ　vs\tCitrix\n\nNetScaler",
@@ -686,6 +661,36 @@
    "normalised": "",
    "tokens": [],
    "entities": [],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "Will our existing thin clients work with Accops?",
+   "group": "citrix-lp",
+   "normalised": "will our existing thin clients work with accops",
+   "tokens": [
+    "exist",
+    "thin",
+    "client",
+    "work"
+   ],
+   "entities": [
+    "Thin Clients"
+   ],
+   "expect": null,
+   "score": null
+  },
+  {
+   "q": "Are you a Gartner leader?",
+   "group": "citrix-lp",
+   "normalised": "are you a gartner leader",
+   "tokens": [
+    "gartn",
+    "leader"
+   ],
+   "entities": [
+    "Gartner"
+   ],
    "expect": null,
    "score": null
   }

@@ -351,3 +351,14 @@ Tier 2 first orders by the card label matched: an industry page's industries com
 - It refuses the whole run on any bad row: a pair no longer approved, an answer or visual changed since the sheet, a proposed text edited in place, or an answer over 80 words or 600 characters or breaking the emphasis rules.
 - It then writes the same answer and visual into `corpus/web/qa-citrix-lp.json`, so the loader (which never touches approved pairs), the intent index and the review data agree with the database. Rebuild the index after: `python prototype/build_intent_index.py`.
 - Not run for real: Siddharth hasn't decided.
+
+## 28 Oct: matcher fixes from the live eval (23/30 correct)
+
+Nothing approved changed; no SQL. Index rebuilt from the approved bank (78 pairs).
+- **Learned negatives now veto** (`build_intent_index.py` `Matcher.vetoed`, `intent.ts` `vetoed`, index field `negatives`): a `qa_id: null` row in `prototype/web_intent_learned.json` with 2+ content words (fuzzy-analysed, as a visitor's words are) stops any question holding all of them from matching a pair; it goes to the model. One-word negatives still only tune the thresholds. Calibration skips vetoed rows. Used for "will our existing thin clients work" (it matched lp-37, which sells HyDesk; no approved pair says a visitor's own thin clients work).
+- **Analyst firms are entities** (`web_intent_synonyms.json` `entity_add`: Gartner incl. "magic quadrant", Forrester, "analyst ranking/report/rating", "industry analyst"), so a question naming one only matches a pair that cites it (none does). "gartner" was also being fuzzy-fixed to "partner".
+- **"leader" alone is not leadership intent:** synonym `leadership -> leads`, so lp-79 (Who leads Accops?) keeps "leads", "CEO", "founder", "runs", "leadership team", and "a Gartner leader" / "market leader" no longer reach it through the stem of "leadership".
+- **Pre-guard `analyst`** (`guard.ts`): "gartner" or "magic quadrant" gets "I can't cover analyst rankings here yet. The team can answer that directly." + the CTA. Gartner wording awaits legal and `sam_web_blocked_patterns` keeps it out of every public record, so the rule hides no approved answer. Red-team #25.
+- **Learned positives:** m04 "learn a new tool" -> lp-08, c02 "renewal quote went up" -> lp-21, m06 "something goes wrong halfway" -> lp-05 (2 phrasings each).
+- **Eval relabels** (`docs/eval-website-stage1.json`): p03 Hyper-V accepts lp-62 (the bank's Hyper-V pair, approved after the set was written) and lp-12, not lp-09 (opens "No."); g03 Middle East accepts lp-74 (this exact question) and lp-30, not lp-26 (Indian banks only), and is now `in_bank`.
+- `ENGINE` not bumped: the pre-guard and intent run before the cache, so c02, m04, m06 and g04 change whatever is cached; p05 (now unmatched) was matched to lp-37 all through `text-first-4`, so it has no cached answer.

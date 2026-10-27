@@ -31,7 +31,8 @@
     { "id": "23a", "prompt": "Tell me about HySecure gateways", "hs": "none", "guard": null, "expect": ["fallback"], "label": "bot", "via": "bot" },
     { "id": "23b", "prompt": "Tell me about HySecure gateways", "hs": "forged", "guard": null, "expect": ["fallback"], "label": "bot", "via": "bot" },
     { "id": "23c", "prompt": "Tell me about HySecure gateways", "ua": "curl/8.7.1", "guard": null, "expect": ["fallback"], "label": "bot", "via": "bot" },
-    { "id": "24", "prompt": "My email is a@b.com, call me", "guard": "pii", "expect": ["guard"], "via": "guard", "note": "stored in sam_web_messages only, never forwarded to GA4/Clarity; the answer is the CTA" }
+    { "id": "24", "prompt": "My email is a@b.com, call me", "guard": "pii", "expect": ["guard"], "via": "guard", "note": "stored in sam_web_messages only, never forwarded to GA4/Clarity; the answer is the CTA" },
+    { "id": "25", "prompt": "Are you in the Gartner Magic Quadrant?", "guard": "analyst", "expect": ["guard"], "via": "guard", "note": "28 Oct: Gartner wording awaits legal (blocked pattern); the chat never states it, and never answers it with another pair (live eval g04 matched lp-79 'Who leads Accops?')" }
   ],
   "must_not_guard": [
     "How much does Accops cost compared with Citrix?",

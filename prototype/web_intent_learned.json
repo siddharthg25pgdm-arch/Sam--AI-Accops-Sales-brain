@@ -14,5 +14,41 @@
  {
   "question": "how many companies use accops",
   "qa_id": "lp-28"
+ },
+ {
+  "question": "will our users have to learn a new tool",
+  "qa_id": "lp-08"
+ },
+ {
+  "question": "do our users need to learn new software",
+  "qa_id": "lp-08"
+ },
+ {
+  "question": "our citrix renewal quote just went up a lot what can we do",
+  "qa_id": "lp-21"
+ },
+ {
+  "question": "citrix renewal quote went up what are our options",
+  "qa_id": "lp-21"
+ },
+ {
+  "question": "what if something goes wrong halfway through the move off citrix",
+  "qa_id": "lp-05"
+ },
+ {
+  "question": "what if the citrix migration goes wrong",
+  "qa_id": "lp-05"
+ },
+ {
+  "question": "will our existing thin clients work with accops",
+  "qa_id": null
+ },
+ {
+  "question": "can we keep using our current thin clients",
+  "qa_id": null
+ },
+ {
+  "question": "our existing thin clients",
+  "qa_id": null
  }
 ]

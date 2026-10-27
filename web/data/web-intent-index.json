@@ -1,7 +1,7 @@
 {
  "version": 1,
- "built_at": "2026-10-27T05:24:17+00:00",
- "knowledge_version": "2026-10-27 05:24:40.191776+00",
+ "built_at": "2026-10-27T21:13:49+00:00",
+ "knowledge_version": "2026-10-27 19:29:36.01534+00",
  "source": "approved",
  "stop": [
   "0",
@@ -290,7 +290,8 @@
   "videos": "video",
   "uses": "use",
   "using": "use",
-  "used": "use"
+  "used": "use",
+  "leadership": "leads"
  },
  "entities": {
   "BFSI": [
@@ -767,6 +768,21 @@
    "reliance",
    "jio",
    "reliance jio"
+  ],
+  "Gartner": [
+   "gartner",
+   "magic quadrant",
+   "gartner mq"
+  ],
+  "Forrester": [
+   "forrester",
+   "forrester wave"
+  ],
+  "Analyst rankings": [
+   "analyst ranking",
+   "analyst report",
+   "analyst rating",
+   "industry analyst"
   ]
  },
  "group_entities": {
@@ -808,6 +824,7 @@
   "ammyadmin",
   "ammyy",
   "an",
+  "analyst",
   "analytics",
   "and",
   "another",
@@ -1044,6 +1061,7 @@
   "for",
   "forcepoint",
   "forgerock",
+  "forrester",
   "fortinet",
   "founder",
   "frame",
@@ -1053,6 +1071,7 @@
   "fujitsu",
   "fully",
   "gapped",
+  "gartner",
   "gateway",
   "gcc",
   "gcp",
@@ -1063,6 +1082,7 @@
   "glassfence",
   "global",
   "go",
+  "goes",
   "good",
   "google",
   "government",
@@ -1072,6 +1092,7 @@
   "guidelines",
   "hai",
   "hain",
+  "halfway",
   "handle",
   "hardware",
   "has",
@@ -1115,6 +1136,7 @@
   "id",
   "idemia",
   "identity",
+  "if",
   "in",
   "inbound",
   "included",
@@ -1177,6 +1199,7 @@
   "leads",
   "leafos",
   "leakage",
+  "learn",
   "learning",
   "least",
   "leaving",
@@ -1197,8 +1220,10 @@
   "logistics",
   "logon",
   "long",
+  "lot",
   "low",
   "ltsr",
+  "magic",
   "make",
   "managed",
   "management",
@@ -1228,6 +1253,7 @@
   "move",
   "moved",
   "moving",
+  "mq",
   "much",
   "multi",
   "named",
@@ -1348,10 +1374,14 @@
   "public",
   "pulse",
   "qr",
+  "quadrant",
   "quality",
+  "quote",
   "raise",
   "range",
+  "ranking",
   "ras",
+  "rating",
   "rbi",
   "real",
   "recognition",
@@ -1371,6 +1401,7 @@
   "replaced",
   "replacement",
   "replaces",
+  "report",
   "reported",
   "reporting",
   "requirement",
@@ -1430,7 +1461,9 @@
   "sla",
   "slow",
   "soc",
+  "software",
   "someone",
+  "something",
   "sonicwall",
   "sovereign",
   "speak",
@@ -1475,6 +1508,7 @@
   "thin",
   "third",
   "thousands",
+  "through",
   "time",
   "timeline",
   "to",
@@ -1514,12 +1548,14 @@
   "vpn",
   "vs",
   "watchguard",
+  "wave",
   "we",
   "web",
   "webex",
   "websites",
   "weeks",
   "well",
+  "went",
   "what",
   "when",
   "where",
@@ -1537,6 +1573,7 @@
   "workspaces",
   "workspot",
   "workstation",
+  "wrong",
   "wso2",
   "wvd",
   "xenapp",
@@ -1583,7 +1620,7 @@
     "what replaces citrix",
     "citrix ka alternative"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-02",
@@ -1617,7 +1654,7 @@
     "storefront and director replacement",
     "citrix products we can retire"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-03",
@@ -1645,7 +1682,7 @@
     "accops citrix comparison table",
     "compare accops and citrix side by side"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-04",
@@ -1675,7 +1712,7 @@
     "large citrix estate",
     "is citrix better for large estates"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-05",
@@ -1692,13 +1729,18 @@
     "approa": 5.9661,
     "citrix": 2.4435,
     "downti": 5.2756,
+    "goes": 5.9661,
+    "halfwa": 5.9661,
     "migrat": 3.7892,
     "move": 4.8726,
     "replac": 2.7702,
     "rip": 5.9661,
     "run": 3.1731,
     "side": 5.2756,
-    "withou": 3.4315
+    "someth": 5.9661,
+    "throug": 4.8726,
+    "withou": 3.4315,
+    "wrong": 5.9661
    },
    "phrases": [
     "can we migrate off citrix without downtime",
@@ -1707,9 +1749,11 @@
     "citrix migration approach",
     "rip and replace",
     "run citrix and accops side by side",
-    "citrix se migrate kaise karein bina downtime"
+    "citrix se migrate kaise karein bina downtime",
+    "what if something goes wrong halfway through the move off citrix",
+    "what if the citrix migration goes wrong"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-06",
@@ -1740,7 +1784,7 @@
     "deployment time",
     "how fast can we move"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-07",
@@ -1772,7 +1816,7 @@
     "pilot with a few users",
     "free trial"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-08",
@@ -1789,8 +1833,11 @@
     "curv": 5.9661,
     "experi": 5.2756,
     "learn": 5.9661,
+    "new": 5.2756,
     "notic": 5.9661,
+    "softwa": 5.2756,
     "team": 4.5875,
+    "tool": 4.8726,
     "train": 4.8726,
     "user": 3.5091
    },
@@ -1800,9 +1847,11 @@
     "learning curve",
     "admin training",
     "will users notice a change",
-    "user experience change"
+    "user experience change",
+    "will our users have to learn a new tool",
+    "do our users need to learn new software"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-09",
@@ -1840,7 +1889,7 @@
     "keep file servers",
     "hypervisor agnostic"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-10",
@@ -1876,7 +1925,7 @@
     "does accops support nutanix",
     "nutanix ahv vdi"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-11",
@@ -1912,7 +1961,7 @@
     "proxmox vdi",
     "moving from vmware to proxmox"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-12",
@@ -1954,7 +2003,7 @@
     "openshift openstack support",
     "which public clouds"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-13",
@@ -1986,7 +2035,7 @@
     "managed vdi service",
     "accops managed desktops"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-14",
@@ -2021,7 +2070,7 @@
     "microsoft avd",
     "accops for avd"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-15",
@@ -2053,7 +2102,7 @@
     "latency",
     "photon display protocol"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-16",
@@ -2090,7 +2139,7 @@
     "graphics workstation",
     "teams call quality"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-17",
@@ -2120,7 +2169,7 @@
     "soc 2",
     "iso certified hai kya"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-18",
@@ -2158,7 +2207,7 @@
     "regulatory compliance india",
     "pci dss"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-19",
@@ -2190,7 +2239,7 @@
     "do we still need netscaler",
     "load balancer replacement"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-20",
@@ -2227,7 +2276,7 @@
     "do we need okta or duo",
     "identity provider"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-21",
@@ -2247,9 +2296,14 @@
     "compar": 3.9045,
     "cost": 4.0355,
     "licens": 3.5091,
+    "lot": 5.9661,
+    "option": 4.3669,
     "per": 5.2756,
     "pric": 4.3669,
-    "user": 3.5091
+    "quot": 5.9661,
+    "renewa": 4.8726,
+    "user": 3.5091,
+    "went": 5.9661
    },
    "phrases": [
     "how much does accops cost compared with citrix",
@@ -2258,9 +2312,11 @@
     "per user cost",
     "how much cheaper than citrix",
     "licence cost",
-    "accops ki pricing batao"
+    "accops ki pricing batao",
+    "our citrix renewal quote just went up a lot what can we do",
+    "citrix renewal quote went up what are our options"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-22",
@@ -2293,7 +2349,7 @@
     "cost savings examples",
     "how much did customers save"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-23",
@@ -2310,7 +2366,7 @@
     "licens": 3.5091,
     "model": 4.5875,
     "named": 5.9661,
-    "option": 4.5875,
+    "option": 4.3669,
     "perpet": 4.8726,
     "subscr": 5.9661,
     "user": 3.5091
@@ -2323,7 +2379,7 @@
     "named users",
     "licensing options"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-24",
@@ -2342,7 +2398,7 @@
     "pric": 4.3669,
     "protec": 4.8726,
     "rais": 5.9661,
-    "renewa": 5.2756,
+    "renewa": 4.8726,
     "seat": 5.9661,
     "won": 4.8726
    },
@@ -2354,7 +2410,7 @@
     "will the price go up at renewal",
     "fewer seats at renewal"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-25",
@@ -2387,7 +2443,7 @@
     "citrix migration case study",
     "who moved off citrix"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-26",
@@ -2424,7 +2480,7 @@
     "banking clients",
     "kaunse bank use karte hain"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-28",
@@ -2468,7 +2524,7 @@
     "how many clients does accops have",
     "how many companies use accops"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-29",
@@ -2500,7 +2556,7 @@
     "support model",
     "support sla"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-30",
@@ -2535,7 +2591,7 @@
     "africa",
     "do you work outside india"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-31",
@@ -2572,7 +2628,7 @@
     "accops parent company",
     "vendor stability"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-32",
@@ -2606,7 +2662,7 @@
     "talk to an expert",
     "talk to an engineer about leaving citrix"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-33",
@@ -2640,7 +2696,7 @@
     "accops product range",
     "accops ke products kaunse hain"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-34",
@@ -2681,7 +2737,7 @@
     "hyworks features",
     "hyworks vdi kya hai"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-35",
@@ -2719,7 +2775,7 @@
     "hysecure gateway features",
     "hysecure ztna gateway kya hai"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-36",
@@ -2761,7 +2817,7 @@
     "hyid features",
     "hyid identity management"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-37",
@@ -2801,7 +2857,7 @@
     "low power thin clients",
     "thin client milega kya"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-38",
@@ -2835,7 +2891,7 @@
     "roaming profiles",
     "replacement for citrix profile management"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-39",
@@ -2873,7 +2929,7 @@
     "vdi for education",
     "lab for students from home"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-40",
@@ -2906,7 +2962,7 @@
     "get rid of our vpn",
     "vpn hatana hai"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-41",
@@ -2944,7 +3000,7 @@
     "accops nano",
     "apne laptop se kaam"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-42",
@@ -2981,7 +3037,7 @@
     "access from chrome browser",
     "browser based remote desktop"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-43",
@@ -3019,7 +3075,7 @@
     "bioauth biometric mfa",
     "bioauth deepfake detection"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-44",
@@ -3058,7 +3114,7 @@
     "mfa on old applications",
     "rbi mfa mandate"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-45",
@@ -3103,7 +3159,7 @@
     "enterprise browser",
     "vajra browser"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-46",
@@ -3133,7 +3189,7 @@
     "award winning",
     "accops recognition"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-47",
@@ -3167,7 +3223,7 @@
     "works on 4g",
     "kam bandwidth pe chalega"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-48",
@@ -3193,7 +3249,7 @@
     "discovery phase",
     "what do you assess before migration"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-49",
@@ -3213,7 +3269,7 @@
     "eol": 5.2756,
     "hardwa": 5.2756,
     "life": 4.8726,
-    "new": 5.9661,
+    "new": 5.2756,
     "old": 5.2756,
     "pcs": 4.8726,
     "refres": 5.9661,
@@ -3230,7 +3286,7 @@
     "avoid hardware refresh",
     "upgrade windows without new pcs"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-50",
@@ -3259,7 +3315,7 @@
     "database requirement",
     "sql licence cost"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-51",
@@ -3292,7 +3348,7 @@
     "print from vdi",
     "local printer support"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-52",
@@ -3313,7 +3369,7 @@
     "monito": 5.2756,
     "replac": 2.7702,
     "sessio": 5.2756,
-    "tool": 5.2756,
+    "tool": 4.8726,
     "vdi": 2.7009
    },
    "phrases": [
@@ -3324,7 +3380,7 @@
     "vdi monitoring tool",
     "how do we monitor sessions"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-53",
@@ -3356,7 +3412,7 @@
     "accops security layers",
     "kitna secure hai platform"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-54",
@@ -3389,7 +3445,7 @@
     "zero trust architecture",
     "least privilege access"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-55",
@@ -3422,7 +3478,7 @@
     "no inbound firewall rules",
     "dmz requirement"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-56",
@@ -3455,7 +3511,7 @@
     "check antivirus before login",
     "posture check"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-57",
@@ -3491,7 +3547,7 @@
     "stop screenshots",
     "prevent data download"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-58",
@@ -3526,7 +3582,7 @@
     "outsourced staff access",
     "vendors ko access kaise dein"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-59",
@@ -3560,7 +3616,7 @@
     "isolate internet browsing",
     "safe browsing"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-60",
@@ -3597,7 +3653,7 @@
     "pdpl",
     "appi japan"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-61",
@@ -3624,7 +3680,7 @@
     "host": 4.8726,
     "hota": 5.9661,
     "model": 4.5875,
-    "option": 4.5875,
+    "option": 4.3669,
     "prem": 5.2756,
     "premis": 4.0355,
     "run": 3.1731
@@ -3637,7 +3693,7 @@
     "cloud or on premise",
     "kahan deploy hota hai"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-62",
@@ -3664,7 +3720,7 @@
     "hyper": 5.2756,
     "leav": 4.1871,
     "opensh": 4.8726,
-    "option": 4.5875,
+    "option": 4.3669,
     "scvmm": 5.2756,
     "suppor": 2.4192,
     "v": 5.2756,
@@ -3679,7 +3735,7 @@
     "leaving vmware",
     "vmware exit options"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-63",
@@ -3711,7 +3767,7 @@
     "pay as you go vdi",
     "daas monthly cost"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-64",
@@ -3744,7 +3800,7 @@
     "daas savings",
     "daas customer stories"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-65",
@@ -3781,7 +3837,7 @@
     "run hyworks in house or daas",
     "should we use daas or hyworks"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-66",
@@ -3816,7 +3872,7 @@
     "isolated network",
     "sovereign deployment"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-67",
@@ -3850,7 +3906,7 @@
     "multi site",
     "business continuity"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-68",
@@ -3887,7 +3943,7 @@
     "which enterprises use accops",
     "bade bade companies accops use karti hain"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-69",
@@ -3924,7 +3980,7 @@
     "enterprise scale",
     "lakhs of users"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-70",
@@ -3965,7 +4021,7 @@
     "bpo voip for remote agents",
     "bpo contact centre work from home"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-71",
@@ -4000,7 +4056,7 @@
     "offshore development centre",
     "gcc developers"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-72",
@@ -4042,7 +4098,7 @@
     "make in india vendor for government",
     "sarkari govt department"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-73",
@@ -4079,7 +4135,7 @@
     "healthcare patient data security",
     "which hospitals use accops"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-74",
@@ -4108,7 +4164,7 @@
     "mena customer wins",
     "dubai references"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-75",
@@ -4135,7 +4191,7 @@
     "accops japan",
     "japan partner"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-76",
@@ -4168,7 +4224,7 @@
     "support lifecycle",
     "eol policy"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-77",
@@ -4200,7 +4256,7 @@
     "product brochure",
     "documentation download"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-78",
@@ -4224,7 +4280,7 @@
     "login": 4.8726,
     "method": 5.9661,
     "mfa": 3.2313,
-    "option": 4.5875,
+    "option": 4.3669,
     "passwo": 5.9661,
     "qr": 5.9661,
     "securi": 4.1871,
@@ -4239,7 +4295,7 @@
     "qr code login",
     "passwordless mfa methods"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   },
   {
    "qa_id": "lp-79",
@@ -4257,7 +4313,6 @@
     "direct": 4.1871,
     "found": 4.8726,
     "lead": 4.1871,
-    "leader": 5.9661,
     "manag": 3.5091,
     "runs": 5.9661,
     "team": 4.5875
@@ -4271,8 +4326,28 @@
     "accops leadership team",
     "managing director of accops"
    ],
-   "min_score": 0.51
+   "min_score": 0.5
   }
  ],
- "margin": 0.06
+ "margin": 0.06,
+ "negatives": [
+  [
+   "exist",
+   "thin",
+   "client",
+   "work"
+  ],
+  [
+   "keep",
+   "use",
+   "curren",
+   "thin",
+   "client"
+  ],
+  [
+   "exist",
+   "thin",
+   "client"
+  ]
+ ]
 }
