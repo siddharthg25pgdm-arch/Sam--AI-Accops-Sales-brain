@@ -70,6 +70,9 @@ export function buildTruth({ qa, pages, assets = [], settings = {}, leads = [], 
   }
   for (const a of assets) if (a.public_url) t.urls.add(a.public_url);
   if (settings.cta_url) t.ctaUrls.add(settings.cta_url);
+  // Stage 3 (27 Oct): every talk-to-sales CTA carries the in-chat Bookings URL, and a bank cta block keeps its own label
+  if (settings.booking_url) t.ctaUrls.add(settings.booking_url);
+  for (const q of qa) if (q.visual === "cta" && q.visual_data?.label) t.ctaLabels.add(cut(q.visual_data.label, 28));
   t.ctaLabels.add(cut(settings.cta_label || "Talk to an expert", 28));
   for (const c of ctas) { t.ctaUrls.add(c.url); t.ctaLabels.add(c.label); }
   return t;
