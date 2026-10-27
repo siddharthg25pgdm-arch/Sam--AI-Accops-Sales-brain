@@ -31,7 +31,8 @@ import {
   loadDashboard, loadMessages, loadBank, oldestConversation, webAdminConfigured,
   type WebDash, type MsgRow, type QaRow, type ReviewMeta, type Blocked, type WebLabel, type WebSource,
 } from "@/lib/web-dashboard";
-import { decidePair, draftPair, aliasPair, saveWebSettings } from "@/app/admin/website-actions";
+import { decidePair, draftPair, aliasPair, saveWebSettings, releaseLead, discardLead } from "@/app/admin/website-actions";
+import { REASON_LABEL, loadLeads, type LeadRow, type LeadStatus } from "@/lib/web-leads";
 
 const barlow = Barlow({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--sb-font", display: "swap" });
 
@@ -46,7 +47,7 @@ const usd = (n: number | null | undefined) => n == null ? "–" : n === 0 ? "$0"
 const plural = (n: number, a: string, b = `${a}s`) => `${num(n)} ${n === 1 ? a : b}`;
 const host = (u: string) => { try { const x = new URL(u); return `${x.host.replace(/^www\./, "")}${x.pathname === "/" ? "" : x.pathname}${x.hash}`; } catch { return u; } };
 
-export const VIEWS = [["analytics", "Analytics"], ["approve", "Approve Q&A"], ["conversations", "Conversations"], ["settings", "Settings"]] as const;
+export const VIEWS = [["analytics", "Analytics"], ["approve", "Approve Q&A"], ["conversations", "Conversations"], ["leads", "Leads"], ["settings", "Settings"]] as const;
 export type View = (typeof VIEWS)[number][0];
 const QA_FILTERS = [["draft", "Waiting"], ["approved", "Approved"], ["retired", "Retired"], ["all", "All"]] as const;
 type QaFilter = (typeof QA_FILTERS)[number][0];
@@ -61,6 +62,8 @@ export type WebsiteData = {
   rows: MsgRow[] | null; rowsError: string | null;
   bank: BankItem[] | null; bankError: string | null; settings: Record<string, string> | null;
   index: IndexInfo; leak: OpsRun | null; leakReadable: boolean; oldest: string | null;
+  /** Stage 3 (05 SQL): the newest 500 leads; webhookSet = WEB_LEAD_WEBHOOK_URL exists here (never its value). */
+  leads?: LeadRow[] | null; leadsError?: string | null; webhookSet?: boolean;
 };
 
 // ------------------------------------------------------------------------------------------- loading
@@ -101,13 +104,16 @@ export async function Website({ sp, days, includeTest, href }: { sp: SP; days: n
   if (!configured) return <WebsiteView d={data} />;
   const needDash = view === "analytics", needRows = view === "analytics" || view === "conversations";
   const needBank = view === "approve" || view === "analytics" || view === "settings";
-  const [dash, rows, bank, runs, oldest] = await Promise.all([
+  const [dash, rows, bank, runs, oldest, leads] = await Promise.all([
     needDash ? loadDashboard(days, includeTest).then(r => ({ r }), e => ({ e: errText(e) })) : null,
     needRows ? loadMessages(days, includeTest).then(r => ({ r }), e => ({ e: errText(e) })) : null,
     needBank ? loadBank().then(r => ({ r }), e => ({ e: errText(e) })) : null,
     view === "analytics" ? recentRuns() : null,
     view === "analytics" ? oldestConversation().catch(() => null) : null,
+    loadLeads().then(r => ({ r }), e => ({ e: errText(e) })), // every view: the quarantine count sits on the Leads tab
   ]);
+  if ("r" in leads) data.leads = leads.r; else data.leadsError = leads.e;
+  data.webhookSet = !!process.env.WEB_LEAD_WEBHOOK_URL?.trim();
   if (dash) "r" in dash ? (data.dash = mapDashboard(dash.r, now, label)) : (data.dashError = dash.e);
   if (rows) "r" in rows ? (data.rows = rows.r) : (data.rowsError = rows.e);
   if (bank) {
@@ -146,6 +152,7 @@ const Sw = ({ s }: { s: WebSource }) => <i className={`sw s-${s}`} aria-hidden="
 
 export function WebsiteView({ d }: { d: WebsiteData }) {
   const waiting = d.bank?.filter(b => b.status === "draft").length ?? null;
+  const held = d.leads?.filter(l => l.status === "suspect").length ?? 0;
   return (
     <div className={`wt ${barlow.variable}`}>
       <div className="wt-sub">
@@ -153,6 +160,7 @@ export function WebsiteView({ d }: { d: WebsiteData }) {
           {VIEWS.map(([k, l]) => (
             <a key={k} href={d.href({ wv: k === "analytics" ? null : k, lb: null, ok: null, err: null })} aria-current={k === d.view ? "true" : undefined}>
               {l}{k === "approve" && waiting ? <span className="n hot" aria-label={`${waiting} waiting`}>{waiting}</span> : null}
+              {k === "leads" && held ? <span className="n hot" aria-label={`${held} quarantined`}>{held}</span> : null}
             </a>
           ))}
         </nav>
@@ -171,6 +179,7 @@ export function WebsiteView({ d }: { d: WebsiteData }) {
           {d.view === "analytics" && <Analytics d={d} />}
           {d.view === "approve" && <Approve d={d} />}
           {d.view === "conversations" && <Conversations d={d} />}
+          {d.view === "leads" && <Leads d={d} />}
           {d.view === "settings" && <Settings d={d} />}
         </>
       )}
@@ -411,7 +420,7 @@ function CeilingColumns({ usage, mixDays, ceiling, groqCap }: { usage: WebDash["
 }
 
 const FUNNEL: [string, string][] = [["popup_shown", "Popup shown"], ["popup_clicked", "Popup clicked"], ["chat_opened", "Chat opened"], ["question_clicked", "Question clicked"],
-  ["answer_shown", "Answer shown"], ["doc_opened", "Document opened"], ["talk_to_sales_clicked", "Talk to sales"]];
+  ["answer_shown", "Answer shown"], ["doc_opened", "Document opened"], ["talk_to_sales_clicked", "Talk to sales"], ["booking_opened", "Calendar opened in the chat"]];
 function Funnel({ events }: { events: Record<string, number> }) {
   const rows = FUNNEL.map(([k, l]) => ({ key: l, n: events[k] ?? 0 }));
   if (rows.every(r => r.n === 0)) return <Empty>No widget events in this period.</Empty>;
@@ -617,6 +626,78 @@ function Conversations({ d }: { d: WebsiteData }) {
   );
 }
 
+// ------------------------------------------------------------------------------------------- leads
+
+const STATUS: Record<LeadStatus, [string, string]> = { clean: ["good", "Clean"], suspect: ["warn", "Quarantined"], released: ["good", "Released"], discarded: ["bad", "Discarded"] };
+
+/** Stage 3: Bookings leads. A quarantined lead is never forwarded on its own; Release forwards it now, Discard keeps it out. */
+function Leads({ d }: { d: WebsiteData }) {
+  if (d.leadsError) return <div className="notice">The leads could not be read ({d.leadsError}). Check that docs/supabase-sam-web-05-leads.sql is applied.</div>;
+  const all = d.leads ?? [];
+  const n = (s: LeadStatus) => all.filter(l => l.status === s).length;
+  const held = all.filter(l => l.status === "suspect");
+  const failed = all.filter(l => (l.status === "clean" || l.status === "released") && !l.forwarded).length;
+  return (
+    <>
+      {!d.webhookSet && <div className="notice">WEB_LEAD_WEBHOOK_URL is not set on this deployment, so clean leads are stored here but not forwarded. Set it (docs/plans/web-stage3-leads-runbook.md), then use Forward again.</div>}
+      <div className="kpis four">
+        <Kpi label="Clean" value={<b className="kv">{num(n("clean"))}</b>} foot={failed ? <span className="pill bad">{plural(failed, "forward")} failed</span> : "passed every check, forwarded on arrival"} />
+        <Kpi label="Quarantined" value={<b className="kv">{num(n("suspect"))}</b>} foot="waiting for you: never forwarded on their own" />
+        <Kpi label="Released" value={<b className="kv">{num(n("released"))}</b>} foot="quarantined, then forwarded by an admin" />
+        <Kpi label="Discarded" value={<b className="kv">{num(n("discarded"))}</b>} foot="kept on record, never forwarded" />
+      </div>
+      <Section id="quarantine" title="Quarantine" sub={<>Leads that failed a check: a free or disposable email, no mail server, a junk-looking name or company, a link in the notes, or more than 25 in a day. Release forwards one to the Website Leads flow now; Discard keeps it out for good.</>}
+        aside={held.length ? <span className="count">{num(held.length)}</span> : undefined}>
+        {held.length === 0 ? <Empty>Nothing in quarantine.</Empty> : <LeadTable d={d} rows={held} quarantine />}
+      </Section>
+      <Section id="leads" title="All leads" sub={<>Newest first, from the Bookings calendar (on the Citrix LP and in the chat). Forwarded = the Website Leads flow accepted it. India time.</>}
+        aside={all.length ? <span className="count">{num(all.length)}</span> : undefined}>
+        {all.length === 0 ? <Empty>No leads yet. They arrive when someone books a time in the calendar.</Empty> : <LeadTable d={d} rows={all.slice(0, 100)} />}
+        {all.length > 100 && <p className="note" style={{ marginTop: 12 }}>Showing the newest 100 of {num(all.length)}.</p>}
+      </Section>
+    </>
+  );
+}
+
+function LeadTable({ d, rows, quarantine }: { d: WebsiteData; rows: LeadRow[]; quarantine?: boolean }) {
+  const why = (l: LeadRow) => l.reasons.map(r => <span key={r} className="pill warn" title={r}>{REASON_LABEL[r] ?? r.replace(/_/g, " ")}</span>);
+  return (
+    <table>
+      <thead><tr><th>Received</th><th>Lead</th><th>Company</th><th>Booked for</th><th>{quarantine ? "Why it was held" : "Status"}</th><th /></tr></thead>
+      <tbody>{rows.map(l => (
+        <tr key={l.id}>
+          <td className="nowrap">{fmtTime(l.created_at)}<div className="subline">{l.source === "citrix-lp-chat" ? "in the chat" : "LP calendar"}</div></td>
+          <td>{[l.first_name, l.last_name].filter(Boolean).join(" ") || "–"}<div className="subline">{l.email}{l.phone ? ` · ${l.phone}` : ""}</div></td>
+          <td>{l.company || "–"}<div className="subline">{[l.role, l.seats && `${l.seats} users`, l.country].filter(Boolean).join(" · ")}</div></td>
+          <td className="nowrap">{fmtTime(l.booking_start)}</td>
+          <td>
+            {quarantine ? why(l) : <><span className={`pill ${STATUS[l.status][0]}`}>{STATUS[l.status][1]}</span>{l.status !== "clean" && why(l)}</>}
+            {!quarantine && <div className="subline">{l.forwarded ? `forwarded ${fmtTime(l.forwarded_at)}` : l.forward_error ? `not forwarded: ${l.forward_error}` : "not forwarded"}</div>}
+            {quarantine && l.raw?.notes && <div className="subline">Notes: {l.raw.notes.length > 160 ? `${l.raw.notes.slice(0, 159)}…` : l.raw.notes}</div>}
+          </td>
+          <td><LeadActions d={d} l={l} /></td>
+        </tr>
+      ))}</tbody>
+    </table>
+  );
+}
+
+function LeadActions({ d, l }: { d: WebsiteData; l: LeadRow }) {
+  if (l.status === "discarded" || l.forwarded) return null;
+  const Do = ({ action, label, cls }: { action: (fd: FormData) => Promise<void>; label: string; cls: string }) => (
+    <form action={action}>
+      <input type="hidden" name="id" value={l.id} /><input type="hidden" name="back" value={d.back} />
+      <button className={cls} type="submit">{label}</button>
+    </form>
+  );
+  return (
+    <div className="row-actions">
+      <Do action={releaseLead} label={l.status === "suspect" ? "Release" : "Forward again"} cls="btn-accent" />
+      <Do action={discardLead} label="Discard" cls="btn-line danger" />
+    </div>
+  );
+}
+
 // ------------------------------------------------------------------------------------------- settings
 
 function Settings({ d }: { d: WebsiteData }) {
@@ -634,7 +715,7 @@ function Settings({ d }: { d: WebsiteData }) {
                 <span className="tog"><input id={`set-${x.key}`} type="checkbox" role="switch" name={x.key} defaultChecked={s[x.key] === "true"} /><span aria-hidden="true" /></span>
               ) : (
                 <input id={`set-${x.key}`} name={x.key} type={x.kind === "int" ? "number" : "text"} min={x.min} max={x.kind === "int" ? x.max : undefined}
-                  maxLength={x.kind === "int" ? undefined : x.max} defaultValue={s[x.key] ?? ""} required inputMode={x.kind === "int" ? "numeric" : undefined} />
+                  maxLength={x.kind === "int" ? undefined : x.max} defaultValue={s[x.key] ?? ""} required={x.kind !== "booking"} inputMode={x.kind === "int" ? "numeric" : undefined} />
               )}
             </div>
           ))}

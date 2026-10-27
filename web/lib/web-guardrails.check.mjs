@@ -239,6 +239,8 @@ const PLANTS = [
   ["lib/web/leak.ts", "import { createClient } from \"@supabase/supabase-js\";", "imports @supabase"],
   ["lib/web/leak.ts", "export const r = 'sam_web_dashboard';", "service-role-only"],
   ["lib/web/leak.ts", "export const r = 'service_role';", "service role"],
+  ["lib/web/leak.ts", "import { loadLeads } from \"@/lib/web-leads\";\nexport const x = loadLeads;", "internal module"], // stage 3: leads stay admin-side
+  ["lib/web/leak.ts", "export const t = 'sam_web_leads';", "the leads table"],
   ["app/embed/Leak.tsx", "export const apikey = 1;", "browser code"],
   ["lib/web/leak.ts", "import \"./helper\";", "cannot resolve"],
 ];

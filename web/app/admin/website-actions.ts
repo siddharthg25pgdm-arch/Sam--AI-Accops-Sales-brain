@@ -1,11 +1,12 @@
 "use server";
 /** The Website tab's controls: approve / edit / retire a Q&A pair, draft a pair from a missed question, add a missed
- *  question as an alias, and the chatbot's settings. Same pattern as actions.ts: each re-checks the admin, writes with
+ *  question as an alias, the chatbot's settings, and Release / Discard for a quarantined lead. Same pattern as actions.ts: each re-checks the admin, writes with
  *  the service key (lib/web-dashboard.ts), then redirects back with a one-line result (?ok= / ?err=) and an anchor. */
 import { randomBytes } from "node:crypto";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { addAlias, draftRow, insertDraft, loadSettings, settingsPatch, writeDecision, writeSettings, type Decision } from "@/lib/web-dashboard";
+import { discardLead as discard, releaseLead as release } from "@/lib/web-leads";
 
 async function admin() {
   const u = await currentUser();
@@ -70,4 +71,22 @@ export async function saveWebSettings(fd: FormData) {
   if (!p.changes.length) back(fd, { ok: "Nothing changed." }, "settings");
   try { await writeSettings(p.changes); } catch (e) { back(fd, { err: fail(e) }, "settings"); }
   back(fd, { ok: `Saved: ${p.changes.map(c => c.key.replace(/_/g, " ")).join(", ")}. Questions use it at once; the launcher's on/off within 5 minutes.` }, "settings");
+}
+
+/** Release a quarantined lead, or Forward again one whose forward failed: it goes to the Website Leads flow now. */
+export async function releaseLead(fd: FormData) {
+  await admin();
+  const id = str(fd, "id") ?? "";
+  let r: Awaited<ReturnType<typeof release>>;
+  try { r = await release(id); } catch (e) { back(fd, { err: fail(e) }, "leads"); }
+  back(fd, !r.ok ? { err: r.error } : r.forwarded ? { ok: "Forwarded to the Website Leads flow." }
+    : { err: `Released, but the forward failed: ${r.error}. It stays on the list; Forward again once that is fixed.` }, "leads");
+}
+
+/** Discard a lead: it stays on record and is never forwarded. */
+export async function discardLead(fd: FormData) {
+  await admin();
+  let r: Awaited<ReturnType<typeof discard>>;
+  try { r = await discard(str(fd, "id") ?? ""); } catch (e) { back(fd, { err: fail(e) }, "leads"); }
+  back(fd, r.ok ? { ok: "Discarded. It will not be forwarded." } : { err: r.error ?? "Could not discard it." }, "leads");
 }

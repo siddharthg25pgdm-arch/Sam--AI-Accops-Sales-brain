@@ -74,6 +74,20 @@
 .w-send:disabled { background: #e9e8e8; color: #9a9a9a; cursor: default; }
 .w-send:not(:disabled):active { transform: scale(.94); }
 
+/* the booking calendar in the panel: over the whole sheet (the chat stays laid out, and inert, underneath) */
+.w-book { position: absolute; inset: 0; z-index: 2; display: none; flex-direction: column; background: #fff; }
+.w-book.on { display: flex; animation: w-in 200ms var(--w-ease) both; }
+.w-book-head { gap: 4px; padding-left: 4px; }
+.w-back { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 12px 0 8px; border-radius: 22px; font-size: 14px;
+  font-weight: 600; color: #fff; transition: background 160ms; }
+.w-back:hover { background: rgba(255, 255, 255, .1); }
+.w-back:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
+.w-book-head .w-head-t { padding-left: 4px; }
+.w-book-head h1 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.w-book-frame { position: relative; flex: 1; min-height: 0; padding-bottom: env(safe-area-inset-bottom); background: #fff; }
+.w-book-wait { position: absolute; inset: 40% 0 auto; text-align: center; font-size: 14px; color: var(--w-ink-3); }
+.w-book-frame iframe { position: relative; display: block; width: 100%; height: 100%; border: 0; background: transparent; }
+
 /* phones: iOS zooms inputs under 16 px */
 @media (max-width: 480px), (pointer: coarse) {
   .w-input textarea { font-size: 16px; }

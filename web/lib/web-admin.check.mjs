@@ -18,7 +18,7 @@ const tmp = mkdtempSync(path.join(tmpdir(), "web-admin-"));
 const stub = (name, src) => { const p = path.join(tmp, name); writeFileSync(p, src); return p; };
 const empty = stub("empty.mjs", "export default {};");
 const jiti = createJiti(import.meta.url, { jsx: { runtime: "automatic" }, alias: {
-  "@/app/admin/website-actions": stub("actions.mjs", "export const decidePair = () => {}, draftPair = () => {}, aliasPair = () => {}, saveWebSettings = () => {};"),
+  "@/app/admin/website-actions": stub("actions.mjs", "export const decidePair = () => {}, draftPair = () => {}, aliasPair = () => {}, saveWebSettings = () => {}, releaseLead = () => {}, discardLead = () => {};"),
   "@/app/admin/website.css": empty, "@/components/blocks/blocks.css": empty,
   "next/font/google": stub("font.mjs", "export const Barlow = () => ({ variable: 'barlow' });"),
   "@": web } });
@@ -202,6 +202,24 @@ ok(items(bank0).every(i => !("error" in i.preview)), `every draft previews clean
 ok((h.match(/class="wt-qa /g) ?? []).length === bank0.length, `${bank0.length} drafts waiting (the loaded bank)`);
 h = view({ view: "approve", qaf: "approved", bank: items(F.bankRows(["lp-22"]), new Set()) });
 ok(h.includes("Approved, but not public") && h.includes("TCO"), "approved but held back shows the blocked claim");
+// stage 3: the Leads view (05 SQL)
+h = view({ view: "leads" });
+ok(h.includes("No leads yet") && h.includes("Nothing in quarantine") && h.includes("WEB_LEAD_WEBHOOK_URL is not set"), "leads render with 0 rows (and say the webhook is missing)");
+h = view({ view: "leads", leadsError: "sam_web_leads returned 404" });
+ok(h.includes("supabase-sam-web-05-leads.sql"), "leads: the table missing says which SQL to apply");
+const lead = (o) => ({ id: "11111111-1111-4111-8111-111111111111", created_at: "2026-10-27T05:00:00Z", source: "citrix-lp-booking", status: "clean", reasons: [], forwarded: true,
+  forwarded_at: "2026-10-27T05:00:01Z", forward_error: null, first_name: "Priya", last_name: "Raman", email: "priya@acme-corp.com", phone: "", company: "Acme", role: "CIO",
+  seats: "600", country: "India", page: "", conversation_id: null, booking_start: "2026-10-29T05:30:00Z", raw: {}, ...o });
+const leads = [lead({}), lead({ id: "22222222-2222-4222-8222-222222222222", status: "suspect", reasons: ["free_email", "no_mx"], forwarded: false, forwarded_at: null, email: "r@gmail.com", raw: { notes: "hello" } }),
+  lead({ id: "33333333-3333-4333-8333-333333333333", status: "clean", forwarded: false, forwarded_at: null, forward_error: "the flow answered 500" }),
+  lead({ id: "44444444-4444-4444-8444-444444444444", status: "discarded", reasons: ["junk_name"], forwarded: false, forwarded_at: null })];
+h = view({ view: "leads", leads, webhookSet: true });
+ok(!h.includes("WEB_LEAD_WEBHOOK_URL is not set") && h.includes("Free email (Gmail, Outlook, ...), not a work address") && h.includes("The email domain receives no mail"), "quarantine shows the reasons in words");
+eq((h.match(/>Release</g) ?? []).length, 2, "Release only on the quarantined lead (in Quarantine and in All leads)");
+eq((h.match(/>Forward again</g) ?? []).length, 1, "Forward again only where the forward failed");
+eq((h.match(/>Discard</g) ?? []).length, 3, "Discard on anything not forwarded and not discarded (the quarantined one in both lists)");
+ok(h.includes("not forwarded: the flow answered 500") && h.includes("1 forward failed") && h.includes("Notes: hello"), "forward errors and the notes are shown");
+ok(view({ view: "analytics", dash: e0, rows: [], leads }).includes('aria-label="1 quarantined"'), "the Leads tab carries the quarantine count");
 
 rmSync(tmp, { recursive: true, force: true });
 console.log(`web-admin.check: ${n} assertions passed`);

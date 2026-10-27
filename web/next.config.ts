@@ -8,6 +8,9 @@ import path from "node:path";
 const EMBED_ORIGINS = ["https://www.accops.com", "https://accops.com", "https://accops-citrix-lp.vercel.app"];
 const embedOrigins = () => [...new Set([...EMBED_ORIGINS, ...(process.env.WEB_EMBED_ORIGINS ?? "").split(",").map(s => s.trim())
   .filter(s => URL.canParse(s) && new URL(s).protocol === "https:" && new URL(s).origin === s)])];
+// The one page /embed may frame: the Microsoft Bookings calendar of settings booking_url (bridge.ts BOOKING_ORIGIN, the
+// same value; web-widget.check proves it). Nothing else, no wildcard.
+const BOOKING_ORIGIN = "https://bookings.cloud.microsoft";
 
 const nextConfig: NextConfig = {
   turbopack: { root: path.join(__dirname) },
@@ -17,7 +20,7 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [{ source: "/embed", headers: [
-      { key: "Content-Security-Policy", value: `frame-ancestors 'self' ${embedOrigins().join(" ")}` },
+      { key: "Content-Security-Policy", value: `frame-ancestors 'self' ${embedOrigins().join(" ")}; frame-src ${BOOKING_ORIGIN}` },
       { key: "X-Robots-Tag", value: "noindex, nofollow" },
     ] }];
   },

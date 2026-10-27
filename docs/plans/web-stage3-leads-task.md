@@ -1,5 +1,7 @@
 # Website chatbot stage 3: lead capture task (protection spec, copied verbatim from the stage-1 plan section 2.5)
 
+**27 Oct 2026: built, with Siddharth's changes of that day** (they win where they differ from the table below): leads come from a Microsoft Bookings calendar through Power Automate (server-to-server, `POST /api/v1/leads/booking`), not a browser form; dedupe is 24 h, not 30 days; status is clean / suspect (quarantine) / released / discarded; clean leads go to the Website Leads flow (Power Automate), not GHL. See [web-stage3-leads-runbook.md](web-stage3-leads-runbook.md).
+
 Source: [2026-10-26-website-chatbot-stage1.md](2026-10-26-website-chatbot-stage1.md) section 2.5. Copied by Stream F on 26 Oct 2026 so stage 3 cannot skip it. No code yet. Stage-1 hooks already in place: every conversation carries a `label` (human/suspect/bot, only escalates) in `sam_web_conversations`; `web/lib/web/bot.ts` exports `mintHs`/`verifyHs` (reuse the same signed-timestamp pattern for the form render time); `checkBotId()` must also run on the lead route (add `/api/web/lead` to `initBotId` in `web/instrumentation-client.ts`).
 
 ### 2.5 Leads (stage 3; the protection is designed now so stage 3 cannot skip it)

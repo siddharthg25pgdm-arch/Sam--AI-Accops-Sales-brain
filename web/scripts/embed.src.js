@@ -25,7 +25,7 @@
   if (!me || W.AccopsChat) return;
   W.AccopsChat = 1;
   var base = new URL(me.src).origin, page = location.origin + location.pathname, K = "acc_chat_", DAY = 864e5, pg = me.getAttribute("data-page");
-  var ID = /^[\w.:-]{1,80}$/, EV = /^(question_clicked|answer_shown|doc_opened|filter_used|step_viewed)$/;
+  var ID = /^[\w.:-]{1,80}$/, EV = /^(question_clicked|answer_shown|doc_opened|filter_used|step_viewed|booking_opened)$/;
   var SRC = /^(bank|intent|cache|model|fallback|guard|limited|repeat|root|chip|picker|teaser)$/, SEC = /^[a-z0-9][a-z0-9-]{0,40}$/;
   var ok = function (re, v) { return typeof v === "string" && re.test(v) ? v : null; };
   var attr = function (n) { return me.getAttribute("data-" + n); };

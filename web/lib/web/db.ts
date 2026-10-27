@@ -31,7 +31,8 @@ async function rest<T>(path: string, body?: unknown): Promise<T> {
 }
 export const rpc = <T>(fn: string, args: Record<string, unknown> = {}) => rest<T>(`rpc/${fn}`, args);
 
-export type Settings = { enabled: boolean; model_enabled: boolean; cta_url: string; cta_label: string };
+/** booking_url: the Bookings calendar the chat opens in its panel (05 SQL; "" or missing = the old new-tab CTA). */
+export type Settings = { enabled: boolean; model_enabled: boolean; cta_url: string; cta_label: string; booking_url?: string };
 export type Qa = { id: string; question: string; answer: string; visual: string | null; visual_data: Record<string, unknown> | null;
   cta: string | null; cta_url: string | null; sources: string[] | null };
 export type QaRef = { id: string; question: string };

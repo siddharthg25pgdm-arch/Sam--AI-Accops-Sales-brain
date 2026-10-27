@@ -16,14 +16,16 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const ROOTS = ["app/embed", "app/api/web", "lib/web", "instrumentation-client.ts", "public/embed.js"];
 const BROWSER = [/^app\/embed\//, /^public\/embed\.js$/];
 const SRC = /\.(ts|tsx|js|mjs|cjs|jsx)$/;
-const BAD_MODULE = /^(lib\/(cards|cards-cache|agent[^/]*|events|api|apiauth|passages|sharepoint|registry-cache|brain|brain-route)\.(ts|tsx)$|data\/(?!web-intent-(index|golden)\.json$))/;
+// web-leads (stage 3's lead store: service key, PII) is reached only by app/api/v1/leads/booking and the admin tab.
+const BAD_MODULE = /^(lib\/(cards|cards-cache|agent[^/]*|events|api|apiauth|passages|sharepoint|registry-cache|brain|brain-route|web-leads)\.(ts|tsx)$|data\/(?!web-intent-(index|golden)\.json$))/;
 const BAD_PACKAGE = /^@supabase\//;
 const TOKENS = [
   [/SUPABASE_SERVICE_(KEY|ROLE)/, "the service key"],
   [/\bservice_role\b/, "the service role"],
   [/\bsb_secret_/, "a Supabase secret key"],
   [/NEXT_PUBLIC_SUPABASE/, "a public Supabase env var"],
-  [/\bsam_web_(dashboard|purge)\b/, "a service-role-only RPC"],
+  [/\bsam_web_(dashboard|purge|purge_leads)\b/, "a service-role-only RPC"],
+  [/\bsam_web_leads\b/, "the leads table"],
   // (?!...) also skips the GTM/GA4 dataLayer names of plan 7.1 (sam_chat, sam_event, sam_qa_id, sam_source): analytics keys, not relations
   [/\bsam_(?!web_|(chat|event|qa_id|source)\b)[a-z0-9_]+/, "an internal sam_* relation"],
   [/\badi_[a-z0-9_]+/, "an internal adi_* relation"],
@@ -86,8 +88,9 @@ const READER_PATHS = new Set(["/", "/sam_web_qa_public", "/sam_web_pages_public"
   ...["settings", "page_group", "roots", "children", "search", "admit", "take_model_slot", "cache_get", "cache_put", "log_message", "log_event"]
     .map(f => `/rpc/sam_web_${f}`)]);
 const INTERNAL = ["sam_asset_cards", "sam_passages", "sam_v1_assets", "sam_events", "sam_sharepoint_files", "sam_ops_runs", "sam_content_requests",
-  "sam_web_qa", "sam_web_pages", "sam_web_settings", "sam_web_conversations", "sam_web_messages", "sam_web_answer_cache", "sam_web_rate", "sam_web_usage_daily"];
-const INTERNAL_RPC = ["sam_web_dashboard", "sam_web_purge", "sam_passages_search"];
+  "sam_web_qa", "sam_web_pages", "sam_web_settings", "sam_web_conversations", "sam_web_messages", "sam_web_answer_cache", "sam_web_rate", "sam_web_usage_daily",
+  "sam_web_leads"];
+const INTERNAL_RPC = ["sam_web_dashboard", "sam_web_purge", "sam_web_purge_leads", "sam_passages_search"];
 
 /** Live probes as anon (publishable key only) and as sam_web_reader. `f` is fetch (injectable for the check). */
 export async function probes({ url, apikey, jwt }, f = fetch) {

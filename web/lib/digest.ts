@@ -78,7 +78,9 @@ export type Digest = {
   ratings: { total: number; helpful: number; wrong_asset: number; missing: number; examples: DigestRating[]; url: string } | null;
   /** The Website line: the chatbot's last 24 hours, real traffic. Null on a day with no conversation and no model use. */
   website: { conversations: number; human: number; suspect: number; bot: number; without_model: Ratio; model_answers: number;
-    peak_pct: number | null; cta_clicks: number; missed: number; url: string } | null;
+    peak_pct: number | null; cta_clicks: number; missed: number; url: string;
+    /** Bookings leads in the last 24 hours, and how many of them wait in quarantine (lib/web-leads.ts). */
+    leads?: { n: number; quarantined: number } | null } | null;
   health: HealthItem[];
   admin_url: string;
 };
@@ -250,10 +252,10 @@ export function buildDigest(i: DigestInput): Digest {
   const oldestDays = wi?.oldest_conversation_at ? (Date.parse(i.now) - Date.parse(wi.oldest_conversation_at)) / 86_400_000 : null;
   if (oldestDays != null && oldestDays > WEB_RETENTION_DAYS - 10) health.push({ title: `Website conversations are ${Math.floor(oldestDays)} days old`,
     detail: `They are kept ${WEB_RETENTION_DAYS} days, then purged (PRD section 10). Schedule sam_web_purge(${WEB_RETENTION_DAYS}) before the oldest passes the limit.` });
-  const website = wi && (wi.conversations > 0 || (peakModel?.n ?? 0) > 0) ? {
+  const website = wi && (wi.conversations > 0 || (peakModel?.n ?? 0) > 0 || (wi.leads?.n ?? 0) > 0) ? {
     conversations: wi.conversations, human: wi.human, suspect: wi.suspect, bot: wi.bot,
     without_model: ratio(wi.without_model.num, wi.without_model.den), model_answers: wi.model_answers, peak_pct: peakModel?.pct ?? null,
-    cta_clicks: wi.cta_clicks, missed: wi.missed, url: `${admin}?tab=website`,
+    cta_clicks: wi.cta_clicks, missed: wi.missed, url: `${admin}?tab=website`, leads: wi.leads?.n ? wi.leads : null,
   } : null;
 
   // The subject and the lead say the same thing: the subject for the inbox, the lead in the email.
@@ -265,7 +267,8 @@ export function buildDigest(i: DigestInput): Digest {
     changed && plural(changed, "file") + " changed",
     qs && plural(qs, "question"),
     ratings && plural(ratings.total, "rating"),
-    website && plural(website.conversations, "website chat"),
+    website?.conversations && plural(website.conversations, "website chat"),
+    website?.leads && plural(website.leads.n, "new lead"),
     health.length && plural(health.length, "thing") + " to check",
   ].filter(Boolean) as string[];
   const subject = `SAM: ${parts.length ? parts.join(", ") : "nothing new"}`;
@@ -290,6 +293,7 @@ export function buildDigest(i: DigestInput): Digest {
 /** The Website line, one sentence: "12 conversations (9 human, 2 suspect, 1 bot) · 71% answered without the model · ...". */
 export function websiteLine(w: NonNullable<Digest["website"]>): string {
   return [
+    w.leads ? `${plural(w.leads.n, "new lead")} (${w.leads.quarantined} quarantined)` : "",
     `${plural(w.conversations, "conversation")} (${w.human} human, ${w.suspect} suspect, ${w.bot} bot)`,
     w.without_model.den ? `${w.without_model.pct == null ? `${w.without_model.num} of ${w.without_model.den}` : `${Math.round(w.without_model.pct)}%`} answered without the model` : "",
     `${plural(w.model_answers, "model answer")}${w.peak_pct != null ? `, ${w.peak_pct}% of the daily ceiling at peak` : ""}`,

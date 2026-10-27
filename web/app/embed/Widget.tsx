@@ -3,7 +3,7 @@
 // answer.blocks.map -> C's block components (Siddharth, 26 Oct: no OpenUI <Renderer> on the client; library.tsx +
 // toOpenUI stay untouched so it can be switched back). Only types come from lib/blocks: the server already validated
 // every answer with Answer.parse, so no zod ships to the browser.
-import { useCallback, useEffect, useRef, useState, type ComponentType, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type ComponentType, type KeyboardEvent, type Ref } from "react";
 import type { Answer as AnswerT, Block, Chip } from "@/lib/blocks";
 import { Answer, Thinking } from "@/components/blocks/Answer";
 import { Calculator } from "@/components/blocks/Calculator";
@@ -15,7 +15,7 @@ import { Picker } from "@/components/blocks/Picker";
 import { Stat } from "@/components/blocks/Stat";
 import { Steps } from "@/components/blocks/Steps";
 import { Text } from "@/components/blocks/Text";
-import { acceptInit, eventMessage, ID, SEC, type WidgetEvent } from "./bridge";
+import { acceptInit, eventMessage, ID, opensBooking, SEC, type WidgetEvent } from "./bridge";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const BLOCK: Record<Block["type"], ComponentType<any>> = { text: Text, doc_card: DocCard, compare_table: CompareTable, steps: Steps, stat: Stat, picker: Picker, calculator: Calculator, cta: Cta };
@@ -25,6 +25,8 @@ const FAIL = "That didn't go through. Try again in a moment, or talk to the team
 export type Props = {
   conversationId: string; hs: string; page: string; starters: Chip[]; origins: string[];
   talk: { label: string; url: string }; ask?: string | null;
+  /** The Bookings calendar (bridge.ts bookingUrl): talk-to-sales opens it inside the panel. "" = a new tab, as before. */
+  booking?: string;
 };
 type Item = { id: number; me: string } | { id: number; a: AnswerT; source: string; qa?: string };
 type Saved = { c: string; hs: string; at: number; page: string; items: Item[]; recent: number[] };
@@ -39,16 +41,47 @@ export function AnswerView({ a }: { a: AnswerT }) {
     blocks={visible(a.blocks).map((b, i) => { const { type, ...p } = b; const C = BLOCK[type]; return C ? <C key={i} {...p} /> : null; })} />;
 }
 
+const ARROW_L = "M10 3.5L5.5 8l4.5 4.5", EXT = "M6.5 3.5h-3v9h9v-3M9 3.5h3.5V7M12.5 3.5L7.5 8.5";
+/** The calendar inside the panel (Siddharth, 27 Oct): the whole sheet (on a phone the loader's frame is already full
+ *  screen), a way back to the chat, a way out to a new tab. Mounted on first open and kept, so going back to check an
+ *  answer never loses a half-filled booking. Only BOOKING_ORIGIN can load (next.config.ts frame-src). */
+export function BookingView({ url, title, on, onBack, onClose, backRef }: { url: string; title: string; on: boolean;
+  onBack: () => void; onClose: () => void; backRef?: Ref<HTMLButtonElement> }) {
+  return (
+    <section className={`w-book${on ? " on" : ""}`} aria-label={title}>
+      <header className="w-head w-book-head">
+        <button type="button" ref={backRef} className="w-back" onClick={onBack} aria-label="Back to the chat">
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d={ARROW_L} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>Back
+        </button>
+        <div className="w-head-t"><h1>{title}</h1><p>Pick a time that suits you</p></div>
+        <a className="w-x" href={url} target="_blank" rel="noopener noreferrer" aria-label="Open the calendar in a new tab">
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d={EXT} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </a>
+        <button type="button" className="w-x" onClick={onClose} aria-label="Close chat">
+          <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
+        </button>
+      </header>
+      <div className="w-book-frame">
+        <p className="w-book-wait" aria-hidden="true">Loading the calendar…</p>
+        <iframe src={url} title={`${title}: booking calendar`} referrerPolicy="strict-origin-when-cross-origin" />
+      </div>
+    </section>
+  );
+}
+
 const rid = () => `v_${Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, "0")).join("")}`;
 const load = (): Saved | null => { try { return JSON.parse(sessionStorage.getItem(KEY) ?? "null"); } catch { return null; } };
 
-export default function Widget({ conversationId, hs: hs0, page, starters: starters0, origins, talk, ask: askFirst }: Props) {
+export default function Widget({ conversationId, hs: hs0, page, starters: starters0, origins, talk, ask: askFirst, booking = "" }: Props) {
   const [items, setItems] = useState<Item[]>([]);
   const [starters, setStarters] = useState(starters0);
   const [near, setNear] = useState<Chip[]>([]); // the section's questions when the chat is reopened elsewhere mid-conversation
   const [busy, setBusy] = useState<false | "click" | "typed">(false);
   const [slow, setSlow] = useState(false);
   const [text, setText] = useState("");
+  const [view, setView] = useState<"chat" | "booking" | "back">("chat"); // "back" = the chat, returned to from the calendar
+  const [booked, setBooked] = useState(false); // the calendar was opened once (its iframe then stays)
+  const backBtn = useRef<HTMLButtonElement>(null);
   const s = useRef({ c: conversationId, hs: hs0, at: Date.now(), recent: [] as number[], renderAt: 0, n: 0,
     parent: null as string | null, visitor: "", prev: "", asked: [] as string[] });
   const thread = useRef<HTMLDivElement>(null);
@@ -106,17 +139,25 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
     void send({ kind: "click", qa_id }, label, qa_id);
   }, [busy, send, track]);
 
-  const cta = useCallback((url: string) => {
+  const cta = useCallback((url: string, action?: string) => {
     const x = s.current;
+    if (opensBooking(booking, action)) { // the calendar in the panel: still a talk-to-sales click, plus booking_opened
+      track("talk_to_sales_clicked", { ref: booking });
+      if (x.parent) parent.postMessage({ t: "cta", url: booking }, x.parent); // the loader counts it; an https URL is never navigated
+      track("booking_opened");
+      setBooked(true);
+      setView("booking");
+      return true;
+    }
     track("talk_to_sales_clicked", { ref: url });
     if (x.parent) parent.postMessage({ t: "cta", url }, x.parent);
     // An https link opens natively (new tab, survives popup blockers); a #anchor is the parent's to scroll to.
     return !!x.parent && url.startsWith("#");
-  }, [track]);
+  }, [booking, track]);
 
   const act: Act = (type, params, label) => {
     if (type === "ask") { askQa(String(params.qa_id), label, String(params.source ?? "chip")); return true; }
-    if (type === "cta") return cta(String(params.url ?? ""));
+    if (type === "cta") return cta(String(params.url ?? ""), String(params.action ?? ""));
     if (type === "event") {
       const n = String(params.name);
       if (n === "doc_opened" || n === "filter_used" || n === "step_viewed")
@@ -194,6 +235,12 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
     return () => cancelAnimationFrame(r);
   }, [items.length, slow]);
 
+  // Into the calendar: focus its Back button. Out of it: back to the input (not on a phone: no surprise keyboard).
+  useEffect(() => {
+    if (view === "booking") backBtn.current?.focus();
+    else if (view === "back" && !matchMedia("(pointer: coarse)").matches) input.current?.focus({ preventScroll: true });
+  }, [view]);
+
   const submit = () => {
     const q = text.trim();
     if (!q || q.length > MAX || busy) return;
@@ -205,11 +252,12 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
   };
   const close = () => { if (s.current.parent) parent.postMessage({ t: "close" }, s.current.parent); };
   const lastMeId = [...items].reverse().find(i => "me" in i)?.id;
+  const inBooking = view === "booking"; // the chat stays laid out underneath (its scroll is kept) but inert
 
   return (
     <ActCtx.Provider value={act}>
       <div className="sam-w">
-        <header className="w-head">
+        <header className="w-head" inert={inBooking}>
           <span className="w-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 18.5V8a3 3 0 013-3h8a3 3 0 013 3v5a3 3 0 01-3 3H9z" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" /><path d="M9.5 10.5h5M9.5 13h3" stroke="#ff9a76" strokeWidth="1.7" strokeLinecap="round" /></svg>
           </span>
@@ -222,7 +270,7 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
           </button>
         </header>
 
-        <div className="w-body" ref={thread} role="log" aria-live="polite" aria-label="Conversation">
+        <div className="w-body" ref={thread} role="log" aria-live="polite" aria-label="Conversation" inert={inBooking}>
           {items.length === 0 && (
             <div className="w-hello sb-in">
               <p className="w-hello-t">What would you like to know?</p>
@@ -257,7 +305,7 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
           {busy && slow && <div className="w-bot"><Thinking /></div>}
         </div>
 
-        <footer className="w-foot">
+        <footer className="w-foot" inert={inBooking}>
           {items.length > 0 && near.length > 0 && !busy && (
             <ul className="sb-chips w-near" aria-label="Asked about this part of the page">
               {near.map(c => <li key={c.id}><button type="button" className="sb-chip" onClick={() => askQa(c.id, c.label, "chip")}>{c.label}</button></li>)}
@@ -275,6 +323,7 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
             </button>
           </form>
         </footer>
+        {booked && booking && <BookingView url={booking} title={talk.label} on={inBooking} backRef={backBtn} onBack={() => setView("back")} onClose={close} />}
       </div>
     </ActCtx.Provider>
   );

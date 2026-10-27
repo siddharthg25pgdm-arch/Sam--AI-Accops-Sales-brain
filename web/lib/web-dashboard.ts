@@ -9,6 +9,8 @@
  *  The pure functions (mapDashboard, the list derivations, decisionPatch, draftRow, settingsPatch, websiteDigest's
  *  shaping) are what lib/web-admin.check.mjs runs on fixtures; the fetchers are thin. */
 import type { Answer, Block } from "@/lib/blocks";
+import { bookingUrl } from "@/app/embed/bridge";
+import { leadsSince } from "@/lib/web-leads";
 
 // ---------------------------------------------------------------- vocabulary
 
@@ -301,7 +303,7 @@ export function withAlias(aliases: string[], question: string): string[] | null 
 
 // ---------------------------------------------------------------- settings
 
-export type SettingSpec = { key: string; label: string; kind: "bool" | "int" | "url" | "text"; min?: number; max?: number; help: string };
+export type SettingSpec = { key: string; label: string; kind: "bool" | "int" | "url" | "text" | "booking"; min?: number; max?: number; help: string };
 export const SETTINGS: SettingSpec[] = [
   { key: "enabled", label: "Show the chatbot on the website", kind: "bool", help: "Off hides the launcher within 5 minutes (the config is cached 300 s)." },
   { key: "model_enabled", label: "Let the model answer", kind: "bool", help: "Off = bank, intent match and cache only, at once. The instant kill switch." },
@@ -311,6 +313,7 @@ export const SETTINGS: SettingSpec[] = [
   { key: "repeat_window_min", label: "Repeat window, minutes", kind: "int", min: 1, max: 120, help: "" },
   { key: "cta_label", label: "Talk-to-sales button", kind: "text", max: 28, help: "At most 28 characters. Changing it clears the answer cache." },
   { key: "cta_url", label: "Talk-to-sales link", kind: "url", max: 300, help: "https://... or #talk once the LP form works. Changing it clears the answer cache." },
+  { key: "booking_url", label: "Booking calendar in the chat", kind: "booking", max: 500, help: "A Microsoft Bookings link (https://bookings.cloud.microsoft/...): Talk to sales then opens this calendar inside the chat. Empty = the Talk-to-sales link in a new tab. The next chat that opens uses it." },
 ];
 /** Form values -> the rows to change, validated; nothing is written when any value is bad. A checkbox posts "on" or nothing. */
 export function settingsPatch(form: Record<string, string | undefined>, current: Record<string, string>): { changes: { key: string; value: string }[] } | { error: string } {
@@ -323,6 +326,9 @@ export function settingsPatch(form: Record<string, string | undefined>, current:
       if (s.kind === "int") {
         if (!/^\d+$/.test(raw) || +raw < (s.min ?? 0) || +raw > (s.max ?? Infinity)) return { error: `${s.label}: a whole number from ${s.min} to ${s.max}.` };
         v = String(+raw);
+      } else if (s.kind === "booking") { // only the one host /embed may frame (bridge.ts BOOKING_ORIGIN); empty switches it off
+        v = raw && bookingUrl(raw);
+        if (raw && !v) return { error: `${s.label}: a link on https://bookings.cloud.microsoft, or empty.` };
       } else if (s.kind === "url") {
         if (!/^(https:\/\/\S+|#[\w-]+)$/.test(raw) || raw.length > (s.max ?? 300) || (raw.startsWith("https://") && !URL.canParse(raw))) return { error: `${s.label}: an https:// link or a #anchor.` };
         v = raw;
@@ -331,7 +337,7 @@ export function settingsPatch(form: Record<string, string | undefined>, current:
         v = raw;
       }
     }
-    if (current[s.key] !== v) changes.push({ key: s.key, value: v });
+    if ((current[s.key] ?? "") !== v) changes.push({ key: s.key, value: v }); // a missing row reads as empty
   }
   return { changes };
 }
@@ -345,12 +351,15 @@ export type WebsiteDigest = {
   usage: { day: string; model_answers: number; groq_answers: number }[];
   model_ceiling: number | null; groq_daily_cap: number | null;
   oldest_conversation_at: string | null;
+  /** Leads received in the last 24 hours and how many wait in quarantine; null until the 05 SQL is applied. */
+  leads?: { n: number; quarantined: number } | null;
 };
-export function toWebsiteDigest(raw: RawDashboard | null, usage: { day: string; model_answers: number; groq_answers: number }[], oldest: string | null, now: string): WebsiteDigest {
+export function toWebsiteDigest(raw: RawDashboard | null, usage: { day: string; model_answers: number; groq_answers: number }[], oldest: string | null, now: string,
+  leads: WebsiteDigest["leads"] = null): WebsiteDigest {
   const d = mapDashboard(raw, now, "all", 1);
   return { conversations: d.conv.total, human: d.conv.human, suspect: d.conv.suspect, bot: d.conv.bot, messages: d.messages,
     without_model: { num: d.withoutModel.num, den: d.withoutModel.den }, model_answers: d.totals.model, cta_clicks: d.cta, missed: d.missedCount,
-    usage, model_ceiling: raw?.model_ceiling ?? null, groq_daily_cap: raw?.groq_daily_cap ?? null, oldest_conversation_at: oldest };
+    usage, model_ceiling: raw?.model_ceiling ?? null, groq_daily_cap: raw?.groq_daily_cap ?? null, oldest_conversation_at: oldest, leads };
 }
 
 // ---------------------------------------------------------------- preview (C's blocks, B's filling)
@@ -457,10 +466,11 @@ export async function writeSettings(changes: { key: string; value: string }[]): 
  *  oldest stored conversation (retention). Real traffic only. */
 export async function websiteDigest(now: string): Promise<WebsiteDigest> {
   const days = [istDay(Date.parse(now) - 86_400_000), istDay(now)];
-  const [raw, usage, oldest] = await Promise.all([
+  const [raw, usage, oldest, leads] = await Promise.all([
     loadDashboard(1, false),
     rest<{ day: string; model_answers: number; groq_answers: number }[]>(`sam_web_usage_daily?select=day,model_answers,groq_answers&day=gte.${days[0]}&order=day`),
     oldestConversation(),
+    leadsSince(new Date(Date.parse(now) - 86_400_000).toISOString()).catch(() => null), // no table yet: no lead line, not a failure
   ]);
-  return toWebsiteDigest(raw, usage, oldest, now);
+  return toWebsiteDigest(raw, usage, oldest, now, leads);
 }

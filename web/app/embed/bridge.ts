@@ -33,12 +33,25 @@ export function acceptInit(e: { origin: string; source: unknown; data: unknown }
   return { origin: e.origin, visitor_id: typeof d.visitor_id === "string" && ID.test(d.visitor_id) ? d.visitor_id : null, consent: d.consent === true };
 }
 
+/** The Microsoft Bookings host the chat may open inside its panel (settings booking_url). next.config.ts frames exactly
+ *  this origin on /embed (frame-src; web-widget.check proves they match) and the Website tab refuses any other. */
+export const BOOKING_ORIGIN = "https://bookings.cloud.microsoft";
+/** booking_url as the widget may use it: an https link on BOOKING_ORIGIN, else "" (the CTA keeps opening cta_url). */
+export function bookingUrl(v: unknown): string {
+  if (typeof v !== "string" || v.length > 500 || !URL.canParse(v.trim())) return "";
+  const u = new URL(v.trim());
+  return u.origin === BOOKING_ORIGIN && !u.username && !u.password ? u.href : "";
+}
+/** A talk-to-sales CTA opens the calendar in the panel when there is one; an open_url CTA (a document, a page) never does. */
+export const opensBooking = (booking: string, action?: string) => !!booking && action !== "open_url";
+
 export const ID = /^[A-Za-z0-9_.:-]{1,80}$/;
 /** The section the visitor is reading, as the loader reports it (an element id, or the cards' "section-N"): never free text. */
 export const SEC = /^[a-z0-9][a-z0-9-]{0,40}$/;
 export const cleanSection = (s: unknown) => (typeof s === "string" && SEC.test(s) ? s : "");
-/** Events the widget reports (the loader reports popup_*, chat_opened, chat_closed and talk_to_sales_clicked itself). */
-export const WIDGET_EVENTS = ["question_clicked", "answer_shown", "doc_opened", "filter_used", "step_viewed", "talk_to_sales_clicked"] as const;
+/** Events the widget reports (the loader reports popup_*, chat_opened, chat_closed and talk_to_sales_clicked itself).
+ *  booking_opened: the calendar opened in the panel (no text; GA4 gets it through the loader's sam_chat push). */
+export const WIDGET_EVENTS = ["question_clicked", "answer_shown", "doc_opened", "filter_used", "step_viewed", "talk_to_sales_clicked", "booking_opened"] as const;
 export type WidgetEvent = (typeof WIDGET_EVENTS)[number];
 export const SOURCES = ["bank", "intent", "cache", "model", "fallback", "guard", "limited", "repeat", "root", "chip", "picker", "teaser"] as const;
 

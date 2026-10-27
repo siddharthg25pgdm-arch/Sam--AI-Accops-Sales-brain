@@ -11,7 +11,9 @@
  *  5. /embed (page.tsx): notFound while inert; when on, a handshake that verifyHs accepts, cleaned page + q + sec, the starters.
  *  6. Every fixture as the widget draws it: each Text / Stat / table / steps shows its source pill ("Based on" for the
  *     model's written answer); a Text without a source is not drawn; **emphasis** is drawn as <strong class="sb-em">
- *     (never raw asterisks), navy on its highlight band at AA contrast; 3-column tables carry data-col (blocks.css). */
+ *     (never raw asterisks), navy on its highlight band at AA contrast; 3-column tables carry data-col (blocks.css).
+ *  Stage 3 (27 Oct): the Bookings calendar in the panel only with a valid booking_url and only for talk-to-sales CTAs,
+ *  frame-src exactly https://bookings.cloud.microsoft, the Back button, booking_opened allowlisted end to end. */
 import assert from "node:assert";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -281,6 +283,11 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   btn.fire("click");
   msg({ t: "cta", url: "https://www.accops.com/schedule-a-free-demo" });
   eq([b.t.opened.length, wrap.className, b.dl().at(-1).sam_event], [0, "f on", "talk_to_sales_clicked"], "https CTA: counted, the widget's link opens it (no window.open)");
+  // stage 3, the calendar in the panel: the widget posts {t:"cta"} with the Bookings URL (counted, never navigated) and booking_opened
+  msg({ t: "cta", url: "https://bookings.cloud.microsoft/book/x@y.onmicrosoft.com/s/abc" });
+  msg({ t: "event", name: "booking_opened", text: "my name is Priya", qa_id: "call me on 98765" });
+  eq([b.t.opened.length, wrap.className, b.dl().slice(-2).map(e => e.sam_event)], [0, "f on", ["talk_to_sales_clicked", "booking_opened"]], "booking: counted as talk to sales + booking_opened; the chat stays open, nothing navigates");
+  eq(b.dl().at(-1), { event: "sam_chat", sam_event: "booking_opened", page_path: "/" }, "booking_opened reaches the dataLayer (GA4) with no text");
   const c = boot({ talk: true });
   await c.advance(10);
   c.sh(".l").fire("click");
@@ -396,6 +403,28 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   // /api/web/event's is_test: server-side, from the origin (loader beacons) or the signed t_ conversation (widget events)
   eq([Br.testEvent(BASE, "sam-accops.vercel.app"), Br.testEvent(LP, "sam-accops.vercel.app"), Br.testEvent(null, "sam-accops.vercel.app")], [true, false, false], "is_test from origin: SAM's own page only");
   eq([Br.testEvent(BASE, "sam-accops.vercel.app", "c_1"), Br.testEvent(BASE, "sam-accops.vercel.app", "t_1")], [false, true], "widget events: test only for a t_ conversation");
+  // stage 3: the booking calendar URL, and which CTAs open it
+  const BK = "https://bookings.cloud.microsoft/book/AccopsUnifiedPlatformforSecureRemoteAccess2@propalmsnetwork.onmicrosoft.com/s/UEDDAf42hEiNVqsGcRVJ-w2?ismsaljsauthenabled";
+  eq(Br.BOOKING_ORIGIN, "https://bookings.cloud.microsoft", "one booking origin");
+  eq(Br.bookingUrl(BK), BK, "the Accops Bookings page is accepted as is");
+  eq(Br.bookingUrl(` ${BK} `), BK, "trimmed");
+  for (const bad of ["", null, 42, "http://bookings.cloud.microsoft/book/x", "https://evil.example/book/x", "https://bookings.cloud.microsoft.evil.example/x",
+    "https://user:pw@bookings.cloud.microsoft/x", "javascript:alert(1)", "https://outlook.office.com/book/x", `https://bookings.cloud.microsoft/${"x".repeat(500)}`])
+    eq(Br.bookingUrl(bad), "", `booking_url refused: ${String(bad).slice(0, 60)}`);
+  eq([Br.opensBooking("", "talk_to_sales"), Br.opensBooking(BK, "talk_to_sales"), Br.opensBooking(BK, undefined), Br.opensBooking(BK, ""), Br.opensBooking(BK, "open_url")],
+    [false, true, true, true, false], "the calendar opens only with a booking_url, and only for talk-to-sales (never an open_url CTA)");
+  eq(Br.eventMessage("booking_opened", { text: "my email is a@b.com", ref: "a b" }), { t: "event", name: "booking_opened", ref: "a_b" }, "booking_opened is allowlisted, no text");
+  ok(read("app/api/web/event/route.ts").includes('"booking_opened"] as const'), "the event route accepts booking_opened");
+  ok(/EV = \/\^\([^)]*\|booking_opened\)\$\//.test(read("scripts/embed.src.js")), "the loader forwards booking_opened to the dataLayer");
+  // the Website tab's setting takes the same rule
+  const Wd = await jiti.import("@/lib/web-dashboard.ts");
+  const cur = { enabled: "true", model_enabled: "true", model_ceiling: "300", groq_daily_cap: "40", repeat_n: "3", repeat_window_min: "10", cta_label: "Talk to an expert", cta_url: "https://www.accops.com/schedule-a-free-demo" };
+  const form = o => ({ ...cur, enabled: "on", model_enabled: "on", ...o });
+  eq(Wd.settingsPatch(form({}), cur), { changes: [] }, "booking_url empty and no row yet: no change");
+  eq(Wd.settingsPatch(form({ booking_url: BK }), cur), { changes: [{ key: "booking_url", value: BK }] }, "setting: the Bookings link saved");
+  eq(Wd.settingsPatch(form({ booking_url: "" }), { ...cur, booking_url: BK }), { changes: [{ key: "booking_url", value: "" }] }, "setting: empty switches it off");
+  for (const bad of ["https://evil.example/x", "http://bookings.cloud.microsoft/x", "javascript:alert(1)"])
+    ok("error" in Wd.settingsPatch(form({ booking_url: bad }), cur), `setting refused: ${bad}`);
 }
 
 // 4. frame-ancestors on /embed only, same list as the widget trusts
@@ -406,8 +435,9 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
     const h = await cfg.headers();
     eq(h.map(r => r.source), ["/embed"], "headers() touches /embed only");
     const csp = h[0].headers.find(x => x.key === "Content-Security-Policy")?.value;
-    eq(csp, `frame-ancestors 'self' ${Br.embedOrigins(env).join(" ")}`, `frame-ancestors = 'self' + the widget's origin list (env ${env ?? "unset"})`);
-    ok(!csp.includes("*"), "frame-ancestors: no wildcard");
+    eq(csp, `frame-ancestors 'self' ${Br.embedOrigins(env).join(" ")}; frame-src ${Br.BOOKING_ORIGIN}`, `frame-ancestors = 'self' + the widget's origin list (env ${env ?? "unset"}); frame-src = the booking origin`);
+    eq(csp.match(/frame-src ([^;]*)/)[1], "https://bookings.cloud.microsoft", "frame-src: exactly the Bookings origin, nothing else");
+    ok(!csp.includes("*"), "frame-ancestors / frame-src: no wildcard");
     ok(!h.flatMap(r => r.headers).some(x => /x-frame-options/i.test(x.key)), "no X-Frame-Options");
   }
   delete process.env.WEB_EMBED_ORIGINS;
@@ -423,12 +453,13 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   const is404 = e => String(e?.digest).includes("404");
   await assert.rejects(() => Page({ searchParams: Promise.resolve({}) }), is404, "inert (no env): 404"); n++;
   Object.assign(process.env, ENV);
-  let enabled = true;
+  let enabled = true, booking;
   const seen = [];
   globalThis.fetch = async u => {
     const s = String(u);
     seen.push(decodeURIComponent(s));
-    const body = s.includes("rpc/sam_web_settings") ? { enabled, model_enabled: true, cta_url: "https://www.accops.com/schedule-a-free-demo", cta_label: "Talk to an expert" }
+    const body = s.includes("rpc/sam_web_settings") ? { enabled, model_enabled: true, cta_url: "https://www.accops.com/schedule-a-free-demo", cta_label: "Talk to an expert",
+      ...(booking === undefined ? {} : { booking_url: booking }) }
       : s.includes("rpc/sam_web_roots") ? [{ id: "lp-01", question: "Why did my Citrix renewal go up?" }, { id: "bad id", question: "x" }, { id: "lp-03", question: "q".repeat(80) }]
       : null;
     return new Response(JSON.stringify(body), { status: body ? 200 : 404 });
@@ -450,6 +481,13 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   await Page({ searchParams: Promise.resolve({ page: "https://accops-citrix-lp.vercel.app/", sec: "Bad Id\"),x" }) });
   ok(!seen.some(u => u.includes("#")), "a junk sec is dropped before any query");
   eq(p.talk, { label: "Talk to an expert", url: "https://www.accops.com/schedule-a-free-demo" }, "talk-to-sales from settings");
+  eq(p.booking, "", "no booking_url (before the 05 SQL): no calendar, the CTA opens a new tab as before");
+  const BK = "https://bookings.cloud.microsoft/book/AccopsUnifiedPlatformforSecureRemoteAccess2@propalmsnetwork.onmicrosoft.com/s/UEDDAf42hEiNVqsGcRVJ-w2?ismsaljsauthenabled";
+  for (const [v, want] of [[BK, BK], ["", ""], ["https://evil.example/book", ""], ["javascript:alert(1)", ""]]) {
+    booking = v;
+    eq((await Page({ searchParams: Promise.resolve({}) })).props.children.props.booking, want, `booking_url ${v || "(empty)"} -> ${want || "no calendar"}`);
+  }
+  booking = undefined;
   const p2 = (await Page({ searchParams: Promise.resolve({ page: "javascript:alert(1)", q: "x y" }) })).props.children.props;
   eq([p2.page, p2.ask], ["", null], "a bad page or q is dropped, never reflected");
   ok(p2.hs !== p.hs, "hs minted per request");
@@ -521,5 +559,22 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   ok(shell.includes("Please don&#x27;t share personal details") || shell.includes("Please don’t share personal details"), "privacy line above the input");
   ok(shell.includes('maxLength="500"'), "input capped at 500");
   ok(shell.includes("Why did my Citrix renewal go up?") && shell.includes("↳"), "roots as ↳ rows");
+  // stage 3: the booking calendar inside the panel
+  const BK = "https://bookings.cloud.microsoft/book/AccopsUnifiedPlatformforSecureRemoteAccess2@propalmsnetwork.onmicrosoft.com/s/UEDDAf42hEiNVqsGcRVJ-w2?ismsaljsauthenabled";
+  const withBk = renderToStaticMarkup(React.createElement(W.default, { conversationId: "c_x", hs: "h", page: "", origins: [], ask: null, starters: [],
+    talk: { label: "Talk to an expert", url: "https://www.accops.com/schedule-a-free-demo" }, booking: BK }));
+  ok(!withBk.includes("<iframe") && withBk.includes('href="https://www.accops.com/schedule-a-free-demo"'), "with a booking_url: nothing loads from Microsoft until asked; the link still works without script");
+  const bv = on => renderToStaticMarkup(React.createElement(W.BookingView, { url: BK, title: "Talk to an expert", on, onBack: () => {}, onClose: () => {} }));
+  const opened = bv(true), shut = bv(false);
+  ok(opened.includes('class="w-book on"') && shut.includes('class="w-book"') && !shut.includes('class="w-book on"'), "shown only when open (kept mounted when not, so a half-filled booking survives Back)");
+  ok(/<button type="button" class="w-back" aria-label="Back to the chat">.*?Back<\/button>/.test(opened), "a Back button to the chat");
+  ok(opened.includes(`<iframe src="${esc(BK)}" title="Talk to an expert: booking calendar"`), "the calendar iframe, titled");
+  ok(opened.includes(`href="${esc(BK)}" target="_blank" rel="noopener noreferrer" aria-label="Open the calendar in a new tab"`) && opened.includes('aria-label="Close chat"'), "a way out to a new tab; close stays reachable");
+  const wsrc = read("app/embed/Widget.tsx");
+  ok(/if \(opensBooking\(booking, action\)\)/.test(wsrc) && /track\("booking_opened"\)/.test(wsrc) && /cta\(String\(params\.url \?\? ""\), String\(params\.action \?\? ""\)\)/.test(wsrc),
+    "every talk-to-sales CTA (answer blocks, Prefer a person, the error CTA) goes through opensBooking");
+  eq((wsrc.match(/inert=\{inBooking\}/g) || []).length, 3, "the chat underneath (header, thread, input) is inert while the calendar is open");
+  const ecss = read("app/embed/embed.css");
+  ok(/\.w-book \{ position: absolute; inset: 0;/.test(ecss) && /\.w-book\.on \{ display: flex;/.test(ecss) && /\.w-book-frame iframe \{[^}]*height: 100%/.test(ecss), "the calendar takes the whole sheet (on a phone the loader's frame is full screen)");
   console.log(`web-widget.check: ${n} assertions passed (loader ${gz} B gzip, ${pills} source pills shown, ${strong} emphasised phrases)`);
 }

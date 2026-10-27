@@ -5,7 +5,7 @@ import { logEvent, webReady } from "@/lib/web/db";
 import { embedOrigins, testEvent } from "@/app/embed/bridge";
 
 const NAMES = ["chat_opened", "chat_closed", "popup_shown", "popup_clicked", "popup_dismissed", "question_clicked",
-  "answer_shown", "doc_opened", "talk_to_sales_clicked", "filter_used", "step_viewed"] as const;
+  "answer_shown", "doc_opened", "talk_to_sales_clicked", "filter_used", "step_viewed", "booking_opened"] as const; // 05 SQL adds booking_opened to the table's check
 const Id = z.string().regex(/^[A-Za-z0-9_.:-]{1,80}$/);
 // Strict: an unknown name or any extra field (free text) is rejected. No field can hold a sentence (no spaces).
 const Event = z.strictObject({ conversation_id: Id.optional(), visitor_id: Id, page: z.string().max(500).regex(/^\S*$/),

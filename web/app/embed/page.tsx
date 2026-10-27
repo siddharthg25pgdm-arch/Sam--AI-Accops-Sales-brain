@@ -9,7 +9,7 @@ import { mintHs } from "@/lib/web/bot";
 import { settings, webReady } from "@/lib/web/db";
 import { cleanPage } from "@/lib/web/fill";
 import { suggest } from "@/lib/web/suggest";
-import { cleanSection, embedOrigins, ID, selfFramed } from "./bridge";
+import { bookingUrl, cleanSection, embedOrigins, ID, selfFramed } from "./bridge";
 import Widget from "./Widget";
 
 // The iframe the loader opens on first interaction (plan 7.2). Server-rendered: the starter questions for the page and
@@ -46,7 +46,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
       <Widget conversationId={conversationId} hs={mintHs(conversationId)} page={page} origins={embedOrigins()}
         starters={rows.filter(r => ID.test(r.id))}
         talk={{ label: cut(s.cta_label || "Talk to an expert", 28), url: (s.cta_url || "https://www.accops.com/schedule-a-free-demo").slice(0, 300) }}
-        ask={ID.test(q) ? q : null} />
+        booking={bookingUrl(s.booking_url)} ask={ID.test(q) ? q : null} />
     </div>
   );
 }
