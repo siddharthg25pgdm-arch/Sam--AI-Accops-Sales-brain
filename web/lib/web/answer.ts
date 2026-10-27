@@ -1,8 +1,10 @@
 /** POST /api/web/ask, in the order of plan 3.3: validate -> classify -> admit -> pre-guard -> tier 0 bank /
  *  tier 1 intent -> (a vague problem: triage chips) -> tier 2 cache -> [human, model on, candidates, a slot] tier 3 model (text-first since 27 Oct:
  *  a written answer, fact-checked, else verified facts) -> cache put -> log. Cheapest first; bots and suspects never
- *  reach the model. Every answer ends with follow-up chips when approved pairs exist. Logging is returned as a
- *  callback the route runs after the response (it never blocks the answer). */
+ *  reach the model. Every answer ends with follow-up chips when approved pairs exist, and the 1st and 3rd a human gets
+ *  carry the qualifying card (qualify.ts). A tap on it is a "qualify" turn: thank-you + 2 chips, stored as intent on the
+ *  conversation, never logged as a message. Logging is returned as a callback the route runs after the response (it
+ *  never blocks the answer). */
 import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { bookingUrl } from "@/app/embed/bridge";
@@ -19,15 +21,19 @@ import { docIntent } from "./facts";
 import { LEAD, SUPPORT, TRIAGE, chips, cleanPage, compose, cta, facts, qaBlocks, qaId, titled } from "./fill";
 import { MAX_CANDS, writeAnswer } from "./model";
 import { qHash } from "./normalise";
+import { KEYS, done, next, pick } from "./qualify";
 
 const Id = z.string().regex(/^[A-Za-z0-9_.:-]{1,80}$/);
 const Body = z.object({
   conversation_id: Id, visitor_id: Id, page: z.string().max(500), hs: z.string().max(400).nullish(),
   parent: z.boolean(), ms_since_render: z.number().finite().min(0), recent_ms: z.array(z.number().finite()).max(6),
   prev: z.string().max(200).optional(),
+  // the qualifying cards this conversation was shown: "users" or, once tapped, "users=5000_plus" (qualify.ts done)
+  qualified: z.array(z.string().max(40)).max(3).optional(),
   turn: z.discriminatedUnion("kind", [
     z.object({ kind: z.literal("click"), qa_id: Id }),
     z.object({ kind: z.literal("typed"), text: z.string().trim().min(1).max(500) }), // above 500 is rejected, not truncated
+    z.object({ kind: z.literal("qualify"), key: z.enum(KEYS as [string, ...string[]]), value: z.string().max(20) }), // a tap on the card
   ]),
 });
 
@@ -63,6 +69,8 @@ export async function ask(req: Request): Promise<Out> {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return json(400, { error: "invalid request" });
   const b = parsed.data, turn = b.turn;
+  const tap = turn.kind === "qualify" ? next(turn.key, turn.value) : null;
+  if (turn.kind === "qualify" && !tap) return json(400, { error: "invalid request" }); // an allowlisted value only, never text
 
   let s: db.Settings, page_group: string;
   const page = cleanPage(b.page);
@@ -72,13 +80,13 @@ export async function ask(req: Request): Promise<Out> {
 
   const ctx: Ctx = { conversation_id: b.conversation_id, visitor_id: b.visitor_id, page, page_group,
     country: req.headers.get("x-vercel-ip-country"), ip_hash: ipHash(req), ua: req.headers.get("user-agent") ?? "",
-    kind: turn.kind, hs: b.hs ?? null, parent: b.parent, ms_since_render: b.ms_since_render, recent_ms: b.recent_ms, eval: ev };
+    kind: turn.kind === "typed" ? "typed" : "click", hs: b.hs ?? null, parent: b.parent, ms_since_render: b.ms_since_render, recent_ms: b.recent_ms, eval: ev };
   const text = turn.kind === "typed" ? turn.text : null;
   const q_hash = text ? qHash(text, page_group) : null;
   const message_id = randomUUID();
-  const m: Record<string, unknown> = { id: message_id, turn_kind: turn.kind, qa_id: turn.kind === "click" ? turn.qa_id : null,
+  const m: Record<string, unknown> = { id: message_id, turn_kind: ctx.kind, qa_id: turn.kind === "click" ? turn.qa_id : null,
     question: text, q_hash, verdict: null, refs: [], candidates: 0, model: null, tokens: 0, error: null, guard_reason: null };
-  let label: Label = "bot", signals: string[] = [];
+  let label: Label = "bot", signals: string[] = [], about = ""; // about: the answered pair's label (the qualifying card's topic)
 
   const rootChips = async () => chips(await db.roots(page).catch(() => []));
   const fallback = async (c?: Chip[]) => ({ lead: LEAD.none, blocks: [cta(s)], chips: c ?? await rootChips() });
@@ -95,6 +103,7 @@ export async function ask(req: Request): Promise<Out> {
   const bank = async (id: string) => {
     const qa = (await db.qas([id])).get(id);
     if (!qa) return null; // retired or never approved
+    about = qa.question;
     const blocks = qaBlocks(qa);
     if ((qa.cta_url || b.recent_ms.length >= 2) && !blocks.some(x => x.type === "cta")) blocks.push(cta(s, qa));
     const rel = related(qa.question, page_group).filter(x => x !== id);
@@ -116,15 +125,26 @@ export async function ask(req: Request): Promise<Out> {
       page_group, country: ctx.country, is_test: ev || isTestConv(ctx.hs, ctx.conversation_id), latency_ms: Date.now() - t0 };
     // the pair a bank / intent answer came from, so the widget never suggests it again in this conversation
     const qa = (src === "bank" || src === "intent") && typeof m.qa_id === "string" ? { qa_id: m.qa_id } : {};
-    return { status, body: { message_id, source: src, ...qa, ...answer },
+    const card = status === 200 ? pick({ n: b.recent_ms.length, label, source: src, reason: m.guard_reason as string | null,
+      topic: `${text ?? ""} ${b.prev ?? ""} ${about}`, done: done(b.qualified) }) : null;
+    return { status, body: { message_id, source: src, ...qa, ...answer, ...(card ? { qualify: card } : {}) },
       log: () => db.logMessage(log).then(() => undefined, e => console.warn(`web log: ${redact(e)}`)) };
   };
 
   try {
     ({ label, signals } = await classify(req, ctx));
-    const adm = ev ? null : await admit(ctx, turn.kind, q_hash); // the eval token skips per-visitor limits, never the ceiling
+    const adm = ev ? null : await admit(ctx, ctx.kind, q_hash); // the eval token skips per-visitor limits, never the ceiling
     if (adm === "rate") return finish("limited", { lead: LEAD.limited, blocks: [cta(s)], chips: await rootChips() }, 429);
     if (adm === "repeat") return finish("repeat", { lead: LEAD.repeat, blocks: [cta(s)], chips: [] });
+
+    if (turn.kind === "qualify") { // the thank-you + its follow-ups (live pairs, the page's roots top up; the widget shows 2)
+      const live = await db.qas(tap!.ids).catch(() => new Map<string, db.Qa>());
+      const rows = [...tap!.ids.flatMap(id => live.get(id) ?? []), ...(await db.roots(page).catch(() => []))];
+      // stored for a human turn only (the SQL also refuses a conversation labelled suspect or bot); not a message
+      const store = label === "human" ? () => db.setIntent(ctx.conversation_id, turn.key, turn.value)
+        .then(() => undefined, e => console.warn(`web intent: ${redact(e)}`)) : null;
+      return { status: 200, body: { lead: tap!.lead, chips: chips(rows, [], 4), ...(tap!.book ? { book: true } : {}) }, log: store };
+    }
 
     if (turn.kind === "click") { // tier 0
       const a = await bank(turn.qa_id);

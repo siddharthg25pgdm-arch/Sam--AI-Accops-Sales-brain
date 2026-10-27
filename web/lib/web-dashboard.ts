@@ -11,6 +11,7 @@
 import type { Answer, Block } from "@/lib/blocks";
 import { bookingUrl } from "@/app/embed/bridge";
 import { leadsSince } from "@/lib/web-leads";
+import { KEYS, QUALIFY, valid, type QKey } from "@/lib/web/qualify";
 
 // ---------------------------------------------------------------- vocabulary
 
@@ -133,7 +134,9 @@ export function mapDashboard(raw: RawDashboard | null, now: string, label: WebLa
 
 // ---------------------------------------------------------------- raw messages -> the lists
 
-export type ConvInfo = { visitor_id: string; page: string | null; page_group: string; country: string | null; label: WebLabel; signals: string[]; is_test: boolean; started_at: string };
+/** intent: the qualifying card's answers (08 SQL; absent until it is applied). */
+export type ConvInfo = { visitor_id: string; page: string | null; page_group: string; country: string | null; label: WebLabel; signals: string[]; is_test: boolean; started_at: string;
+  intent?: Partial<Record<string, string>> | null };
 export type MsgRow = { id: string; conversation_id: string; turn_kind: "click" | "typed"; qa_id: string | null; question: string | null; source: WebSource;
   verdict: "answered" | "partial" | "none" | null; refs: string[]; model: string | null; tokens: number; latency_ms: number | null; error: string | null;
   guard_reason: string | null; created_at: string; conv: ConvInfo };
@@ -177,6 +180,22 @@ export function missedRanked(rows: MsgRow[]): Missed[] {
   }
   return [...m.values()].map(({ v, r, ...x }) => ({ ...x, visitors: v.size, refs: [...r].slice(0, 6) }))
     .sort((a, b) => b.visitors - a.visitors || b.asks - a.asks || b.last.localeCompare(a.last));
+}
+
+/** A conversation's qualifying answers as the tab shows them ("Users: 5,000+"), allowlisted values only, card order. */
+export const intentPills = (intent: ConvInfo["intent"]) =>
+  KEYS.flatMap(k => { const v = intent?.[k]; return v && valid(k, v) ? [`${QUALIFY[k].short}: ${(QUALIFY[k].options as Record<string, string>)[v]}`] : []; });
+
+export type IntentMix = { key: QKey; label: string; answered: number; rows: { key: string; n: number }[] };
+/** The qualifying answers across the period's human conversations: per question, how many answered and the split, in the
+ *  card's option order (zeros kept, so the scale reads the same every time). `of` = human conversations. */
+export function intentMix(rows: MsgRow[]): { of: number; mix: IntentMix[] } {
+  const convs = conversationsFrom(rows, "human");
+  return { of: convs.length, mix: KEYS.map(k => {
+    const o = QUALIFY[k].options as Record<string, string>, n = new Map<string, number>();
+    for (const c of convs) { const v = c.intent?.[k]; if (v && valid(k, v)) n.set(v, (n.get(v) ?? 0) + 1); }
+    return { key: k, label: QUALIFY[k].short, answered: [...n.values()].reduce((a, b) => a + b, 0), rows: Object.entries(o).map(([v, l]) => ({ key: l, n: n.get(v) ?? 0 })) };
+  }) };
 }
 
 /** Why the pipeline stopped before answering: the pre-guard's rule names, plus limits and repeats. All labels. */
@@ -408,11 +427,14 @@ export async function loadDashboard(days: number, includeTest: boolean): Promise
 const MSG_COLS = "id,conversation_id,turn_kind,qa_id,question,source,verdict,refs,model,tokens,latency_ms,error,guard_reason,created_at";
 const CONV_COLS = "visitor_id,page,page_group,country,label,signals,is_test,started_at";
 export const MSG_LIMIT = 5000;
-/** Messages of conversations started in the window (the dashboard RPC's window), newest first. */
+/** Messages of conversations started in the window (the dashboard RPC's window), newest first, with each conversation's
+ *  qualifying answers (intent). ponytail: until the 08 SQL adds that column PostgREST refuses it, so the read is retried
+ *  without it; drop the retry once 08 is applied. */
 export async function loadMessages(days: number, includeTest: boolean, limit = MSG_LIMIT): Promise<MsgRow[]> {
   const from = new Date(Date.now() - days * 86_400_000).toISOString();
-  return rest<MsgRow[]>(`sam_web_messages?select=${MSG_COLS},conv:sam_web_conversations!inner(${CONV_COLS})` +
+  const read = (cols: string) => rest<MsgRow[]>(`sam_web_messages?select=${MSG_COLS},conv:sam_web_conversations!inner(${cols})` +
     `&conv.started_at=gt.${enc(from)}${includeTest ? "" : "&conv.is_test=is.false"}&order=created_at.desc&limit=${limit}`);
+  return read(`${CONV_COLS},intent`).catch(e => (/intent/.test(String(e)) ? read(CONV_COLS) : Promise.reject(e)));
 }
 
 export async function oldestConversation(): Promise<string | null> {

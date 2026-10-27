@@ -59,6 +59,9 @@ export const pageCards = (urls: string[]) => rest<PageCard[]>(`sam_web_pages_pub
  *  (other than not_page), within 90 days; null for an unknown id or nothing to recall. */
 export type Recall = { last_qa: QaRef[]; last_page: { url: string; title: string } | null; last_seen: string } | null;
 export const recall = (visitor_id: string, not_page: string) => rpc<Recall>("sam_web_recall", { visitor_id, not_page });
+/** The qualifying card's answer as anonymous intent on the conversation (08 SQL; the allowlist is re-checked there).
+ *  false = not stored (an unknown or non-human conversation). Until 08 is applied the RPC 404s and is only warned about. */
+export const setIntent = (conversation_id: string, key: string, value: string) => rpc<boolean>("sam_web_set_intent", { conversation_id, key, value });
 
 /** Approved pairs only (the view filters status/review); ids are validated by the caller (no quotes or commas). */
 export async function qas(ids: string[]): Promise<Map<string, Qa>> {

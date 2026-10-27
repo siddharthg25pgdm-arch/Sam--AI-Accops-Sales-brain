@@ -42,6 +42,10 @@ export function bookingUrl(v: unknown): string {
   const u = new URL(v.trim());
   return u.origin === BOOKING_ORIGIN && !u.username && !u.password ? u.href : "";
 }
+/** The routes off the chat (27 Oct): existing customers to the ticket portal accops.com/contact-us publishes
+ *  ("support@accops.com | Ticket Portal | support.accops.com"; the triage chip uses it too), partners to the public
+ *  partner page. Both open in a new tab: a different journey from the chat. */
+export const SUPPORT_URL = "https://support.accops.com/", PARTNER_URL = "https://www.accops.com/partners";
 /** A talk-to-sales CTA opens the calendar in the panel when there is one; an open_url CTA (a document, a page) never does. */
 export const opensBooking = (booking: string, action?: string) => !!booking && action !== "open_url";
 
@@ -50,8 +54,11 @@ export const ID = /^[A-Za-z0-9_.:-]{1,80}$/;
 export const SEC = /^[a-z0-9][a-z0-9-]{0,40}$/;
 export const cleanSection = (s: unknown) => (typeof s === "string" && SEC.test(s) ? s : "");
 /** Events the widget reports (the loader reports popup_*, chat_opened, chat_closed and talk_to_sales_clicked itself).
- *  booking_opened: the calendar opened in the panel (no text; GA4 gets it through the loader's sam_chat push). */
-export const WIDGET_EVENTS = ["question_clicked", "answer_shown", "doc_opened", "filter_used", "step_viewed", "talk_to_sales_clicked", "booking_opened"] as const;
+ *  booking_opened: the calendar opened in the panel (no text; GA4 gets it through the loader's sam_chat push).
+ *  qualify_answered: a tap on the qualifying card (ref "users:5000_plus", allowlisted values only); routing_*: the
+ *  routing bar above the input (27 Oct). */
+export const WIDGET_EVENTS = ["question_clicked", "answer_shown", "doc_opened", "filter_used", "step_viewed", "talk_to_sales_clicked", "booking_opened",
+  "qualify_answered", "routing_book", "routing_support", "routing_partner"] as const;
 export type WidgetEvent = (typeof WIDGET_EVENTS)[number];
 export const SOURCES = ["bank", "intent", "cache", "model", "fallback", "guard", "limited", "repeat", "root", "chip", "picker", "teaser"] as const;
 

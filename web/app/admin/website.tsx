@@ -27,7 +27,7 @@ import intentIndex from "@/data/web-intent-index.json";
 import reviewMeta from "@/data/web-qa-review.json";
 import {
   SOURCES, SOURCE_LABEL, SOURCE_HELP, LABELS, LABEL_HELP, NO_MODEL, SETTINGS, MSG_LIMIT, MAX_WORDS, RETENTION_DAYS, WARN_SHARE,
-  mapDashboard, conversationsFrom, missedRanked, stopReasons, signalCounts, topByPage, latencyBySource, previewAnswer, blockedBy, words,
+  mapDashboard, conversationsFrom, missedRanked, stopReasons, signalCounts, topByPage, latencyBySource, previewAnswer, blockedBy, words, intentMix, intentPills,
   loadDashboard, loadMessages, loadBank, oldestConversation, webAdminConfigured,
   type WebDash, type MsgRow, type QaRow, type ReviewMeta, type Blocked, type WebLabel, type WebSource,
 } from "@/lib/web-dashboard";
@@ -197,7 +197,7 @@ function Analytics({ d }: { d: WebsiteData }) {
   const wm = w.withoutModel;
   const dailyMsgs = w.mix.map(x => x.total);
   const popup = { shown: w.events.popup_shown ?? 0, clicked: w.events.popup_clicked ?? 0 };
-  const missed = missedRanked(rows), stops = stopReasons(rows), signals = signalCounts(rows), pages = topByPage(rows), lat = latencyBySource(rows);
+  const missed = missedRanked(rows), stops = stopReasons(rows), signals = signalCounts(rows), pages = topByPage(rows), lat = latencyBySource(rows), who = intentMix(rows);
   const today = w.today;
   return (
     <>
@@ -267,6 +267,20 @@ function Analytics({ d }: { d: WebsiteData }) {
           </table>
         )}
         {missed.length > 25 && <p className="note" style={{ marginTop: 12 }}>Showing the top 25 of {num(missed.length)}.</p>}
+      </Section>
+
+      <Section title="Who they are: the qualifying question" sub={<>Anonymous answers to the one tap-to-answer question after the 1st and 3rd answer (no email, no free text), per human conversation in this period. Microsoft Bookings can&apos;t be prefilled from its link, so a booking never carries these: read them here, next to the conversation. Needs docs/supabase-sam-web-08-intent.sql.</>}
+        aside={<span className="count">{num(who.of)} human</span>}>
+        {who.mix.every(m => m.answered === 0) ? <Empty>{who.of ? "No one has answered the qualifying question yet." : "No human conversations in this period."}</Empty> : (
+          <div className="two">
+            {who.mix.map(m => (
+              <div key={m.key}>
+                <p className="subline" style={{ margin: "0 0 8px" }}><b>{m.label}</b> · answered in {num(m.answered)} of {plural(who.of, "conversation")}</p>
+                <BarList label={m.label} rows={m.rows} />
+              </div>
+            ))}
+          </div>
+        )}
       </Section>
 
       <div className="two">
@@ -420,7 +434,8 @@ function CeilingColumns({ usage, mixDays, ceiling, groqCap }: { usage: WebDash["
 }
 
 const FUNNEL: [string, string][] = [["popup_shown", "Popup shown"], ["popup_clicked", "Popup clicked"], ["chat_opened", "Chat opened"], ["question_clicked", "Question clicked"],
-  ["answer_shown", "Answer shown"], ["doc_opened", "Document opened"], ["talk_to_sales_clicked", "Talk to sales"], ["booking_opened", "Calendar opened in the chat"]];
+  ["answer_shown", "Answer shown"], ["doc_opened", "Document opened"], ["talk_to_sales_clicked", "Talk to sales"], ["booking_opened", "Calendar opened in the chat"],
+  ["qualify_answered", "Qualifying question answered"], ["routing_book", "Bar: Book a call"], ["routing_support", "Bar: Existing customer support"], ["routing_partner", "Bar: Partner enquiry"]];
 function Funnel({ events }: { events: Record<string, number> }) {
   const rows = FUNNEL.map(([k, l]) => ({ key: l, n: events[k] ?? 0 }));
   if (rows.every(r => r.n === 0)) return <Empty>No widget events in this period.</Empty>;
@@ -598,6 +613,7 @@ function Conversations({ d }: { d: WebsiteData }) {
                   {c.country && <span>{c.country}</span>}
                   <span>{plural(c.turns.length, "message")}</span>
                   {c.is_test && <span className="pill">test</span>}
+                  {intentPills(c.intent).map(t => <span key={t} className="pill good">{t}</span>)}
                   <span className="spacer" />
                   {c.signals.filter(s => s !== "eval").slice(0, 4).map(s => <span key={s} className="pill">{s.replace(/_/g, " ")}</span>)}
                   <span className={`pill lb-${c.label}`}>{c.label}</span>

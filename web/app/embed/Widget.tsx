@@ -3,7 +3,7 @@
 // answer.blocks.map -> C's block components (Siddharth, 26 Oct: no OpenUI <Renderer> on the client; library.tsx +
 // toOpenUI stay untouched so it can be switched back). Only types come from lib/blocks: the server already validated
 // every answer with Answer.parse, so no zod ships to the browser.
-import { useCallback, useEffect, useRef, useState, type ComponentType, type KeyboardEvent, type MouseEvent, type Ref } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type ComponentType, type KeyboardEvent, type MouseEvent, type Ref } from "react";
 import type { Answer as AnswerT, Block, Chip } from "@/lib/blocks";
 import { Answer, Thinking } from "@/components/blocks/Answer";
 import { Calculator } from "@/components/blocks/Calculator";
@@ -16,7 +16,7 @@ import { Stat } from "@/components/blocks/Stat";
 import { Steps } from "@/components/blocks/Steps";
 import { Text } from "@/components/blocks/Text";
 import { emSplit } from "@/lib/emphasis";
-import { acceptInit, eventMessage, ID, opensBooking, SEC, type WidgetEvent } from "./bridge";
+import { acceptInit, eventMessage, ID, opensBooking, PARTNER_URL, SEC, SUPPORT_URL, type WidgetEvent } from "./bridge";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const BLOCK: Record<Block["type"], ComponentType<any>> = { text: Text, doc_card: DocCard, compare_table: CompareTable, steps: Steps, stat: Stat, picker: Picker, calculator: Calculator, cta: Cta };
@@ -32,7 +32,10 @@ export type Props = {
    *  visit only: EU/EEA/UK/CH), and for a returning device the server's greeting (approved labels / public titles only). */
   visitor?: string; persist?: boolean; welcome?: { line: string; chips: Chip[]; book?: boolean } | null;
 };
-type Item = { id: number; me: string } | { id: number; a: AnswerT; source: string; qa?: string };
+/** The qualifying card under an answer (lib/web/qualify.ts): the server's question and options, then the visitor's tap,
+ *  then the server's thank-you and its offers (book = "Book a time with an engineer" first). */
+export type Qz = { key: string; prompt: string; options: { value: string; label: string }[]; picked?: string; lead?: string; chips?: Chip[]; book?: boolean };
+type Item = { id: number; me: string } | { id: number; a: AnswerT; source: string; qa?: string; qz?: Qz };
 type Saved = { c: string; hs: string; at: number; page: string; items: Item[]; recent: number[] };
 
 /** Every Text and Stat must show where it came from (Siddharth, 26 Oct): a Text without a source is not drawn
@@ -73,6 +76,52 @@ export function BookingView({ url, title, on, onBack, onClose, backRef }: { url:
   );
 }
 
+/** The qualifying card (27 Oct): ONE question, tap-to-answer, the server's allowlisted options only (no text box, never
+ *  an email). The options stay after the tap (the chosen one pressed, so keyboard focus stays put), then the thank-you
+ *  and 2 offers. */
+export function QualifyCard({ q, onPick, onAsk, book }: { q: Qz; onPick: (value: string) => void; onAsk: (c: Chip) => void;
+  book: { href: string; onClick: (e: MouseEvent) => void } }) {
+  const id = useId();
+  return (
+    <div className="sb w-qz sb-in" role="group" aria-labelledby={id}>
+      <p className="w-qz-q" id={id}>{q.prompt}</p>
+      <ul className="sb-chips">
+        {q.options.map(o => (
+          <li key={o.value}>
+            <button type="button" className="sb-chip" aria-pressed={q.picked ? q.picked === o.value : undefined}
+              disabled={!!q.picked && q.picked !== o.value} onClick={() => { if (!q.picked) onPick(o.value); }}>{o.label}</button>
+          </li>
+        ))}
+      </ul>
+      {q.lead && <p className="w-qz-t">{q.lead}</p>}
+      {q.lead && (q.book || !!q.chips?.length) && (
+        <ul className="sb-chips" aria-label="Suggested next steps">
+          {q.book && <li><a className="sb-chip" href={book.href} target="_blank" rel="noopener noreferrer" onClick={book.onClick}>Book a time with an engineer</a></li>}
+          {q.chips?.map(c => <li key={c.id}><button type="button" className="sb-chip" onClick={() => onAsk(c)}>{c.label}</button></li>)}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+/** The routing bar above the input (27 Oct, as Sophos's and Pathlock's): always there, three ways to a person. Book a
+ *  call opens the calendar in the panel (cta_url in a new tab without booking_url); support and partners are other
+ *  journeys, so a new tab. Under 400 px it folds into one "Need a person?" pill that opens the three (embed.css). */
+export function RoutingBar({ book, onBook, onRoute }: { book: string; onBook: (e: MouseEvent) => void; onRoute: (name: "routing_support" | "routing_partner") => void }) {
+  const [open, setOpen] = useState(false);
+  const tab = <span className="sb-sr"> (opens in a new tab)</span>;
+  return (
+    <nav className="w-route" aria-label="Talk to a person">
+      <button type="button" className="w-route-t" aria-expanded={open} aria-controls="w-route-l" onClick={() => setOpen(o => !o)}>Need a person?</button>
+      <ul id="w-route-l" className={`w-route-l${open ? " on" : ""}`}>
+        <li><a href={book} target="_blank" rel="noopener noreferrer" onClick={onBook}>Book a call</a></li>
+        <li><a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" onClick={() => onRoute("routing_support")}>Existing customer support{tab}</a></li>
+        <li><a href={PARTNER_URL} target="_blank" rel="noopener noreferrer" onClick={() => onRoute("routing_partner")}>Partner enquiry{tab}</a></li>
+      </ul>
+    </nav>
+  );
+}
+
 const rid = () => crypto.randomUUID(); // only when the loader gave none (the /embed URL's vid, or the init message)
 const load = (): Saved | null => { try { return JSON.parse(sessionStorage.getItem(KEY) ?? "null"); } catch { return null; } };
 
@@ -88,7 +137,7 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
   const [booked, setBooked] = useState(false); // the calendar was opened once (its iframe then stays)
   const backBtn = useRef<HTMLButtonElement>(null);
   const s = useRef({ c: conversationId, hs: hs0, at: Date.now(), recent: [] as number[], renderAt: 0, n: 0,
-    parent: null as string | null, visitor, prev: "", asked: [] as string[] });
+    parent: null as string | null, visitor, prev: "", asked: [] as string[], qz: [] as string[] }); // qz: cards shown ("users" / "users=5000_plus")
   const thread = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const lastMe = useRef<HTMLDivElement>(null);
@@ -118,9 +167,9 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
     setNear([]);
     setBusy(turn.kind);
     const body = { conversation_id: x.c, visitor_id: x.visitor || (x.visitor = rid()), page, hs: x.hs, parent: !!x.parent,
-      ms_since_render: Math.max(0, now - x.renderAt), recent_ms: x.recent, ...(turn.kind === "typed" && x.prev ? { prev: x.prev.slice(0, 200) } : {}), turn };
+      ms_since_render: Math.max(0, now - x.renderAt), recent_ms: x.recent, ...(turn.kind === "typed" && x.prev ? { prev: x.prev.slice(0, 200) } : {}), ...(x.qz.length ? { qualified: x.qz } : {}), turn };
     if (turn.kind === "typed") x.prev = turn.text;
-    let a: AnswerT | null = null, source = "fallback";
+    let a: AnswerT | null = null, source = "fallback", qz: Qz | undefined;
     try {
       const r = await fetch("/api/web/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(20_000) });
       const j = await r.json(); // a 429 still carries renderable fallback blocks
@@ -129,13 +178,46 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
         if (qa) x.asked.push(qa);
         a = { lead: j.lead, blocks: j.blocks, chips: Array.isArray(j.chips) ? (j.chips as Chip[]).filter(c => !x.asked.includes(c.id)) : [] };
         source = String(j.source);
+        // the qualifying card: the server decides (humans, 1st and 3rd answer); never a 3rd card, never one already shown
+        const c = j.qualify;
+        if (c && typeof c.key === "string" && typeof c.prompt === "string" && Array.isArray(c.options) && x.qz.length < 2 && !x.qz.some(k => k.split("=")[0] === c.key)) {
+          qz = { key: c.key, prompt: c.prompt, options: c.options };
+          x.qz.push(c.key);
+        }
       }
     } catch { /* below */ }
     if (!a) a = { lead: FAIL, blocks: [{ type: "cta", label: talk.label, action: "talk_to_sales", url: booking || talk.url }], chips: [] };
     else track("answer_shown", { qa_id: qa, source });
-    push({ a, source, qa });
+    push({ a, source, qa, ...(qz ? { qz } : {}) });
     setBusy(false);
   }, [busy, page, talk, booking, track]);
+
+  /** A tap on a qualifying card: pressed at once, then the server's thank-you + offers (it stores the tap as anonymous
+   *  intent, 08 SQL). Not a question: it never joins recent_ms, which counts the asks for the 1st / 3rd card rule. */
+  const qualify = useCallback(async (id: number, key: string, value: string) => {
+    const x = s.current;
+    if (!x.qz.includes(key)) return; // shown and not yet answered
+    x.qz = x.qz.map(k => (k === key ? `${key}=${value}` : k));
+    const patch = (p: Partial<Qz>) => setItems(prev => {
+      const next = prev.map(i => ("a" in i && i.id === id && i.qz ? { ...i, qz: { ...i.qz, ...p } } : i));
+      save(next);
+      return next;
+    });
+    patch({ picked: value });
+    track("qualify_answered", { ref: `${key}:${value}` });
+    let lead = "Thanks, that helps.", chips: Chip[] = [], book = false;
+    try {
+      const r = await fetch("/api/web/ask", { method: "POST", headers: { "Content-Type": "application/json" }, signal: AbortSignal.timeout(10_000),
+        body: JSON.stringify({ conversation_id: x.c, visitor_id: x.visitor || (x.visitor = rid()), page, hs: x.hs, parent: !!x.parent,
+          ms_since_render: Math.max(0, Date.now() - x.renderAt), recent_ms: x.recent, turn: { kind: "qualify", key, value } }) });
+      const j = await r.json();
+      if (typeof j?.lead === "string") lead = j.lead;
+      if (Array.isArray(j?.chips)) chips = j.chips;
+      book = j?.book === true;
+    } catch { /* the thank-you alone */ }
+    patch({ lead, book, chips: chips.filter(c => typeof c.id === "string" && ID.test(c.id) && !c.url && !x.asked.includes(c.id)).slice(0, book ? 1 : 2) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, track]);
 
   /** A tier-0 click: echo the label as the visitor's own bubble (Klook / WhatsApp pattern). */
   const askQa = useCallback((qa_id: string, label: string, source: string) => {
@@ -177,7 +259,8 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
     x.renderAt = Date.now();
     if (old && old.page === page && Date.now() - old.at < HS_REUSE_MS && old.items?.length) {
       Object.assign(x, { c: old.c, hs: old.hs, at: old.at, recent: old.recent ?? [], n: old.items.length + 1,
-        asked: old.items.flatMap(i => ("qa" in i && i.qa ? [i.qa] : [])) });
+        asked: old.items.flatMap(i => ("qa" in i && i.qa ? [i.qa] : [])),
+        qz: old.items.flatMap(i => ("a" in i && i.qz ? [i.qz.picked ? `${i.qz.key}=${i.qz.picked}` : i.qz.key] : [])) });
       setItems(old.items);
     }
     /** The loader says the visitor reopened the chat on another section: that section's questions, never one already asked
@@ -316,6 +399,8 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
           ) : (
             <div key={it.id} className="w-bot">
               <AnswerView a={it.a} />
+              {it.qz && <QualifyCard q={it.qz} onPick={v => void qualify(it.id, it.qz!.key, v)} onAsk={c => askQa(c.id, c.label, "chip")}
+                book={{ href: talkHref, onClick: onTalk }} />}
             </div>
           ))}
           {busy && slow && <div className="w-bot"><Thinking /></div>}
@@ -327,6 +412,7 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
               {near.map(c => <li key={c.id}><button type="button" className="sb-chip" onClick={() => askQa(c.id, c.label, "chip")}>{c.label}</button></li>)}
             </ul>
           )}
+          <RoutingBar book={talkHref} onBook={e => { track("routing_book"); onTalk(e); }} onRoute={n => track(n)} />
           <p className="w-privacy">Please don&rsquo;t share personal details. Conversations are stored to improve answers, and the topics
             you view are remembered on this device {persist ? "for 90 days" : "for this visit"}.{" "}
             <a href="https://www.accops.com/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy</a></p>

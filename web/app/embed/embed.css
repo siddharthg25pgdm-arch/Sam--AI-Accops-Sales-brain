@@ -54,6 +54,29 @@
 .w-human .sb-ic { width: 15px; height: 15px; transition: transform 200ms var(--w-ease); }
 .w-human:hover .sb-ic { transform: translateX(2px); }
 
+/* the qualifying card under an answer (27 Oct): one tap-to-answer question; the chosen option stays, pressed (navy) */
+.w-qz { margin-top: 14px; padding: 12px 12px 14px; border: 1px solid var(--w-line); border-radius: 14px; background: var(--w-card); }
+.w-qz-q { margin-bottom: 10px; font-size: 14.5px; font-weight: 600; line-height: 1.4; color: var(--w-ink); }
+.w-qz .sb-chip { min-height: 34px; padding: 6px 12px; font-size: 13.5px; }
+.w-qz .sb-chip[aria-pressed="true"] { background: var(--w-navy); border-color: var(--w-navy); color: #fff; }
+.w-qz .sb-chip:disabled { opacity: .5; cursor: default; }
+.w-qz-t { margin: 12px 0 8px; font-size: 14px; color: var(--w-ink-2); }
+
+/* the routing bar (27 Oct): three quiet pills above the input, one row in the 400 px panel (Barlow 12.5 px); under
+   400 px one "Need a person?" pill that opens them. 12.5 px Barlow Medium: 366 px of pills in 372 px of room (13 px wraps) */
+.w-route { padding: 0 2px 8px; }
+.w-route-l { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.w-route-l a, .w-route-t { display: inline-flex; align-items: center; min-height: 32px; padding: 0 10px; border: 1px solid var(--w-line);
+  border-radius: 999px; background: #fff; font-size: 12.5px; font-weight: 500; color: var(--w-ink-2); white-space: nowrap;
+  transition: border-color 160ms, color 160ms; }
+.w-route-l a:hover, .w-route-t:hover { border-color: var(--w-navy); color: var(--w-navy); }
+.w-route-t { display: none; }
+@media (max-width: 399px) {
+  .w-route { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .w-route-t { display: inline-flex; }
+  .w-route-l:not(.on) { display: none; }
+}
+
 /* footer: the privacy line right above the input (Klaviyo), then a pill input with a round send */
 .w-foot { flex: none; padding: 8px 12px 12px; padding-bottom: max(12px, env(safe-area-inset-bottom)); background: #fff;
   box-shadow: 0 -1px 0 var(--w-line); }

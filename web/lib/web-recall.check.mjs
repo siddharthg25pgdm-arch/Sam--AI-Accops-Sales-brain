@@ -192,8 +192,9 @@ eq(normal.qa_id, "lp-01", "the normal teaser is the page's top question");
     && /grant execute on function sam_web_recall\(text, text\) to sam_web_reader;/.test(sql) && (sql.match(/grant [^;]*sam_web_recall/g) || []).length === 1, "recall: granted to sam_web_reader only");
   const names = s => s.match(/\(name in \(([^)]*)\)/)[1].match(/'([a-z_]+)'/g).map(x => x.slice(1, -1)).sort();
   const route = readFileSync(path.join(web, "app/api/web/event/route.ts"), "utf8").match(/const NAMES = \[([^\]]*)\]/)[1].match(/"([a-z_]+)"/g).map(x => x.slice(1, -1)).sort();
-  eq(names(sql), route, "the table's event names = the event route's (page_viewed added)");
-  ok(readFileSync(path.join(web, "scripts/web-guard.mjs"), "utf8").includes('"log_event", "recall"]'), "web-guard: the reader may see /rpc/sam_web_recall");
+  const later = ["qualify_answered", "routing_book", "routing_partner", "routing_support"]; // 08's (web-answer.check proves 08 = the route)
+  eq(names(sql), route.filter(x => !later.includes(x)), "the table's event names = the event route's, before 08 (page_viewed added)");
+  ok(readFileSync(path.join(web, "scripts/web-guard.mjs"), "utf8").includes('"log_event", "recall"'), "web-guard: the reader may see /rpc/sam_web_recall");
 }
 
 console.log(`examples: ${w2.line} | ${w6.line} | ${w4.line}`);

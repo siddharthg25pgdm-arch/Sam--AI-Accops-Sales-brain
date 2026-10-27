@@ -16,7 +16,10 @@
  *     model's written answer); a Text without a source is not drawn; **emphasis** is drawn as <strong class="sb-em">
  *     (never raw asterisks), navy on its highlight band at AA contrast; 3-column tables carry data-col (blocks.css).
  *  Stage 3 (27 Oct): the Bookings calendar in the panel only with a valid booking_url and only for talk-to-sales CTAs,
- *  frame-src exactly https://bookings.cloud.microsoft, the Back button, booking_opened allowlisted end to end. */
+ *  frame-src exactly https://bookings.cloud.microsoft, the Back button, booking_opened allowlisted end to end.
+ *  Qualify + routing (27 Oct): the qualifying card (tap-only options, pressed after the tap, thank-you + offers, the
+ *  calendar first when the server says book; never a 3rd card or a repeat), the routing bar (three routes, Book a call
+ *  falling back to cta_url, the "Need a person?" fold under 400 px), qualify_answered / routing_* allowlisted end to end. */
 import assert from "node:assert";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -299,6 +302,11 @@ for (const config of [null, { enabled: false, teaser: null, chips: [] }]) {
   msg({ t: "event", name: "booking_opened", text: "my name is Priya", qa_id: "call me on 98765" });
   eq([b.t.opened.length, wrap.className, b.dl().slice(-2).map(e => e.sam_event)], [0, "f on", ["talk_to_sales_clicked", "booking_opened"]], "booking: counted as talk to sales + booking_opened; the chat stays open, nothing navigates");
   eq(b.dl().at(-1), { event: "sam_chat", sam_event: "booking_opened", page_path: "/" }, "booking_opened reaches the dataLayer (GA4) with no text");
+  // 27 Oct: the qualifying card's tap and the routing bar reach GA4 by name only (the answer value stays in our own log)
+  for (const name of ["qualify_answered", "routing_book", "routing_support", "routing_partner"]) msg({ t: "event", name, ref: "users:5000_plus", text: "my email is a@b.com" });
+  msg({ t: "event", name: "routing_sales" });
+  eq(b.dl().slice(-4), ["qualify_answered", "routing_book", "routing_support", "routing_partner"].map(sam_event => ({ event: "sam_chat", sam_event, page_path: "/" })),
+    "qualify_answered + routing_* reach the dataLayer, name only (no ref, no text); an unlisted name never does");
   const c = boot({ talk: true });
   await c.advance(10);
   c.sh(".l").fire("click");
@@ -472,8 +480,12 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   eq([Br.opensBooking("", "talk_to_sales"), Br.opensBooking(BK, "talk_to_sales"), Br.opensBooking(BK, undefined), Br.opensBooking(BK, ""), Br.opensBooking(BK, "open_url")],
     [false, true, true, true, false], "the calendar opens only with a booking_url, and only for talk-to-sales (never an open_url CTA)");
   eq(Br.eventMessage("booking_opened", { text: "my email is a@b.com", ref: "a b" }), { t: "event", name: "booking_opened", ref: "a_b" }, "booking_opened is allowlisted, no text");
-  ok(read("app/api/web/event/route.ts").includes('"booking_opened", "page_viewed"] as const'), "the event route accepts booking_opened and page_viewed");
-  ok(/EV = \/\^\([^)]*\|booking_opened\)\$\//.test(read("scripts/embed.src.js")), "the loader forwards booking_opened to the dataLayer");
+  ok(/"booking_opened", "page_viewed",\s*"qualify_answered", "routing_book", "routing_support", "routing_partner"\] as const/.test(read("app/api/web/event/route.ts")),
+    "the event route accepts booking_opened, page_viewed, qualify_answered and routing_*");
+  ok(read("scripts/embed.src.js").includes("|booking_opened|qualify_answered|routing_(book|support|partner))$/"), "the loader forwards booking_opened, qualify_answered and routing_* to the dataLayer");
+  eq(Br.eventMessage("qualify_answered", { ref: "users:5000_plus", text: "my email is a@b.com", qa_id: "call me" }), { t: "event", name: "qualify_answered", ref: "users:5000_plus" }, "qualify_answered: the key:value ref only");
+  for (const name of ["routing_book", "routing_support", "routing_partner"]) eq(Br.eventMessage(name, { text: "hi" }), { t: "event", name }, `${name} allowlisted, no text`);
+  eq([Br.SUPPORT_URL, Br.PARTNER_URL], ["https://support.accops.com/", "https://www.accops.com/partners"], "support = the ticket portal accops.com/contact-us publishes; partners = the public partner page");
   // the Website tab's setting takes the same rule
   const Wd = await jiti.import("@/lib/web-dashboard.ts");
   const cur = { enabled: "true", model_enabled: "true", model_ceiling: "300", groq_daily_cap: "40", repeat_n: "3", repeat_window_min: "10", cta_label: "Talk to an expert", cta_url: "https://www.accops.com/schedule-a-free-demo" };
@@ -668,5 +680,47 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   eq((wsrc.match(/inert=\{inBooking\}/g) || []).length, 3, "the chat underneath (header, thread, input) is inert while the calendar is open");
   const ecss = read("app/embed/embed.css");
   ok(/\.w-book \{ position: absolute; inset: 0;/.test(ecss) && /\.w-book\.on \{ display: flex;/.test(ecss) && /\.w-book-frame iframe \{[^}]*height: 100%/.test(ecss), "the calendar takes the whole sheet (on a phone the loader's frame is full screen)");
+  // 27 Oct: the qualifying card. Tap-only (no text box, never an email), the server's options; after the tap the choice
+  // stays pressed (focus stays put), the others are disabled, then the thank-you and its offers
+  const QZ = { key: "users", prompt: "Quick one, so we point you to the right thing: how many users are on Citrix today?",
+    options: [{ value: "under_250", label: "Under 250" }, { value: "250_1000", label: "250–1,000" }, { value: "1000_5000", label: "1,000–5,000" }, { value: "5000_plus", label: "5,000+" }] };
+  const qc = q => renderToStaticMarkup(React.createElement(W.QualifyCard, { q, onPick: () => {}, onAsk: () => {}, book: { href: BK, onClick: () => {} } }));
+  const q0 = qc(QZ);
+  ok(/<div class="sb w-qz sb-in" role="group" aria-labelledby="([^"]+)"><p class="w-qz-q" id="\1">Quick one, so we point you to the right thing: how many users are on Citrix today\?<\/p>/.test(q0), "the card: a labelled group, the question");
+  eq([...q0.matchAll(/<button type="button" class="sb-chip">([^<]+)<\/button>/g)].map(m => m[1]), ["Under 250", "250–1,000", "1,000–5,000", "5,000+"], "four tap-to-answer options, nothing pressed yet");
+  ok(!/<input|<textarea|email/i.test(q0) && !q0.includes("w-qz-t"), "no text box, no email, no thank-you before the tap");
+  const q1 = qc({ ...QZ, picked: "5000_plus", lead: "Thanks. For a large deployment, these are the most useful next reads:", chips: [{ id: "lp-69", label: "Can Accops scale to tens of thousands of users?" }, { id: "lp-25", label: "Has anyone replaced Citrix with Accops?" }] });
+  ok(q1.includes('<button type="button" class="sb-chip" aria-pressed="true">5,000+</button>') && (q1.match(/aria-pressed="false" disabled="">/g) || []).length === 3, "after the tap: the choice pressed, the other three disabled");
+  ok(q1.includes('<p class="w-qz-t">Thanks. For a large deployment, these are the most useful next reads:</p>') && q1.includes(">Can Accops scale to tens of thousands of users?</button>") && !q1.includes("Book a time"), "the thank-you and its 2 offers");
+  const q2 = qc({ ...QZ, key: "renewal", picked: "within_3m", options: [{ value: "within_3m", label: "Within 3 months" }], lead: "Thanks. With a renewal that close, a call with an engineer is the quickest way to a plan:", book: true, chips: [{ id: "lp-21", label: "How much does Accops cost compared with Citrix?" }] });
+  ok(q2.split('aria-label="Suggested next steps">')[1].startsWith(`<li><a class="sb-chip" href="${esc(BK)}" target="_blank" rel="noopener noreferrer">Book a time with an engineer</a></li>`), "renewal within 3 months: the calendar first (through cta(), so it opens in the panel)");
+  const wq = read("app/embed/Widget.tsx");
+  ok(wq.includes("x.qz.length < 2 && !x.qz.some(k => k.split(\"=\")[0] === c.key)"), "the widget never draws a 3rd card or one already shown (the server rules it too)");
+  ok(wq.includes('...(x.qz.length ? { qualified: x.qz } : {})') && wq.includes("qz: old.items.flatMap("), "every ask tells the server which cards were shown (restored with the thread)");
+  const qfn = wq.slice(wq.indexOf("const qualify = useCallback"), wq.indexOf("/** A tier-0 click"));
+  ok(qfn.includes('recent_ms: x.recent, turn: { kind: "qualify", key, value }') && !/x\.recent\s*=/.test(qfn), "a tap is a qualify turn and never joins recent_ms (the 1st / 3rd answer rule counts asks)");
+  ok(qfn.includes('if (!x.qz.includes(key)) return;') && qfn.includes('track("qualify_answered", { ref: `${key}:${value}` })'), "one answer per card; qualify_answered carries key:value");
+  ok(/book=\{\{ href: talkHref, onClick: onTalk \}\}/.test(wq), "the card's calendar offer goes through cta() (opensBooking)");
+
+  // the routing bar above the input: three routes, always there
+  const rb = bk => renderToStaticMarkup(React.createElement(W.default, { conversationId: "c_x", hs: "h", page: "", origins: [], ask: null, starters: [], booking: bk,
+    talk: { label: "Talk to an expert", url: "https://www.accops.com/schedule-a-free-demo" } }));
+  const bar = bk => rb(bk).match(/<nav class="w-route" aria-label="Talk to a person">.*?<\/nav>/)[0];
+  const tab = '<span class="sb-sr"> (opens in a new tab)</span>';
+  eq([...bar(BK).matchAll(/<li><a href="([^"]+)" target="_blank" rel="noopener noreferrer">(.*?)<\/a><\/li>/g)].map(m => [m[1], m[2]]),
+    [[esc(BK), "Book a call"], ["https://support.accops.com/", `Existing customer support${tab}`], ["https://www.accops.com/partners", `Partner enquiry${tab}`]],
+    "three routes: Book a call (the calendar), Existing customer support, Partner enquiry (new tabs)");
+  ok(bar("").includes('<li><a href="https://www.accops.com/schedule-a-free-demo" target="_blank" rel="noopener noreferrer">Book a call</a></li>'), "no booking_url: Book a call falls back to the CTA link");
+  ok(bar(BK).startsWith('<nav class="w-route" aria-label="Talk to a person"><button type="button" class="w-route-t" aria-expanded="false" aria-controls="w-route-l">Need a person?</button><ul id="w-route-l" class="w-route-l">'),
+    "the fold: one \"Need a person?\" button, collapsed, controlling the list");
+  const sh2 = rb(BK);
+  ok(sh2.indexOf('class="w-route"') > sh2.indexOf('class="w-foot"') && sh2.indexOf('class="w-route"') < sh2.indexOf('class="w-privacy"') && sh2.indexOf('class="w-privacy"') < sh2.indexOf("<form"), "in the footer, above the privacy line and the input");
+  ok(wq.includes('onBook={e => { track("routing_book"); onTalk(e); }}') && wq.includes("onRoute={n => track(n)}") && wq.includes('onRoute("routing_support")') && wq.includes('onRoute("routing_partner")'),
+    "routing_book then cta() (the calendar in the panel, or cta_url); routing_support / routing_partner tracked");
+  const rcss = read("app/embed/embed.css");
+  ok(/\.w-route-t \{ display: none; \}/.test(rcss) && /@media \(max-width: 399px\) \{[^}]*\.w-route \{[^}]*\}\s*\.w-route-t \{ display: inline-flex; \}\s*\.w-route-l:not\(\.on\) \{ display: none; \}/.test(rcss),
+    "under 400 px the three fold into the one pill (the 400 px desktop panel shows all three)");
+  ok(/\.w-route-l a, \.w-route-t \{[^}]*min-height: 32px;[^}]*font-size: 12\.5px;/.test(rcss), "compact pills, 32 px targets");
+
   console.log(`web-widget.check: ${n} assertions passed (loader ${gz} B gzip, ${pills} source pills shown, ${strong} emphasised phrases)`);
 }

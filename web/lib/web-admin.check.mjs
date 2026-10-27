@@ -195,6 +195,21 @@ const approvedIds = bank0.slice(0, 24).map(q => q.id);
 const busyBank = items(F.bankRows(approvedIds), new Set(approvedIds));
 h = view({ dash: b, rows, bank: busyBank, chatOn: true });
 ok(h.includes("Missed questions") && h.includes("Does HyWorks support GPU passthrough on Nutanix?") && h.includes("over 70%") && !h.includes("Nothing is public yet"), "busy analytics");
+// 27 Oct: the qualifying answers (08 SQL intent): their split on Analytics (human conversations only), pills on each conversation
+{
+  const human = rows.find(r => r.conv.label === "human"), bot = rows.find(r => r.conv.label !== "human");
+  const tagged = rows.map(r => r.conversation_id === human.conversation_id ? { ...r, conv: { ...r.conv, intent: { users: "5000_plus", renewal: "within_3m", email: "a@b.com" } } }
+    : r.conversation_id === bot.conversation_id ? { ...r, conv: { ...r.conv, intent: { users: "under_250" } } } : r);
+  eq(W.intentPills({ users: "5000_plus", renewal: "within_3m", platform: "toString", email: "x" }), ["Users: 5,000+", "Renewal: Within 3 months"], "pills: allowlisted values only, in the card's order");
+  const im = W.intentMix(tagged);
+  ok(im.of === W.conversationsFrom(rows, "human").length && im.of > 0, "of = the period's human conversations");
+  eq(im.mix.map(m => [m.key, m.answered]), [["users", 1], ["renewal", 1], ["platform", 0]], "human answers only (a suspect or bot conversation's never counts)");
+  eq(im.mix[0].rows, [["Under 250", 0], ["250–1,000", 0], ["1,000–5,000", 0], ["5,000+", 1]].map(([key, n]) => ({ key, n })), "the card's option order, zeros kept");
+  ok(view({ dash: b, rows: tagged, bank: busyBank, chatOn: true }).includes("Who they are: the qualifying question") && view({ dash: b, rows: tagged, bank: busyBank, chatOn: true }).includes("answered in 1 of")
+    && view({ dash: b, rows: tagged, bank: busyBank, chatOn: true }).includes("Bookings can&#x27;t be prefilled"), "analytics: the split, and why bookings don't carry it");
+  ok(view({ dash: b, rows, bank: busyBank, chatOn: true }).includes("No one has answered the qualifying question yet."), "analytics: nothing answered yet (or 08 not applied)");
+  ok(view({ view: "conversations", rows: tagged }).includes('<span class="pill good">Users: 5,000+</span><span class="pill good">Renewal: Within 3 months</span>'), "conversations: the answers on their conversation");
+}
 h = view({ view: "approve", bank: items(bank0) });
 const lp03 = bank0.find(q => q.id === "lp-03");
 ok(h.includes('id="qa-lp-03"') && h.includes(lp03.answer.replace(/'/g, "&#x27;").replace(/&/g, "&amp;").slice(0, 40)) && h.includes("sb-answer") && h.includes("Needs your sign-off"), "approval card: answer, preview drawn with C's blocks, sign-off reason");

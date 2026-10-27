@@ -1,5 +1,6 @@
 /** Filling (plan 3.5, text-first since 27 Oct 2026): every visitor-visible field is an approved record, a fixed string
  *  here, or the model's answer AFTER the fact check (facts.ts) and the emphasis limits (emphasis.ts). */
+import { SUPPORT_URL } from "@/app/embed/bridge";
 import type { Block, Chip } from "@/lib/blocks";
 import { emClean } from "@/lib/emphasis";
 import type { Candidate, Written } from "./contracts";
@@ -26,7 +27,7 @@ export const TRIAGE: Chip[] = [
   { id: "lp-40", label: "Remote access / VPN replacement" },
   { id: "lp-36", label: "Securing logins (MFA/SSO)" },
 ];
-export const SUPPORT: Chip = { id: "support", label: "I'm an existing Accops customer (support)", url: "https://support.accops.com/" };
+export const SUPPORT: Chip = { id: "support", label: "I'm an existing Accops customer (support)", url: SUPPORT_URL };
 
 export const cut = (s: string, n: number) => (s.length <= n ? s : `${s.slice(0, n - 1).trimEnd()}…`);
 

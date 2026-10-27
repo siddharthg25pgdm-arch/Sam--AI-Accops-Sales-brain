@@ -245,3 +245,88 @@ Tier 2 first orders by the card label matched: an industry page's industries com
 - **Welcome back:** "Welcome back! Last time you asked “How do I talk to an Accops engineer?” Want to pick up there?" (`recall.ts askedLine`; a full stop after the quote only when the label has no end mark). When that pair's visual is a CTA (lp-32, lp-06, lp-07, lp-21, lp-24, lp-63), the first offer is "Book a time with an engineer" (the calendar in the panel; a new tab to `cta_url` without `booking_url`). `db.pairs()` now reads `visual`.
 - **Triage** (`intent.ts vague`, `fill.ts TRIAGE`): an opener with a problem or help word, no core.terms name, at most 5 content words and no confident match ("we have remote access problems") gets "Happy to help. Which of these is closest to what you need?" + Moving off Citrix (lp-05), Remote access / VPN replacement (lp-40), Securing logins (MFA/SSO) (lp-36), approved ones only, + "I'm an existing Accops customer (support)" linking to https://support.accops.com/ (the ticket portal accops.com/contact-us publishes). It runs after the intent miss and before the cache, never after an earlier question, and is logged as source `fallback` with `guard_reason = "triage"`. No eval question that passes the pre-guard trips it. Chips may now number 4, and a chip may carry an https `url` (a new-tab link chip).
 - **Not built:** a `support_opened` event (needs the events check constraint in SQL); a guard for BotID's own client failing (a blocked `c.js` makes the ask fail, a challenge that never resolves hangs it).
+
+## 27 Oct: qualify + routing (benchmark recommendations 2 and 6, approved by Siddharth)
+
+**The qualifying card** (`lib/web/qualify.ts`, pure: the server, the Website tab and the checks share one list). Anonymous: tap-only, allowlisted values, no text box, never an email.
+
+| Key | Question (after "Quick one, so we point you to the right thing:" on the 1st card, "One more, if that's OK:" on the 2nd) | Values (labels) |
+|---|---|---|
+| `users` | how many users are on Citrix today? (known not on Citrix: "how many users would this cover?") | `under_250` Under 250, `250_1000` 250–1,000, `1000_5000` 1,000–5,000, `5000_plus` 5,000+ |
+| `renewal` | when is your Citrix renewal due? | `within_3m` Within 3 months, `3_12m` 3–12 months, `later` Later, `not_citrix` Not on Citrix |
+| `platform` | what are you running today? | `citrix` Citrix, `vmware_omnissa` VMware or Omnissa, `avd` Azure Virtual Desktop, `other` Something else |
+
+- **When** (`answer.ts finish()` → `pick`): a 200 answer gets `qualify: {key, prompt, options}` only if the turn is labelled human, the send is the conversation's 1st or 3rd (`recent_ms.length`, as the CTA timing), the source is bank, intent, cache, model or fallback but not the triage (`guard_reason = "triage"`), and fewer than 2 cards were shown. Never guard, limited, repeat, bots or suspects. It is decided per request and never cached.
+- **Never twice:** every ask carries `qualified` (≤ 3 entries: `"users"` = shown, `"users=5000_plus"` = answered; junk, unknown keys or values and `a=b=c` are dropped). A key in it is never asked again.
+- **Which question:** renewal after a pricing or licensing word (in the question, the previous question or the answered pair's label); platform when no platform is named; otherwise users. When the visitor is known not to be on Citrix (platform answered other than Citrix, or renewal "Not on Citrix"), the renewal question is skipped and the users one is reworded.
+- **The tap** is `turn: {kind: "qualify", key, value}` on `/api/web/ask`:
+  - It is classified and admitted as a click. No message is logged, and there is no model call, search or cache.
+  - A key or value outside the allowlist is a 400 before any read.
+  - The reply is `{lead, chips, book?}`: the `NEXT` thank-you, its pairs (live ones only), then the page's roots. The widget shows 2, or the calendar plus 1 when `book`.
+  - `sam_web_set_intent` stores it after the response, for a human turn only.
+- **Thank-you lines and their pairs** (`qualify.ts NEXT`; Siddharth may edit them):
+  - users: under_250 → lp-13, lp-23; 250_1000 → lp-23, lp-06; 1000_5000 → lp-06, lp-07; 5000_plus "For a large deployment…" → lp-69 (scale), lp-25 (replaced Citrix).
+  - renewal: within_3m → **"Book a time with an engineer" first**, then lp-21; 3_12m → lp-06, lp-07; later → lp-01, lp-23; not_citrix → lp-33, lp-61.
+  - platform: citrix → lp-02, lp-05; vmware_omnissa → lp-09, lp-12; avd → lp-14, lp-13; other → lp-33, lp-61.
+- **Widget** (`QualifyCard`):
+  - The card sits under the answer's chips: the question, then the options as chips.
+  - After the tap, the chosen option is pressed (`aria-pressed`, so focus stays put) and the others are disabled. Then come the thank-you and the offers. The calendar offer goes through `cta()`, so it opens in the panel.
+  - The widget also refuses a 3rd card or a repeated key, and restores cards (and what was tapped) with the thread.
+  - A tap never joins `recent_ms`, so the 1st / 3rd rule counts questions only.
+  - Each tap sends `qualify_answered` with ref `key:value`. The event route refuses any other ref, and GA4 gets the name only.
+
+**SQL 08** (`docs/supabase-sam-web-08-intent.sql`, NOT APPLIED; apply order 05, 06, 07, 08):
+- `sam_web_conversations.intent jsonb not null default '{}'` (an object, at most 256 bytes).
+- `sam_web_set_intent(conversation_id, key, value) → boolean` is a security definer function with a fixed search_path. It merges one key, only for an allowlisted (key, value) pair (the same 12 as `qualify.ts`, proven in web-answer.check) and only on a conversation labelled human. It is granted to `sam_web_reader` ONLY.
+- The event check is 07's list plus `qualify_answered`, `routing_book`, `routing_support` and `routing_partner`.
+- `web-guard.mjs` now allows `/rpc/sam_web_set_intent` for the reader.
+- Until 08 is applied: the RPC 404s and is only warned about, the new events fail the check and are only warned about, and the Website tab's conversations read retries without the `intent` column (`loadMessages`).
+- Known gap: a tap that lands before the answer's own log has created the conversation row is dropped. A person never taps that fast.
+
+**Booking notes:**
+- Microsoft Bookings cannot be prefilled from its URL. Microsoft Q&A and the Bookings Tech Community threads say name, email, custom answers and notes cannot be passed as query parameters (they give "Bad request"). The only documented parameter is `RefID`, a traffic-source tag, not a notes field.
+- So nothing is faked: the intent stays on the conversation and the Website tab shows it there.
+- The Leads view does not join it: a lead carries `conversation_id` only when the flow sends one, and Bookings never does.
+
+**The routing bar** (`RoutingBar`, in the footer above the privacy line and the input; always there, inert while the calendar is open):
+- **Book a call** tracks `routing_book`, then goes through `onTalk` → `cta()`. It opens the calendar in the panel, or `cta_url` in a new tab without `booking_url`. Its href is `booking || cta_url`.
+- **Existing customer support** → `https://support.accops.com/` (`bridge.ts SUPPORT_URL`, which the triage chip now uses too), `routing_support`.
+- **Partner enquiry** → `https://www.accops.com/partners` (the partner page card), `routing_partner`.
+- Both support and partner open in a new tab with "(opens in a new tab)" for screen readers.
+- Size: 12.5 px pills with 32 px targets. They fit one row of the 400 px desktop panel: 366 px of pills against 372 px of room, measured from Barlow Medium's advance widths (13 px would need 378, so it would wrap). Not seen in a browser here.
+- Under 400 px the three fold into one "Need a person?" pill (`aria-expanded`, `aria-controls`) that opens them.
+- The loader forwards `qualify_answered` and `routing_*` to the dataLayer; it is 5,051 B gzip.
+
+**Website tab:**
+- Analytics has "Who they are: the qualifying question": per question, how many of the period's human conversations answered, and the split in the card's option order.
+- Conversations shows pills on each conversation ("Users: 5,000+", "Renewal: Within 3 months").
+- The funnel gains rows for the answered card and the three bar routes.
+
+**Draft bank pairs** (loaded as drafts, review data rebuilt, intent index NOT rebuilt):
+- **lp-80** "Is there a free trial or a free POC?", under lp-07. No page says a pilot is free, so it says what is published, with a "Book a time with an engineer" CTA. needs_approval: commercial terms.
+- **lp-81** "Does Accops support Linux desktops?", under lp-34. HyWorks (you run it) and Accops Managed Desktops (DaaS) are named side by side.
+- **lp-82** "Can users reach HyWorks from Linux devices?", under lp-81, at depth 4. It covers HyDesk Hy6000's embedded Linux, HyLite in a browser and Nano. The pages do not say a HyWorks client app installs on a Linux PC, so it doesn't claim that.
+- **lp-83** "Does Accops SSO work with Azure AD or Entra ID?", under lp-36 (benchmark problem 1). The answer says Azure AD because the pages still do; "Entra ID" is only in the label and aliases.
+- After approving lp-80: drop the aliases "free trial" and "trial" from lp-07 (approved, so the loader can't), then rebuild the index.
+
+**Checks:**
+- `web-answer.check` covers:
+  - when the card shows and when it doesn't (answers 0-6), the 2-card limit, no repeats, junk `qualified`
+  - which question, and the rewording
+  - bot, suspect, guard, triage, limited and repeat: no card
+  - every allowlisted pair has a thank-you, and anything else is refused
+  - the tap's reply, store, no-message rule and 400s
+  - the event allowlist and `qualify_answered`'s ref
+  - SQL 08's column, function, allowlist = `qualify.ts`, grants, and the event list = the route's
+- `web-widget.check` covers:
+  - the card's markup before and after the tap, and the calendar first
+  - the widget's no-3rd-card / no-repeat rule, and the tap kept out of `recent_ms`
+  - the routing bar's three links, the booking fallback, the fold and its CSS
+  - the new events through the bridge and the loader
+- `web-admin.check` covers `intentPills`, `intentMix` (human only, option order) and both views rendering.
+- `web-recall.check` now compares 07's list with the route's minus 08's names.
+
+**Not built (say if wanted):**
+- Intent next to a lead in the Leads view (needs a conversation id on the booking, which Bookings can't carry).
+- A "shown" count for the card (only taps are logged).
+- A per-section choice of question (the teaser's discovery question, recommendation 7).
