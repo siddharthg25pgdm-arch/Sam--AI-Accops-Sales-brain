@@ -8,7 +8,7 @@
 import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { bookingUrl } from "@/app/embed/bridge";
-import { Answer, type Chip } from "@/lib/blocks";
+import { Answer, type Block, type Chip } from "@/lib/blocks";
 import { redact } from "@/lib/redact";
 import { classify, isTestConv } from "@/lib/web/bot";
 import { admit } from "@/lib/web/limits";
@@ -17,8 +17,8 @@ import { cacheGet, cachePut } from "@/lib/web/cache";
 import { intentMatch, related, vague } from "@/lib/web/intent";
 import type { Ctx, Label, Source } from "./contracts";
 import * as db from "./db";
-import { docIntent } from "./facts";
-import { LEAD, SUPPORT, TRIAGE, chips, cleanPage, compose, cta, facts, qaBlocks, qaId, titled } from "./fill";
+import { docIntent, specifics } from "./facts";
+import { ENGINEER, LEAD, SUPPORT, TRIAGE, bookChip, chips, cleanPage, compose, cta, facts, qaBlocks, qaId, titled } from "./fill";
 import { MAX_CANDS, writeAnswer } from "./model";
 import { qHash } from "./normalise";
 import { KEYS, done, next, pick } from "./qualify";
@@ -153,8 +153,11 @@ export async function ask(req: Request): Promise<Out> {
     const g = preGuard(turn.text, cta(s));
     if (g) { m.guard_reason = g.reason; return finish("guard", g.answer); } // the rule name only, never the text
 
+    // A question for specifics (versions, ports, configuration, sizing…) gets "Book a time with an engineer" as its first
+    // chip (Siddharth, 28 Oct: answers stay at capability level; an engineer confirms the details).
+    const spec = specifics(turn.text), lead1 = (c: Chip[]) => (spec ? [bookChip(s), ...c.filter(x => x.id !== "book")].slice(0, 3) : c);
     const hit = intentMatch(turn.text, page_group); // tier 1
-    if (hit) { const a = await bank(hit.qa_id); if (a) { m.qa_id = hit.qa_id; return finish("intent", a); } }
+    if (hit) { const a = await bank(hit.qa_id); if (a) { m.qa_id = hit.qa_id; return finish("intent", { ...a, chips: lead1(a.chips) }); } }
     // "we have remote access problems" as an opener: route it (live pairs only) + the support portal. After an earlier
     // question the model gets that question as context instead.
     if (!b.prev && vague(turn.text, page_group)) {
@@ -180,28 +183,32 @@ export async function ask(req: Request): Promise<Out> {
     if (!w) { // no slot, or both providers failed: verified facts; not cached (the next ask may reach the model)
       m.error = "model";
       const blocks = facts(turn.text, page_group, [], cands, pairs, doc);
-      const next = await more([], rel, [], pairs);
+      const next = lead1(await more([], rel, [], pairs));
       return finish("fallback", blocks.length ? { lead: LEAD.facts, blocks: [...blocks, cta(s)], chips: next } : await fallback(next));
     }
     Object.assign(m, { verdict: w.verdict, model: w.model, tokens: w.tokens, refs: w.cites });
 
     const cited = w.cites.filter(r => r.startsWith("qa:")).map(qaId);
     const picks = w.followups.map(id => pairs.get(id)).filter((x): x is db.Qa => !!x); // the model's follow-ups, approved only
-    const next = await more(picks, rel, cited, pairs);
+    const next = lead1(await more(picks, rel, cited, pairs));
     let a: Answer, source: Source = "model";
     if (w.verdict === "none") { a = await fallback(next); source = "fallback"; }
     else {
-      const c = compose(w, cands, pairs, doc);
+      const c = compose(w, cands, pairs, doc), top = cited.map(id => pairs.get(id)).find(Boolean);
       let blocks = c.blocks, lead: string | undefined = w.verdict === "partial" ? LEAD.partial : undefined;
-      if (c.problems.length) { // the written answer may not be shown: verified facts instead; the log says what failed
+      if (c.dropped.length) m.error = `too_technical: ${c.dropped.join(", ")}`; // logged even when the rest is shown
+      if (c.problems.length && c.dropped.length) { // what the technical detail left can't stand alone: an engineer (28 Oct)
+        m.error = `too_technical: ${c.dropped.join(", ")}; ${c.problems.join("; ")}`.slice(0, 200);
+        blocks = [{ ...cta(s, top), label: ENGINEER } as Block];
+        lead = LEAD.specifics;
+      } else if (c.problems.length) { // the written answer may not be shown: verified facts instead; the log says what failed
         m.error = `fact_check: ${c.problems.join("; ")}`.slice(0, 200);
         blocks = facts(turn.text, page_group, w.cites, cands, pairs, doc);
         lead = LEAD.facts;
       }
       if (!blocks.length) { a = await fallback(next); source = "fallback"; }
       else {
-        const top = cited.map(id => pairs.get(id)).find(Boolean);
-        if (lead || top?.cta_url || b.recent_ms.length >= 2) blocks.push(cta(s, top));
+        if (!blocks.some(x => x.type === "cta") && (lead || top?.cta_url || b.recent_ms.length >= 2)) blocks.push(cta(s, top));
         a = { ...(lead ? { lead } : {}), blocks, chips: next };
       }
     }

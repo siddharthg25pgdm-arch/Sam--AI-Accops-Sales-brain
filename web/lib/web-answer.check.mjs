@@ -591,4 +591,77 @@ ok(!af.includes("**extreme-latency cases**") && af.includes("extreme-latency cas
   ok(readFileSync(path.join(web, "scripts/web-guard.mjs"), "utf8").includes('"recall", "set_intent"]'), "web-guard: the reader may see /rpc/sam_web_set_intent");
 }
 
+// ---- 28 Oct: not too technical (Siddharth: "don't answer anything too technical that which might not match later with
+// what we can provide or the customer gets confused"). Capability + outcome in plain words; an engineer confirms specifics.
+{
+  const { plain, ENGINEER } = await jiti.import("./web/fill.ts");
+  const { specifics } = await jiti.import("./web/facts.ts");
+  const { SYSTEM } = await jiti.import("./web/model.ts");
+  const { ENGINE } = await jiti.import("./web/cache.ts");
+  ok(/CIO, CISO or IT head, not an engineer/.test(SYSTEM) && /Never give version, port or hardware model numbers, protocol details, configuration steps, compatibility lists or edge-case caveats/.test(SYSTEM)
+    && /answer at capability level/.test(SYSTEM) && /ONLY the approved Accops records/.test(SYSTEM), "the system prompt carries the rule (and keeps the eval's canary)");
+  ok(ENGINE === "text-first-4", "cache ENGINE bumped, so answers cached before the rule are never served");
+  // each rule: the offending sentence goes, the plain one stays
+  for (const [why, text, kept] of [
+    ["version", "Yes. **HyWorks** supports Nutanix AHV. Recent releases add a connector for Prism Central v7.3 and later.", "Yes. **HyWorks** supports Nutanix AHV."],
+    ["version", "HyWorks supports Nutanix AHV as a hypervisor. Current versions such as HySecure 7.3 show end of life as to be announced.", "HyWorks supports Nutanix AHV as a hypervisor."],
+    ["version", "HyID adds MFA to Windows logon. It needs version 10 of the credential provider.", "HyID adds MFA to Windows logon."],
+    ["port", "HySecure gives zero trust access to internal apps. It needs port 443 open to the internet.", "HySecure gives zero trust access to internal apps."],
+    ["port", "HySecure gives zero trust access to internal apps. Its admin console answers on gateway:8443.", "HySecure gives zero trust access to internal apps."],
+    ["model number", "Accops thin clients replace PCs as managed endpoints. HyDesk Hy6000 runs Accops embedded Linux.", "Accops thin clients replace PCs as managed endpoints."],
+    ["protocol detail", "HyID adds single sign-on to SaaS apps. It federates with SAML 2.0 and OAuth 2.0, with IdP- and SP-initiated flows.", "HyID adds single sign-on to SaaS apps."],
+    ["protocol detail", "HyID works with your existing directory. It binds over LDAPS, with Kerberos for Windows logon.", "HyID works with your existing directory."],
+    ["protocol detail", "HySecure protects remote access to internal apps. Every tunnel uses TLS 1.3.", "HySecure protects remote access to internal apps."],
+    ["third-party list", "Accops runs on infrastructure you already own. HyWorks works with VMware, Nutanix, Hyper-V, AWS and Google Cloud.", "Accops runs on infrastructure you already own."],
+  ]) {
+    const p = plain(text);
+    ok(p.text === kept && p.dropped.join() === why, `${why}: "${text}" -> "${p.text}" (${p.dropped})`);
+  }
+  ok(plain("Yes. HySecure needs port 443 open.").text === "", "a bare \"Yes.\" left over is not an answer");
+  ok(plain("VMware, Nutanix and Hyper-V are supported. Azure, AWS and OCI integrate.").dropped.join() === "third-party list", "more than 3 third-party products across sentences");
+  for (const fine of ["Yes. **HySecure** is ISO 27001:2022 certified.", "HPCL cut IT costs by 25%, and 1.5 million users run Accops at 99.9% uptime.",
+    "Older Windows 10 PCs become VDI endpoints.", "A Japanese university gave 25,000+ students remote lab access.", "Sessions are protected with AES-256 encryption.",
+    "HyWorks works with VMware, Nutanix and Hyper-V.", "HyID single sign-on works with SAML apps and Azure AD.", "Users see 2.5x faster logins, rated 4.8/5 by admins.",
+    "Accops replaces NetScaler, Director, SQL Server and Universal Print Server with one platform.", "Does it support Microsoft 365?"])
+    ok(plain(fine).text === fine && !plain(fine).dropped.length, `not technical: "${fine}" (${plain(fine).dropped})`);
+  // questions that ask for specifics, and ones that don't
+  for (const q of ["Which version of Nutanix Prism Central do you support?", "What ports does HySecure need open?", "How do I configure HyID with Entra ID?",
+    "Is there a compatibility matrix for HyWorks?", "What are the system requirements for the HyWorks controller?", "How many servers do we need for 2,000 users?",
+    "Can you give me step-by-step setup instructions?", "What are your sizing guidelines?", "Which hypervisors does Accops support?"]) ok(specifics(q), `specifics: ${q}`);
+  for (const q of ["How is Accops different from Citrix?", "Does Accops support SSO?", "Is HySecure certified?", "Can we migrate off Citrix without downtime?",
+    "How much does Accops cost?", "Do you offer customer support in Japan?"]) ok(!specifics(q), `not specifics: ${q}`);
+
+  // a model answer with one technical sentence: that sentence goes, the rest shows (logged, cached)
+  fresh(); N.openai.push(writes("answered", `${GOOD} The certificate covers HySecure gateways on port 443.`, ["fact:hysecure-1"]));
+  r = await run(typed("is hysecure certified"));
+  ok(r.body.source === "model" && r.body.blocks[0].body === GOOD && r.body.blocks[0].ai && !JSON.stringify(r.body).includes("443"), `the port sentence dropped, the rest shown: ${r.body.blocks[0].body}`);
+  ok(N.logs[0].error === "too_technical: port" && N.puts.length === 1 && N.puts[0].src === "model", `logged and cached: ${N.logs[0].error}`);
+  ok(!r.body.chips.some(c => c.id === "book"), "not a question for specifics: no engineer chip");
+  const sys = N.model[0].body.messages[0].content;
+  ok(sys === SYSTEM, "the rule reaches the model");
+  // all of it technical: the fixed line + "Book a time with an engineer" (the calendar), never the detail
+  fresh(); N.settings.booking_url = BK; N.openai.push(writes("answered", "Yes. HySecure 7.3 needs port 443 and TLS 1.2 for every gateway.", ["fact:hysecure-1"]));
+  r = await run(typed("What ports does HySecure need open?"));
+  ok(r.body.source === "model" && r.body.lead === LEAD.specifics && r.body.blocks.map(b => b.type).join() === "cta", `nothing safe left: the fixed line + a CTA: ${JSON.stringify(r.body.blocks)}`);
+  ok(r.body.blocks[0].label === ENGINEER && r.body.blocks[0].action === "talk_to_sales" && r.body.blocks[0].url === BK, "the CTA is the engineer's calendar");
+  ok(!/7\.3|443|TLS/.test(JSON.stringify(r.body)) && /^too_technical: protocol detail; empty or over 70 words/.test(N.logs[0].error) && N.puts[0].src === "model", `never the detail; logged, cached: ${N.logs[0].error}`);
+  ok(r.body.chips[0].id === "book" && r.body.chips[0].label === ENGINEER && r.body.chips[0].url === BK && r.body.chips.length <= 3, `a question for specifics: chips lead with the engineer: ${JSON.stringify(r.body.chips)}`);
+  // a question for specifics with a plain answer: the answer, and the chips lead with the engineer (cta_url without booking_url)
+  fresh(); N.openai.push(writes("answered", GOOD, ["fact:hysecure-1"]));
+  r = await run(typed("Which ISO version is HySecure certified to?"));
+  ok(r.body.blocks[0].body === GOOD && r.body.chips[0].id === "book" && r.body.chips[0].url === DEMO && r.body.chips.length === 3 && r.body.chips.slice(1).every(c => !c.url),
+    `chips: the engineer, then the follow-ups: ${r.body.chips.map(c => c.id)}`);
+  fresh({ S: { intent: { qa_id: "lp-steps-1", score: 5, margin: 0.4 } } }); N.settings.booking_url = BK;
+  r = await run(typed("how do we configure the migration step by step"));
+  ok(r.body.source === "intent" && r.body.chips[0].id === "book" && r.body.chips[0].url === BK && r.body.chips.length <= 3, "an intent answer to a question for specifics leads with the engineer too");
+  fresh(); N.settings.booking_url = "x".repeat(10); N.openai.push(writes("answered", GOOD, ["fact:hysecure-1"]));
+  r = await run(typed("What version of ISO 27001?"));
+  ok(r.body.chips[0].url === DEMO, "a junk booking_url: the engineer chip falls back to cta_url");
+  // verified facts never quote a technical page line
+  const PORTS = { ref: "fact:ports", kind: "fact", types: ["text"], title: "HySecure", text: "Certified HySecure 7.3 gateways listen on port 443.", url: "https://www.accops.com/hysecure" };
+  fresh({ cands: [PORTS, CANDS[1]] }); N.slot.openai = false;
+  r = await run(typed("is hysecure certified"));
+  ok(JSON.stringify(texts(r.body)) === JSON.stringify([CANDS[1].text]), `the technical quote is never a verified fact: ${texts(r.body)}`);
+}
+
 console.log(`web-answer.check: ${n} assertions passed`);

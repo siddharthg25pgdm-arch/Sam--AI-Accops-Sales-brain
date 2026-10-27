@@ -668,6 +668,12 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   ok(tri.includes('<button type="button" class="sb-chip">Moving off Citrix</button>') &&
     tri.includes('<a class="sb-chip" href="https://support.accops.com/" target="_blank" rel="noopener noreferrer">I&#x27;m an existing Accops customer (support)<span class="sb-sr"> (opens in a new tab)</span></a>'),
     "triage: route chips ask, the support chip is a new-tab link to the portal");
+  // 28 Oct: a question for specifics leads its chips with the engineer: a calendar link that goes through cta() (the panel)
+  const eng = renderToStaticMarkup(React.createElement(W.AnswerView, { a: { blocks: [], chips: [{ id: "book", label: "Book a time with an engineer", url: BK }] } }));
+  ok(eng.includes(`<a class="sb-chip" href="${esc(BK)}" target="_blank" rel="noopener noreferrer">Book a time with an engineer</a>`) && !eng.includes("sb-sr"),
+    "the engineer chip: a calendar link (no new-tab note: with booking_url it opens in the panel)");
+  ok(read("components/blocks/Answer.tsx").includes('c.url && c.id === "book"') && read("components/blocks/Answer.tsx").includes('act("cta", { action: "talk_to_sales", url: c.url }, c.label)'),
+    "its click goes through act(\"cta\") like every talk-to-sales CTA");
   const bv = on => renderToStaticMarkup(React.createElement(W.BookingView, { url: BK, title: "Talk to an expert", on, onBack: () => {}, onClose: () => {} }));
   const opened = bv(true), shut = bv(false);
   ok(opened.includes('class="w-book on"') && shut.includes('class="w-book"') && !shut.includes('class="w-book on"'), "shown only when open (kept mounted when not, so a half-filled booking survives Back)");

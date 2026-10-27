@@ -1,12 +1,12 @@
 /** Filling (plan 3.5, text-first since 27 Oct 2026): every visitor-visible field is an approved record, a fixed string
  *  here, or the model's answer AFTER the fact check (facts.ts) and the emphasis limits (emphasis.ts). */
-import { SUPPORT_URL } from "@/app/embed/bridge";
+import { SUPPORT_URL, bookingUrl } from "@/app/embed/bridge";
 import type { Block, Chip } from "@/lib/blocks";
 import { emClean } from "@/lib/emphasis";
 import type { Candidate, Written } from "./contracts";
 import * as db from "./db";
 import type { Qa, QaRef, Settings } from "./db";
-import { factCheck } from "./facts";
+import { entities, factCheck } from "./facts";
 import { analyse, groupNames, weight } from "./intent";
 
 /** The only prose not taken from a record (plan 3.4). Siddharth may edit these strings. */
@@ -17,7 +17,10 @@ export const LEAD = {
   repeat: "Looks like this one needs a person. The team can answer it directly.",
   facts: "Here's what we've published on that:", // verified facts: the model's answer failed the fact check, or no model answer
   triage: "Happy to help. Which of these is closest to what you need?", // a vague problem (intent.ts vague)
+  // the model's answer was all too-technical detail (plain), so nothing safe is left to say (28 Oct)
+  specifics: "That depends on your setup. An engineer can confirm the details for your environment on a short call.",
 } as const;
+export const ENGINEER = "Book a time with an engineer";
 
 /** The triage chips for a vague problem (benchmark, 27 Oct: Scout's sales / support split). Each maps to an approved
  *  pair (answer.ts keeps only the live ones), then the support route for existing customers: the ticket portal that
@@ -100,6 +103,13 @@ export function qaBlocks(qa: Qa, only?: string): Block[] {
 export const cta = (s: Settings, qa?: Qa | null): Block => ({ type: "cta", label: cut(qa?.cta || s.cta_label || "Talk to an expert", 28),
   action: "talk_to_sales", url: (qa?.cta_url || s.cta_url || "https://www.accops.com/schedule-a-free-demo").slice(0, 300) });
 
+/** The first chip when a typed question asks for specifics (facts.ts specifics): the Bookings calendar (the widget opens
+ *  it in the panel), else the talk-to-sales URL. */
+export const bookChip = (s: Settings): Chip => {
+  const u = [bookingUrl(s.booking_url), s.cta_url].find(x => x && x.length <= 300 && /^https:\/\/[^\s"<>]+$/.test(x)); // Chip's url rule
+  return { id: "book", label: ENGINEER, url: u ?? "https://www.accops.com/schedule-a-free-demo" };
+};
+
 export const chips = (rows: QaRef[], skip: string[] = [], n = 3): Chip[] =>
   rows.filter((r, i) => r.id && r.id.length <= 80 && !skip.includes(r.id) && rows.findIndex(x => x.id === r.id) === i)
     .slice(0, n).map(r => ({ id: r.id, label: cut(r.question, 60) }));
@@ -120,23 +130,57 @@ export const accopsFirst = (s: string) =>
   s.split(/(?<=[.!?;])\s+/).map(c => RIVAL.test(c) && !/accops/i.test(c) ? c.replace(/\*\*/g, "") : c).join(" ");
 const words = (s: string) => s.replace(/\*/g, "").split(/\s+/).filter(Boolean).length;
 
-/** The model's written answer -> blocks, or `problems` when it may not be shown (the caller then shows verified facts).
- *  Text: whitespace collapsed, whole sentences up to 70 words, emphasis within the limits (emphasis.ts), fact-checked
- *  against the title + text of the candidates it cites (facts.ts), with ONE "Based on" pill from the first cite.
- *  Then a qa candidate's own approved visual if the model chose one (a doc card only on a document ask), then a
- *  document card for a document ask. Never a page card: pages feed facts only. */
-export function compose(w: Written, cands: Candidate[], pairs: Map<string, Qa>, askedForDoc: boolean): { blocks: Block[]; problems: string[] } {
+/** Not too technical (Siddharth, 28 Oct 2026: "don't answer anything too technical that which might not match later with
+ *  what we can provide or the customer gets confused"). Visitors are CIOs, CISOs, IT heads and procurement: an answer
+ *  states the capability and the outcome, and an engineer confirms the specifics on a call. A sentence with any of these
+ *  is dropped from a model answer (and a page quote with one is never a verified fact).
+ *  ponytail: regexes, so a plain decimal ("3.5 hours") reads as a version; widen the exclusions if the logged
+ *  "too_technical" errors show good sentences going. */
+const TECH: [why: string, re: RegExp][] = [
+  ["protocol detail", /\b(idp|sp)[\s-]+initiated\b|\b(saml|oauth|tls|ssl|ike)\s*v?\d|\b(kerberos|ldaps|ntlm\w*|dtls|ipsec|scim|x\.509|pkcs|802\.1x|hdx|edt|thinwire|framehawk|pcoip|blast\s+extreme)\b/i],
+  ["port", /\bports?\s+\d|\b(tcp|udp)\s*\/?\s*\d|\b\d+\s*\/\s*(tcp|udp)\b|(?<!\d):\d{2,5}\b/i],
+  ["model number", /\b(?!(aes|sha|rsa|iso|fy)-?\d)[a-z]{1,6}-?\d{3,}[a-z]*\b/i], // Hy6000; never ISO 27001 or AES-256
+  ["version", /\bv\d+(\.\d+)*\b|\b(version|release)\s+\d|\b\d+(\.\d+)*\s+(and|or)\s+(later|above|newer|higher)\b|\b\d+\.\d+(\.\d+)*\b(?!\s*(%|x\b|×|times\b|per\s?cent|percent|million|billion|lakh|crore|thousand|\/|out\s+of|stars?\b))/i],
+];
+// Accops's own core.terms labels and the industries; every other label is a third-party product.
+// ponytail: by hand (the intent index carries no kind); read core.terms' kind if the index gains it.
+const OWN = /^(Hy|Accops|BioAuth|Biometric Server|Reporting Server|Huddle|Nano|AirBridge|Enterprise Browser|Virtual Browser|Vajra|Turbo|Photon|Spectra|GlassFence|IRIS|Launchpad|Data-less PC|Thin Clients|Password Vault|CMS|BFSI|Government|Pharma|Manufacturing|IT \/ ITeS|Education|E-commerce|Media|Telecom)/;
+const thirdParty = (s: string) => entities(s).filter(l => !OWN.test(l));
+const MAX_THIRD = 3; // more named third-party products than this in one answer reads as a compatibility list
+
+/** `text` without its too-technical sentences: each TECH hit goes, then while the rest names more than MAX_THIRD
+ *  third-party products, the sentence naming the most. `dropped` says why (empty = nothing was). */
+export function plain(text: string): { text: string; dropped: string[] } {
+  const dropped: string[] = [];
+  const kept = sentences(text).filter(s => { const t = TECH.find(([, re]) => re.test(s)); if (t) dropped.push(t[0]); return !t; });
+  while (thirdParty(kept.join(" ")).length > MAX_THIRD) {
+    const n = kept.map(s => thirdParty(s).length), i = n.indexOf(Math.max(...n));
+    dropped.push("third-party list");
+    kept.splice(i, 1);
+  }
+  if (dropped.length && words(kept.join(" ")) < 4) kept.length = 0; // a bare "Yes." left over says nothing on its own
+  return { text: kept.join(" "), dropped: [...new Set(dropped)] };
+}
+
+/** The model's written answer -> blocks, or `problems` when it may not be shown (the caller then shows verified facts,
+ *  or, when `dropped` says too-technical sentences went, LEAD.specifics + an engineer).
+ *  Text: whitespace collapsed, whole sentences up to 70 words, too-technical sentences dropped (plain), emphasis within
+ *  the limits (emphasis.ts), fact-checked against the title + text of the candidates it cites (facts.ts), with ONE
+ *  "Based on" pill from the first cite. Then a qa candidate's own approved visual if the model chose one (a doc card
+ *  only on a document ask), then a document card for a document ask. Never a page card: pages feed facts only. */
+export function compose(w: Written, cands: Candidate[], pairs: Map<string, Qa>, askedForDoc: boolean): { blocks: Block[]; problems: string[]; dropped: string[] } {
   const byRef = new Map(cands.map(c => [c.ref, c]));
   const cited = [...new Set(w.cites)].map(r => byRef.get(r)).filter((c): c is Candidate => !!c);
   let kept = "", n = 0;
   for (const s of sentences(w.answer.replace(/\s+/g, " ").trim())) { if (n + words(s) > 70) break; kept += `${kept ? " " : ""}${s}`; n += words(s); }
-  const body = emClean(accopsFirst(kept)).replace(/ {2,}/g, " ").trim();
+  const { text, dropped } = plain(kept);
+  const body = emClean(accopsFirst(text)).replace(/ {2,}/g, " ").trim();
   const src = cited.map(c => source(c.kind === "qa" ? pairs.get(qaId(c.ref))?.sources?.[0] ?? c.url : c.url)).find(Boolean);
   const problems = [
     ...(!cited.length ? ["no cites"] : []), ...(!body ? ["empty or over 70 words"] : []), ...(body.length > 600 ? ["over 600 chars"] : []),
     ...(!src ? ["no source"] : []), ...factCheck(body, cited.map(c => `${c.title}. ${c.text}`)),
   ];
-  if (problems.length) return { blocks: [], problems };
+  if (problems.length) return { blocks: [], problems, dropped };
   const blocks: Block[] = [{ type: "text", body, source: src, ai: true }];
   const v = byRef.get(w.visual.ref), qa = v?.kind === "qa" ? pairs.get(qaId(v.ref)) : undefined;
   if (qa && w.visual.type !== "text" && v!.types.includes(w.visual.type) && (w.visual.type !== "doc_card" || askedForDoc)) blocks.push(...qaBlocks(qa, w.visual.type));
@@ -144,7 +188,7 @@ export function compose(w: Written, cands: Candidate[], pairs: Map<string, Qa>, 
     const d = [...cited, ...cands].map(docCard).find(Boolean);
     if (d) blocks.push(d);
   }
-  return { blocks, problems: [] };
+  return { blocks, problems: [], dropped };
 }
 
 /** A text's words and core.terms names, as the intent matcher sees them ("@" marks a name: Entra ID meets Azure AD). */
@@ -178,7 +222,7 @@ export function facts(q: string, group: string, first: string[], cands: Candidat
     const qa = c.kind === "qa" ? pairs.get(qaId(c.ref)) : undefined;
     const body = qa ? qa.answer : c.kind === "fact" ? c.text.replace(/\*/g, "").slice(0, 600) : "";
     const src = source(qa ? qa.sources?.[0] : c.url);
-    if (!body || !src || seen.has(body)) continue;
+    if (!body || !src || seen.has(body) || (!qa && plain(body).dropped.length)) continue; // a technical page quote is never shown
     seen.add(body);
     const have = new Set(keys(`${qa?.question ?? c.title}. ${body}`)), rel = want.filter(k => have.has(k)).reduce((s, k) => s + topicWeight(k), 0);
     if (rel > 0) rows.push({ b: { type: "text", body, source: src }, rel });

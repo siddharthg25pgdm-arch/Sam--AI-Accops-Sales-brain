@@ -32,7 +32,8 @@ function numbers(s: string): string[] {
   return out;
 }
 
-const entities = (s: string) => {
+/** The core.terms labels `s` names (any alias, plurals). fill.ts counts the third-party ones. */
+export const entities = (s: string) => {
   const t = norm(s).trim().split(" ");
   return ENTS.filter(([, al]) => al.some(a => t.some((_, i) => a.every((w, k) => t[i + k] === w || t[i + k] === `${w}s` || t[i + k] === `${w}es`))))
     .map(([label]) => label);
@@ -65,6 +66,21 @@ export function factCheck(answer: string, evidence: string[]): string[] {
   if (/https?:|www\.|\]\(|\b[a-z0-9-]+\.(com|in|io|net|org)\b/i.test(a)) out.push("a link"); // answers stay in the chat
   return [...new Set(out)];
 }
+
+/** The visitor asks for engineer-level specifics (Siddharth, 28 Oct: "don't answer anything too technical"): versions,
+ *  ports, configuration, a compatibility matrix, system requirements, sizing, step-by-step. The answer stays at capability
+ *  level and its chips lead with "Book a time with an engineer" (answer.ts). */
+const SPECIFICS = [
+  /\bversions?\b|\bv\d/, /\bports?\b|\bfirewall\s+rules?\b/,
+  /\bconfigur\w*|\binstall(ation|ing)?\s+(steps?|guide|process)\b|\bset\s?-?up\s+(steps?|guide|process)\b/,
+  /\bhow\s+(do|to|can|should)\s+(i|we|you)?\s*(configure|install|set\s?up|integrate|deploy)\b/,
+  /\bcompatib\w*\s+(matrix|list)\b|\bsupported\s+(versions?|os|operating\s+systems?|platforms?|hardware|browsers?|devices?)\b/,
+  /\b(which|what)\s+(\w+\s+)?(versions?|protocols?|ports?|os|operating\s+systems?|browsers?|hypervisors?|databases?)\b/,
+  /\b(system|hardware|minimum|server|client)\s+requirements?\b|\bprerequisites?\b|\bspecs\b|\bspecifications?\b/,
+  /\bsizing\b|\bcapacity\s+planning\b|\bhow\s+(much|many)\s+(ram|memory|cpus?|vcpus?|cores?|storage|disk|servers?)\b/,
+  /\bstep[\s-]by[\s-]step\b/,
+];
+export const specifics = (q: string) => { const t = q.toLowerCase(); return SPECIFICS.some(re => re.test(t)); };
 
 /** The visitor explicitly asks for a document: only then may a document card follow the answer (Siddharth, 27 Oct). */
 export const docIntent = (q: string) =>
