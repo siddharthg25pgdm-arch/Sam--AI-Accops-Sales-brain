@@ -8,7 +8,7 @@ import { redact } from "@/lib/redact";
 import type { CacheGet, CachePut } from "./contracts";
 import { rpc } from "./db";
 
-export const ENGINE = "text-first-2"; // bump when tier 3 changes what it answers
+export const ENGINE = "text-first-3"; // bump when tier 3 changes what it answers (3: 27 Oct, verified facts never pad)
 export const cacheKey = (q_hash: string) => createHash("sha256").update(`${q_hash}|${ENGINE}`).digest("hex");
 
 export const cacheGet: CacheGet = async q_hash => {
