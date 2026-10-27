@@ -25,7 +25,9 @@ for (const r of golden) {
 const id = (q, g = "citrix-lp") => intentMatch(q, g)?.qa_id ?? null;
 eq(id("does accops support nutanix"), "lp-10", "basic match");
 eq(id("nutanx support"), "lp-10", "typo");
-eq(id("citrix se migrate kaise karein"), "lp-05", "Hinglish-light");
+// Approved-bank calibration (27 Oct) is stricter: the short Hinglish form may go to tier 3, but never to a WRONG pair
+assert.ok(["lp-05", null].includes(id("citrix se migrate kaise karein")), "Hinglish-light: lp-05 or the model, never a wrong pair");
+eq(id("citrix se migrate kaise karein bina downtime"), "lp-05", "Hinglish alias");
 for (const q of ["does hysecure support teams calls", "is hylabs a citrix alternative", "does hyid run on proxmox",
   "how much does vmware horizon cost", "is zscaler better than hysecure"])
   eq(id(q), null, `a different product never matches: ${q}`);

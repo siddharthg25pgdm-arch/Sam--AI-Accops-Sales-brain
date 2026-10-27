@@ -1,8 +1,8 @@
 {
  "version": 1,
- "built_at": "2026-10-26T23:36:09+00:00",
- "knowledge_version": "draft:a2981753c752",
- "source": "draft-corpus",
+ "built_at": "2026-10-27T04:32:44+00:00",
+ "knowledge_version": "2026-10-27 04:32:21.958999+00",
+ "source": "approved",
  "stop": [
   "0",
   "1",
@@ -808,7 +808,6 @@
   "ammyadmin",
   "ammyy",
   "an",
-  "analyst",
   "analytics",
   "and",
   "another",
@@ -1051,7 +1050,6 @@
   "fujitsu",
   "fully",
   "gapped",
-  "gartner",
   "gateway",
   "gcc",
   "gcp",
@@ -1196,7 +1194,6 @@
   "long",
   "low",
   "ltsr",
-  "magic",
   "make",
   "managed",
   "management",
@@ -1345,7 +1342,6 @@
   "public",
   "pulse",
   "qr",
-  "quadrant",
   "quality",
   "raise",
   "range",
@@ -1558,16 +1554,18 @@
    ],
    "allow": [
     "Citrix",
+    "HyID",
     "HySecure",
-    "HyWorks"
+    "HyWorks",
+    "VMware"
    ],
    "keywords": {
-    "altern": 4.9836,
-    "citrix": 2.5461,
-    "compar": 4.0141,
-    "differ": 5.3868,
-    "real": 5.3868,
-    "replac": 2.8753
+    "altern": 4.8701,
+    "citrix": 2.4412,
+    "compar": 3.902,
+    "differ": 5.9636,
+    "real": 5.273,
+    "replac": 2.7678
    },
    "phrases": [
     "how is accops different from citrix",
@@ -1578,7 +1576,7 @@
     "what replaces citrix",
     "citrix ka alternative"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-02",
@@ -1592,16 +1590,16 @@
     "Citrix"
    ],
    "keywords": {
-    "citrix": 2.5461,
-    "compon": 4.6982,
-    "direct": 4.4773,
-    "drop": 6.0776,
-    "estat": 4.6982,
-    "many": 3.7955,
-    "produc": 4.0141,
-    "replac": 2.8753,
-    "retir": 6.0776,
-    "storef": 6.0776
+    "citrix": 2.4412,
+    "compon": 4.585,
+    "direct": 4.3644,
+    "drop": 5.9636,
+    "estat": 4.585,
+    "many": 3.6839,
+    "produc": 3.902,
+    "replac": 2.7678,
+    "retir": 5.9636,
+    "storef": 5.9636
    },
    "phrases": [
     "which citrix components does accops replace",
@@ -1612,7 +1610,7 @@
     "storefront and director replacement",
     "citrix products we can retire"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-03",
@@ -1626,12 +1624,12 @@
     "Citrix"
    ],
    "keywords": {
-    "citrix": 2.5461,
-    "compar": 4.0141,
-    "featur": 4.2973,
-    "parity": 6.0776,
-    "side": 5.3868,
-    "tabl": 6.0776
+    "citrix": 2.4412,
+    "compar": 3.902,
+    "featur": 4.1846,
+    "parity": 5.9636,
+    "side": 5.273,
+    "tabl": 5.9636
    },
    "phrases": [
     "how does accops compare with citrix feature by feature",
@@ -1640,7 +1638,7 @@
     "accops citrix comparison table",
     "compare accops and citrix side by side"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-04",
@@ -1654,14 +1652,14 @@
     "Citrix"
    ],
    "keywords": {
-    "better": 6.0776,
-    "choic": 6.0776,
-    "citrix": 2.5461,
-    "estat": 4.6982,
-    "fit": 5.3868,
-    "larg": 4.4773,
-    "right": 4.9836,
-    "stay": 4.9836
+    "better": 5.9636,
+    "choic": 5.9636,
+    "citrix": 2.4412,
+    "estat": 4.585,
+    "fit": 5.273,
+    "larg": 4.3644,
+    "right": 5.273,
+    "stay": 4.8701
    },
    "phrases": [
     "when is citrix still the better choice",
@@ -1670,7 +1668,7 @@
     "large citrix estate",
     "is citrix better for large estates"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-05",
@@ -1684,16 +1682,16 @@
     "Citrix"
    ],
    "keywords": {
-    "approa": 4.6982,
-    "citrix": 2.5461,
-    "downti": 5.3868,
-    "migrat": 3.8986,
-    "move": 4.6982,
-    "replac": 2.8753,
-    "rip": 6.0776,
-    "run": 3.2805,
-    "side": 5.3868,
-    "withou": 3.468
+    "approa": 5.9636,
+    "citrix": 2.4412,
+    "downti": 5.273,
+    "migrat": 3.7867,
+    "move": 4.8701,
+    "replac": 2.7678,
+    "rip": 5.9636,
+    "run": 3.1707,
+    "side": 5.273,
+    "withou": 3.429
    },
    "phrases": [
     "can we migrate off citrix without downtime",
@@ -1704,7 +1702,7 @@
     "run citrix and accops side by side",
     "citrix se migrate kaise karein bina downtime"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-06",
@@ -1718,15 +1716,15 @@
     "Citrix"
    ],
    "keywords": {
-    "citrix": 2.5461,
-    "deploy": 3.8986,
-    "fast": 4.4773,
-    "long": 4.2973,
-    "many": 3.7955,
-    "migrat": 3.8986,
-    "move": 4.6982,
-    "take": 4.9836,
-    "timeli": 6.0776
+    "citrix": 2.4412,
+    "deploy": 3.7867,
+    "fast": 4.8701,
+    "long": 4.3644,
+    "many": 3.6839,
+    "migrat": 3.7867,
+    "move": 4.8701,
+    "take": 4.8701,
+    "timeli": 5.9636
    },
    "phrases": [
     "how long does a citrix to accops migration take",
@@ -1735,7 +1733,7 @@
     "deployment time",
     "how fast can we move"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-07",
@@ -1747,17 +1745,17 @@
     "Citrix"
    ],
    "keywords": {
-    "befor": 4.9836,
-    "commit": 6.0776,
-    "concep": 6.0776,
-    "few": 6.0776,
-    "free": 6.0776,
-    "pilot": 5.3868,
-    "poc": 5.3868,
-    "proof": 6.0776,
-    "run": 3.2805,
-    "trial": 6.0776,
-    "user": 3.4012
+    "befor": 4.8701,
+    "commit": 5.9636,
+    "concep": 5.9636,
+    "few": 5.9636,
+    "free": 5.9636,
+    "pilot": 5.273,
+    "poc": 5.273,
+    "proof": 5.9636,
+    "run": 3.1707,
+    "trial": 5.9636,
+    "user": 3.5066
    },
    "phrases": [
     "can we run a pilot or poc before committing",
@@ -1767,7 +1765,7 @@
     "pilot with a few users",
     "free trial"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-08",
@@ -1779,15 +1777,15 @@
     "Citrix"
    ],
    "keywords": {
-    "admin": 5.3868,
-    "chang": 4.1454,
-    "curv": 6.0776,
-    "experi": 4.9836,
-    "learn": 6.0776,
-    "notic": 6.0776,
-    "team": 4.6982,
-    "train": 4.9836,
-    "user": 3.4012
+    "admin": 5.273,
+    "chang": 4.585,
+    "curv": 5.9636,
+    "experi": 5.273,
+    "learn": 5.9636,
+    "notic": 5.9636,
+    "team": 4.8701,
+    "train": 4.8701,
+    "user": 3.5066
    },
    "phrases": [
     "will our it team and users need retraining",
@@ -1797,7 +1795,7 @@
     "will users notice a change",
     "user experience change"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-09",
@@ -1815,17 +1813,17 @@
     "VMware"
    ],
    "keywords": {
-    "activ": 4.9836,
-    "agnost": 6.0776,
-    "direct": 4.4773,
-    "exist": 4.9836,
-    "file": 5.3868,
-    "hyperv": 4.2973,
-    "infras": 4.6982,
-    "keep": 5.3868,
-    "replac": 2.8753,
-    "server": 4.2973,
-    "vmwar": 4.4773
+    "activ": 4.8701,
+    "agnost": 5.9636,
+    "direct": 4.3644,
+    "exist": 4.8701,
+    "file": 5.273,
+    "hyperv": 4.1846,
+    "infras": 4.8701,
+    "keep": 5.9636,
+    "replac": 2.7678,
+    "server": 4.1846,
+    "vmwar": 4.3644
    },
    "phrases": [
     "do we have to replace our hypervisor or active directory",
@@ -1835,7 +1833,7 @@
     "keep file servers",
     "hypervisor agnostic"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-10",
@@ -1855,13 +1853,13 @@
     "Thin Clients"
    ],
    "keywords": {
-    "ahv": 5.3868,
-    "centra": 5.3868,
-    "nutani": 4.9836,
-    "prism": 5.3868,
-    "run": 3.2805,
-    "suppor": 2.5215,
-    "vdi": 2.7726
+    "ahv": 5.273,
+    "centra": 5.273,
+    "nutani": 4.8701,
+    "prism": 5.273,
+    "run": 3.1707,
+    "suppor": 2.4169,
+    "vdi": 2.6985
    },
    "phrases": [
     "does accops run on nutanix ahv",
@@ -1871,7 +1869,7 @@
     "does accops support nutanix",
     "nutanix ahv vdi"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-11",
@@ -1893,11 +1891,11 @@
     "VMware"
    ],
    "keywords": {
-    "moving": 6.0776,
-    "proxmo": 6.0776,
-    "suppor": 2.5215,
-    "vdi": 2.7726,
-    "vmwar": 4.4773
+    "moving": 5.9636,
+    "proxmo": 5.9636,
+    "suppor": 2.4169,
+    "vdi": 2.6985,
+    "vmwar": 4.3644
    },
    "phrases": [
     "does accops support proxmox",
@@ -1907,7 +1905,7 @@
     "proxmox vdi",
     "moving from vmware to proxmox"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-12",
@@ -1929,17 +1927,17 @@
     "VMware"
    ],
    "keywords": {
-    "aws": 6.0776,
-    "azur": 3.7955,
-    "cloud": 4.1454,
-    "gcp": 6.0776,
-    "hyperv": 4.2973,
-    "oci": 6.0776,
-    "opensh": 4.9836,
-    "openst": 6.0776,
-    "platfo": 4.4773,
-    "public": 4.9836,
-    "suppor": 2.5215
+    "aws": 5.9636,
+    "azur": 3.7867,
+    "cloud": 4.1846,
+    "gcp": 5.9636,
+    "hyperv": 4.1846,
+    "oci": 5.9636,
+    "opensh": 4.8701,
+    "openst": 5.9636,
+    "platfo": 4.3644,
+    "public": 4.8701,
+    "suppor": 2.4169
    },
    "phrases": [
     "which hypervisors and clouds does accops support",
@@ -1949,7 +1947,7 @@
     "openshift openstack support",
     "which public clouds"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-13",
@@ -1964,13 +1962,13 @@
     "Citrix"
    ],
    "keywords": {
-    "daas": 3.4012,
-    "deskto": 3.2805,
-    "host": 4.9836,
-    "manag": 3.6177,
-    "run": 3.2805,
-    "servic": 4.1454,
-    "vdi": 2.7726
+    "daas": 3.5911,
+    "deskto": 3.2909,
+    "host": 4.8701,
+    "manag": 3.5911,
+    "run": 3.1707,
+    "servic": 4.033,
+    "vdi": 2.6985
    },
    "phrases": [
     "can accops run it for us as a managed service daas",
@@ -1981,7 +1979,7 @@
     "managed vdi service",
     "accops managed desktops"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-14",
@@ -2000,13 +1998,13 @@
     "Thin Clients"
    ],
    "keywords": {
-    "avd": 4.6982,
-    "azur": 3.7955,
-    "deskto": 3.2805,
-    "micros": 4.4773,
-    "virtua": 3.5398,
-    "work": 2.4298,
-    "wvd": 6.0776
+    "avd": 4.585,
+    "azur": 3.7867,
+    "deskto": 3.2909,
+    "micros": 4.3644,
+    "virtua": 3.5066,
+    "work": 2.4662,
+    "wvd": 5.9636
    },
    "phrases": [
     "does accops work with azure virtual desktop",
@@ -2016,7 +2014,7 @@
     "microsoft avd",
     "accops for avd"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-15",
@@ -2032,13 +2030,13 @@
     "Photon"
    ],
    "keywords": {
-    "displa": 4.6982,
-    "good": 5.3868,
-    "hdx": 4.9836,
-    "latenc": 6.0776,
-    "perfor": 6.0776,
-    "photon": 5.3868,
-    "protoc": 4.9836
+    "displa": 4.585,
+    "good": 5.273,
+    "hdx": 4.8701,
+    "latenc": 5.9636,
+    "perfor": 5.9636,
+    "photon": 5.273,
+    "protoc": 4.8701
    },
    "phrases": [
     "is the accops display protocol as good as hdx",
@@ -2048,7 +2046,7 @@
     "latency",
     "photon display protocol"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-16",
@@ -2063,18 +2061,18 @@
     "HyWorks"
    ],
    "keywords": {
-    "cad": 5.3868,
-    "call": 4.4773,
-    "confer": 6.0776,
-    "gpu": 6.0776,
-    "graphi": 4.6982,
-    "optimi": 6.0776,
-    "qualit": 6.0776,
-    "team": 4.6982,
-    "video": 5.3868,
-    "well": 6.0776,
-    "work": 2.4298,
-    "workst": 5.3868
+    "cad": 5.273,
+    "call": 4.3644,
+    "confer": 5.9636,
+    "gpu": 5.9636,
+    "graphi": 4.585,
+    "optimi": 5.9636,
+    "qualit": 5.9636,
+    "team": 4.8701,
+    "video": 5.273,
+    "well": 5.9636,
+    "work": 2.4662,
+    "workst": 5.273
    },
    "phrases": [
     "will teams calls video and graphics work well",
@@ -2085,7 +2083,7 @@
     "graphics workstation",
     "teams call quality"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-17",
@@ -2099,12 +2097,12 @@
     "Citrix"
    ],
    "keywords": {
-    "27001": 5.3868,
-    "certif": 4.9836,
-    "compli": 3.7955,
-    "iso": 5.3868,
-    "securi": 4.0141,
-    "soc": 6.0776
+    "27001": 5.273,
+    "certif": 4.8701,
+    "compli": 3.6839,
+    "iso": 5.273,
+    "securi": 4.1846,
+    "soc": 5.9636
    },
    "phrases": [
     "is accops iso 27001 certified",
@@ -2115,7 +2113,7 @@
     "soc 2",
     "iso certified hai kya"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-18",
@@ -2131,18 +2129,18 @@
     "Government"
    ],
    "keywords": {
-    "act": 4.9836,
-    "cert": 5.3868,
-    "compli": 3.7955,
-    "dpdp": 4.9836,
-    "dss": 6.0776,
-    "guidel": 4.9836,
-    "help": 3.6177,
-    "india": 3.7955,
-    "meity": 5.3868,
-    "pci": 6.0776,
-    "rbi": 3.7955,
-    "regula": 5.3868
+    "act": 5.9636,
+    "cert": 5.273,
+    "compli": 3.6839,
+    "dpdp": 5.273,
+    "dss": 5.9636,
+    "guidel": 4.8701,
+    "help": 3.6839,
+    "india": 4.1846,
+    "meity": 5.273,
+    "pci": 5.9636,
+    "rbi": 3.7867,
+    "regula": 5.273
    },
    "phrases": [
     "does accops help with rbi cert in or dpdp compliance",
@@ -2153,7 +2151,7 @@
     "regulatory compliance india",
     "pci dss"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-19",
@@ -2169,13 +2167,13 @@
     "HySecure"
    ],
    "keywords": {
-    "adc": 6.0776,
-    "balanc": 6.0776,
-    "citrix": 2.5461,
-    "gatewa": 4.9836,
-    "load": 6.0776,
-    "netsca": 4.9836,
-    "replac": 2.8753
+    "adc": 5.9636,
+    "balanc": 5.9636,
+    "citrix": 2.4412,
+    "gatewa": 4.8701,
+    "load": 5.9636,
+    "netsca": 4.8701,
+    "replac": 2.7678
    },
    "phrases": [
     "can accops replace netscaler or citrix gateway",
@@ -2185,7 +2183,7 @@
     "do we still need netscaler",
     "load balancer replacement"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-20",
@@ -2203,16 +2201,16 @@
     "Okta"
    ],
    "keywords": {
-    "anoth": 6.0776,
-    "duo": 6.0776,
-    "identi": 5.3868,
-    "includ": 4.9836,
-    "mfa": 3.3389,
-    "okta": 6.0776,
-    "provid": 4.9836,
-    "separa": 4.9836,
-    "sso": 4.2973,
-    "vendor": 3.2255
+    "anoth": 5.9636,
+    "duo": 5.9636,
+    "identi": 5.273,
+    "includ": 4.8701,
+    "mfa": 3.2288,
+    "okta": 5.9636,
+    "provid": 4.8701,
+    "separa": 4.8701,
+    "sso": 4.1846,
+    "vendor": 3.116
    },
    "phrases": [
     "are mfa and sso included or do we need another vendor",
@@ -2222,7 +2220,7 @@
     "do we need okta or duo",
     "identity provider"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-21",
@@ -2236,15 +2234,15 @@
     "Citrix"
    ],
    "keywords": {
-    "batao": 6.0776,
-    "cheap": 5.3868,
-    "citrix": 2.5461,
-    "compar": 4.0141,
-    "cost": 4.1454,
-    "licens": 3.5398,
-    "per": 5.3868,
-    "pric": 4.2973,
-    "user": 3.4012
+    "batao": 5.9636,
+    "cheap": 5.273,
+    "citrix": 2.4412,
+    "compar": 3.902,
+    "cost": 4.033,
+    "licens": 3.5066,
+    "per": 5.273,
+    "pric": 4.3644,
+    "user": 3.5066
    },
    "phrases": [
     "how much does accops cost compared with citrix",
@@ -2255,7 +2253,7 @@
     "licence cost",
     "accops ki pricing batao"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-22",
@@ -2270,15 +2268,15 @@
     "Government"
    ],
    "keywords": {
-    "cost": 4.1454,
-    "custom": 3.468,
-    "exampl": 6.0776,
-    "reduct": 6.0776,
-    "report": 6.0776,
-    "roi": 6.0776,
-    "save": 5.3868,
-    "saving": 4.9836,
-    "tco": 4.9836
+    "cost": 4.033,
+    "custom": 3.3574,
+    "exampl": 5.9636,
+    "reduct": 5.9636,
+    "report": 5.9636,
+    "roi": 5.9636,
+    "save": 5.273,
+    "saving": 5.273,
+    "tco": 5.273
    },
    "phrases": [
     "what savings have customers reported",
@@ -2288,7 +2286,7 @@
     "cost savings examples",
     "how much did customers save"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-23",
@@ -2300,15 +2298,15 @@
     "Citrix"
    ],
    "keywords": {
-    "availa": 4.1454,
-    "concur": 6.0776,
-    "licens": 3.5398,
-    "model": 4.6982,
-    "named": 6.0776,
-    "option": 4.6982,
-    "perpet": 4.6982,
-    "subscr": 6.0776,
-    "user": 3.4012
+    "availa": 4.1846,
+    "concur": 5.9636,
+    "licens": 3.5066,
+    "model": 4.585,
+    "named": 5.9636,
+    "option": 4.585,
+    "perpet": 4.8701,
+    "subscr": 5.9636,
+    "user": 3.5066
    },
    "phrases": [
     "what licensing models are available",
@@ -2318,7 +2316,7 @@
     "named users",
     "licensing options"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-24",
@@ -2330,16 +2328,16 @@
     "Citrix"
    ],
    "keywords": {
-    "fewer": 6.0776,
-    "go": 4.6982,
-    "increa": 4.6982,
-    "lock": 6.0776,
-    "pric": 4.2973,
-    "protec": 4.6982,
-    "rais": 5.3868,
-    "renewa": 4.6982,
-    "seat": 5.3868,
-    "won": 4.6982
+    "fewer": 5.9636,
+    "go": 4.585,
+    "increa": 4.8701,
+    "lock": 5.9636,
+    "pric": 4.3644,
+    "protec": 4.8701,
+    "rais": 5.9636,
+    "renewa": 5.273,
+    "seat": 5.9636,
+    "won": 4.8701
    },
    "phrases": [
     "how do we know accops won t raise prices at renewal too",
@@ -2349,7 +2347,7 @@
     "will the price go up at renewal",
     "fewer seats at renewal"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-25",
@@ -2365,15 +2363,15 @@
     "HyWorks"
    ],
    "keywords": {
-    "anyon": 4.4773,
-    "case": 4.0141,
-    "citrix": 2.5461,
-    "custom": 3.468,
-    "displa": 4.6982,
-    "migrat": 3.8986,
-    "moved": 6.0776,
-    "replac": 2.8753,
-    "study": 4.6982
+    "anyon": 4.3644,
+    "case": 3.902,
+    "citrix": 2.4412,
+    "custom": 3.3574,
+    "displa": 4.585,
+    "migrat": 3.7867,
+    "moved": 5.9636,
+    "replac": 2.7678,
+    "study": 4.585
    },
    "phrases": [
     "has anyone replaced citrix with accops",
@@ -2382,7 +2380,7 @@
     "citrix migration case study",
     "who moved off citrix"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-26",
@@ -2401,15 +2399,15 @@
     "Government"
    ],
    "keywords": {
-    "bank": 3.6177,
-    "bfsi": 4.9836,
-    "client": 3.2805,
-    "custom": 3.468,
-    "insur": 4.4773,
-    "insura": 6.0776,
-    "kauns": 5.3868,
-    "refer": 4.6982,
-    "use": 2.3278
+    "bank": 3.5911,
+    "bfsi": 5.9636,
+    "client": 3.2288,
+    "custom": 3.3574,
+    "insur": 4.3644,
+    "insura": 5.9636,
+    "kauns": 5.273,
+    "refer": 4.585,
+    "use": 2.3049
    },
    "phrases": [
     "which banks and insurers use accops",
@@ -2419,34 +2417,7 @@
     "banking clients",
     "kaunse bank use karte hain"
    ],
-   "min_score": 0.43
-  },
-  {
-   "qa_id": "lp-27",
-   "groups": [
-    "citrix-lp",
-    "home"
-   ],
-   "must": [],
-   "allow": [
-    "Citrix"
-   ],
-   "keywords": {
-    "analys": 6.0776,
-    "daas": 3.4012,
-    "gartn": 4.2973,
-    "magic": 4.4773,
-    "quadra": 4.4773,
-    "recogn": 5.3868
-   },
-   "phrases": [
-    "is accops in the gartner magic quadrant",
-    "gartner",
-    "magic quadrant",
-    "analyst recognition",
-    "gartner daas"
-   ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-28",
@@ -2465,16 +2436,16 @@
     "Pharma / Healthcare"
    ],
    "keywords": {
-    "big": 6.0776,
-    "compan": 3.6177,
-    "count": 6.0776,
-    "countr": 5.3868,
-    "custom": 3.468,
-    "many": 3.7955,
-    "number": 6.0776,
-    "organi": 4.2973,
-    "partn": 3.6177,
-    "use": 2.3278
+    "big": 5.9636,
+    "compan": 3.5066,
+    "count": 5.9636,
+    "countr": 5.273,
+    "custom": 3.3574,
+    "many": 3.6839,
+    "number": 5.9636,
+    "organi": 4.1846,
+    "partn": 3.7867,
+    "use": 2.3049
    },
    "phrases": [
     "how many organisations use accops",
@@ -2484,7 +2455,7 @@
     "how many countries",
     "how many partners"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-29",
@@ -2497,16 +2468,16 @@
     "Citrix"
    ],
    "keywords": {
-    "after": 4.9836,
-    "go": 4.6982,
-    "live": 5.3868,
-    "model": 4.6982,
-    "oem": 6.0776,
-    "partn": 3.6177,
-    "provid": 4.9836,
-    "sla": 6.0776,
-    "suppor": 2.5215,
-    "techni": 6.0776
+    "after": 4.8701,
+    "go": 4.585,
+    "live": 5.273,
+    "model": 4.585,
+    "oem": 5.9636,
+    "partn": 3.7867,
+    "provid": 4.8701,
+    "sla": 5.9636,
+    "suppor": 2.4169,
+    "techni": 5.9636
    },
    "phrases": [
     "who supports us after go live accops or a partner",
@@ -2516,7 +2487,7 @@
     "support model",
     "support sla"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-30",
@@ -2530,17 +2501,17 @@
     "Citrix"
    ],
    "keywords": {
-    "africa": 4.6982,
-    "east": 4.2973,
-    "europ": 5.3868,
-    "india": 3.7955,
-    "intern": 4.2973,
-    "middl": 4.4773,
-    "organi": 4.2973,
-    "outsid": 5.3868,
-    "suppor": 2.5215,
-    "uae": 4.9836,
-    "work": 2.4298
+    "africa": 4.585,
+    "east": 4.3644,
+    "europ": 5.273,
+    "india": 4.1846,
+    "intern": 4.3644,
+    "middl": 4.585,
+    "organi": 4.1846,
+    "outsid": 5.273,
+    "suppor": 2.4169,
+    "uae": 4.8701,
+    "work": 2.4662
    },
    "phrases": [
     "do you support organisations outside india",
@@ -2551,7 +2522,7 @@
     "africa",
     "do you work outside india"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-31",
@@ -2566,18 +2537,18 @@
     "Reliance Jio"
    ],
    "keywords": {
-    "compan": 3.6177,
-    "headqu": 5.3868,
-    "indian": 4.9836,
-    "jio": 5.3868,
-    "locati": 6.0776,
-    "owners": 6.0776,
-    "owns": 5.3868,
-    "parent": 6.0776,
-    "relian": 5.3868,
-    "stabil": 6.0776,
-    "struct": 6.0776,
-    "vendor": 3.2255
+    "compan": 3.5066,
+    "headqu": 5.273,
+    "indian": 5.273,
+    "jio": 5.273,
+    "locati": 5.9636,
+    "owners": 5.9636,
+    "owns": 5.273,
+    "parent": 5.9636,
+    "relian": 5.273,
+    "stabil": 5.9636,
+    "struct": 5.9636,
+    "vendor": 3.116
    },
    "phrases": [
     "who owns accops and is it an indian company",
@@ -2588,7 +2559,7 @@
     "accops parent company",
     "vendor stability"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-32",
@@ -2601,17 +2572,17 @@
     "Citrix"
    ],
    "keywords": {
-    "book": 5.3868,
-    "citrix": 2.5461,
-    "contac": 4.9836,
-    "demo": 5.3868,
-    "engin": 5.3868,
-    "expert": 5.3868,
-    "leav": 4.2973,
-    "sale": 4.9836,
-    "someon": 4.9836,
-    "speak": 6.0776,
-    "talk": 4.9836
+    "book": 5.273,
+    "citrix": 2.4412,
+    "contac": 4.8701,
+    "demo": 5.273,
+    "engin": 5.273,
+    "expert": 5.273,
+    "leav": 4.1846,
+    "sale": 4.8701,
+    "someon": 5.273,
+    "speak": 5.9636,
+    "talk": 4.8701
    },
    "phrases": [
     "how do i talk to an accops engineer",
@@ -2622,7 +2593,7 @@
     "talk to an expert",
     "talk to an engineer about leaving citrix"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-33",
@@ -2634,18 +2605,19 @@
    "must": [],
    "allow": [
     "Citrix",
+    "HyDesk",
     "HyID",
     "HySecure",
     "HyWorks",
     "Thin Clients"
    ],
    "keywords": {
-    "kauns": 5.3868,
-    "overvi": 5.3868,
-    "platfo": 4.4773,
-    "produc": 4.0141,
-    "rang": 6.0776,
-    "sell": 4.4773
+    "kauns": 5.273,
+    "overvi": 5.273,
+    "platfo": 4.3644,
+    "produc": 3.902,
+    "rang": 5.9636,
+    "sell": 4.3644
    },
    "phrases": [
     "what is accops",
@@ -2655,7 +2627,7 @@
     "accops product range",
     "accops ke products kaunse hain"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-34",
@@ -2678,15 +2650,15 @@
     "VMware"
    ],
    "keywords": {
-    "app": 4.6982,
-    "case": 4.0141,
-    "deliv": 4.4773,
-    "deskto": 3.2805,
-    "featur": 4.2973,
-    "hywork": 3.5398,
-    "use": 2.3278,
-    "vdi": 2.7726,
-    "virtua": 3.5398
+    "app": 4.585,
+    "case": 3.902,
+    "deliv": 4.3644,
+    "deskto": 3.2909,
+    "featur": 4.1846,
+    "hywork": 3.429,
+    "use": 2.3049,
+    "vdi": 2.6985,
+    "virtua": 3.5066
    },
    "phrases": [
     "what is hyworks vdi",
@@ -2696,7 +2668,7 @@
     "hyworks features",
     "hyworks vdi kya hai"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-35",
@@ -2710,20 +2682,21 @@
    ],
    "allow": [
     "Citrix",
+    "Government",
     "HySecure"
    ],
    "keywords": {
-    "access": 2.8753,
-    "app": 4.6982,
-    "case": 4.0141,
-    "featur": 4.2973,
-    "gatewa": 4.9836,
-    "hysecu": 3.7955,
-    "privat": 6.0776,
-    "trust": 4.2973,
-    "use": 2.3278,
-    "zero": 4.1454,
-    "ztna": 3.8986
+    "access": 2.7678,
+    "app": 4.585,
+    "case": 3.902,
+    "featur": 4.1846,
+    "gatewa": 4.8701,
+    "hysecu": 3.7867,
+    "privat": 5.9636,
+    "trust": 5.273,
+    "use": 2.3049,
+    "zero": 4.8701,
+    "ztna": 3.7867
    },
    "phrases": [
     "what is the hysecure ztna gateway",
@@ -2733,7 +2706,7 @@
     "hysecure gateway features",
     "hysecure ztna gateway kya hai"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-36",
@@ -2752,20 +2725,20 @@
     "HyID"
    ],
    "keywords": {
-    "authen": 4.4773,
-    "case": 4.0141,
-    "factor": 4.9836,
-    "featur": 4.2973,
-    "handl": 4.6982,
-    "hyid": 4.1454,
-    "identi": 5.3868,
-    "manag": 3.6177,
-    "mfa": 3.3389,
-    "multi": 4.9836,
-    "sign": 5.3868,
-    "singl": 6.0776,
-    "sso": 4.2973,
-    "use": 2.3278
+    "authen": 4.3644,
+    "case": 3.902,
+    "factor": 4.8701,
+    "featur": 4.1846,
+    "handl": 4.585,
+    "hyid": 4.033,
+    "identi": 5.273,
+    "manag": 3.5911,
+    "mfa": 3.2288,
+    "multi": 4.8701,
+    "sign": 5.273,
+    "singl": 5.9636,
+    "sso": 4.1846,
+    "use": 2.3049
    },
    "phrases": [
     "how does hyid handle mfa and sso",
@@ -2775,7 +2748,7 @@
     "hyid features",
     "hyid identity management"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-37",
@@ -2794,17 +2767,17 @@
     "Thin Clients"
    ],
    "keywords": {
-    "client": 3.2805,
-    "deskto": 3.2805,
-    "devic": 3.468,
-    "hydesk": 4.4773,
-    "low": 4.6982,
-    "milega": 6.0776,
-    "offer": 4.0141,
-    "power": 4.6982,
-    "replac": 2.8753,
-    "thin": 3.6177,
-    "zero": 4.1454
+    "client": 3.2288,
+    "deskto": 3.2909,
+    "devic": 3.3574,
+    "hydesk": 4.3644,
+    "low": 4.585,
+    "milega": 5.9636,
+    "offer": 4.033,
+    "power": 4.8701,
+    "replac": 2.7678,
+    "thin": 3.5066,
+    "zero": 4.8701
    },
    "phrases": [
     "do you offer thin clients",
@@ -2815,7 +2788,7 @@
     "low power thin clients",
     "thin client milega kya"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-38",
@@ -2830,16 +2803,16 @@
     "HyWorks"
    ],
    "keywords": {
-    "app": 4.6982,
-    "attach": 6.0776,
-    "citrix": 2.5461,
-    "fslogi": 4.9836,
-    "manag": 3.6177,
-    "profil": 6.0776,
-    "replac": 2.8753,
-    "roam": 6.0776,
-    "suppor": 2.5215,
-    "user": 3.4012
+    "app": 4.585,
+    "attach": 5.9636,
+    "citrix": 2.4412,
+    "fslogi": 4.8701,
+    "manag": 3.5911,
+    "profil": 5.9636,
+    "replac": 2.7678,
+    "roam": 5.9636,
+    "suppor": 2.4169,
+    "user": 3.5066
    },
    "phrases": [
     "do you support fslogix and app attach",
@@ -2849,7 +2822,7 @@
     "roaming profiles",
     "replacement for citrix profile management"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-39",
@@ -2866,18 +2839,18 @@
     "HyLabs"
    ],
    "keywords": {
-    "colleg": 6.0776,
-    "comput": 4.9836,
-    "educat": 6.0776,
-    "home": 4.2973,
-    "hylab": 4.2973,
-    "ict": 4.9836,
-    "lab": 6.0776,
-    "labs": 4.6982,
-    "studen": 4.9836,
-    "univer": 4.4773,
-    "vdi": 2.7726,
-    "virtua": 3.5398
+    "colleg": 5.9636,
+    "comput": 5.9636,
+    "educat": 5.9636,
+    "home": 4.1846,
+    "hylab": 4.1846,
+    "ict": 4.8701,
+    "lab": 5.9636,
+    "labs": 4.585,
+    "studen": 4.8701,
+    "univer": 4.3644,
+    "vdi": 2.6985,
+    "virtua": 3.5066
    },
    "phrases": [
     "do you have virtual labs for colleges",
@@ -2887,7 +2860,7 @@
     "vdi for education",
     "lab for students from home"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-40",
@@ -2904,13 +2877,13 @@
     "HySecure"
    ],
    "keywords": {
-    "hatana": 6.0776,
-    "instea": 6.0776,
-    "replac": 2.8753,
-    "rid": 6.0776,
-    "ssl": 6.0776,
-    "vpn": 4.0141,
-    "ztna": 3.8986
+    "hatana": 5.9636,
+    "instea": 5.9636,
+    "replac": 2.7678,
+    "rid": 5.9636,
+    "ssl": 5.9636,
+    "vpn": 3.902,
+    "ztna": 3.7867
    },
    "phrases": [
     "can accops replace our vpn",
@@ -2920,7 +2893,7 @@
     "get rid of our vpn",
     "vpn hatana hai"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-41",
@@ -2935,19 +2908,19 @@
     "Nano"
    ],
    "keywords": {
-    "access": 2.8753,
-    "bring": 6.0776,
-    "byod": 4.6982,
-    "devic": 3.468,
-    "kaam": 6.0776,
-    "laptop": 4.6982,
-    "nano": 4.6982,
-    "own": 4.4773,
-    "person": 4.2973,
-    "secur": 3.0336,
-    "staff": 4.6982,
-    "unmana": 5.3868,
-    "work": 2.4298
+    "access": 2.7678,
+    "bring": 5.9636,
+    "byod": 4.585,
+    "devic": 3.3574,
+    "kaam": 5.9636,
+    "laptop": 4.585,
+    "nano": 4.585,
+    "own": 4.585,
+    "person": 4.3644,
+    "secur": 2.9692,
+    "staff": 4.585,
+    "unmana": 5.273,
+    "work": 2.4662
    },
    "phrases": [
     "can staff work securely from personal devices",
@@ -2958,7 +2931,7 @@
     "accops nano",
     "apne laptop se kaam"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-42",
@@ -2975,17 +2948,17 @@
     "HyWorks"
    ],
    "keywords": {
-    "access": 2.8753,
-    "based": 4.9836,
-    "brows": 3.8986,
-    "chrom": 5.3868,
-    "client": 3.2805,
-    "connec": 4.4773,
-    "deskto": 3.2805,
-    "html5": 6.0776,
-    "hylit": 4.6982,
-    "remot": 3.078,
-    "user": 3.4012
+    "access": 2.7678,
+    "based": 5.273,
+    "brows": 3.7867,
+    "chrom": 5.273,
+    "client": 3.2288,
+    "connec": 4.3644,
+    "deskto": 3.2909,
+    "html5": 5.9636,
+    "hylit": 4.585,
+    "remot": 3.1707,
+    "user": 3.5066
    },
    "phrases": [
     "can users connect from just a browser",
@@ -2995,7 +2968,7 @@
     "access from chrome browser",
     "browser based remote desktop"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-43",
@@ -3014,16 +2987,16 @@
     "HySecure"
    ],
    "keywords": {
-    "authen": 4.4773,
-    "bioaut": 4.6982,
-    "biomet": 5.3868,
-    "deepfa": 6.0776,
-    "detect": 5.3868,
-    "face": 5.3868,
-    "finger": 5.3868,
-    "login": 4.9836,
-    "mfa": 3.3389,
-    "suppor": 2.5215
+    "authen": 4.3644,
+    "bioaut": 4.585,
+    "biomet": 5.273,
+    "deepfa": 5.9636,
+    "detect": 5.273,
+    "face": 5.9636,
+    "finger": 5.273,
+    "login": 4.8701,
+    "mfa": 3.2288,
+    "suppor": 2.4169
    },
    "phrases": [
     "do you support biometric or face login",
@@ -3033,7 +3006,7 @@
     "bioauth biometric mfa",
     "bioauth deepfake detection"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-44",
@@ -3050,19 +3023,19 @@
     "HyID"
    ],
    "keywords": {
-    "add": 4.2973,
-    "applic": 4.4773,
-    "apps": 4.0141,
-    "chang": 4.1454,
-    "code": 5.3868,
-    "legacy": 4.2973,
-    "logon": 5.3868,
-    "mandat": 6.0776,
-    "mfa": 3.3389,
-    "old": 4.9836,
-    "rbi": 3.7955,
-    "window": 4.9836,
-    "withou": 3.468
+    "add": 4.1846,
+    "applic": 4.585,
+    "apps": 3.902,
+    "chang": 4.585,
+    "code": 5.273,
+    "legacy": 4.1846,
+    "logon": 5.273,
+    "mandat": 5.9636,
+    "mfa": 3.2288,
+    "old": 5.273,
+    "rbi": 3.7867,
+    "window": 4.8701,
+    "withou": 3.429
    },
    "phrases": [
     "can you add mfa to legacy apps and windows logon",
@@ -3072,7 +3045,7 @@
     "mfa on old applications",
     "rbi mfa mandate"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-45",
@@ -3092,21 +3065,21 @@
     "Vajra Browser"
    ],
    "keywords": {
-    "365": 4.9836,
-    "access": 2.8753,
-    "apps": 4.0141,
-    "brows": 3.8986,
-    "contro": 5.3868,
-    "enterp": 4.6982,
-    "micros": 4.4773,
-    "offic": 4.9836,
-    "other": 6.0776,
-    "saas": 4.9836,
-    "salesf": 5.3868,
-    "secur": 3.0336,
-    "securi": 4.0141,
-    "sso": 4.2973,
-    "vajra": 5.3868
+    "365": 4.8701,
+    "access": 2.7678,
+    "apps": 3.902,
+    "brows": 3.7867,
+    "contro": 5.273,
+    "enterp": 4.8701,
+    "micros": 4.3644,
+    "offic": 4.8701,
+    "other": 5.9636,
+    "saas": 4.8701,
+    "salesf": 5.273,
+    "secur": 2.9692,
+    "securi": 4.1846,
+    "sso": 4.1846,
+    "vajra": 5.273
    },
    "phrases": [
     "can accops secure microsoft 365 and other saas apps",
@@ -3117,7 +3090,7 @@
     "enterprise browser",
     "vajra browser"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-46",
@@ -3132,12 +3105,12 @@
     "IT / ITeS"
    ],
    "keywords": {
-    "award": 5.3868,
-    "dsci": 6.0776,
-    "indust": 4.2973,
-    "recogn": 5.3868,
-    "winn": 6.0776,
-    "won": 4.6982
+    "award": 5.273,
+    "dsci": 5.9636,
+    "indust": 4.585,
+    "recogn": 5.9636,
+    "winn": 5.9636,
+    "won": 4.8701
    },
    "phrases": [
     "has accops won any awards",
@@ -3147,7 +3120,7 @@
     "award winning",
     "accops recognition"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-47",
@@ -3161,17 +3134,17 @@
     "E-commerce / Retail"
    ],
    "keywords": {
-    "4g": 6.0776,
-    "bandwi": 4.9836,
-    "connec": 4.4773,
-    "intern": 4.2973,
-    "kam": 6.0776,
-    "link": 5.3868,
-    "low": 4.6982,
-    "networ": 4.1454,
-    "poor": 6.0776,
-    "slow": 6.0776,
-    "work": 2.4298
+    "4g": 5.9636,
+    "bandwi": 4.8701,
+    "connec": 4.3644,
+    "intern": 4.3644,
+    "kam": 5.9636,
+    "link": 5.273,
+    "low": 4.585,
+    "networ": 4.033,
+    "poor": 5.9636,
+    "slow": 5.9636,
+    "work": 2.4662
    },
    "phrases": [
     "does accops work over slow or low bandwidth links",
@@ -3181,7 +3154,7 @@
     "works on 4g",
     "kam bandwidth pe chalega"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-48",
@@ -3193,12 +3166,12 @@
     "Citrix"
    ],
    "keywords": {
-    "assess": 6.0776,
-    "befor": 4.9836,
-    "cover": 6.0776,
-    "discov": 6.0776,
-    "migrat": 3.8986,
-    "phas": 6.0776
+    "assess": 5.9636,
+    "befor": 4.8701,
+    "cover": 5.9636,
+    "discov": 5.9636,
+    "migrat": 3.7867,
+    "phas": 5.9636
    },
    "phrases": [
     "what does the migration assessment cover",
@@ -3207,7 +3180,7 @@
     "discovery phase",
     "what do you assess before migration"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-49",
@@ -3221,20 +3194,20 @@
     "Citrix"
    ],
    "keywords": {
-    "avoid": 6.0776,
-    "end": 4.1454,
-    "endpoi": 4.6982,
-    "eol": 5.3868,
-    "hardwa": 5.3868,
-    "life": 4.9836,
-    "new": 5.3868,
-    "old": 4.9836,
-    "pcs": 4.9836,
-    "refres": 6.0776,
-    "reus": 6.0776,
-    "upgrad": 6.0776,
-    "window": 4.9836,
-    "withou": 3.468
+    "avoid": 5.9636,
+    "end": 4.585,
+    "endpoi": 4.585,
+    "eol": 5.273,
+    "hardwa": 5.273,
+    "life": 4.8701,
+    "new": 5.9636,
+    "old": 5.273,
+    "pcs": 4.8701,
+    "refres": 5.9636,
+    "reus": 5.9636,
+    "upgrad": 5.9636,
+    "window": 4.8701,
+    "withou": 3.429
    },
    "phrases": [
     "can we reuse old windows 10 pcs as endpoints",
@@ -3244,7 +3217,7 @@
     "avoid hardware refresh",
     "upgrade windows without new pcs"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-50",
@@ -3257,13 +3230,13 @@
     "HyWorks"
    ],
    "keywords": {
-    "cost": 4.1454,
-    "databa": 5.3868,
-    "licens": 3.5398,
-    "requir": 4.9836,
-    "server": 4.2973,
-    "site": 5.3868,
-    "sql": 5.3868
+    "cost": 4.033,
+    "databa": 5.273,
+    "licens": 3.5066,
+    "requir": 4.8701,
+    "server": 4.1846,
+    "site": 5.273,
+    "sql": 5.273
    },
    "phrases": [
     "do we still need sql server licences",
@@ -3273,7 +3246,7 @@
     "database requirement",
     "sql licence cost"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-51",
@@ -3286,17 +3259,17 @@
     "HyLite"
    ],
    "keywords": {
-    "deskto": 3.2805,
-    "driver": 6.0776,
-    "local": 5.3868,
-    "print": 5.3868,
-    "server": 4.2973,
-    "suppor": 2.5215,
-    "univer": 4.4773,
-    "vdi": 2.7726,
-    "virtua": 3.5398,
-    "withou": 3.468,
-    "work": 2.4298
+    "deskto": 3.2909,
+    "driver": 5.9636,
+    "local": 5.273,
+    "print": 5.273,
+    "server": 4.1846,
+    "suppor": 2.4169,
+    "univer": 4.3644,
+    "vdi": 2.6985,
+    "virtua": 3.5066,
+    "withou": 3.429,
+    "work": 2.4662
    },
    "phrases": [
     "how does printing work without universal print server",
@@ -3306,7 +3279,7 @@
     "print from vdi",
     "local printer support"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-52",
@@ -3321,14 +3294,14 @@
     "HyWorks"
    ],
    "keywords": {
-    "analyt": 6.0776,
-    "citrix": 2.5461,
-    "direct": 4.4773,
-    "monito": 5.3868,
-    "replac": 2.8753,
-    "sessio": 5.3868,
-    "tool": 5.3868,
-    "vdi": 2.7726
+    "analyt": 5.9636,
+    "citrix": 2.4412,
+    "direct": 4.3644,
+    "monito": 5.273,
+    "replac": 2.7678,
+    "sessio": 5.273,
+    "tool": 5.273,
+    "vdi": 2.6985
    },
    "phrases": [
     "what replaces citrix director for monitoring",
@@ -3338,7 +3311,7 @@
     "vdi monitoring tool",
     "how do we monitor sessions"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-53",
@@ -3349,17 +3322,18 @@
    ],
    "must": [],
    "allow": [
+    "BioAuth",
     "Citrix",
     "HyID"
    ],
    "keywords": {
-    "certif": 4.9836,
-    "featur": 4.2973,
-    "layer": 6.0776,
-    "overvi": 5.3868,
-    "platfo": 4.4773,
-    "secur": 3.0336,
-    "securi": 4.0141
+    "certif": 4.8701,
+    "featur": 4.1846,
+    "layer": 5.9636,
+    "overvi": 5.273,
+    "platfo": 4.3644,
+    "secur": 2.9692,
+    "securi": 4.1846
    },
    "phrases": [
     "is accops secure and certified",
@@ -3369,7 +3343,7 @@
     "accops security layers",
     "kitna secure hai platform"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-54",
@@ -3385,14 +3359,14 @@
     "HySecure"
    ],
    "keywords": {
-    "access": 2.8753,
-    "archit": 5.3868,
-    "least": 6.0776,
-    "privil": 6.0776,
-    "trust": 4.2973,
-    "work": 2.4298,
-    "zero": 4.1454,
-    "ztna": 3.8986
+    "access": 2.7678,
+    "archit": 5.9636,
+    "least": 5.9636,
+    "privil": 5.9636,
+    "trust": 5.273,
+    "work": 2.4662,
+    "zero": 4.8701,
+    "ztna": 3.7867
    },
    "phrases": [
     "how does accops do zero trust",
@@ -3402,7 +3376,7 @@
     "zero trust architecture",
     "least privilege access"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-55",
@@ -3417,15 +3391,15 @@
     "HySecure"
    ],
    "keywords": {
-    "connec": 4.4773,
-    "dmz": 6.0776,
-    "firewa": 5.3868,
-    "inboun": 5.3868,
-    "open": 4.9836,
-    "port": 5.3868,
-    "requir": 4.9836,
-    "revers": 6.0776,
-    "rule": 4.4773
+    "connec": 4.3644,
+    "dmz": 5.9636,
+    "firewa": 5.273,
+    "inboun": 5.273,
+    "open": 4.8701,
+    "port": 5.273,
+    "requir": 4.8701,
+    "revers": 5.9636,
+    "rule": 5.9636
    },
    "phrases": [
     "do we need to open inbound firewall ports",
@@ -3435,7 +3409,7 @@
     "no inbound firewall rules",
     "dmz requirement"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-56",
@@ -3448,17 +3422,17 @@
     "Citrix"
    ],
    "keywords": {
-    "access": 2.8753,
-    "antivi": 6.0776,
-    "befor": 4.9836,
-    "bind": 5.3868,
-    "check": 6.0776,
-    "compli": 3.7955,
-    "devic": 3.468,
-    "endpoi": 4.6982,
-    "login": 4.9836,
-    "postur": 6.0776,
-    "run": 3.2805
+    "access": 2.7678,
+    "antivi": 5.9636,
+    "befor": 4.8701,
+    "bind": 5.273,
+    "check": 5.9636,
+    "compli": 3.6839,
+    "devic": 3.3574,
+    "endpoi": 4.585,
+    "login": 4.8701,
+    "postur": 5.9636,
+    "run": 3.1707
    },
    "phrases": [
     "what device checks run before access",
@@ -3468,7 +3442,7 @@
     "check antivirus before login",
     "posture check"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-57",
@@ -3479,21 +3453,22 @@
    "must": [],
    "allow": [
     "Citrix",
-    "Thin Clients"
+    "Thin Clients",
+    "Vajra Browser"
    ],
    "keywords": {
-    "block": 5.3868,
-    "copy": 5.3868,
-    "data": 3.8986,
-    "dlp": 6.0776,
-    "downlo": 4.6982,
-    "leakag": 4.9836,
-    "leav": 4.2973,
-    "past": 6.0776,
-    "preven": 5.3868,
-    "screen": 6.0776,
-    "sessio": 5.3868,
-    "stop": 4.9836
+    "block": 5.273,
+    "copy": 5.273,
+    "data": 3.902,
+    "dlp": 5.9636,
+    "downlo": 4.585,
+    "leakag": 4.8701,
+    "leav": 4.1846,
+    "past": 5.9636,
+    "preven": 5.273,
+    "screen": 5.9636,
+    "sessio": 5.273,
+    "stop": 4.8701
    },
    "phrases": [
     "can we stop data leaving the session",
@@ -3503,7 +3478,7 @@
     "stop screenshots",
     "prevent data download"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-58",
@@ -3519,16 +3494,16 @@
     "HyWorks"
    ],
    "keywords": {
-    "access": 2.8753,
-    "contra": 5.3868,
-    "dein": 6.0776,
-    "give": 4.4773,
-    "outsou": 6.0776,
-    "party": 6.0776,
-    "secur": 3.0336,
-    "staff": 4.6982,
-    "third": 6.0776,
-    "vendor": 3.2255
+    "access": 2.7678,
+    "contra": 5.273,
+    "dein": 5.9636,
+    "give": 4.585,
+    "outsou": 5.9636,
+    "party": 5.9636,
+    "secur": 2.9692,
+    "staff": 4.585,
+    "third": 5.9636,
+    "vendor": 3.116
    },
    "phrases": [
     "how do we give vendors secure access",
@@ -3538,7 +3513,7 @@
     "outsourced staff access",
     "vendors ko access kaise dein"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-59",
@@ -3554,15 +3529,15 @@
     "Virtual Browser"
    ],
    "keywords": {
-    "brows": 3.8986,
-    "intern": 4.2973,
-    "isolat": 4.1454,
-    "networ": 4.1454,
-    "remot": 3.078,
-    "risky": 6.0776,
-    "safe": 6.0776,
-    "virtua": 3.5398,
-    "websit": 6.0776
+    "brows": 3.7867,
+    "intern": 4.3644,
+    "isolat": 4.033,
+    "networ": 4.033,
+    "remot": 3.1707,
+    "risky": 5.9636,
+    "safe": 5.9636,
+    "virtua": 3.5066,
+    "websit": 5.9636
    },
    "phrases": [
     "can you isolate risky websites from our network",
@@ -3572,7 +3547,7 @@
     "isolate internet browsing",
     "safe browsing"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-60",
@@ -3588,17 +3563,17 @@
     "Pharma / Healthcare"
    ],
    "keywords": {
-    "appi": 6.0776,
-    "compli": 3.7955,
-    "data": 3.8986,
-    "gdpr": 6.0776,
-    "global": 4.9836,
-    "help": 3.6177,
-    "hipaa": 5.3868,
-    "japan": 4.6982,
-    "pdpl": 6.0776,
-    "protec": 4.6982,
-    "regula": 5.3868
+    "appi": 5.9636,
+    "compli": 3.6839,
+    "data": 3.902,
+    "gdpr": 5.9636,
+    "global": 5.273,
+    "help": 3.6839,
+    "hipaa": 5.273,
+    "japan": 4.585,
+    "pdpl": 5.9636,
+    "protec": 4.8701,
+    "regula": 5.273
    },
    "phrases": [
     "does accops help with hipaa and gdpr",
@@ -3609,7 +3584,7 @@
     "pdpl",
     "appi japan"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-61",
@@ -3631,15 +3606,15 @@
     "VMware"
    ],
    "keywords": {
-    "cloud": 4.1454,
-    "deploy": 3.8986,
-    "host": 4.9836,
-    "hota": 6.0776,
-    "model": 4.6982,
-    "option": 4.6982,
-    "prem": 5.3868,
-    "premis": 4.1454,
-    "run": 3.2805
+    "cloud": 4.1846,
+    "deploy": 3.7867,
+    "host": 4.8701,
+    "hota": 5.9636,
+    "model": 4.585,
+    "option": 4.585,
+    "prem": 5.273,
+    "premis": 4.033,
+    "run": 3.1707
    },
    "phrases": [
     "where does accops run on prem or cloud",
@@ -3649,7 +3624,7 @@
     "cloud or on premise",
     "kahan deploy hota hai"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-62",
@@ -3671,17 +3646,17 @@
     "VMware"
    ],
    "keywords": {
-    "connec": 4.4773,
-    "exit": 6.0776,
-    "hyper": 5.3868,
-    "leav": 4.2973,
-    "opensh": 4.9836,
-    "option": 4.6982,
-    "scvmm": 5.3868,
-    "suppor": 2.5215,
-    "v": 5.3868,
-    "vmwar": 4.4773,
-    "withou": 3.468
+    "connec": 4.3644,
+    "exit": 5.9636,
+    "hyper": 5.273,
+    "leav": 4.1846,
+    "opensh": 4.8701,
+    "option": 4.585,
+    "scvmm": 5.273,
+    "suppor": 2.4169,
+    "v": 5.273,
+    "vmwar": 4.3644,
+    "withou": 3.429
    },
    "phrases": [
     "does accops support hyper v and openshift",
@@ -3691,7 +3666,7 @@
     "leaving vmware",
     "vmware exit options"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-63",
@@ -3705,15 +3680,15 @@
     "Citrix"
    ],
    "keywords": {
-    "cost": 4.1454,
-    "daas": 3.4012,
-    "deskto": 3.2805,
-    "go": 4.6982,
-    "monthl": 6.0776,
-    "pay": 6.0776,
-    "per": 5.3868,
-    "pric": 4.2973,
-    "vdi": 2.7726
+    "cost": 4.033,
+    "daas": 3.5911,
+    "deskto": 3.2909,
+    "go": 4.585,
+    "monthl": 5.9636,
+    "pay": 5.9636,
+    "per": 5.273,
+    "pric": 4.3644,
+    "vdi": 2.6985
    },
    "phrases": [
     "how is accops daas priced",
@@ -3723,7 +3698,7 @@
     "pay as you go vdi",
     "daas monthly cost"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-64",
@@ -3739,14 +3714,14 @@
     "IT / ITeS"
    ],
    "keywords": {
-    "benefi": 6.0776,
-    "custom": 3.468,
-    "daas": 3.4012,
-    "result": 6.0776,
-    "saving": 4.9836,
-    "seen": 6.0776,
-    "stori": 5.3868,
-    "succes": 5.3868
+    "benefi": 5.9636,
+    "custom": 3.3574,
+    "daas": 3.5911,
+    "result": 5.9636,
+    "saving": 5.273,
+    "seen": 5.9636,
+    "stori": 5.273,
+    "succes": 5.273
    },
    "phrases": [
     "what results have daas customers seen",
@@ -3756,7 +3731,7 @@
     "daas savings",
     "daas customer stories"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-65",
@@ -3776,15 +3751,15 @@
     "HyWorks"
    ],
    "keywords": {
-    "compar": 4.0141,
-    "daas": 3.4012,
-    "deskto": 3.2805,
-    "hous": 6.0776,
-    "hywork": 3.5398,
-    "manag": 3.6177,
-    "oursel": 6.0776,
-    "run": 3.2805,
-    "use": 2.3278
+    "compar": 3.902,
+    "daas": 3.5911,
+    "deskto": 3.2909,
+    "hous": 5.9636,
+    "hywork": 3.429,
+    "manag": 3.5911,
+    "oursel": 5.9636,
+    "run": 3.1707,
+    "use": 2.3049
    },
    "phrases": [
     "should we run hyworks ourselves or use accops daas",
@@ -3793,7 +3768,7 @@
     "run hyworks in house or daas",
     "should we use daas or hyworks"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-66",
@@ -3808,17 +3783,17 @@
     "HyID"
    ],
    "keywords": {
-    "air": 4.6982,
-    "deploy": 3.8986,
-    "fully": 5.3868,
-    "gapp": 4.6982,
-    "isolat": 4.1454,
-    "networ": 4.1454,
-    "offlin": 6.0776,
-    "only": 5.3868,
-    "premis": 4.1454,
-    "run": 3.2805,
-    "sover": 6.0776
+    "air": 4.585,
+    "deploy": 3.7867,
+    "fully": 5.273,
+    "gapp": 4.585,
+    "isolat": 4.033,
+    "networ": 4.033,
+    "offlin": 5.9636,
+    "only": 5.273,
+    "premis": 4.033,
+    "run": 3.1707,
+    "sover": 5.9636
    },
    "phrases": [
     "can accops run fully on premises or air gapped",
@@ -3828,7 +3803,7 @@
     "isolated network",
     "sovereign deployment"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-67",
@@ -3843,16 +3818,16 @@
     "HyWorks"
    ],
    "keywords": {
-    "availa": 4.1454,
-    "busin": 4.4773,
-    "contin": 5.3868,
-    "disast": 5.3868,
-    "dr": 6.0776,
-    "high": 6.0776,
-    "multi": 4.9836,
-    "recov": 5.3868,
-    "site": 5.3868,
-    "suppor": 2.5215
+    "availa": 4.1846,
+    "busin": 5.273,
+    "contin": 5.273,
+    "disast": 5.273,
+    "dr": 5.9636,
+    "high": 5.9636,
+    "multi": 4.8701,
+    "recov": 5.273,
+    "site": 5.273,
+    "suppor": 2.4169
    },
    "phrases": [
     "does accops support disaster recovery",
@@ -3862,7 +3837,7 @@
     "multi site",
     "business continuity"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-68",
@@ -3882,15 +3857,15 @@
     "Pharma / Healthcare"
    ],
    "keywords": {
-    "bade": 6.0776,
-    "compan": 3.6177,
-    "custom": 3.468,
-    "enterp": 4.6982,
-    "indust": 4.2973,
-    "organi": 4.2973,
-    "refer": 4.6982,
-    "today": 5.3868,
-    "use": 2.3278
+    "bade": 5.9636,
+    "compan": 3.5066,
+    "custom": 3.3574,
+    "enterp": 4.8701,
+    "indust": 4.585,
+    "organi": 4.1846,
+    "refer": 4.585,
+    "today": 5.9636,
+    "use": 2.3049
    },
    "phrases": [
     "which organisations use accops",
@@ -3899,7 +3874,7 @@
     "which enterprises use accops",
     "bade bade companies accops use karti hain"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-69",
@@ -3916,17 +3891,17 @@
     "Government"
    ],
    "keywords": {
-    "deploy": 3.8986,
-    "enterp": 4.6982,
-    "lakh": 6.0776,
-    "larg": 4.4773,
-    "many": 3.7955,
-    "scal": 4.1454,
-    "scalab": 6.0776,
-    "suppor": 2.5215,
-    "tens": 6.0776,
-    "thousa": 6.0776,
-    "user": 3.4012
+    "deploy": 3.7867,
+    "enterp": 4.8701,
+    "lakh": 5.9636,
+    "larg": 4.3644,
+    "many": 3.6839,
+    "scal": 4.033,
+    "scalab": 5.9636,
+    "suppor": 2.4169,
+    "tens": 5.9636,
+    "thousa": 5.9636,
+    "user": 3.5066
    },
    "phrases": [
     "can accops scale to tens of thousands of users",
@@ -3936,7 +3911,7 @@
     "enterprise scale",
     "lakhs of users"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-70",
@@ -3954,19 +3929,19 @@
     "IT / ITeS"
    ],
    "keywords": {
-    "agent": 4.0141,
-    "bpo": 4.6982,
-    "bpos": 6.0776,
-    "call": 4.4773,
-    "centr": 4.9836,
-    "compan": 3.6177,
-    "contac": 4.9836,
-    "home": 4.2973,
-    "ites": 6.0776,
-    "remot": 3.078,
-    "servic": 4.1454,
-    "voip": 5.3868,
-    "work": 2.4298
+    "agent": 3.902,
+    "bpo": 4.585,
+    "bpos": 5.9636,
+    "call": 4.3644,
+    "centr": 4.8701,
+    "compan": 3.5066,
+    "contac": 4.8701,
+    "home": 4.1846,
+    "ites": 5.9636,
+    "remot": 3.1707,
+    "servic": 4.033,
+    "voip": 5.273,
+    "work": 2.4662
    },
    "phrases": [
     "does accops work for it services and bpos",
@@ -3977,7 +3952,7 @@
     "bpo voip for remote agents",
     "bpo contact centre work from home"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-71",
@@ -3993,16 +3968,16 @@
     "IT / ITeS"
    ],
    "keywords": {
-    "access": 2.8753,
-    "anywh": 5.3868,
-    "centr": 4.9836,
-    "develo": 5.3868,
-    "enviro": 5.3868,
-    "gcc": 6.0776,
-    "offsho": 6.0776,
-    "remot": 3.078,
-    "secur": 3.0336,
-    "work": 2.4298
+    "access": 2.7678,
+    "anywh": 5.273,
+    "centr": 4.8701,
+    "develo": 5.9636,
+    "enviro": 5.9636,
+    "gcc": 5.9636,
+    "offsho": 5.9636,
+    "remot": 3.1707,
+    "secur": 2.9692,
+    "work": 2.4662
    },
    "phrases": [
     "can our developers work securely from anywhere",
@@ -4012,7 +3987,7 @@
     "offshore development centre",
     "gcc developers"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-72",
@@ -4029,21 +4004,21 @@
     "Government"
    ],
    "keywords": {
-    "access": 2.8753,
-    "depart": 6.0776,
-    "e": 4.9836,
-    "govern": 4.2973,
-    "govt": 6.0776,
-    "india": 3.7955,
-    "make": 4.9836,
-    "offic": 4.9836,
-    "psu": 6.0776,
-    "psus": 5.3868,
-    "public": 4.9836,
-    "sarkar": 6.0776,
-    "sector": 5.3868,
-    "vendor": 3.2255,
-    "work": 2.4298
+    "access": 2.7678,
+    "depart": 5.9636,
+    "e": 4.8701,
+    "govern": 4.1846,
+    "govt": 5.9636,
+    "india": 4.1846,
+    "make": 5.273,
+    "offic": 4.8701,
+    "psu": 5.9636,
+    "psus": 5.273,
+    "public": 4.8701,
+    "sarkar": 5.9636,
+    "sector": 5.273,
+    "vendor": 3.116,
+    "work": 2.4662
    },
    "phrases": [
     "do you work with government and psus",
@@ -4054,7 +4029,7 @@
     "make in india vendor for government",
     "sarkari govt department"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-73",
@@ -4068,19 +4043,20 @@
    ],
    "allow": [
     "Citrix",
+    "HyDesk",
     "HyWorks",
     "Pharma / Healthcare"
    ],
    "keywords": {
-    "compan": 3.6177,
-    "data": 3.8986,
-    "health": 5.3868,
-    "hospit": 4.6982,
-    "patien": 5.3868,
-    "pharma": 5.3868,
-    "securi": 4.0141,
-    "use": 2.3278,
-    "work": 2.4298
+    "compan": 3.5066,
+    "data": 3.902,
+    "health": 5.273,
+    "hospit": 4.585,
+    "patien": 5.273,
+    "pharma": 5.273,
+    "securi": 4.1846,
+    "use": 2.3049,
+    "work": 2.4662
    },
    "phrases": [
     "do you work with hospitals and healthcare",
@@ -4090,7 +4066,7 @@
     "healthcare patient data security",
     "which hospitals use accops"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-74",
@@ -4104,13 +4080,13 @@
     "Government"
    ],
    "keywords": {
-    "custom": 3.468,
-    "dubai": 6.0776,
-    "east": 4.2973,
-    "mena": 6.0776,
-    "middl": 4.4773,
-    "refer": 4.6982,
-    "wins": 6.0776
+    "custom": 3.3574,
+    "dubai": 5.9636,
+    "east": 4.3644,
+    "mena": 5.9636,
+    "middl": 4.585,
+    "refer": 4.585,
+    "wins": 5.9636
    },
    "phrases": [
     "do you have customers in the middle east",
@@ -4119,7 +4095,7 @@
     "mena customer wins",
     "dubai references"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-75",
@@ -4134,10 +4110,10 @@
     "HyLabs"
    ],
    "keywords": {
-    "custom": 3.468,
-    "japan": 4.6982,
-    "partn": 3.6177,
-    "refer": 4.6982
+    "custom": 3.3574,
+    "japan": 4.585,
+    "partn": 3.7867,
+    "refer": 4.585
    },
    "phrases": [
     "do you have customers in japan",
@@ -4146,7 +4122,7 @@
     "accops japan",
     "japan partner"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-76",
@@ -4160,16 +4136,16 @@
     "HySecure"
    ],
    "keywords": {
-    "end": 4.1454,
-    "eol": 5.3868,
-    "life": 4.9836,
-    "lifecy": 6.0776,
-    "long": 4.2973,
-    "ltsr": 6.0776,
-    "policy": 4.9836,
-    "produc": 4.0141,
-    "releas": 4.4773,
-    "suppor": 2.5215
+    "end": 4.585,
+    "eol": 5.273,
+    "life": 4.8701,
+    "lifecy": 5.9636,
+    "long": 4.3644,
+    "ltsr": 5.9636,
+    "policy": 4.8701,
+    "produc": 3.902,
+    "releas": 4.3644,
+    "suppor": 2.4169
    },
    "phrases": [
     "how long is each accops release supported",
@@ -4179,7 +4155,7 @@
     "support lifecycle",
     "eol policy"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-77",
@@ -4195,13 +4171,13 @@
     "Nano"
    ],
    "keywords": {
-    "brochu": 6.0776,
-    "datash": 6.0776,
-    "docum": 4.9836,
-    "downlo": 4.6982,
-    "pdf": 6.0776,
-    "produc": 4.0141,
-    "send": 6.0776
+    "brochu": 5.9636,
+    "datash": 5.9636,
+    "docum": 4.8701,
+    "downlo": 4.585,
+    "pdf": 5.9636,
+    "produc": 3.902,
+    "send": 5.9636
    },
    "phrases": [
     "do you have a brochure or datasheet",
@@ -4211,7 +4187,7 @@
     "product brochure",
     "documentation download"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   },
   {
    "qa_id": "lp-78",
@@ -4227,20 +4203,20 @@
     "HyID"
    ],
    "keywords": {
-    "code": 5.3868,
-    "fido": 6.0776,
-    "fido2": 6.0776,
-    "key": 4.9836,
-    "keys": 6.0776,
-    "login": 4.9836,
-    "method": 6.0776,
-    "mfa": 3.3389,
-    "option": 4.6982,
-    "passwo": 6.0776,
-    "qr": 6.0776,
-    "securi": 4.0141,
-    "sign": 5.3868,
-    "suppor": 2.5215
+    "code": 5.273,
+    "fido": 5.9636,
+    "fido2": 5.9636,
+    "key": 5.9636,
+    "keys": 5.9636,
+    "login": 4.8701,
+    "method": 5.9636,
+    "mfa": 3.2288,
+    "option": 4.585,
+    "passwo": 5.9636,
+    "qr": 5.9636,
+    "securi": 4.1846,
+    "sign": 5.273,
+    "suppor": 2.4169
    },
    "phrases": [
     "do you support passwordless login",
@@ -4250,8 +4226,8 @@
     "qr code login",
     "passwordless mfa methods"
    ],
-   "min_score": 0.43
+   "min_score": 0.51
   }
  ],
- "margin": 0.05
+ "margin": 0.06
 }
