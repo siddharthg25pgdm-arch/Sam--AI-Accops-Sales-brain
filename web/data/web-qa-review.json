@@ -1852,7 +1852,7 @@
   "reasons": [
    "commercial terms (whether a pilot is free)"
   ],
-  "notes": "Benchmark 27 Oct, problem 7: 'Can we do a free trial or a POC first?' got lp-07's pilot answer with nothing on cost. No public page says a pilot, POC or trial is free (only the demo form's URL, /schedule-a-free-demo, says 'free demo'), so the answer says what is published and offers the call. If Accops does run free POCs, edit the answer to say so. lp-07 (approved) still carries the aliases 'free trial' and 'trial'; the loader never touches an approved pair, so after approving this one, drop those two from lp-07 in Supabase and rebuild the intent index, or the matcher keeps sending 'free trial' to lp-07.",
+  "notes": "Benchmark 27 Oct, problem 7: 'Can we do a free trial or a POC first?' got lp-07's pilot answer with nothing on cost. No public page says a pilot, POC or trial is free (only the demo form's URL, /schedule-a-free-demo, says 'free demo'), so the answer says what is published and offers the call. If Accops does run free POCs, edit the answer to say so. lp-07 (approved) still carries the aliases 'free trial' and 'trial'; the loader never touches an approved pair, so after approving this one, drop those two from lp-07 in Supabase and rebuild the intent index, or the matcher keeps sending 'free trial' to lp-07. 28 Oct: rewritten in plain words (Siddharth: not too technical): capability and outcome, specifics left to an engineer.",
   "evidence": [
    {
     "url": "https://accops-citrix-lp.vercel.app/#migration",
@@ -1862,7 +1862,7 @@
  },
  "lp-81": {
   "reasons": [],
-  "notes": "Benchmark 27 Oct, problem 8: 'Does Accops support Linux desktops?' was answered from the DaaS page only, so an on-prem HyWorks buyer read it as managed-service only. This pair names both: HyWorks (you run it) first, so the pill reads the HyWorks page. No Linux distribution is named because no public page names one.",
+  "notes": "Benchmark 27 Oct, problem 8: 'Does Accops support Linux desktops?' was answered from the DaaS page only, so an on-prem HyWorks buyer read it as managed-service only. This pair names both: HyWorks (you run it) first, so the pill reads the HyWorks page. No Linux distribution is named because no public page names one. 28 Oct: rewritten in plain words (Siddharth: not too technical): capability and outcome, specifics left to an engineer.",
   "evidence": [
    {
     "url": "https://www.accops.com/products/hyworks",
@@ -1884,7 +1884,7 @@
  },
  "lp-82": {
   "reasons": [],
-  "notes": "Follow-up to lp-81 (benchmark problem 8). The public pages cover Linux endpoints three ways: HyDesk Hy6000's Accops embedded Linux, HyLite in a browser, and Nano's Linux live OS. They do NOT say whether the HyWorks client app installs on an ordinary Linux PC, so the answer doesn't claim it; if it does, a public page should say so first. Depth 4 in the tree (lp-33 > lp-34 > lp-81 > lp-82).",
+  "notes": "Follow-up to lp-81 (benchmark problem 8). The public pages cover Linux endpoints three ways: HyDesk Hy6000's Accops embedded Linux, HyLite in a browser, and Nano's Linux live OS. They do NOT say whether the HyWorks client app installs on an ordinary Linux PC, so the answer doesn't claim it; if it does, a public page should say so first. Depth 4 in the tree (lp-33 > lp-34 > lp-81 > lp-82). 28 Oct: rewritten in plain words (Siddharth: not too technical): capability and outcome, specifics left to an engineer. The answer now names the two simplest routes (Linux-based thin clients, a browser); Nano and the Hy6000 model number are left to the engineer.",
   "evidence": [
    {
     "url": "https://www.accops.com/products/hydesk",
@@ -1918,7 +1918,7 @@
  },
  "lp-83": {
   "reasons": [],
-  "notes": "Benchmark 27 Oct, problem 1: 'Does Accops support SAML SSO with Microsoft Entra ID?' had no pair, fell to the model and then to padded verified facts. Microsoft renamed Azure AD to Entra ID, but every accops.com page still says Azure AD, so the answer does (a name must be on a source page); 'Entra ID' is in the question label and aliases only.",
+  "notes": "Benchmark 27 Oct, problem 1: 'Does Accops support SAML SSO with Microsoft Entra ID?' had no pair, fell to the model and then to padded verified facts. Microsoft renamed Azure AD to Entra ID, but every accops.com page still says Azure AD, so the answer does (a name must be on a source page); 'Entra ID' is in the question label and aliases only. 28 Oct: rewritten in plain words (Siddharth: not too technical): capability and outcome, specifics left to an engineer. Entra ID is Microsoft's current name for Azure AD; the pages still say Azure AD, so the answer names both. SAML 2.0 / OAuth 2.0 and IdP- / SP-initiated flows are left to the engineer.",
   "evidence": [
    {
     "url": "https://www.accops.com/products/hyid",
