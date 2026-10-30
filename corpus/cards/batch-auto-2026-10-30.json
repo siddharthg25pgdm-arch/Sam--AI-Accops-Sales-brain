@@ -1,0 +1,50 @@
+{
+  "generated_by": "Claude, nightly carding job, 30 October 2026",
+  "batch": "auto-2026-10-30",
+  "note": "Nightly auto-carding batch for 30 October 2026. One uncarded document from the SharePoint carding queue, read in full from corpus/text/. No sensitive values (credentials, phone numbers, bank details, personal emails, customer IDs, usernames, IP/MAC addresses) appear in the source. The document is a confidential partner business plan, not rep-sendable collateral - see its needs_human.",
+  "schema_notes": {
+    "needs_human": "A question only Siddharth or marketing can answer.",
+    "client_actual": "Real customer names printed in the document. Supabase only, never in a model prompt."
+  },
+  "model_visible": ["title", "asset_type", "industry", "client", "products", "competitors", "personas", "use_for", "publish_year", "visibility", "superseded_by"],
+  "cards": [
+    {
+      "source": "sharepoint/Jio Accops 5 Years Plan V2.3.pptx",
+      "title": "Jio Platforms x Accops: Five-Year Growth and Commercial Framework for a Joint DaaS + ZTNA Managed Service (V2.3, 2026) - Internal Partner Business Plan",
+      "asset_type": "Deck",
+      "industry": "Cross-industry",
+      "client": "",
+      "client_actual": "",
+      "client_named": false,
+      "products": ["Digital Workspace", "DaaS", "VDI", "HyWorks", "HySecure", "ZTNA", "MFA", "SSO"],
+      "competitors": ["Microsoft Azure Virtual Desktop", "Microsoft Windows 365", "AWS WorkSpaces", "Citrix DaaS", "Omnissa Horizon Cloud"],
+      "personas": ["Partner", "CIO", "CISO", "IT head", "Head of Infrastructure"],
+      "regulations": ["DPDP Act"],
+      "key_problem": "Jio Platforms and Accops are deciding whether to stand up a joint Digital Workspace MSP - Jio bringing cloud, network, enterprise sales and L1/L2 support, Accops bringing VDI and ZTNA licences - and need one document that sizes the India DaaS opportunity, names the incumbents to displace, fixes a per-user price and revenue split, and sets a five-year seat and revenue model with annual go/no-go gates.",
+      "key_outcomes": [
+        "Three separately sourced market figures, explicitly not added together: India public cloud spend USD 17.5 Bn forecast for 2026, up 28.1% on 2025 (Gartner); India DaaS market USD 398.2 m in 2025 at a 14.3% CAGR to 2031 (OMR); India ZTNA market USD 26.9 m in 2025 growing to USD 109.3 m by 2030 at 32.3% CAGR (MarketsandMarkets)",
+        "Competitive field named as Microsoft (Azure Virtual Desktop and Windows 365 Cloud PCs), AWS (Amazon WorkSpaces), Citrix (Citrix DaaS) and Omnissa (Horizon Cloud), with a market-share block of roughly 54%, 21%, 12% and 9% - see the brief, the shares sit in a separate text block from the vendor names",
+        "Division of labour: Jio provides cloud infrastructure, network connectivity, the enterprise sales team and channel, and owns the customer relationship, billing and L1/L2 support; Accops provides HyWorks VDI (personal or shared Windows and Linux desktops, app virtualization), HySecure ZTNA per-application tunnels, contextual access on identity/device posture/time/location, MFA, SSO and the central management console",
+        "Year-1 model: a 2027 modelled India DaaS market of INR 4,421.9 Cr, a 10% target share giving INR 442.2 Cr of bundle revenue, divided by INR 30,000 per user per year for roughly 1,47,397 average billable seats - the deck itself calls this aggressive for Year 1 and dependent on validated pipeline and Jio cloud capacity",
+        "Indicative pricing: INR 2,500 per user per month (INR 30,000 per user per year), split 60/40 - INR 1,500 to Jio for compute, storage and network capacity on Jio cloud, INR 1,000 to Accops as one combined VDI + ZTNA software allocation, explicitly not INR 1,000 each. Third-party licensing is excluded and stays the customer's responsibility",
+        "Five-year revenue ramp holding 10% share as the market grows 14.3% a year: INR 442.2, 505.4, 577.7, 660.3 and 754.7 Cr for 2027 to 2031, a cumulative INR 2,940.4 Cr split INR 1,764.2 Cr to Jio and INR 1,176.2 Cr to Accops",
+        "Matching seat ramp: 1,47,397 seats in 2027 rising through 1,68,477, 1,92,567 and 2,20,107 to 2,51,580 in 2031, repeated as the annual gate on the roadmap (Launch 2027, Expand 2028, Standardise 2029, Scale 2030, Sustain 2031)",
+        "Five lead industries - BFSI (branch, contractor and third-party access), IT / ITES / BPO (high-density desktops for delivery centres), Pharma / life sciences (controlled R&D and partner access), Government (distributed departments and field units) and Manufacturing (plant, vendor and field workforce) - with a seat-split block of 22.8% (29,325), 23.0% (30,000), 20.9% (26,881), 23.4% (30,097) and 24.5% (31,512) users; Education and GCCs are listed as further potential areas",
+        "Five-stage delivery model (Assess, Pilot, Onboard, Operate, Optimize) with Jio proposed for cloud, network, customer relationship, billing and L1/L2, and Accops for licences, solution design, pre-sales, product enablement and L3",
+        "A 90-day plan in three blocks: Days 1-30 form the joint team and steering group, validate market and price assumptions and shortlist pilot accounts; Days 31-60 build the pilot on Jio cloud, run priority-industry pilots and draft commercial terms; Days 61-90 review pilot results, set the Year-1 capacity and sales plan and take a leadership go / no-go on the five-year plan",
+        "Customer-facing value story kept to cost (predictable per-user monthly price, workspace and secure access in one service, central admin, sizing-dependent costs) and security (policy-based access on identity and device posture, centralised workspace and data controls, per-application access, MFA, SSO and session controls), closing on Secure / Simple / Scalable with DPDP Act compliance support, DLP, encrypted connections, centralised audit logs and immediate access revocation"
+      ],
+      "brief": "A short partner business-plan deck (sixteen slides by my own count of the slide markers in the extracted text, not a figure stated in the document) proposing a Jio Platforms x Accops joint Digital Workspace MSP selling DaaS and ZTNA as one bundle. The arc is market sizing, the competitive field, who brings what, the 10%-share Year-1 model, target industries, the INR 2,500 per-user price and 60/40 split, the customer value story, the five-year revenue and seat ramp, the delivery model, the roadmap with annual seat gates, a 90-day action plan and a Secure/Simple/Scalable close. Every slide carries a 2026 Accops copyright line. Two caveats about the numbers, both from the deck itself: the three market figures on slide 2 are labelled as separate estimates that are not added together, and the Year-1 10% capture is labelled aggressive and conditional on validated pipeline and Jio cloud capacity. Two blocks lose their pairing in text extraction and must be read on the slide before anyone quotes a specific pair: on slide 3 the four market-share percentages sit in a block after the four vendor names, and on slide 6 the five seat percentages and user counts sit in a block after the five industries, which are themselves listed out of numbered order. Everything in the deck is modelled or indicative - there are no signed terms, no named customers and no committed capacity.",
+      "use_for": "Internal reference only, for anyone working on the Jio alliance: what was proposed to Jio Platforms, at what price, on what split, and against what seat and revenue model. The source for the INR 2,500 per-user-per-month bundle price and the 60/40 commercial split as last modelled, and for the 90-day pilot-and-decide plan. Do not send to a customer and do not quote its revenue, share or seat numbers in a customer-facing document - they are internal projections, not performance.",
+      "publish_year": "2026",
+      "expired": false,
+      "stale_risk": "A V2.3 draft of an unsigned plan whose first year is 2027 and whose 90-day plan starts from an unspecified date, so how much of it is still live depends entirely on where the Jio conversation now stands. Every revenue, seat and share figure is modelled from third-party market estimates at a fixed 10% capture, not from pipeline. The market sources carry their own vintages (2025 bases, a 2026 forecast), and the competitor market shares are undated and unsourced on the slide.",
+      "superseded_by": "",
+      "confidence": 0.88,
+      "public_url": "",
+      "visibility": "internal",
+      "internal_reason": "Confidential partner business plan: unsigned commercial terms, a per-user price, a revenue split and five-year projections between Jio Platforms and Accops. No verified public URL.",
+      "needs_human": "Three things. (1) This sits in Sales Collateral / Presentations / General Presentations alongside rep-sendable material, but it is an internal partner business plan with unsigned commercials - confirm it should stay in that folder, or move it somewhere reps cannot reach it. (2) V2.3 implies earlier and possibly later versions; confirm this is the current one and whether the Jio plan is still live, since nothing here is marked superseded. (3) The market-share figures on slide 3 and the industry seat-split figures on slide 6 are each in a text block separate from the labels they belong to, so the pairings are not verifiable from the extracted text - someone should open the deck and confirm them before any of those numbers is repeated."
+    }
+  ]
+}
