@@ -857,7 +857,7 @@
     },
     {
       "source": "sharepoint/v2026-06-22-MEA-Confidential-Accops Partner Bootcamp Event Deck 4Hour 2026.pptx",
-      "title": "Accops Partner Sales Bootcamp 2026 - MEA Edition for the Dubai Partner Summit (Confidential, 22 Jun 2026): Middle East Sovereignty and Cloud-Risk Case, MEA Partner Programme and Tiers, USD TCO, DaaS at USD 17.99, Q3 Offers, Named Case Studies",
+      "title": "Accops Partner Sales Bootcamp 2026 - MEA Edition for the Dubai Partner Summit (Confidential, 22 Jun 2026): AI-Exploit Threat Case, Middle East Sovereignty and Cloud-Risk, MEA Partner Programme and Tiers, Five-Year USD TCO, DaaS at USD 17.99, Q3 Offers, Named Case Studies",
       "asset_type": "Deck",
       "industry": "Cross-industry",
       "client": "About 20 named case-study slides (Indian and Middle East banking, manufacturing, pharma, government, e-commerce, broking, aviation, retail, payments, hospitality, IT services, healthcare, shipbuilding) plus MEA, global and Japan reference-customer slides",
@@ -888,7 +888,10 @@
         "HyMobile",
         "UEM",
         "Reporting Server",
-        "IRIS"
+        "IRIS",
+        "Nano",
+        "NanoOS",
+        "Vajra Browser"
       ],
       "competitors": [
         "Zscaler",
@@ -896,7 +899,14 @@
         "Omnissa",
         "Azure Virtual Desktop",
         "AWS",
-        "Microsoft"
+        "Microsoft",
+        "Okta",
+        "OneLogin",
+        "Palo Alto",
+        "Netskope",
+        "Nexthink",
+        "TeamViewer",
+        "AnyDesk"
       ],
       "personas": [
         "Partner",
@@ -907,29 +917,38 @@
       "regulations": [
         "UAE data residency",
         "US CLOUD Act",
-        "FISA 702"
+        "FISA 702",
+        "EU sanctions",
+        "RBI",
+        "DPDP Act",
+        "CERT-In",
+        "OWASP Top 10",
+        "SANS Top 25"
       ],
-      "key_problem": "Middle East partners need a reason to sell on-premise, sovereign EUC security now - regional conflict, mandated work from home and attacks on hyperscaler data centres - plus the MEA partner-programme rules and the offers they can use.",
+      "key_problem": "Middle East partners need a reason to sell on-premise, sovereign EUC security now - AI-assisted exploitation that patching cannot keep pace with, regional conflict, mandated work from home and attacks on hyperscaler data centres - plus the MEA partner-programme rules and the offers they can use.",
       "key_outcomes": [
-        "Agenda slide 3 lists the pitch themes: bulletproof against AI-assisted attacks, ZTNA for vendors and BYOD, delaying laptop purchases, password-less and SSO everywhere, 'reducing VDI TCO by 40%', the enterprise browser, special offers",
-        "Middle East market (31-33): Gartner/MarkNtel market sizing with a Middle East share of EUC TAM (USD 2.72B in 2028, 9.4% of world), 2030 roadmap re-worded for 'MEA+APJ' with the ARR target, MEA business drivers",
-        "Offers (39-41, 91-92): free legacy-app SSO for 6 months, 50% discount for FY27 orders, '100% money back guarantee on any product - pay by August, refund before Mar27' (Q3 offer)",
-        "MEA partner programme (45-54): distributors by region, Platinum/Gold/Silver/Authorized, tier revenue requirements by country group (A/B/C), a partner discount table, partner portal, ACAP certifications",
-        "Middle East sovereignty section (55-63): Iran-Israel escalation (Mar 2026), UAE government WFH advisory, drone strikes on AWS data centres in the UAE and Bahrain, CLOUD Act/FISA 702 reach, Microsoft's Azure suspension for Unit 8200, UAE breach-cost statistics, 'sovereignty by architecture, not by passport' - Accops deployed 100% on-premise in UAE data centres",
-        "Product modules as in the India bootcamp (IAM, ZTNA, VDI, more products) with embedded demo videos, a 2,000-PC TCO restated in USD, DaaS at USD 17.99/user/month, Reporting Server 3.0 (GA 15 July 2026), IRIS (15 Dec 2026)",
-        "Last four slides (259-262) are another vendor's company slides (Haltdos: app security and delivery platform, awards, leadership, 600+ customers, products) with no Accops context"
+        "Agenda slide 3 lists the pitch themes: bulletproof against AI-assisted attacks, ZTNA for vendors and BYOD, delaying laptop purchases, password-less and SSO everywhere, 'reducing VDI solution TCO by 40%', the enterprise browser, special offers",
+        "New opening (5-16, repeated 177-181): AI-assisted exploitation as the reason to isolate - an 'Anthropic's Claude Mythos (Preview)' slide claiming AI models now out-find humans on vulnerabilities (a 27-year-old OpenBSD remote crash, a 16-year-old FFmpeg bug, a chained Linux kernel privilege escalation), 86% of commercial codebases carrying vulnerable open-source components, end-of-life software accumulating 218 new vulnerabilities every six months, and the conclusion that patching cannot beat AI scale",
+        "Middle East market (31-33): Gartner/MarkNtel market sizing with a Middle East share of EUC TAM (USD 2.72B in 2028, 9.4% of world), 2030 roadmap re-worded for 'MEA+APJ' with a USD 500 million ARR target, MEA business drivers",
+        "Offers (39-41, 91-92, 208, 229, 256): free legacy-app SSO for 6 months, 50% discount for FY27 orders, free VDI licences until the existing VDI solution expires ('buy now, pay later'), '100% money back guarantee on any product - pay by August, refund before Mar27', and DaaS at USD 17.99 per user per month (one slide adds a free device)",
+        "MEA partner programme (45-54): distributors by region, Platinum/Gold/Silver/Authorized, tier revenue requirements by country group (A/B/C), an MRP and transfer-price discount table, partner portal, MDF and SPIFF terms, ACAP certifications",
+        "Middle East sovereignty section (55-63): Iran-Israel escalation (Mar 2026), UAE MoHRE remote-work advisory, drone strikes on AWS data centres in the UAE and Bahrain, CLOUD Act/FISA 702 reach, Microsoft's Azure suspension for Unit 8200, daily cyber attempts on UAE infrastructure rising from about 200,000 to about 600,000, a UAE/KSA average breach cost of USD 8.74M and 84% of UAE firms paying ransom, closing on 'sovereignty by architecture, not by passport' - Accops deployed 100% on-premise inside a UAE data centre",
+        "The five-year USD TCO table (204) totals USD 3,667,000 for desktops against USD 3,195,000 for VDI - an absolute saving of USD 472,000, which the slide itself calls 13% over five years, not the 40% the agenda and the industry use-case slides claim. Separately, HyLabs claims about 60% savings over five years for a 200-PC lab (214) and the Proxmox-based DaaS slide claims 30% savings against MS AVD (227)",
+        "Product modules as in the India bootcamp (IAM, ZTNA, VDI, Remote Browser Isolation, AirBridge, Huddle, Proxmox, thin clients) with embedded demo videos and launch dates: Accops + Forcepoint integrated SSE with ZTNA (GA 15 May 2026), GlassFence application isolation, Enterprise Browser and Password-less (15 July 2026), Photon display protocol (15 June 2026), Data-less PC, CMS, Reporting Server 3.0 (15 July 2026) and IRIS multi-tenant SaaS V1.0 (15 Dec 2026)",
+        "The ZTNA summary and detailed architecture slides (130, 169-175) are the Indian NIC build left in place: they cite NIC's Parichay/Pehchan IdP, NIC SIEM, a CERT-In empanelled security audit and a 5 lakh-user sizing",
+        "Last four slides (259-262) are another vendor's company slides (Haltdos: enterprise application security and delivery platform, recognitions, leadership, 600+ client companies, product list) with no Accops context"
       ],
-      "brief": "The MEA confidential edition (260 slides; last saved 9 September 2026) of the 2026 partner bootcamp, built for the Dubai Partner Summit and marked 'Accops Confidential. For Internal Use Only.'. It localises the India master with Middle East market sizing, a Gulf sovereignty and cloud-continuity section, the MEA partner programme with country-group tiers and discounts, USD pricing (TCO, DaaS USD 17.99) and Q3 offers, and keeps all the named case studies. Several case slides carry pasted-over descriptions (NIC described as an HIV/AIDS drug maker, Kotak Securities as a Middle East retailer).",
-      "use_for": "Internal source for a Middle East partner or customer session: slides 55-63 (Gulf sovereignty and hyperscaler-risk argument), 31 (Middle East market sizing), 48-49 (MEA partner tiers and discounts - internal), 204 (USD TCO). Verify the March 2026 AWS strike claims before quoting.",
+      "brief": "The MEA confidential edition (260 slides, numbered to 262) of the 2026 partner bootcamp, built for the Dubai Partner Summit and marked 'Accops Confidential. For Internal Use Only.'. It localises the India master with Middle East market sizing, a Gulf sovereignty and cloud-continuity section, the MEA partner programme with country-group tiers and discounts, USD pricing and Q3 offers, and keeps all the named case studies. It opens on AI-assisted vulnerability exploitation before the threat wheel, and covers the Accops + Forcepoint SSE launch, GlassFence, the Enterprise Browser, Photon, Data-less PC, CMS and IRIS alongside a five-year USD TCO table. Several case slides carry pasted-over descriptions: NIC is described as an HIV/AIDS API manufacturer and Kotak Securities as a Middle East retailer, both copied from neighbouring slides. One identity slide uses the CEO's own account names and a bank customer ID as a worked example of identity sprawl.",
+      "use_for": "Internal source for a Middle East partner or customer session: slides 55-63 (Gulf sovereignty and hyperscaler-risk argument), 31 (Middle East market sizing), 48-49 (MEA partner tiers and discounts - internal), 204 (five-year USD TCO). When a buyer asks for the arithmetic, use slide 204's own 13%, not the 40% headline. Verify the March 2026 AWS strike and the Unit 8200 claims before quoting.",
       "publish_year": "2026",
       "expired": false,
-      "stale_risk": "22 June 2026 edition, last saved 9 September 2026. Offers are time-bound (Q3, FY27, 'pay by August'). DaaS price is USD 17.99 here vs Rs 1,333 and USD 21.1 in other decks. Geopolitical slides describe March-May 2026 events.",
+      "stale_risk": "22 June 2026 edition. The OneDrive copy was touched on 3 November 2026, but its extracted text is byte-identical to the September 2026 version, so nothing in the deck itself moved. Offers are time-bound (JAS quarter, Q3, FY27, 'pay by August', 'refund before Mar27') and two of them are still headed 'June Month Offer Only for You'. DaaS price is USD 17.99 here vs Rs 1,333 and USD 21.1 in other decks. The agenda and the industry use-case slides promise 40% VDI TCO savings while the deck's own TCO table works out at 13%. Slide 17 cites the 2023 and 2024 Gartner Magic Quadrants while slide 22 cites the 2025 MQ for DaaS. Geopolitical slides describe March-September 2026 events.",
       "superseded_by": "",
-      "confidence": 0.8,
+      "confidence": 0.85,
       "public_url": "",
       "visibility": "internal",
       "internal_reason": "Marked 'Accops Confidential. For Internal Use Only.'; contains partner tier thresholds and discounts, the ARR target, money-back and discount offers, named case studies, the CEO's personal identifiers and another vendor's slides.",
-      "needs_human": "MEA variant of 'v2026-06-30-Confidential-Accops Partner Bootcamp Event Deck 4Hour 2026- Final Version'. Remove the four Haltdos slides at the end (or explain why another company's pitch is in an Accops deck). Fix the wrong descriptions on the NIC (slide 138) and Kotak Securities (slide 140) case slides. Replace the CEO-identifiers slide values. Verify the AWS UAE/Bahrain strike and Unit 8200 claims. Settle one DaaS price."
+      "needs_human": "MEA variant of 'v2026-06-30-Confidential-Accops Partner Bootcamp Event Deck 4Hour 2026- Final Version'. Re-read in full on 4 November 2026 after the file's timestamp moved; the text turned out to be unchanged, so this is a correction of the card, not of the deck. Two fixes: the card previously claimed a '2,000-PC TCO' that is nowhere in the deck, and it did not mention that the five-year USD TCO table's own answer is 13% while the agenda and the industry use-case slides claim 40% - settle which number reps may use. The card also now covers the AI-exploit opening, Forcepoint SSE, GlassFence, the Enterprise Browser, Photon, Data-less PC, CMS and IRIS, which were already in the deck. Still unfixed in the deck: the four Haltdos slides at the end (or explain why another company's pitch is in an Accops deck), the wrong descriptions on the NIC (slide 138) and Kotak Securities (slide 140) case slides, and the identity slide built from the CEO's real account names and a bank customer ID. Still to verify: the AWS UAE/Bahrain strike and Unit 8200 claims, and the 'Anthropic's Claude Mythos (Preview)' citation. The ZTNA summary and architecture slides still carry NIC Parichay/Pehchan, NIC SIEM and CERT-In detail from the India government build. Settle one DaaS price."
     },
     {
       "source": "sharepoint/Public Version v2026-06-22-MEA-Confidential-Accops Partner Bootcamp Event Deck 4Hour 2026.pptx",
