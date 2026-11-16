@@ -40,7 +40,6 @@
 /* empty state: a line, the page's questions as quiet ↳ rows (Plane), an honest way to a person (Podia) */
 .w-hello { display: flex; flex-direction: column; }
 .w-hello-t { font-size: 19px; font-weight: 600; line-height: 1.3; letter-spacing: -.01em; }
-.w-hello-s { margin-top: 4px; font-size: 14px; color: var(--w-ink-2); }
 .w-eyebrow { margin: 22px 0 4px; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--w-ink-3); }
 .w-roots li + li { border-top: 1px solid var(--w-line); }
 .w-roots button, .w-roots a { display: flex; align-items: flex-start; gap: 10px; min-height: 48px; padding: 12px 8px; margin: 0 -8px; width: calc(100% + 16px);

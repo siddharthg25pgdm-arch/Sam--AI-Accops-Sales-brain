@@ -50,5 +50,29 @@
  {
   "question": "our existing thin clients",
   "qa_id": null
+ },
+ {
+  "question": "when should i choose citrix over accops",
+  "qa_id": "lp-01"
+ },
+ {
+  "question": "is citrix better than accops",
+  "qa_id": "lp-01"
+ },
+ {
+  "question": "should we stay on citrix",
+  "qa_id": "lp-01"
+ },
+ {
+  "question": "why not citrix",
+  "qa_id": "lp-01"
+ },
+ {
+  "question": "why not just stay with citrix",
+  "qa_id": "lp-01"
+ },
+ {
+  "question": "when is citrix the better choice",
+  "qa_id": "lp-01"
  }
 ]

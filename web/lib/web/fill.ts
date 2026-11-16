@@ -19,6 +19,8 @@ export const LEAD = {
   triage: "Happy to help. Which of these is closest to what you need?", // a vague problem (intent.ts vague)
   // the model's answer was all too-technical detail (plain), so nothing safe is left to say (28 Oct)
   specifics: "That depends on your setup. An engineer can confirm the details for your environment on a short call.",
+  // the model's answer only said when a competitor is the better choice (prefersRival): nothing is left to say (17 Nov)
+  rival: "Where Accops fits depends on your estate. An Accops engineer can assess your environment with you on a short call.",
 } as const;
 export const ENGINEER = "Book a time with an engineer";
 
@@ -125,7 +127,24 @@ const sentences = (s: string) => s.split(/(?<=[.!?])\s+/).filter(Boolean);
 
 // Highlights go on Accops (Siddharth, 27 Oct 2026): a clause about a competitor that doesn't name Accops keeps its words but
 // loses its ** (the first live answer bolded a Citrix strength). ponytail: static rival list; read core.terms if it grows.
-const RIVAL = /\b(citrix|netscaler|vmware|horizon|omnissa|broadcom|azure virtual desktop|avd|windows 365|zscaler|okta)\b/i;
+const RIVALS = "citrix|netscaler|vmware|horizon|omnissa|broadcom|azure virtual desktop|avd|windows 365|zscaler|okta";
+const RIVAL = new RegExp(`\\b(${RIVALS})\\b`, "i");
+
+/** Never recommend a competitor (Siddharth, 17 Nov 2026: "when should I choose citrix over accops" got "Citrix can be the
+ *  better choice for…"). True when a sentence makes a competitor the better / preferred / recommended choice: "choose /
+ *  stay on / stick with / go with Citrix", or a preference word ("better", "best", "the right fit", "recommended"…) whose
+ *  nearest vendor name is a competitor. A name right after than / over / to / versus is the one compared against, so
+ *  "Accops is a better fit than Citrix" stays. ponytail: word distance, not grammar; a false hit only drops a sentence. */
+const STAY = new RegExp(`\\b(stay(ing)?\\s+(with|on)|stick(ing)?\\s+(with|to)|choos(e|ing)|pick(ing)?|go(ing)?\\s+(with|for)|opt(ing)?\\s+for|prefer(ring)?|recommend(ing|s)?)\\s+(${RIVALS})\\b`, "i");
+const BETTER = /\b(better|best|stronger|preferable|preferred|superior|more suitable|right (choice|fit|option|platform)|ideal (choice|fit|option)|recommended|makes? more sense|wins)\b/gi;
+const NAMED = new RegExp(`\\b(than|over|to|versus|vs\\.?)?\\s*\\b(accops|hyworks|hysecure|hyid|hylabs|hydesk|${RIVALS})\\b`, "gi");
+export function prefersRival(s: string) {
+  if (!RIVAL.test(s)) return false;
+  if (STAY.test(s)) return true;
+  const named = [...s.matchAll(NAMED)].filter(m => !m[1]).map(m => ({ at: (m.index ?? 0) + m[0].length - m[2].length, rival: RIVAL.test(m[2]) }));
+  return [...s.matchAll(BETTER)].some(b => named.reduce<(typeof named)[number] | null>((a, w) =>
+    (!a || Math.abs(w.at - (b.index ?? 0)) < Math.abs(a.at - (b.index ?? 0)) ? w : a), null)?.rival);
+}
 export const accopsFirst = (s: string) =>
   s.split(/(?<=[.!?;])\s+/).map(c => RIVAL.test(c) && !/accops/i.test(c) ? c.replace(/\*\*/g, "") : c).join(" ");
 const words = (s: string) => s.replace(/\*/g, "").split(/\s+/).filter(Boolean).length;
@@ -168,19 +187,21 @@ export function plain(text: string): { text: string; dropped: string[] } {
  *  the limits (emphasis.ts), fact-checked against the title + text of the candidates it cites (facts.ts), with ONE
  *  "Based on" pill from the first cite. Then a qa candidate's own approved visual if the model chose one (a doc card
  *  only on a document ask), then a document card for a document ask. Never a page card: pages feed facts only. */
-export function compose(w: Written, cands: Candidate[], pairs: Map<string, Qa>, askedForDoc: boolean): { blocks: Block[]; problems: string[]; dropped: string[] } {
+export function compose(w: Written, cands: Candidate[], pairs: Map<string, Qa>, askedForDoc: boolean): { blocks: Block[]; problems: string[]; dropped: string[]; rival: boolean } {
   const byRef = new Map(cands.map(c => [c.ref, c]));
   const cited = [...new Set(w.cites)].map(r => byRef.get(r)).filter((c): c is Candidate => !!c);
   let kept = "", n = 0;
   for (const s of sentences(w.answer.replace(/\s+/g, " ").trim())) { if (n + words(s) > 70) break; kept += `${kept ? " " : ""}${s}`; n += words(s); }
-  const { text, dropped } = plain(kept);
+  // never a competitor recommended (17 Nov): those sentences go; a bare "Yes." left over says nothing on its own
+  const all = sentences(kept), fair = all.filter(s => !prefersRival(s)), rival = fair.length < all.length;
+  const { text, dropped } = plain(rival && words(fair.join(" ")) < 4 ? "" : fair.join(" "));
   const body = emClean(accopsFirst(text)).replace(/ {2,}/g, " ").trim();
   const src = cited.map(c => source(c.kind === "qa" ? pairs.get(qaId(c.ref))?.sources?.[0] ?? c.url : c.url)).find(Boolean);
   const problems = [
     ...(!cited.length ? ["no cites"] : []), ...(!body ? ["empty or over 70 words"] : []), ...(body.length > 600 ? ["over 600 chars"] : []),
     ...(!src ? ["no source"] : []), ...factCheck(body, cited.map(c => `${c.title}. ${c.text}`)),
   ];
-  if (problems.length) return { blocks: [], problems, dropped };
+  if (problems.length) return { blocks: [], problems, dropped, rival };
   const blocks: Block[] = [{ type: "text", body, source: src, ai: true }];
   const v = byRef.get(w.visual.ref), qa = v?.kind === "qa" ? pairs.get(qaId(v.ref)) : undefined;
   if (qa && w.visual.type !== "text" && v!.types.includes(w.visual.type) && (w.visual.type !== "doc_card" || askedForDoc)) blocks.push(...qaBlocks(qa, w.visual.type));
@@ -188,7 +209,7 @@ export function compose(w: Written, cands: Candidate[], pairs: Map<string, Qa>, 
     const d = [...cited, ...cands].map(docCard).find(Boolean);
     if (d) blocks.push(d);
   }
-  return { blocks, problems: [], dropped };
+  return { blocks, problems: [], dropped, rival };
 }
 
 /** A text's words and core.terms names, as the intent matcher sees them ("@" marks a name: Entra ID meets Azure AD). */
@@ -223,6 +244,7 @@ export function facts(q: string, group: string, first: string[], cands: Candidat
     const body = qa ? qa.answer : c.kind === "fact" ? c.text.replace(/\*/g, "").slice(0, 600) : "";
     const src = source(qa ? qa.sources?.[0] : c.url);
     if (!body || !src || seen.has(body) || (!qa && plain(body).dropped.length)) continue; // a technical page quote is never shown
+    if (sentences(body).some(prefersRival)) continue; // nor a record that makes a competitor the better choice (17 Nov)
     seen.add(body);
     const have = new Set(keys(`${qa?.question ?? c.title}. ${body}`)), rel = want.filter(k => have.has(k)).reduce((s, k) => s + topicWeight(k), 0);
     if (rel > 0) rows.push({ b: { type: "text", body, source: src }, rel });

@@ -113,7 +113,6 @@
 .wt-phone { background: #ffffff; border-radius: 18px; border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 10px 30px rgba(15, 30, 58, .08); overflow: hidden; color-scheme: light; }
 .wt-phone-head { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #0f1e3a; color: #fff; font-size: 13px; font-weight: 600; }
 .wt-phone-head i { width: 18px; height: 18px; border-radius: 6px; background: #c8431c; display: inline-block; }
-.wt-phone-head span { font-weight: 400; opacity: .7; font-size: 11.5px; margin-left: auto; }
 .wt-phone-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; max-height: 620px; overflow: auto; background: #fff; }
 .wt-bubble { align-self: flex-end; max-width: 80%; background: #0f1e3a; color: #fff; border-radius: 14px 14px 4px 14px; padding: 8px 12px; font-size: 14px; line-height: 1.4; }
 .wt-cap { margin: 8px 2px 0; font-size: 11.5px; color: var(--ink-3); }

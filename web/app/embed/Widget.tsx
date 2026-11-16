@@ -38,8 +38,8 @@ export type Qz = { key: string; prompt: string; options: { value: string; label:
 type Item = { id: number; me: string } | { id: number; a: AnswerT; source: string; qa?: string; qz?: Qz };
 type Saved = { c: string; hs: string; at: number; page: string; items: Item[]; recent: number[] };
 
-/** Every Text and Stat must show where it came from (Siddharth, 26 Oct): a Text without a source is not drawn
- *  (a Stat cannot exist without one: the contract requires it). */
+/** Every Text and Stat must have a source (Siddharth, 26 Oct): a Text without one is not drawn (a Stat cannot exist
+ *  without one: the contract requires it). The source is kept for the logs and the fact check, never shown (17 Nov). */
 export const visible = (blocks: Block[]) => blocks.filter(b => b.type !== "text" || !!b.source);
 
 /** One answer, drawn directly: C's Answer root (lead, 40 ms stagger, chips) around the block components. */
@@ -357,7 +357,6 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
           </span>
           <div className="w-head-t">
             <h1>Ask Accops</h1>
-            <p>Answers from accops.com</p>
           </div>
           <button type="button" className="w-x" onClick={close} aria-label="Close chat">
             <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
@@ -369,7 +368,6 @@ export default function Widget({ conversationId, hs: hs0, page, starters: starte
             <div className="w-hello sb-in">
               <p className="w-hello-t">{welcome // "Welcome back! Last time you asked “…”": any **emphasis** as in a Text block
                 ? emSplit(welcome.line).map((t, i) => (i % 2 ? <strong key={i} className="sb-em">{t}</strong> : t)) : "What would you like to know?"}</p>
-              <p className="w-hello-s">Every answer links to its source on accops.com.</p>
               {(offer.length > 0 || book) && (
                 <>
                   <p className="w-eyebrow" id="w-roots">{welcome ? "Pick up where you left off" : "Asked on this page"}</p>

@@ -561,11 +561,11 @@ function QaCard({ b, d }: { b: BankItem; d: WebsiteData }) {
 function Preview({ b }: { b: BankItem }) {
   return (
     <div className="wt-phone" aria-label={`Preview of ${b.id}`}>
-      <div className="wt-phone-head"><i aria-hidden="true" />Ask Accops<span>Answers from accops.com</span></div>
+      <div className="wt-phone-head"><i aria-hidden="true" />Ask Accops</div>
       <div className="wt-phone-body">
         <div className="wt-bubble">{b.question}</div>
         {"error" in b.preview ? <p className="wt-bad">{b.preview.error}</p>
-          : <AnswerRoot lead={b.preview.answer.lead} chips={b.preview.answer.chips} blocks={b.preview.answer.blocks.map((x, i) => <BlockView key={i} b={x} />)} />}
+          : <AnswerRoot sources lead={b.preview.answer.lead} chips={b.preview.answer.chips} blocks={b.preview.answer.blocks.map((x, i) => <BlockView key={i} b={x} />)} />}
       </div>
     </div>
   );

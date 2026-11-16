@@ -600,7 +600,7 @@ ok(!af.includes("**extreme-latency cases**") && af.includes("extreme-latency cas
   const { ENGINE } = await jiti.import("./web/cache.ts");
   ok(/CIO, CISO or IT head, not an engineer/.test(SYSTEM) && /Never give version, port or hardware model numbers, protocol details, configuration steps, compatibility lists or edge-case caveats/.test(SYSTEM)
     && /answer at capability level/.test(SYSTEM) && /ONLY the approved Accops records/.test(SYSTEM), "the system prompt carries the rule (and keeps the eval's canary)");
-  ok(ENGINE === "text-first-4", "cache ENGINE bumped, so answers cached before the rule are never served");
+  ok(/^text-first-[4-9]$/.test(ENGINE), "cache ENGINE bumped, so answers cached before the rule are never served");
   // each rule: the offending sentence goes, the plain one stays
   for (const [why, text, kept] of [
     ["version", "Yes. **HyWorks** supports Nutanix AHV. Recent releases add a connector for Prism Central v7.3 and later.", "Yes. **HyWorks** supports Nutanix AHV."],
@@ -662,6 +662,45 @@ ok(!af.includes("**extreme-latency cases**") && af.includes("extreme-latency cas
   fresh({ cands: [PORTS, CANDS[1]] }); N.slot.openai = false;
   r = await run(typed("is hysecure certified"));
   ok(JSON.stringify(texts(r.body)) === JSON.stringify([CANDS[1].text]), `the technical quote is never a verified fact: ${texts(r.body)}`);
+}
+
+// ---- 17 Nov: never recommend a competitor (Siddharth: "when should I choose citrix over accops" got "Citrix can be the
+// better choice…" and lp-04's "Stay or switch" table). The prompt says so; the server drops any sentence that does it.
+{
+  const { prefersRival, ENGINEER } = await jiti.import("./web/fill.ts");
+  const { SYSTEM } = await jiti.import("./web/model.ts");
+  const { ENGINE } = await jiti.import("./web/cache.ts");
+  ok(/Never recommend a competitor/.test(SYSTEM) && /should we stay on X/.test(SYSTEM) && /engineer can assess their estate/.test(SYSTEM) && /ONLY the approved Accops records/.test(SYSTEM),
+    "the system prompt: never recommend a competitor; say where Accops fits + an engineer (canary kept)");
+  ok(ENGINE === "text-first-5", "cache ENGINE bumped (17 Nov), so the cached pro-Citrix answers are never served");
+  for (const t of ["Citrix can be the better choice for a very large multi-region estate.", "For very large estates, the better fit is Citrix.",
+    "We recommend Citrix if you rely on HDX.", "You may want to stay on Citrix for now.", "Choose Citrix when you have a Citrix CoE.",
+    "Citrix may be better than Accops for large estates.", "VMware Horizon is the right choice for that.", "Omnissa remains stronger for very large estates.",
+    "Azure Virtual Desktop is preferable if you are all-in on Microsoft.", "Stick with AVD if your apps already run there."])
+    ok(prefersRival(t), `a competitor recommended: dropped: "${t}"`);
+  for (const t of ["Accops is a better fit than Citrix for most mainstream workloads.", "Compared with Citrix, Accops is the stronger fit when you want one vendor.",
+    "Accops runs alongside your Citrix environment during the pilot.", "Citrix HDX remains the more mature protocol for extreme-latency cases.",
+    "Accops works best on infrastructure you already own, including VMware.", "Accops is the stronger fit when you want VDI, secure access and identity from one vendor.",
+    "Accops replaces NetScaler, Director, SQL Server and Universal Print Server with one platform.", "Most teams choose Accops over Citrix for one-vendor support."])
+    ok(!prefersRival(t), `not a competitor recommendation: kept: "${t}"`);
+
+  // a model answer with one pro-Citrix sentence: it goes, the rest shows (logged)
+  fresh(); N.openai.push(writes("answered", `${GOOD} Citrix can be the better choice for very large multi-region estates.`, ["fact:hysecure-1"]));
+  r = await run(typed("is hysecure certified or should we stay on citrix"));
+  ok(r.body.source === "model" && r.body.blocks[0].body === GOOD && !/better choice/.test(JSON.stringify(r.body)), `the pro-Citrix sentence dropped, the rest shown: ${r.body.blocks[0].body}`);
+  ok(N.logs[0].error === "competitor_preferred", `logged: ${N.logs[0].error}`);
+  // all of it pro-Citrix: "an engineer can assess your estate" + the calendar CTA, and the chips lead with the calendar
+  fresh(); N.settings.booking_url = BK; N.openai.push(writes("answered", "Yes. Citrix can be the better choice for very large multi-region estates with an established Citrix CoE.", ["fact:hysecure-1"]));
+  r = await run(typed("when should I choose citrix over accops"));
+  ok(r.body.source === "model" && r.body.lead === LEAD.rival && r.body.blocks.map(b => b.type).join() === "cta" && r.body.blocks[0].label === ENGINEER && r.body.blocks[0].url === BK,
+    `nothing left: the engineer line + the calendar: ${JSON.stringify(r.body)}`);
+  ok(r.body.chips[0].id === "book" && r.body.chips[0].url === BK && r.body.chips.length <= 3 && !/better choice/.test(JSON.stringify(r.body)), `chips lead with the calendar: ${r.body.chips.map(c => c.id)}`);
+  ok(/^competitor_preferred; empty or over 70 words/.test(N.logs[0].error) && N.puts[0].src === "model", `logged, cached: ${N.logs[0].error}`);
+  // verified facts never quote a record that makes a competitor the better choice (the LP's own #section-6 line)
+  const FIT = { ref: "fact:fit", kind: "fact", types: ["text"], title: "HySecure fit", text: "HySecure is certified, but Citrix can be the better choice for very large multi-region estates.", url: "https://accops-citrix-lp.vercel.app/#section-6" };
+  fresh({ cands: [FIT, CANDS[1]] }); N.slot.openai = false;
+  r = await run(typed("is hysecure certified"));
+  ok(JSON.stringify(texts(r.body)) === JSON.stringify([CANDS[1].text]), `the pro-Citrix quote is never a verified fact: ${texts(r.body)}`);
 }
 
 console.log(`web-answer.check: ${n} assertions passed`);

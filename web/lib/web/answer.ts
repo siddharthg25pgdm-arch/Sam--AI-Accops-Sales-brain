@@ -190,17 +190,20 @@ export async function ask(req: Request): Promise<Out> {
 
     const cited = w.cites.filter(r => r.startsWith("qa:")).map(qaId);
     const picks = w.followups.map(id => pairs.get(id)).filter((x): x is db.Qa => !!x); // the model's follow-ups, approved only
-    const next = lead1(await more(picks, rel, cited, pairs));
+    let next = lead1(await more(picks, rel, cited, pairs));
     let a: Answer, source: Source = "model";
     if (w.verdict === "none") { a = await fallback(next); source = "fallback"; }
     else {
       const c = compose(w, cands, pairs, doc), top = cited.map(id => pairs.get(id)).find(Boolean);
       let blocks = c.blocks, lead: string | undefined = w.verdict === "partial" ? LEAD.partial : undefined;
-      if (c.dropped.length) m.error = `too_technical: ${c.dropped.join(", ")}`; // logged even when the rest is shown
-      if (c.problems.length && c.dropped.length) { // what the technical detail left can't stand alone: an engineer (28 Oct)
-        m.error = `too_technical: ${c.dropped.join(", ")}; ${c.problems.join("; ")}`.slice(0, 200);
+      // logged even when the rest is shown: too-technical sentences, and any that made a competitor the better choice (17 Nov)
+      const why = [...(c.rival ? ["competitor_preferred"] : []), ...(c.dropped.length ? [`too_technical: ${c.dropped.join(", ")}`] : [])].join("; ");
+      if (why) m.error = why;
+      if (c.problems.length && (c.dropped.length || c.rival)) { // what's left can't stand alone: an engineer (28 Oct, 17 Nov)
+        m.error = `${why}; ${c.problems.join("; ")}`.slice(0, 200);
         blocks = [{ ...cta(s, top), label: ENGINEER } as Block];
-        lead = LEAD.specifics;
+        lead = c.rival ? LEAD.rival : LEAD.specifics;
+        if (c.rival) next = [bookChip(s), ...next.filter(x => x.id !== "book")].slice(0, 3); // the calendar chip first
       } else if (c.problems.length) { // the written answer may not be shown: verified facts instead; the log says what failed
         m.error = `fact_check: ${c.problems.join("; ")}`.slice(0, 200);
         blocks = facts(turn.text, page_group, w.cites, cands, pairs, doc);

@@ -12,9 +12,9 @@
  *  3. The widget bridge (app/embed/bridge.ts): init only from an allowed parent; events strip anything but name/id/source/ref.
  *  4. frame-ancestors on /embed only (next.config.ts), from the same origin list the widget trusts.
  *  5. /embed (page.tsx): notFound while inert; when on, a handshake that verifyHs accepts, cleaned page + q + sec, the starters.
- *  6. Every fixture as the widget draws it: each Text / Stat / table / steps shows its source pill ("Based on" for the
- *     model's written answer); a Text without a source is not drawn; **emphasis** is drawn as <strong class="sb-em">
- *     (never raw asterisks), navy on its highlight band at AA contrast; 3-column tables carry data-col (blocks.css).
+ *  6. Every fixture as the widget draws it: each Text / Stat / table / steps keeps its source in the payload but never
+ *     draws the pill (Siddharth, 17 Nov 2026: no "From …" / "Based on …" under answers); a Text without a source is
+ *     not drawn; **emphasis** is drawn as <strong class="sb-em"> (never raw asterisks), navy on its highlight band at AA contrast; 3-column tables carry data-col (blocks.css).
  *  Stage 3 (27 Oct): the Bookings calendar in the panel only with a valid booking_url and only for talk-to-sales CTAs,
  *  frame-src exactly https://bookings.cloud.microsoft, the Back button, booking_opened allowlisted end to end.
  *  Qualify + routing (27 Oct): the qualifying card (tap-only options, pressed after the tap, thank-you + offers, the
@@ -598,7 +598,7 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
     for (const b of f.answer.blocks) {
       if (["text", "stat", "compare_table", "steps", "calculator"].includes(b.type)) {
         ok(b.source, `${f.id}: ${b.type} has a source`);
-        ok(html.includes(`${b.type === "text" && b.ai ? "Based on" : "From"} ${esc(b.source.label)}`), `${f.id}: ${b.type} shows its source pill`);
+        ok(!html.includes(`${b.type === "text" && b.ai ? "Based on" : "From"} ${esc(b.source.label)}`), `${f.id}: ${b.type} draws no source pill`);
         pills++;
       }
       if (b.type === "text") emSplit(b.body).forEach((t, i) => {
@@ -611,6 +611,7 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   const t = fixtures.find(f => f.id === "lp-28").answer;
   const bare = { ...t, blocks: [{ type: "text", body: "An unsourced claim: 99% faster." }, ...t.blocks] };
   ok(!renderToStaticMarkup(React.createElement(W.AnswerView, { a: bare })).includes("99% faster"), "a Text without a source is not drawn");
+  ok(!/sb-src/.test(fixtures.map(f => renderToStaticMarkup(React.createElement(W.AnswerView, { a: f.answer }))).join("")), "no source pill anywhere in the widget");
   ok(!/\*\*/.test(fixtures.map(f => renderToStaticMarkup(React.createElement(W.AnswerView, { a: f.answer }))).join("")), "no raw ** reaches the page");
   ok(strong >= 2, `emphasis drawn (${strong})`);
   const css = read("components/blocks/blocks.css");
@@ -683,6 +684,7 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
   const wsrc = read("app/embed/Widget.tsx");
   ok(/if \(opensBooking\(booking, action\)\)/.test(wsrc) && /track\("booking_opened"\)/.test(wsrc) && /cta\(String\(params\.url \?\? ""\), String\(params\.action \?\? ""\)\)/.test(wsrc),
     "every talk-to-sales CTA (answer blocks, Prefer a person, the error CTA) goes through opensBooking");
+  ok(/<h1>Ask Accops<\/h1>\s*<\/div>/.test(wsrc) && !/Answers from accops\.com|links to its source/.test(wsrc), "header: just \"Ask Accops\", no subtitle; no hello line promising source links (17 Nov)");
   eq((wsrc.match(/inert=\{inBooking\}/g) || []).length, 3, "the chat underneath (header, thread, input) is inert while the calendar is open");
   const ecss = read("app/embed/embed.css");
   ok(/\.w-book \{ position: absolute; inset: 0;/.test(ecss) && /\.w-book\.on \{ display: flex;/.test(ecss) && /\.w-book-frame iframe \{[^}]*height: 100%/.test(ecss), "the calendar takes the whole sheet (on a phone the loader's frame is full screen)");
@@ -728,5 +730,5 @@ const Br = await jiti.import("@/app/embed/bridge.ts");
     "under 400 px the three fold into the one pill (the 400 px desktop panel shows all three)");
   ok(/\.w-route-l a, \.w-route-t \{[^}]*min-height: 32px;[^}]*font-size: 12\.5px;/.test(rcss), "compact pills, 32 px targets");
 
-  console.log(`web-widget.check: ${n} assertions passed (loader ${gz} B gzip, ${pills} source pills shown, ${strong} emphasised phrases)`);
+  console.log(`web-widget.check: ${n} assertions passed (loader ${gz} B gzip, ${pills} sourced blocks, no pill shown, ${strong} emphasised phrases)`);
 }

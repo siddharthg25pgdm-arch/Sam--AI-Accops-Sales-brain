@@ -213,6 +213,7 @@ ok(h.includes("Missed questions") && h.includes("Does HyWorks support GPU passth
 h = view({ view: "approve", bank: items(bank0) });
 const lp03 = bank0.find(q => q.id === "lp-03");
 ok(h.includes('id="qa-lp-03"') && h.includes(lp03.answer.replace(/'/g, "&#x27;").replace(/&/g, "&amp;").slice(0, 40)) && h.includes("sb-answer") && h.includes("Needs your sign-off"), "approval card: answer, preview drawn with C's blocks, sign-off reason");
+ok(h.includes('class="sb-src"') && !h.includes("Answers from accops.com"), "approval preview: source pills shown to the admin (visitors never see them, 17 Nov), no header subtitle");
 ok(items(bank0).every(i => !("error" in i.preview)), `every draft previews cleanly: ${items(bank0).filter(i => "error" in i.preview).map(i => `${i.id} ${i.preview.error}`)}`);
 ok((h.match(/class="wt-qa /g) ?? []).length === bank0.length, `${bank0.length} drafts waiting (the loaded bank)`);
 h = view({ view: "approve", qaf: "approved", bank: items(F.bankRows(["lp-22"]), new Set()) });

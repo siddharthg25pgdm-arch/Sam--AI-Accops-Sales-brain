@@ -4,8 +4,8 @@ import { emSplit } from "@/lib/emphasis";
 import type { Text as TextT } from "@/lib/blocks";
 import { SourcePill } from "./parts";
 
-/** A verbatim bank answer or page quote ("From ..."), or the model's fact-checked answer ("Based on ..."), with the
- *  provenance pill under it (Lightfield pattern). `**phrase**` is drawn as <strong> (signalling: the few words that
+/** A verbatim bank answer or page quote ("From ..."), or the model's fact-checked answer ("Based on ..."). The provenance
+ *  pill under it shows in the admin preview only (SourcePill; visitors never see it since 17 Nov 2026). `**phrase**` is drawn as <strong> (signalling: the few words that
  *  carry the answer); a screen reader reads it as ordinary text. */
 export function Text({ body, source, ai }: Omit<z.infer<typeof TextT>, "type">) {
   return (

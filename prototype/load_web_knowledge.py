@@ -42,7 +42,8 @@ PAGE_COLS = ["url", "title", "page_type", "products", "industries", "summary", "
 QA_COLS = ["id", "question", "aliases", "answer", "visual", "visual_data", "pages", "parent_id", "nudge_weight",
            "regions", "cta", "cta_url", "sources", "origin"]
 QA_RENAME = {"parent": "parent_id"}
-# Bank keys read by the mapping but not stored (the review sheet keeps evidence/notes; status is always 'draft' here).
+# Bank keys read by the mapping but not stored (the review sheet keeps evidence/notes; status is always 'draft' here,
+# and a pair marked "retired" in the bank is skipped by read_corpus).
 QA_READ = {"short_answer", "status"}
 VISUALS = {"text", "doc_card", "compare_table", "steps", "stat", "picker", "calculator", "cta"}
 MOJIBAKE = re.compile("â€|Ã[\u0080-¿]|â„")
@@ -300,7 +301,9 @@ def read_corpus(ref: str | None) -> tuple[list[dict], list[dict], list[str]]:
             pages += json.loads(read(n)); files.append(n)
         elif re.match(r"^qa-.*\.json$", n):
             d = json.loads(read(n))
-            qa += d if isinstance(d, list) else d.get("pairs") or d.get("qa") or d.get("items") or []
+            # a pair marked "retired" in the bank (17 Nov 2026: lp-04) is never loaded, so it can't come back as a draft
+            qa += [q for q in (d if isinstance(d, list) else d.get("pairs") or d.get("qa") or d.get("items") or [])
+                   if q.get("status") != "retired"]
             files.append(n)
     return pages, qa, files
 

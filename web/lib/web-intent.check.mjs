@@ -70,6 +70,11 @@ eq(evalQs.filter(q => !preGuard(q) && vague(q, "citrix-lp")), [], `no eval quest
 assert.ok(weight("suppor") < weight("sso") && weight("sso") < weight("saml"), "support < SSO < SAML (unknown to the bank: rare)"); n++;
 eq(groupNames("citrix-lp"), ["Citrix"], "the Citrix LP is about Citrix (context there, not a topic)");
 eq(groupNames("general"), [], "no group subject elsewhere");
+// 17 Nov: lp-04 ("When is Citrix still the better choice?") is retired, never in the index; "should we stay on Citrix"
+// questions get lp-01 (how Accops differs), never a pair that recommends a competitor
+eq(ix.intents.some(i => i.qa_id === "lp-04"), false, "lp-04 retired: not in the index");
+for (const q of ["when should I choose citrix over accops", "is citrix better than accops", "should we stay on citrix", "why not citrix", "When is Citrix the better choice?"])
+  eq(id(q), "lp-01", `"${q}" -> lp-01`);
 
 const t0 = performance.now(); let k = 0;
 for (let i = 0; i < 20; i++) for (const q of qs) { intentMatch(q, "citrix-lp"); k++; }

@@ -21,11 +21,11 @@
     ["how do accops features stack up against citrix", "lp-03", "para"],
     ["featur parity with citirx", "lp-03", "typo"],
 
-    ["when should we stay with citrix", "lp-04", "para"],
-    ["when does citrix make more sense than accops", "lp-04", "para"],
-    ["is accops right for a very large multi region citrix estate", "lp-04", "para"],
-    ["in which cases is citrix the better choice", "lp-04", "para"],
-    ["citrix kab better hai", "lp-04", "hinglish"],
+    ["when should we stay with citrix", "lp-01", "para"],
+    ["when does citrix make more sense than accops", "lp-01", "para"],
+    ["is accops right for a very large multi region citrix estate", "lp-69", "para"],
+    ["in which cases is citrix the better choice", "lp-01", "para"],
+    ["citrix kab better hai", "lp-01", "hinglish"],
 
     ["can we move off citrix without any downtime", "lp-05", "para"],
     ["will users face downtime during the migration", "lp-05", "para"],

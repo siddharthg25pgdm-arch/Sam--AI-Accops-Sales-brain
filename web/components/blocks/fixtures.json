@@ -72,8 +72,8 @@
       "label": "How does Accops compare with Citrix feature by feature?"
      },
      {
-      "id": "lp-04",
-      "label": "When is Citrix still the better choice?"
+      "id": "lp-21",
+      "label": "How much does Accops cost compared with Citrix?"
      }
     ]
    }
@@ -192,8 +192,8 @@
     ],
     "chips": [
      {
-      "id": "lp-04",
-      "label": "When is Citrix still the better choice?"
+      "id": "lp-21",
+      "label": "How much does Accops cost compared with Citrix?"
      },
      {
       "id": "lp-15",
@@ -668,8 +668,8 @@
       "label": "Which Citrix components does Accops replace?"
      },
      {
-      "id": "lp-04",
-      "label": "When is Citrix still the better choice?"
+      "id": "lp-21",
+      "label": "How much does Accops cost compared with Citrix?"
      }
     ]
    }

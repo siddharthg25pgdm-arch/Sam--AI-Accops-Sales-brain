@@ -1,5 +1,5 @@
 "use client";
-// Shared bits for the answer blocks: the action bridge, the provenance pill and the few icons.
+// Shared bits for the answer blocks: the action bridge, the provenance pill (admin preview only) and the few icons.
 import { createContext, useContext, type ReactNode } from "react";
 import type { z } from "zod";
 import type { Source } from "@/lib/blocks";
@@ -12,7 +12,12 @@ export type Act = (type: ActType, params: Record<string, unknown>, label: string
 export const ActCtx = createContext<Act>(() => false);
 export const useAct = () => useContext(ActCtx);
 
+/** Visitors never see the provenance pill (Siddharth, 17 Nov 2026). Blocks keep their `source` (logs, fact check); only
+ *  the admin preview turns it on (<Answer sources>). */
+export const ShowSrcCtx = createContext(false);
+
 export function SourcePill({ source, lead = "From" }: { source: z.infer<typeof Source>; lead?: "From" | "Based on" }) {
+  if (!useContext(ShowSrcCtx)) return null;
   return (
     <a className="sb-src" href={source.url} target="_blank" rel="noopener noreferrer" title={source.url}>
       <Icon d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 013.5 3.5l-1 1M9 11.5l-1 1A2.5 2.5 0 014.5 9l1-1" />

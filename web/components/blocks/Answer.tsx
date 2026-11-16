@@ -1,13 +1,15 @@
 "use client";
 import { useEffect, useState, type ReactNode } from "react";
 import type { Chip } from "@/lib/blocks";
-import { useAct } from "./parts";
+import { ShowSrcCtx, useAct } from "./parts";
 
-/** The answer root: the fixed lead line, the blocks staggered in 40 ms apart, then up to 3 follow-up chips. */
-export function Answer({ lead, blocks, chips }: { lead?: string | null; blocks: ReactNode[]; chips: Chip[] }) {
+/** The answer root: the fixed lead line, the blocks staggered in 40 ms apart, then up to 3 follow-up chips.
+ *  `sources` draws the blocks' provenance pills: the admin preview only, never a visitor (17 Nov 2026). */
+export function Answer({ lead, blocks, chips, sources = false }: { lead?: string | null; blocks: ReactNode[]; chips: Chip[]; sources?: boolean }) {
   const act = useAct();
   let k = 0;
   return (
+    <ShowSrcCtx.Provider value={sources}>
     <div className="sb sb-answer">
       {lead && <p className="sb-lead sb-in" style={{ ["--i" as string]: k++ }}>{lead}</p>}
       {blocks.map((b, i) => <div key={i} className="sb-in" style={{ ["--i" as string]: k++ }}>{b}</div>)}
@@ -26,6 +28,7 @@ export function Answer({ lead, blocks, chips }: { lead?: string | null; blocks: 
         </ul>
       )}
     </div>
+    </ShowSrcCtx.Provider>
   );
 }
 

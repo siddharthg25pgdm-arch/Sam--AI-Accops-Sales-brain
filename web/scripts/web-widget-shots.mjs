@@ -54,7 +54,7 @@ const ROOTS = [
   { id: "lp-03", label: "How does Accops compare with Citrix feature by feature?" },
   { id: "lp-02", label: "Which Citrix components does Accops replace?" },
 ];
-const CLICK = { "lp-01": "lp-01", "lp-03": "lp-03", "lp-05": "lp-05", "lp-02": "lp-02-stat", "lp-13": "lp-13", "lp-19": "lp-19", "lp-26": "lp-28", "lp-25": "lp-22", "lp-04": "partial", "lp-15": "partial" };
+const CLICK = { "lp-01": "lp-01", "lp-03": "lp-03", "lp-05": "lp-05", "lp-02": "lp-02-stat", "lp-13": "lp-13", "lp-19": "lp-19", "lp-26": "lp-28", "lp-25": "lp-22", "lp-21": "partial", "lp-15": "partial" };
 const TYPED = [[/replac/i, "picker", "intent"], [/bank|regulat/i, "lp-28", "intent"], [/nutanix|hypervisor/i, "partial", "model"], [/gateway|brochure|pdf/i, "lp-19", "intent"],
   [/discount|price/i, "fallback", "guard"], [/slow/i, "lp-22", "model"]];
 const asks = [], events = [];
@@ -218,8 +218,8 @@ try {
     await fr.waitForFunction(() => document.querySelectorAll(".w-bot .sb-answer").length >= 5);
     await wait(900);
     await shot(page, `${W}-10-stat`);
-    const pillsOk = await fr.evaluate(() => [...document.querySelectorAll(".sb-text, .sb-stat")].every(b => { const p = b.querySelector(".sb-src"); if (!p) return false; const r = p.getBoundingClientRect(); return r.width > 40 && r.height >= 20 && getComputedStyle(p).visibility === "visible"; }));
-    pass(`${W}: every Text and Stat shows a visible source pill`, pillsOk);
+    const pillsOk = await fr.evaluate(() => document.querySelectorAll(".sb-src").length === 0 && document.querySelectorAll(".sb-text, .sb-stat").length > 0);
+    pass(`${W}: no source pill under any answer (Siddharth, 17 Nov 2026)`, pillsOk);
 
     // the ask bodies the widget sent
     const mine = asks.slice(-5);

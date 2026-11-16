@@ -491,9 +491,9 @@
   "approval_reasons": [
    "competitor claim"
   ],
-  "status": "draft",
+  "status": "retired",
   "origin": "claude_draft",
-  "notes": "Trust-building answer; keep it even though it concedes ground."
+  "notes": "RETIRED 17 Nov 2026 (Siddharth): the bot must never recommend a competitor. Retired in sam_web_qa; the loader skips retired pairs, so it is never re-inserted. Questions like this map to lp-01 (prototype/web_intent_learned.json)."
  },
  {
   "id": "lp-05",
