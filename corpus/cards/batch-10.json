@@ -2341,7 +2341,7 @@
   },
   {
    "source": "sharepoint/Nigeria Event PPT V1.0.pptx",
-   "title": "Secure Gateway to a Border-less Digital Workspace: Nigeria / Africa Event Deck (Sep 2026) - 'Africa at Risk' Statistics, Isolation, Single-Vendor Platform, Competitor Comparison vs Citrix, Omnissa, AVD, SSE, Okta",
+   "title": "Secure Gateway to a Border-less Digital Workspace: Nigeria / Africa Event Deck (Nov 2026 revision) - AI-Found Vulnerabilities, Open-Source / End-of-Life Exposure, 'Africa at Risk' INTERPOL Statistics, Isolation, Single-Vendor Platform, Competitor Comparison vs Citrix, Omnissa, AVD, SSE, Okta",
    "asset_type": "Deck",
    "industry": "",
    "client": "Anonymised largest-customers slide, reference and MEA customer logo slides, global-footprint map",
@@ -2353,8 +2353,11 @@
     "HyWorks",
     "Enterprise Browser",
     "HyDesk",
+    "Remote Browser Isolation",
+    "Thin Clients",
     "ZTNA",
     "VDI",
+    "DaaS",
     "MFA",
     "SSO",
     "Digital Workspace"
@@ -2374,25 +2377,26 @@
     "partner"
    ],
    "regulations": [],
-   "key_problem": "Africa faces the highest attack volume on the planet on a cybersecurity budget comparable to a single European country, with AI now driving most reported cybercrime, while patching and point tools cannot keep up.",
+   "key_problem": "Africa faces the highest attack volume on the planet on a cybersecurity budget comparable to a single European country, while AI now finds and chains software vulnerabilities faster than humans and most enterprise code still carries vulnerable or end-of-life open-source components - so patching and point tools cannot keep up.",
    "key_outcomes": [
-    "'Africa at risk' (slide 5): about 200 million cyber-threat detections a week across 54 countries; 55% of reported cybercrime now AI-enabled; drivers incl. scams/phishing 17%, identity theft/financial fraud 14%, sextortion 14%; continent's security spend compared with a single European nation (Gartner, IDC, cioafrica.co)",
-    "Common 2026 threat storyline (AI vulnerability discovery, open-source/EOL exposure, current tools fall short) and 'isolate your crown jewels'",
-    "Tool map, vendor sprawl and single-vendor value; company, two years in the Gartner DaaS MQ (2025 & 2026), technology partners, customers",
-    "Competitor comparison table (slide 19): Accops Digital Workspace vs Citrix, Omnissa, AVD, SSE and Okta/OneLogin on Linux VDI, private-cloud/on-prem, SaaS control plane, perpetual pricing, integrated secure access gateway ('NetScaler is separate cost') and more",
+    "New AI-threat opening (slides 3-5): AI models have surpassed humans at finding and exploiting vulnerabilities, citing a 27-year-old remote crash in OpenBSD, a 16-year-old FFmpeg flaw and an autonomously chained Linux-kernel privilege escalation (attributed on the slide to an Anthropic model preview), then a critical-threat wall (ransomware-as-a-service, synthetic identity fraud, supply chain, prompt injection, deepfake phishing, 'harvest now, decrypt later', polymorphic malware)",
+    "Legacy and open-source exposure (slide 4): 86% of commercial codebases contain vulnerable open-source components, 81% of those carry high- or critical-risk vulnerabilities, 5-15% of enterprise dependency graphs are already end-of-life, and 218 new vulnerabilities appear per end-of-life component every 6 months",
+    "'Africa at risk' (slide 6): about 200 million cyber-threat detections a week across 54 countries; 55% of reported cybercrime now AI-enabled, with attack-type percentages (scams/phishing 17%, identity theft/financial fraud 14%, sextortion 14%, data breaches 11%, business email compromise 10%, ransomware/banking trojans 7%, critical infrastructure 6%) now attributed on the slide to INTERPOL's African Cyberthreat Assessment Report 2026, published 3 August 2026 on 2025 reported cases; the spend comparison chart still credits Gartner, IDC and cioafrica.co",
+    "'Current tools fall short' and 'isolate your crown jewels', then the tool map, vendor sprawl and single-vendor value; company credentials, two years in the Gartner DaaS Magic Quadrant (2025 & 2026), technology partners, reference customers and MEA reference customers by sector",
+    "Competitor comparison table (slide 20): Accops Digital Workspace vs Citrix, Omnissa, AVD, SSE and Okta/OneLogin on Linux VDI, private-cloud/on-prem, SaaS control plane (Accops marked '2026'), perpetual pricing, integrated secure access gateway ('NetScaler is separate cost'), thin clients, hypervisor support and more",
     "Presented by Accops' Business Director for Africa; closes with 'Meet us in Hall 5, booth H5-002'"
    ],
-   "brief": "A 21-slide event deck for a Nigeria / Africa event (last saved September 2026) presented by Accops' Africa business director. It adapts the 2026 corporate storyline with an Africa-specific threat slide, then the isolation and single-vendor argument, company credentials, global footprint, customers and a feature comparison against Citrix, Omnissa, AVD, SSE vendors and Okta/OneLogin.",
-   "use_for": "Africa prospects and partners (Nigeria, Kenya, Uganda and others): slide 5 for regional threat statistics, slide 19 as a current competitor comparison table. The only Africa-specific material found so far.",
+   "brief": "A 22-slide event deck for a Nigeria / Africa event, revised 19 November 2026 and presented by Accops' Africa business director (slide 2 has no extractable text). This revision opens with three new threat slides - AI-discovered vulnerabilities, open-source and end-of-life exposure, and a critical-threat wall - ahead of the Africa-specific threat slide, which now carries an INTERPOL source line. From there it runs the familiar storyline: current tools fall short, isolate your crown jewels, the tool map and vendor sprawl, the single-vendor argument, company credentials, global footprint, reference and MEA customers, the largest-customers install base, and a feature comparison against Citrix, Omnissa, AVD, SSE vendors and Okta/OneLogin. Every slide number has shifted by one from the September 2026 version.",
+   "use_for": "Africa prospects and partners (Nigeria, Kenya, Uganda and others): slides 3-4 for the AI and open-source threat framing, slide 6 for regional threat statistics, slide 20 as the current competitor comparison table. Still the only Africa-specific material found so far.",
    "publish_year": "2026",
    "expired": false,
-   "stale_risk": "September 2026 and current. About slide says '2023 & 2024 Gartner MQ' while slide 14 says 2025 & 2026. Africa statistics rest on mixed sources incl. a trade website.",
+   "stale_risk": "Revised November 2026 and current. The About-us slide still says '2023 & 2024 Gartner Magic Quadrant' while slide 15 says two consecutive years 2025 & 2026 - the About-us slide was not updated. The Africa headline figure and spend chart rest on mixed sources including a trade website; only the attack-type percentages carry the INTERPOL attribution.",
    "superseded_by": "",
-   "confidence": 0.8,
+   "confidence": 0.85,
    "public_url": "",
    "visibility": "internal",
    "internal_reason": "Event deck with competitor comparison; no verified public URL.",
-   "needs_human": "Verify the Africa statistics' sources before quoting them in writing. Is there an Africa customer reference to add?"
+   "needs_human": "Updated 19 November 2026: three new threat slides were added at the front, so every slide number moved by one from the September version - re-check any talk track or handout that cites slide numbers. The Africa attack-type percentages now cite INTERPOL's African Cyberthreat Assessment Report 2026 (3 August 2026), which answers the earlier sourcing question; the 200-million-detections-a-week figure and the spend-comparison chart still do not. Confirm the slide 3 attribution to an Anthropic model preview is cleared for external use, and fix the About-us slide's '2023 & 2024' Gartner line. Is there an Africa customer reference to add?"
   },
   {
    "source": "sharepoint/Savex_Accops Partner 30 mins 2026.pptx",
